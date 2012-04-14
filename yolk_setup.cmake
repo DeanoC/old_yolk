@@ -4,7 +4,7 @@ cmake_policy( VERSION 2.8.2 )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set( LLVM_ROOT "${CMAKE_CURRENT_BINARY_DIR}/third/llvm" CACHE PATH "Root of LLVM install.")
+set( LLVM_ROOT "${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm" CACHE PATH "Root of LLVM install.")
 
 LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 
@@ -68,12 +68,10 @@ if( OPENCL_FOUND AND USE_OPENCL )
 	link_directories( ${OPENCL_LIB_DIR} )
 endif( OPENCL_FOUND AND USE_OPENCL )
 
-
-include_directories( "${WIERD_PATH}/third/glog/include/" )
+include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/glog/include/" )
 LIST( APPEND CMAKE_MODULE_PATH "${LLVM_ROOT}/share/llvm/cmake" )
-#include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/third/llvm/include/" )
-#include_directories( "${CMAKE_CURRENT_BINARY_DIR}/third/llvm/include/" )
+include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/submodules/llvm/include/" )
+include_directories( "${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm/include/" )
+include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/submodules/json-spirit/" )
 
-include_directories( "${WIERD_PATH}/third/" )
-
-set( Core_LIBRARIES core ${Boost_LIBRARIES} glog ${TBB_LIBRARY_DIRS} )
+set( Core_LIBRARIES core ${Boost_LIBRARIES} glog )

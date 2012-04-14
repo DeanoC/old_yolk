@@ -1,0 +1,9 @@
+[submodule "submodules/compiler-rt"]
+	path = submodules/compiler-rt
+	url = git@bitbucket.org:DeanoC/llvm.git
+[submodule "submodules/llvm"]
+	path = submodules/llvm
+	url = git@bitbucket.org:DeanoC/llvm.git
+[submodule "submodules/json-spirit"]
+	path = submodules/json-spirit
+	url = git://gitorious.org/json-spirit/json-spirit.git
