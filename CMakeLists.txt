@@ -1,10 +1,14 @@
 cmake_minimum_required( VERSION 2.8.2 )
 
 # make overrides installed
-set( CMAKE_USER_MAKE_RULES_OVERRIDE
-   ${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/c_flag_overrides.cmake )
-set( CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-   ${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/cxx_flag_overrides.cmake )
+if(MSVC)
+	set( CMAKE_USER_MAKE_RULES_OVERRIDE
+   		${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/c_flag_overrides.cmake )
+	set( CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
+   		${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/cxx_flag_overrides.cmake )
+else()
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "CXX Flags" )
+endif()
 
 # top level wierd cmake file
 project( Yolk )
@@ -12,7 +16,8 @@ project( Yolk )
 include( yolk_setup.cmake )
 
 # tell it to recurse into the third party dir
-add_subdirectory( submodules )
+# do manually for now
+#add_subdirectory( submodules )
 
 # tell it to recurse into the source dir
 add_subdirectory( src )
