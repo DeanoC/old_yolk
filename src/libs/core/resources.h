@@ -79,7 +79,6 @@ public:
 private:
 	ScopedAsyncResourceHandle& operator= (const ScopedAsyncResourceHandle&);
 
-	typedef typename arh::ResourcePtr ResourcePtr;
 	const arh*	 handle;	
 };
 

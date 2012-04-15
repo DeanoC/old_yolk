@@ -58,10 +58,17 @@ inline bool isnormal( double a )
 #if defined( USE_DX11 )
 #	include "vector_math_dx10.h"
 #else
+#endif //end USE_DX11
 
-#endif
+#else
 
-#endif
+namespace Core {
+	using std::isnan;
+	using std::isfinite;
+	using std::isnormal;
+}
+
+#endif // end WIN32
 
 // if there is no platform specific version fall back to a standard C implementation
 #if !defined(PLATFORM_SPECIFIC_VECTOR_MATH_DEFINED)

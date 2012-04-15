@@ -6,7 +6,7 @@
 
 #include "core/core.h"
 
-#include "FileIO.h"
+#include "fileio.h"
 #include <cstdio>
 
 namespace Core

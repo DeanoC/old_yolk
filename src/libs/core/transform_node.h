@@ -92,7 +92,7 @@ protected:
 	//! local scale
 	Math::Vector3		scale;
 	//! cached transform matrix made when needed if position and orientation have changed
-	mutable Math::Matrix4x4&	transform;
+	mutable Math::Matrix4x4*	transform;
 	//! flag for whether to transform matrix is currently valid
 	mutable bool				transformCached;
 

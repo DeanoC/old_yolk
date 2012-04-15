@@ -86,7 +86,7 @@
 #	if(PLATFORM == WINDOWS)
 #		include "platform_windows/debug_win.h"
 #	else
-#		include "platform_posix/debug_Core.h"
+#		include "platform_posix/debug_std.h"
 #	endif
 
 	namespace Core {

@@ -90,10 +90,10 @@ void Rasteriser::Reset( RasteriserTriangle const* triangle )
 	float bottom = std::max( std::max( m_current.y[0], m_current.y[1] ), m_current.y[2] );
 
 	// rely on casting doing truncation
-	m_left   = std::max( unsigned int( 0 ), unsigned int( left ) );
-	m_right  = std::min( m_width, unsigned int( right ) + 1 );
-	m_top    = std::max( unsigned int( 0 ), unsigned int( top ) );
-	m_bottom = std::min( m_height, unsigned int( bottom ) + 1 );
+	m_left   = std::max( (unsigned int)( 0 ), (unsigned int)( left ) );
+	m_right  = std::min( m_width, (unsigned int)( right ) + 1 );
+	m_top    = std::max( (unsigned int)( 0 ), (unsigned int)( top ) );
+	m_bottom = std::min( m_height, (unsigned int)( bottom ) + 1 );
 
 	// pre-compute a barycentric coordinate constant
 	m_baryConstRcp = 1.0f/( 

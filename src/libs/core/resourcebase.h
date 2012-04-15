@@ -71,7 +71,7 @@ public:
 	// helper to acquire an class that inherits off Resource<type>
 	template<class T>
 	Core::shared_ptr<T> Acquire() const {
-		return Core::shared_static_cast<T>( BaseAcquire() );
+		return boost::shared_static_cast<T>( BaseAcquire() );
 	}
 
 	//! acquire a typed resource 

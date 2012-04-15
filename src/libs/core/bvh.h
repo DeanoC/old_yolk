@@ -94,7 +94,7 @@ public:
 	virtual void drawDebug( const Core::TransformNode* transform, Core::Frustum* frustum );
 
 
-	Core::poolvector<Node>	m_nodes;	//!< The nodes of the bvh
+	Core::vector<Node>	m_nodes;	//!< The nodes of the bvh
 // TODO made public to quickly get linux build to work. FIXME
 //protected:
 

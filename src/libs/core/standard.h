@@ -203,7 +203,7 @@ namespace Core
 	using std::iter_swap;
 	using std::iterator;
 	using std::reverse_iterator;
-	using std::reverse_bidirectional_iterator;
+//	using std::reverse_bidirectional_iterator;
 	using std::input_iterator_tag;
 	using std::output_iterator_tag;
 	using std::forward_iterator_tag;
@@ -492,12 +492,12 @@ namespace Core
 	// http://wwwasd.web.cern.ch/wwwasd/lhc++/RW/stdlibcr/classref.htm
 
 	using std::tr1::swap;
-	using std::tr1::operator ==;
-	using std::tr1::operator !=;
-	using std::tr1::operator <;
-	using std::tr1::operator <=;
-	using std::tr1::operator >;
-	using std::tr1::operator >=;
+//	using std::tr1::operator ==;
+//	using std::tr1::operator !=;
+//	using std::tr1::operator <;
+//	using std::tr1::operator <=;
+//	using std::tr1::operator >;
+//	using std::tr1::operator >=;
 	using std::tr1::hash;
 	using std::tr1::bad_function_call;
 	using std::tr1::bind;
@@ -629,7 +629,7 @@ namespace Core
 	using std::tr1::exponential_distribution;
 	using std::tr1::normal_distribution;
 	using std::tr1::gamma_distribution;
-	using std::tr1::_Rng_abort;
+//	using std::tr1::_Rng_abort;
 
 	// tr1 unordered_map and unordered_set
 	using std::tr1::unordered_set;

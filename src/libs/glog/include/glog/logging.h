@@ -44,7 +44,7 @@
 #include <string.h>
 #include <time.h>
 #include <string>
-#if 0
+#if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 #ifdef __DEPRECATED
@@ -65,23 +65,23 @@
 // Note: these commands below may look like "#if 1" or "#if 0", but
 // that's because they were constructed that way at ./configure time.
 // Look at logging.h.in to see how they're calculated (based on your config).
-#if 0
+#if HAVE_STDINT_H
 #include <stdint.h>             // the normal place uint16_t is defined
 #endif
-#if 0
+#if HAVE_SYS_TYPES_H
 #include <sys/types.h>          // the normal place u_int16_t is defined
 #endif
-#if 0
+#if HAVE_INTTYPES_H
 #include <inttypes.h>           // a third place for uint16_t or u_int16_t
 #endif
 
-#if 0
+#if HAVE_LIB_GFLAGS
 #include <gflags/gflags.h>
 #endif
 
 namespace google {
 
-#if 0      // the C99 format
+#if 1      // the C99 format
 typedef int32_t int32;
 typedef uint32_t uint32;
 typedef int64_t int64;
@@ -91,7 +91,7 @@ typedef int32_t int32;
 typedef u_int32_t uint32;
 typedef int64_t int64;
 typedef u_int64_t uint64;
-#elif 1    // the windows (vc7) format
+#elif 0    // the windows (vc7) format
 typedef __int32 int32;
 typedef unsigned __int32 uint32;
 typedef __int64 int64;
@@ -121,7 +121,7 @@ typedef unsigned __int64 uint64;
 // the absence of better information (ie. -fprofile-arcs).
 //
 #ifndef GOOGLE_PREDICT_BRANCH_NOT_TAKEN
-#if 0
+#ifdef HAVE___BUILTIN_EXPECT
 #define GOOGLE_PREDICT_BRANCH_NOT_TAKEN(x) (__builtin_expect(x, 0))
 #else
 #define GOOGLE_PREDICT_BRANCH_NOT_TAKEN(x) x

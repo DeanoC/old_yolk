@@ -16,7 +16,7 @@ TransformNode::TransformNode( Math::Matrix4x4& result ) :
 	position( Math::Vector3(0,0,0) ),
 	orientation( Math::IdentityQuat() ),
 	scale( Math::Vector3(1,1,1) ),
-	transform( result ),
+	transform( &result ),
 	transformCached( false ),
 	parent( 0 ) {
 }
@@ -66,14 +66,14 @@ const Math::Matrix4x4 TransformNode::getLocalTransform() const {
 
 const Math::Matrix4x4& TransformNode::getWorldTransform() const {
 	if( !transformCached ) {
-		transform = getLocalTransform();
+		*transform = getLocalTransform();
 		if( parent != 0  ) {
-			transform = parent->getWorldTransform() * transform;
+			*transform = parent->getWorldTransform() * *transform;
 		}
 		transformCached = true;
 	} 
 
-	return transform;
+	return *transform;
 
 }
 void TransformNode::setParent( TransformNode* _parent ) {
