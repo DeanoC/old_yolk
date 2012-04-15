@@ -66,7 +66,7 @@ class ScopedAsyncResourceHandle {
 public:
 	typedef typename arh::ResourcePtr ResourcePtr;
 
-	explicit ScopedAsyncResourceHandle() : handle(nullptr) {}
+	explicit ScopedAsyncResourceHandle() : handle(NULL) {}
 
 	explicit ScopedAsyncResourceHandle( const arh* _handle ) : handle(_handle) {}
 	~ScopedAsyncResourceHandle() { if( handle ) handle->Close(); }
