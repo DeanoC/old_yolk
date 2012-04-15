@@ -13,6 +13,10 @@
 #ifndef WIERD_CORE_CORE_H
 #define WIERD_CORE_CORE_H
 
+#define __STDC_LIMIT_MACROS
+#define __STDC_CONSTANT_MACROS
+
+
 // set up the platform level defines
 #include "platform.h"
 
@@ -55,6 +59,7 @@
 #define USE_CPP_EXCEPTIONS
 
 #define GC_NOT_DLL
+
 //#define USE_GC
 #include "memory.h"
 #include <cassert>
