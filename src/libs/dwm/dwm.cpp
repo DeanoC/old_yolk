@@ -11,6 +11,11 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "vmthread.h"
 
+#define DECL_INEXEBITCODE( NAME ) extern const unsigned char* binary_data_vm_code_##NAME##_cpp; extern size_t binary_data_vm_code_##NAME##_cpp_sizeof;
+#define MEMFILE_INEXEBITCODE( NAME )  MemFile( (uint8_t*) binary_data_vm_code_##NAME##_cpp, binary_data_vm_code_##NAME##_cpp_sizeof )
+
+DECL_INEXEBITCODE( helloworld );
+
 Dwm::Dwm() :
 	context( llvm::getGlobalContext() ) {
 }
@@ -32,7 +37,7 @@ llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
 	using namespace Core;
 	using namespace llvm;
 
-	uint64_t bcLen = inny.tell();
+	uint64_t bcLen = inny.bytesLeft();
 
 	// note on 32 bit system only load max 32 bit file size (no harm)
 	MemoryBuffer *bcBuffer = MemoryBuffer::getNewMemBuffer( (size_t) bcLen );
@@ -48,8 +53,9 @@ void Dwm::bootstrapLocal() {
 	auto hwThreads = Core::thread::hardware_concurrency();
 
 	// load initial bitcode modules
-	auto init0bc = loadBitCode( FilePath( FILE_PATH_LITERAL("./init0.bc") ) );
+//	auto init0bc = loadBitCode( FilePath( FILE_PATH_LITERAL("./init0.bc") ) );
 //	auto initNbc = loadBitCode( FilePath( FILE_PATH_LITERAL("./initN.bc") ) );
+   auto init0bc = loadBitCode( MEMFILE_INEXEBITCODE( helloworld ) );
 
 	// init thread0 into llvm execution environment
 	auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this, init0bc ) );

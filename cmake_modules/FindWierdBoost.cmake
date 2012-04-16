@@ -25,7 +25,7 @@ endif()
 add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
 
 # pick the right boost
-set( Boost_USE_STATIC_LIBS   OFF )
+set( Boost_USE_STATIC_LIBS   ON )
 set( Boost_USE_STATIC_RUNTIME OFF )
 set( Boost_USE_MULTITHREADED ON )
 set( BOOST_VERSION 1.48.0 )
