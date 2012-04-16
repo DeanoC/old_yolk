@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "core/clock.h"
 #include "core/sysmsg.h"
+#include "dwm/dwm.h"
 
 #define START_FULLSCREEN	false
 #define START_WIDTH			1280/2
@@ -24,6 +25,8 @@ void DebugModeCallback( int debugMode ) {
 	g_iDebugMode = debugMode;
 }
 
+Core::shared_ptr<Dwm> dwm;
+
 int Main() {
 	using namespace Core;
 
@@ -31,6 +34,9 @@ int Main() {
 	SystemMessage::Get()->RegisterDebugModeChangeCallback( DebugModeCallback );
 
 	InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
+
+	dwm.reset( new Dwm );
+	dwm->bootstrapLocal();
 
 	MainLoop();
 

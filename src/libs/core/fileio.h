@@ -23,15 +23,15 @@ class InOutInterface {
 public:
 	virtual ~InOutInterface(){}
 		
-	virtual void Close() = 0;
-	virtual bool IsValid() = 0;
+	virtual void close() = 0;
+	virtual bool isValid() = 0;
 		
-	virtual uint64_t Read(uint8_t* _buffer, uint64_t _bytes) = 0;
+	virtual uint64_t read(uint8_t* _buffer, uint64_t _bytes) = 0;
 		
-	virtual uint64_t Tell() = 0;
-	virtual void SeekFromStart( uint64_t _seek ) = 0;
-	virtual uint64_t BytesLeft() = 0;
-	virtual uint8_t GetByte() = 0;
+	virtual uint64_t tell() = 0;
+	virtual void seekFromStart( uint64_t _seek ) = 0;
+	virtual uint64_t bytesLeft() = 0;
+	virtual uint8_t getByte() = 0;
 };
 
 
@@ -39,24 +39,24 @@ class File : public InOutInterface {
 public:
 	File() : fh(NULL) {}
 	File( const char* _path ) : fh(NULL) {
-		Open(_path);
+		open(_path);
 	}
 	~File() {
-		Close();
+		close();
 	}
 		
-	bool Open( const char* _path );
-	virtual void Close();
-	virtual bool IsValid() {
+	bool open( const char* _path );
+	virtual void close();
+	virtual bool isValid() {
 		return (fh != NULL);
 	}
 		
-	virtual uint64_t Read(uint8_t* _buffer, uint64_t _len);
+	virtual uint64_t read(uint8_t* _buffer, uint64_t _len);
 
-	virtual uint64_t Tell();
-	virtual void SeekFromStart( uint64_t _seek );		
-	virtual uint64_t BytesLeft();
-	virtual uint8_t GetByte();
+	virtual uint64_t tell();
+	virtual void seekFromStart( uint64_t _seek );		
+	virtual uint64_t bytesLeft();
+	virtual uint8_t getByte();
 protected:
 	FILE* fh;
 };
@@ -70,16 +70,16 @@ public:
 		m_Size = _size;
 		m_Offset = 0;
 	}
-	virtual void Close(){
+	virtual void close(){
 		CORE_DELETE_ARRAY m_Buffer;
 		m_Buffer = 0;
 	}
-	virtual bool IsValid() {
+	virtual bool isValid() {
 		return (m_Buffer != NULL);
 	}
 		
 
-	virtual uint64_t Read( uint8_t* _buffer, uint64_t _len ){
+	virtual uint64_t read( uint8_t* _buffer, uint64_t _len ){
 		if ( m_Offset + _len > m_Size ) {
 			_len = m_Size - m_Offset;
 		}
@@ -89,13 +89,13 @@ public:
 		return _len;
 	}
 
-	virtual uint64_t Tell() {
+	virtual uint64_t tell() {
 		return m_Offset;
 	}
-	virtual void SeekFromStart( uint64_t _seek ) {
+	virtual void seekFromStart( uint64_t _seek ) {
 		m_Offset = _seek;
 	}
-	virtual uint8_t GetByte() {
+	virtual uint8_t getByte() {
 		if( m_Offset > m_Size)
 			return 0;
 		if( m_Offset < 0 )

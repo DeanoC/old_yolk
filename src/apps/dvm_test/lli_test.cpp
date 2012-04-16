@@ -1,25 +1,5 @@
 
 #include "core/core.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "llvm/Type.h"
-#include "llvm/ADT/Triple.h"
-#include "llvm/Bitcode/ReaderWriter.h"
-#include "llvm/CodeGen/LinkAllCodegenComponents.h"
-#include "llvm/ExecutionEngine/GenericValue.h"
-#include "llvm/ExecutionEngine/Interpreter.h"
-#include "llvm/Support/IRReader.h"
-#include "llvm/Support/ManagedStatic.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/PluginLoader.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/Process.h"
-#include "llvm/Support/Signals.h"
-#include <cerrno>
-#include "json_spirit/json_spirit_reader.h"
-using namespace llvm;
-
-static ExecutionEngine *EE = 0;
 
 // Yolkside
 //
@@ -38,10 +18,10 @@ typedef uint32_t YolkObjectType;
 
 class YolkModule {
 public:
-	llvm::Module* ir;
+//	llvm::Module* ir;
 
 	std::vector< const char* >		exportNames;
-	std::vector< llvm::Function* >	exportsFuncs;
+//	std::vector< llvm::Function* >	exportsFuncs;
 };
 
 class YolkApi {
@@ -157,8 +137,6 @@ YolkREMFragment* LoadIR( const char* irFileName ) {
 // main Driver function
 //
 int CallREM( const char* irFileName ) {
-
-	LLVMContext &Context = getGlobalContext();
 
 	auto frag = loadIR( irFileName );
 	Module *Mod = frag->ir;

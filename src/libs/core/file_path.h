@@ -9,8 +9,8 @@
 //
 //                   POSIX            Windows
 //                   ---------------  ----------------------------------
-// Fundamental type  char[]           wchar_t[]
-// Encoding          unspecified*     UTF-16
+// Fundamental type  char[]           char[]
+// Encoding          UTF-8			  UTF-8
 // Separator         /                \, tolerant of /
 // Drive letters     no               case-insensitive A-Z followed by :
 // Alternate root    // (surprise!)   \\, for UNC paths
