@@ -25,14 +25,17 @@ class VMThread;
 class Dwm {
 public:
 	Dwm();
+   ~Dwm();
 	void bootstrapLocal();
 
 	llvm::Module* loadBitCode( const Core::FilePath& filepath );
    llvm::Module* loadBitCode( Core::InOutInterface& inny );
 
+   llvm::LLVMContext& getContext() const { return context; };
+
 private:
-	Core::vector<Core::shared_ptr<VMThread>>				vmThreads;
-	llvm::LLVMContext&										context;
+	Core::vector<Core::shared_ptr<VMThread>>				   vmThreads;
+	llvm::LLVMContext&										      context;
 	Core::unordered_map< Core::FilePath, llvm::Module* >	modules;
 };
 

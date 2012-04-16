@@ -33,6 +33,8 @@
 // Classes and structures
 //---------------------------------------------------------------------------
 
+extern bool InWinCrtReportLog;
+
 //---------------------------------------------------------------------------
 //!	Output to the VC6 debug console the type
 //---------------------------------------------------------------------------
@@ -41,7 +43,9 @@ void DebugInfo(T& in)
 {
 	std::ostringstream out;
 	out << in;
+   InWinCrtReportLog = true;
 	_RPT0(_CRT_WARN, out.str().c_str() );
+   InWinCrtReportLog = false;
 	printf( out.str().c_str() );
 }
 
@@ -53,13 +57,17 @@ void DebugError(T& in)
 {
 	std::ostringstream out;
 	out << in;
+   InWinCrtReportLog = true;
 	_RPT0(_CRT_ERROR, out.str().c_str() );
+   InWinCrtReportLog = false;
 	printf( out.str().c_str() );
 }
 
 inline void DebugLogNL()
 {
+   InWinCrtReportLog = true;
 	_RPT0(_CRT_WARN, "\n" );
+   InWinCrtReportLog = false;
 	printf( "\n" );
 }
 

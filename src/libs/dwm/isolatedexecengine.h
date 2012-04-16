@@ -11,6 +11,8 @@ class IsolatedExecEngine {
 public:
 	IsolatedExecEngine( llvm::Module* init );
 
+   void run( const char* funcname );
+
 private:
 	Core::scoped_ptr<llvm::ExecutionEngine> exec;
 };

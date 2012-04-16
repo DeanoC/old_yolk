@@ -22,8 +22,12 @@
 
 extern void WinGetMessages( void );
 extern bool WinInitWindow( int width, int height, bool bFullscreen );
+bool InWinCrtReportLog = false;
 int __cdecl WinCrtReportHook(int type, char * msg, int * ret )
 {
+   if(InWinCrtReportLog)
+      return FALSE;
+
 	switch( type )
 	{
 	case _CRT_WARN:		LOG(INFO) << msg; break;

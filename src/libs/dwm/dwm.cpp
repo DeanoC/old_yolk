@@ -9,15 +9,27 @@
 #include "llvm/Support/IRReader.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/Debug.h"
+#include "llvm/Support/raw_ostream.h"
+
 #include "vmthread.h"
 
 #define DECL_INEXEBITCODE( NAME ) extern const unsigned char* binary_data_vm_code_##NAME##_cpp; extern size_t binary_data_vm_code_##NAME##_cpp_sizeof;
 #define MEMFILE_INEXEBITCODE( NAME )  MemFile( (uint8_t*) binary_data_vm_code_##NAME##_cpp, binary_data_vm_code_##NAME##_cpp_sizeof )
 
 DECL_INEXEBITCODE( helloworld );
+DECL_INEXEBITCODE( bootstrap );
 
 Dwm::Dwm() :
 	context( llvm::getGlobalContext() ) {
+
+   #ifndef NDEBUG
+      llvm::DebugFlag = false;
+   #endif
+}
+
+Dwm::~Dwm() {
+//   llvm::dbgs().flush();
 }
 
 llvm::Module* Dwm::loadBitCode( const Core::FilePath& filepath ) {
@@ -53,13 +65,13 @@ void Dwm::bootstrapLocal() {
 	auto hwThreads = Core::thread::hardware_concurrency();
 
 	// load initial bitcode modules
-//	auto init0bc = loadBitCode( FilePath( FILE_PATH_LITERAL("./init0.bc") ) );
-//	auto initNbc = loadBitCode( FilePath( FILE_PATH_LITERAL("./initN.bc") ) );
-   auto init0bc = loadBitCode( MEMFILE_INEXEBITCODE( helloworld ) );
+   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
 
 	// init thread0 into llvm execution environment
-	auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this, init0bc ) );
+	auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this, initbc ) );
 	vmThreads.push_back( thread0 );
+   // lets start booting
+   thread0->run( "bootstrap0" );
 
 }
 
