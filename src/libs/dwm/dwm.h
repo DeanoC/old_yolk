@@ -18,6 +18,7 @@
 #include "llvm/CodeGen/LinkAllCodegenComponents.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/Interpreter.h"
+#include "core/fileio.h"
 
 class VMThread;
 
@@ -27,6 +28,8 @@ public:
 	void bootstrapLocal();
 
 	llvm::Module* loadBitCode( const Core::FilePath& filepath );
+   llvm::Module* loadBitCode( Core::InOutInterface& inny );
+
 private:
 	Core::vector<Core::shared_ptr<VMThread>>				vmThreads;
 	llvm::LLVMContext&										context;

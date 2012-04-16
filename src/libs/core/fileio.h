@@ -24,7 +24,7 @@ public:
 	virtual ~InOutInterface(){}
 		
 	virtual void close() = 0;
-	virtual bool isValid() = 0;
+	virtual bool isValid() const = 0;
 		
 	virtual uint64_t read(uint8_t* _buffer, uint64_t _bytes) = 0;
 		
@@ -47,7 +47,7 @@ public:
 		
 	bool open( const char* _path );
 	virtual void close();
-	virtual bool isValid() {
+	virtual bool isValid() const {
 		return (fh != NULL);
 	}
 		
@@ -74,7 +74,7 @@ public:
 		CORE_DELETE_ARRAY m_Buffer;
 		m_Buffer = 0;
 	}
-	virtual bool isValid() {
+	virtual bool isValid() const {
 		return (m_Buffer != NULL);
 	}
 		
@@ -103,7 +103,7 @@ public:
 				
 		return m_Buffer[ m_Offset++ ];
 	}
-	virtual uint64_t BytesLeft(){
+	virtual uint64_t bytesLeft() {
 		return m_Size - m_Offset;
 	}
 				 

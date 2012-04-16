@@ -25,12 +25,18 @@ llvm::Module* Dwm::loadBitCode( const Core::FilePath& filepath ) {
 		// file not found
 		return nullptr;
 	}
+   return loadBitCode( bcFile );
+}
 
-	uint64_t bcLen = bcFile.tell();
+llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
+	using namespace Core;
+	using namespace llvm;
+
+	uint64_t bcLen = inny.tell();
 
 	// note on 32 bit system only load max 32 bit file size (no harm)
 	MemoryBuffer *bcBuffer = MemoryBuffer::getNewMemBuffer( (size_t) bcLen );
-	bcFile.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
+	inny.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
 	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, context );
 
 	return mod;

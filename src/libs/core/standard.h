@@ -47,9 +47,6 @@
 /// MS crappy vector - replaced with alignedvector
 /// 
 ///
-/// \remark	Copyright (c) 20110 Deano Ca;ver. All rights reserved.
-/// \remark	mailto://deano@rattie.demon.co.uk
-///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once

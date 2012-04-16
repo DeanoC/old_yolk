@@ -7,7 +7,7 @@ if(MSVC)
 	set( CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
    		${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/cxx_flag_overrides.cmake )
 else()
-	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "CXX Flags" )
+#	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "CXX Flags" )
 endif()
 
 # top level wierd cmake file

@@ -11,7 +11,6 @@ LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 find_package( CMakeCommon REQUIRED )
 find_package( WierdBoost REQUIRED )
 
-
 SET( USE_V8 false CACHE BOOL "Use Googles V8 Javascript system" )
 SET( USE_DX11 false CACHE BOOL "Use DirectX 11 " )
 SET( USE_OPENGL false CACHE BOOL "Use OpenGL render back end" )

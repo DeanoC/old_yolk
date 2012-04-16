@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define CORE_ALIGN(x)			__declspec(align(x))
-#if COMPILER_VERSION < MS_VS2010
+#if COMPILER_VERSION >= MS_VS2010
 #	define CORE_STATIC_ASSERT(x)	static_assert(x)
 #else
 #	define CORE_STATIC_ASSERT(x)	BOOST_STATIC_ASSERT(x)
