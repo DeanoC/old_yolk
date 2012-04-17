@@ -46,7 +46,7 @@ void DebugInfo(T& in)
    InWinCrtReportLog = true;
 	_RPT0(_CRT_WARN, out.str().c_str() );
    InWinCrtReportLog = false;
-	printf( out.str().c_str() );
+//	printf( out.str().c_str() );
 }
 
 //---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ void DebugError(T& in)
    InWinCrtReportLog = true;
 	_RPT0(_CRT_ERROR, out.str().c_str() );
    InWinCrtReportLog = false;
-	printf( out.str().c_str() );
+//	printf( out.str().c_str() );
 }
 
 inline void DebugLogNL()
@@ -68,7 +68,7 @@ inline void DebugLogNL()
    InWinCrtReportLog = true;
 	_RPT0(_CRT_WARN, "\n" );
    InWinCrtReportLog = false;
-	printf( "\n" );
+//	printf( "\n" );
 }
 
 

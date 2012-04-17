@@ -61,6 +61,7 @@ llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
 
 void Dwm::bootstrapLocal() {
 	using namespace Core;
+   using namespace llvm;
 	
 	auto hwThreads = Core::thread::hardware_concurrency();
 
@@ -70,8 +71,13 @@ void Dwm::bootstrapLocal() {
 	// init thread0 into llvm execution environment
 	auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this, initbc ) );
 	vmThreads.push_back( thread0 );
+
+   std::vector<GenericValue> args;
+//   args.push_back( debugFnGV );
+//   thread0->getEngine()->exec->addGlobalMapping( debugFnGV, &DebugOutFn );
+
    // lets start booting
-   thread0->run( "bootstrap0" );
+   thread0->getEngine()->run( "bootstrap0", args );
 
 }
 

@@ -13,7 +13,7 @@ class VMThread : public Core::thread {
 public:
 	VMThread( Dwm& dwm, llvm::Module* module );
 
-   void run( const char* funcname ) { execEngine->run( funcname ); }
+   IsolatedExecEngine* getEngine() { return &(*execEngine); }
 
 private:
 	Dwm&										world;

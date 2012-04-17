@@ -7,14 +7,17 @@
 #ifndef DWM_ISOLATEDEXECENGINE_H_
 #define DWM_ISOLATEDEXECENGINE_H_
 
-class IsolatedExecEngine {
+#include "../lib/ExecutionEngine/Interpreter/Interpreter.h"
+
+class IsolatedExecEngine : public llvm::Interpreter {
 public:
-	IsolatedExecEngine( llvm::Module* init );
+	explicit IsolatedExecEngine( llvm::Module* init );
 
-   void run( const char* funcname );
+   void run( const char* funcname, const std::vector<llvm::GenericValue>& args );
 
-private:
-	Core::scoped_ptr<llvm::ExecutionEngine> exec;
+   virtual llvm::GenericValue callExternalFunction(llvm::Function *F,
+                                 const std::vector<llvm::GenericValue> &ArgVals);
+
 };
 
 #endif
