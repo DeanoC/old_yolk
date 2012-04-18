@@ -9,6 +9,8 @@
 
 #include "../lib/ExecutionEngine/Interpreter/Interpreter.h"
 
+typedef llvm::GenericValue (*ExtFnHandler)( const std::vector<llvm::GenericValue>& );
+
 class IsolatedExecEngine : public llvm::Interpreter {
 public:
 	explicit IsolatedExecEngine( llvm::Module* init );
@@ -17,7 +19,10 @@ public:
 
    virtual llvm::GenericValue callExternalFunction(llvm::Function *F,
                                  const std::vector<llvm::GenericValue> &ArgVals);
+private:
+   typedef Core::unordered_map< uintptr_t, ExtFnHandler > ExtFnHash;
 
+   ExtFnHash      extFnHash;
 };
 
 #endif

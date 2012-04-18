@@ -33,12 +33,12 @@ int Main() {
 	SystemMessage::Get()->RegisterQuitCallback( QuitCallback );
 	SystemMessage::Get()->RegisterDebugModeChangeCallback( DebugModeCallback );
 
-	InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
+//	InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
 
 	dwm.reset( new Dwm );
 	dwm->bootstrapLocal();
 
-	MainLoop();
+//	MainLoop();
 
 	return 0;
 }

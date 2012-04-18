@@ -36,6 +36,7 @@
 ///		- static_assert (used for portable CORE_STATIC_ASSERT)
 ///		- asio
 ///		- scoped_array
+///      - foreach (due to VC10 not supporting c++11 range for
 ///		- mpl (note you have to include boost/mpl/XXX.hpp) yourself as so many of them
 /// To use simple replace std:: or std::tr1:: boost, with Core:: and viola will work as you expect.
 ///
@@ -480,6 +481,8 @@ namespace Core
 
 #include <boost/utility/enable_if.hpp>
 
+#include <boost/foreach.hpp>
+
 #include "core/aligned_vector.h"
 #include "core/thread.h"
 
@@ -743,13 +746,5 @@ namespace Core
 	#undef STRING_CTORS_IMPL
 
 }	//namespace Core
-
-// its quite legit for external libs (google, etc.) to use std
-// but we shouldn't so every now and again use this to hunt down any in
-// our code. You will get lots of false positives in external code but
-// ignore them and change std:: usage in code owned by us
-#if defined( FIND_STD_USAGE_IN_WIERD )
-#	define std Use_Core_namespace_instead
-#endif
 
 #endif // end CORE_STANDARD_H

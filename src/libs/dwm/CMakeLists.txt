@@ -15,6 +15,11 @@ file( GLOB vm_src_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 								vm_code/*.c
 								vm_code/*.asm
 								)
+file( GLOB vm_hdr_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+								vm_code/*.h )
+list( APPEND vm_files ${vm_src_files} ${vm_hdr_files} )
+SOURCE_GROUP( vm_code FILES ${vm_files} )
+
 if( WIN32 )
 	set( CLANG_EXE ${LLVM_ROOT}/bin/${CMAKE_CFG_INTDIR}/clang++.exe )
 else()
@@ -22,7 +27,7 @@ else()
 endif()
 foreach( sc ${vm_src_files} )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.bc 
-						COMMAND ${CLANG_EXE} -c -nostdinc -emit-llvm -o ${CMAKE_CURRENT_BINARY_DIR}/${sc}.bc  ${CMAKE_CURRENT_SOURCE_DIR}/${sc}
+						COMMAND ${CLANG_EXE} -c -v -nostdinc -std=c++0x -isystem ${CMAKE_CURRENT_SOURCE_DIR}/vm_code/system/include -emit-llvm -D__STDC__ -o ${CMAKE_CURRENT_BINARY_DIR}/${sc}.bc  ${CMAKE_CURRENT_SOURCE_DIR}/${sc}
 						DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${sc} VERBATIM )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.bc.cpp 
 						COMMAND bin2c ${CMAKE_CURRENT_BINARY_DIR}/${sc}.bc ${CMAKE_CURRENT_BINARY_DIR}/${sc}.bc.cpp ${sc}
@@ -31,7 +36,7 @@ foreach( sc ${vm_src_files} )
 endforeach( sc ${vm_src_files} )
 
 ADD_MSVC_PRECOMPILED_HEADER( "dwm.h" "${cpp_src_files}" )
-add_library( dwm ${src_files} ${header_files} ${vm_src_files} )
+add_library( dwm ${src_files} ${header_files} ${vm_files} )
 
 # make a nice hierachy
 set_target_properties( dwm PROPERTIES FOLDER "Libs")
