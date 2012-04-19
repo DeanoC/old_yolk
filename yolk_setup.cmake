@@ -82,10 +82,14 @@ if( OPENCL_FOUND AND USE_OPENCL )
 	link_directories( ${OPENCL_LIB_DIR} )
 endif( OPENCL_FOUND AND USE_OPENCL )
 
+# special handling for the various submodules bits and peices
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/glog/include/" )
 LIST( APPEND CMAKE_MODULE_PATH "${LLVM_ROOT}/share/llvm/cmake" )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/submodules/llvm/include/" )
 include_directories( "${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm/include/" )
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/submodules/json-spirit/" )
+include_directories( "${CMAKE_CURRENT_BINARY_DIR}/submodules/zlib/" )
+include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/submodules/zlib/" )
+link_directories( ${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm/lib )
 
 set( Core_LIBRARIES core ${Boost_LIBRARIES} glog )

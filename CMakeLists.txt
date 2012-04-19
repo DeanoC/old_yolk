@@ -10,6 +10,7 @@ else()
 #	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "CXX Flags" )
 endif()
 
+
 # top level wierd cmake file
 project( Yolk )
 
@@ -18,7 +19,6 @@ include( yolk_setup.cmake )
 # tell it to recurse into the third party dir
 # do manually for now
 add_subdirectory( submodules )
-link_directories( ${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm/lib )
 # tell it to recurse into the source dir
 add_subdirectory( src )
 

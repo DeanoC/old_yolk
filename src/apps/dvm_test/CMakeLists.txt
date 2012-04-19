@@ -12,12 +12,12 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 # ADD_MSVC_PRECOMPILED_HEADER( "convertmesh_pch.h" "${cpp_src_files}" )
 add_executable( dvm_test WIN32 ${src_files} ${header_files} )
 
-list( APPEND targ_link_libs dvm_test ${Core_LIBRARIES} dwm )
+list( APPEND targ_link_libs ${Core_LIBRARIES} dwm )
 if( UNIX )
 list( APPEND targ_link_libs pthread dl )
 endif()
 
-target_link_libraries( ${targ_link_libs} )
+target_link_libraries( dvm_test ${targ_link_libs} )
 
 llvm_config( dvm_test   mcjit jit nativecodegen 
 					  interpreter

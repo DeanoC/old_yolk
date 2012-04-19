@@ -17,7 +17,8 @@ file( GLOB vm_src_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 								)
 file( GLOB vm_hdr_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 								vm_code/*.h )
-list( APPEND vm_files ${vm_src_files} ${vm_hdr_files} )
+#list( APPEND vm_files ${vm_src_files} ${vm_hdr_files} )
+list( APPEND vm_files ${vm_hdr_files} )
 SOURCE_GROUP( vm_code FILES ${vm_files} )
 
 if( WIN32 )
