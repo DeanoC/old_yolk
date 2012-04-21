@@ -69,23 +69,49 @@ llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
 	return mod;
 }
 
+void print_object_value (
+        const std::error_code& error,
+        std::shared_ptr<riak::object> object,
+        riak::value_updater& )
+{
+   using namespace boost;
+   if (!error) {
+      if (!! object)
+         Log << str(format("Fetch succeeded! Value is: %1%") % object->value());
+      else
+         Log << str(format("Fetch succeeded! No value found."));      
+
+   } else {
+      Log << "Could not receive the object from Riak due to a hard error.";
+   }
+}
+
+
+
+
 void Dwm::bootstrapLocal() {
 	using namespace Core;
    using namespace llvm;
-	
+
 	auto hwThreads = Core::thread::hardware_concurrency();
 
    boost::asio::io_service ios;
 
+   // TODO fallback IPs, better error handling etc.
    riak::transport::delivery_provider connection;
-   CoreTry {
+//   CoreTry {
       connection = riak::make_single_socket_transport("192.168.254.95", 8081, ios);
-   } CoreCatch( boost::system::system_error& e ) {
-      Log << e.what() << Logger::endl;
-      return;
-   }
+//   } CoreCatch( boost::system::system_error& e ) {
+//      Log << e.what() << Logger::endl;
+//      return;
+//   }
 
    auto my_store = riak::make_client(connection, &no_sibling_resolution, ios);
+
+   my_store->get_object( "sys", "info", Core::bind(&print_object_value, Core::_1, Core::_2, Core::_3) );
+
+   ios.run();
+
    // load initial bitcode modules
    auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
 

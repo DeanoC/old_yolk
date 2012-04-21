@@ -342,15 +342,15 @@ namespace Core
 }
 
 // these are auto forwarding to the tr1 implementations of the platform if it supports them
-#	include	<boost/tr1/functional.hpp>
-#	include "boost/tr1/memory.hpp"
-#	include "boost/tr1/type_traits.hpp"
-#	include "boost/tr1/random.hpp"
-#	include "boost/tr1/tuple.hpp"
-#	include "boost/tr1/utility.hpp"
-#	include "boost/tr1/array.hpp"
-#	include "boost/tr1/regex.hpp"
-#	include "boost/tr1/complex.hpp"
+#	include <boost/tr1/functional.hpp>
+#	include <boost/tr1/memory.hpp>
+#	include <boost/tr1/type_traits.hpp>
+#	include <boost/tr1/random.hpp>
+#	include <boost/tr1/tuple.hpp>
+#	include <boost/tr1/utility.hpp>
+#	include <boost/tr1/array.hpp>
+#	include <boost/tr1/regex.hpp>
+#	include <boost/tr1/complex.hpp>
 #	include <boost/tr1/unordered_map.hpp>
 #	include <boost/tr1/unordered_set.hpp>
 
@@ -457,6 +457,13 @@ namespace Core
 	using boost::scoped_ptr;
 }
 
+#include <boost/make_shared.hpp>
+namespace Core
+{
+	using boost::make_shared;
+	using boost::allocate_shared;
+}
+
 namespace Core
 {
 	namespace mpl
@@ -510,6 +517,11 @@ namespace Core
 	using std::tr1::reference_wrapper;
 	using std::tr1::result_of;
 	using std::tr1::swap;
+	namespace placeholders {
+		using namespace std::tr1::placeholders;
+	}
+   // so we can use Core::_1 as boost and tr1 on msvc argue if we using std::placeholders as a shortcut
+	using namespace std::tr1::placeholders;
 
 
 	// tr1 array
@@ -587,7 +599,7 @@ namespace Core
 	using std::tr1::match_results;
 	using std::tr1::cmatch;
 	using std::tr1::smatch;
-	namespace regex_consants {
+	namespace regex_constants {
 		using namespace std::tr1::regex_constants;
 	}
 	using std::tr1::regex_error;
