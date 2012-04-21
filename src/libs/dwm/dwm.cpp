@@ -11,6 +11,9 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
+#include "riak/client.hxx"
+#include "riak/transport.hxx"
+#include "riak/transports/single-serial-socket.hxx"
 
 #include "vmthread.h"
 
@@ -19,6 +22,14 @@
 
 DECL_INEXEBITCODE( helloworld );
 DECL_INEXEBITCODE( bootstrap );
+
+std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
+{
+    auto garbage = std::make_shared<riak::object>();
+    garbage->set_value("<result of sibling resolution>");
+    garbage->set_content_type("text/plain");
+    return garbage;
+}
 
 Dwm::Dwm() :
 	context( llvm::getGlobalContext() ) {
@@ -64,7 +75,18 @@ void Dwm::bootstrapLocal() {
 	
 	auto hwThreads = Core::thread::hardware_concurrency();
 
-	// load initial bitcode modules
+   boost::asio::io_service ios;
+
+   riak::transport::delivery_provider connection;
+   CoreTry {
+      connection = riak::make_single_socket_transport("192.168.254.95", 8081, ios);
+   } CoreCatch( boost::system::system_error& e ) {
+      Log << e.what() << Logger::endl;
+      return;
+   }
+
+   auto my_store = riak::make_client(connection, &no_sibling_resolution, ios);
+   // load initial bitcode modules
    auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
 
 	// init thread0 into llvm execution environment

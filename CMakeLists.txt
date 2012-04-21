@@ -1,15 +1,9 @@
 cmake_minimum_required( VERSION 2.8.2 )
-
-# make overrides installed
-if(MSVC)
-	set( CMAKE_USER_MAKE_RULES_OVERRIDE
-   		${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/c_flag_overrides.cmake )
-	set( CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-   		${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/cxx_flag_overrides.cmake )
-else()
-#	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "CXX Flags" )
+if( CMAKE_COMPILER_IS_GNUCXX )
+	set(CMAKE_CXX_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_CXX_FLAGS} -std=c++0x" )
+elseif( WIN32 )
+	set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /MP /D_ITERATOR_DEBUG_LEVEL=0" CACHE STRING "C++ Flags" )
 endif()
-
 
 # top level wierd cmake file
 project( Yolk )
