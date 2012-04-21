@@ -15,7 +15,7 @@ IsolatedExecEngine::IsolatedExecEngine( llvm::Module* init ) :
    auto fn = init->getFunctionList().begin();
    while( fn != init->getFunctionList().end() ) {
       if( fn->isDeclaration() ) {
-         Log << "extern " << fn->getName().data() << Core::Logger::endl;
+         LOG(INFO) << "extern " << fn->getName().data() << Core::Logger::endl;
          //TODO prep external function map here
       }
       ++fn;
@@ -29,7 +29,7 @@ void IsolatedExecEngine::run( const char* funcname, const std::vector<llvm::Gene
 }
 
 llvm::GenericValue DebugOutFn( const std::vector<llvm::GenericValue> &ArgVals ) {
-   Log << (const char*) ArgVals[0].PointerVal;
+   LOG(INFO) << (const char*) ArgVals[0].PointerVal;
    return llvm::GenericValue();
 }
 
@@ -42,7 +42,7 @@ llvm::GenericValue IsolatedExecEngine::callExternalFunction(llvm::Function *F,
          extFnHash[ (uintptr_t) F ] = DebugOutFn;
          fn = extFnHash.find( (uintptr_t) F );
       } else {
-         Log << "External Function called : " << F->getName().data() << " < " << (uintptr_t)F << " >" << Core::Logger::endl;
+         LOG(INFO) << "External Function called : " << F->getName().data() << " < " << (uintptr_t)F << " >" << Core::Logger::endl;
          return GenericValue();
       }
    }

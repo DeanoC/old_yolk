@@ -75,11 +75,13 @@
 
 #if defined( USE_GLOG )
 #	include "glog/logging.h"
+namespace Core {
+   class Logger {
+   public:
+		static const std::string endl;
+   };
+};
 #else
-// glog compat layer (not not all glog features support but should compile and log somthing...)
-// ignore GLOG level and just log something...
-
-#define LOG(c) Log 
 
 	// older log library left in for now...
 	// Include OS version specific debug function
@@ -99,9 +101,9 @@
 	class Logger
 	{
 	public:
-		enum eLNL { endl };
-		enum eInfo { info };
-		enum eError { error };
+		enum eLNL_USEendl{ endl };
+		enum eInfo_USEinfo { info };
+		enum eError_USEerror { error };
 
 		Logger() : m_bInfo( true ) {}
 
@@ -121,11 +123,11 @@
 		}
 
 		/// adds a new line (same as <<"\n")
-		const Logger& operator<<(eLNL) const	{ DebugLogNL();	m_bInfo = true; return *this; };
+		const Logger& operator<<(eLNL_USEendl) const	{ DebugLogNL();	m_bInfo = true; return *this; };
 		/// Changes output to the warning stream
-		const Logger& operator<<(eInfo) const	{ m_bInfo = true; return *this; };
+		const Logger& operator<<(eInfo_USEinfo) const	{ m_bInfo = true; return *this; };
 		/// Changes output to the error stream
-		const Logger& operator<<(eError) const	{ m_bInfo = false; return *this; };
+		const Logger& operator<<(eError_USEerror) const	{ m_bInfo = false; return *this; };
 
 	private:
 		//! are we in the info or error state
@@ -136,12 +138,21 @@
 
 	extern Core::Logger Log; // The log is left in the global namespace for easy access
 
+// glog compat layer (not not all glog features support but should compile and log somthing...)
+//#define LOG(c) Log << c
+//#	define FATAL Core::Logger::error
+//#	define ERROR Core::Logger::error
+//#	define WARN Core::Logger::info
+//#	define INFO Core::Logger::info
+// faking FATAL etc. upset some other google libraries who think they are smart and glog must be used
+#define LOG(c) Log
+
 #endif
 
 	/// Log file and line macros in a VS compat manner
-#	define LOG_FILE_LINE( lev, f, l ) LOG(lev) << (f) << '(' << (l) << ')' << " : "
+#	define LOG_FILE_LINE( lev, f, l ) LOG(lev) << (f) << "(" << (l) << ")" << " : "
 	/// Log file and line macros for a code file and line
-#	define LOGFL LOG_FILE_LINE( lev, __FILE__, __LINE__ )
+#	define LOGFL LOG_FILE_LINE( INFO, __FILE__, __LINE__ )
 
 namespace Core 
 {

@@ -20,9 +20,11 @@
 /// catch x type of exception 
 #	define CoreCatch(x)	catch(x)
 /// catch our Exception class of type x
-#	define CoreCatchException(x)	catch( x ## _Exception const& err)
+#	define CoreCatchOurException(x)	catch( x ## _Exception const& err)
 /// catch any and all exception
 #	define CoreCatchAll	catch( ... )
+/// catch any of our Exception class
+#	define CoreCatchAllOurExceptions	catch( Except const& err)
 /// this functions makes no throws
 #	define CoreNoThrows	throw()
 /// throw an x type of exception
@@ -41,9 +43,11 @@
 /// catch x type of exception 
 #	define CoreCatch(x)	if( false )
 /// catch our Exception class of type x
-#	define CoreCatchException(x)	if( false )
+#	define CoreCatchOurException(x)	if( false )
 /// catch any and all exception
 #	define CoreCatchAll	if( false )
+/// catch any of our Exception class
+#	define CoreCatchAllOurExceptions	if( false )
 /// this functions makes no throws
 #	define CoreNoThrows	
 /// throw an x type of exception
@@ -70,17 +74,6 @@ public:																\
 	const Core::string getDescription( void ) const CoreNoThrows		\
 		{ return Core::string( #Description ); }; 					\
 }
-
-/// Log an exception in VC6 IDE format for quick finding (just double click on the log)
-#define LOG_EXCEPTION(Ex)											\
-		IF_DEBUG(													\
-			LOG_FILE_LINE( Ex.getFile(), Ex.getLine() )				\
-			Log << Ex.getDescription() << "\n";						\
-			Log << Ex.getName();									\
-			if(Ex.getUserText() != "")								\
-				Log << " : " << Ex.getUserText();					\
-			Log << "\n"												\
-				);													
 
 //---------------------------------------------------------------------------
 // Includes
@@ -145,6 +138,17 @@ DECLARE_EXCEPTION(TodoError, TODO Not yet implemented);
 DECLARE_EXCEPTION(ParamError, Some parameter was incorrect);
 DECLARE_EXCEPTION(BoundCheckFail, A boundary check has failed);
 DECLARE_EXCEPTION(AssertError, Assert Failed);
+
+inline void LogException( const Except& Ex ) {
+   /// Log an exception in VC6 IDE format for quick finding (just double click on the log)
+	LOG_FILE_LINE( INFO, Ex.getFile(), Ex.getLine() );			
+	LOG(INFO) << Ex.getDescription() << "\n";						
+	LOG(INFO) << Ex.getName();									      
+	if(Ex.getUserText() != "")	{							         
+      LOG(INFO) << " : " << Ex.getUserText(); 
+   }		
+	LOG(INFO) << "\n";												    
+}
 
 //---------------------------------------------------------------------------
 // Prototypes

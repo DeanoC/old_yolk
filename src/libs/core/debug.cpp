@@ -20,6 +20,13 @@
 #include <sys/sysctl.h>
 #endif
 #include "debug.h"
+
+#if defined( USE_GLOG )
+namespace Core {
+   const std::string Logger::endl = "\n";
+}
+#endif
+
 //---------------------------------------------------------------------------
 // Local Enums and typedefs
 //---------------------------------------------------------------------------

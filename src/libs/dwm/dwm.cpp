@@ -77,12 +77,12 @@ void print_object_value (
    using namespace boost;
    if (!error) {
       if (!! object)
-         Log << str(format("Fetch succeeded! Value is: %1%") % object->value());
+         LOG(INFO) << str(format("Fetch succeeded! Value is: %1%") % object->value());
       else
-         Log << str(format("Fetch succeeded! No value found."));      
+         LOG(INFO) << str(format("Fetch succeeded! No value found."));      
 
    } else {
-      Log << "Could not receive the object from Riak due to a hard error.";
+      LOG(INFO) << "Could not receive the object from Riak due to a hard error.";
    }
 }
 
@@ -99,12 +99,12 @@ void Dwm::bootstrapLocal() {
 
    // TODO fallback IPs, better error handling etc.
    riak::transport::delivery_provider connection;
-//   CoreTry {
+   CoreTry {
       connection = riak::make_single_socket_transport("192.168.254.95", 8081, ios);
-//   } CoreCatch( boost::system::system_error& e ) {
-//      Log << e.what() << Logger::endl;
-//      return;
-//   }
+   } CoreCatch( boost::system::system_error& e ) {
+      LOG(ERROR) << e.what() << Logger::endl;
+      return;
+   }
 
    auto my_store = riak::make_client(connection, &no_sibling_resolution, ios);
 

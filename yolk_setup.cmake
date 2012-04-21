@@ -95,4 +95,5 @@ include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/submodules/protobuf/src/" )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/submodules/riak-cpp/ )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/submodules/riak-cpp/ )
 
+set( USE_GLOG TRUE )
 set( Core_LIBRARIES core ${Boost_LIBRARIES} glog )
