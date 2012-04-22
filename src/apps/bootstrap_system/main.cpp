@@ -4,6 +4,7 @@
 #include "riak/transports/single-serial-socket.hxx"
 #include "json_spirit/json_spirit_reader.h"
 #include "json_spirit/json_spirit_writer.h"
+#include "boost/program_options.hpp"
 
 DECLARE_EXCEPTION(RiakSystemExists, Riak DB already has a system);
 DECLARE_EXCEPTION(RiakHardNetwork, Hard Riak error likely unable to find DB check host and port );
@@ -13,29 +14,35 @@ class SystemBootStrapper {
 public:
    SystemBootStrapper() :
       hostname( "192.168.254.95" ),
-      port( 8081 )
+      port( 8081 ),
+      deleteSystem( false )
    {
    }
    void Go() {
       readConfig();
       CoreTry {
          connection = riak::make_single_socket_transport(hostname, port, ios);
+         store = riak::make_client(connection, Core::bind(&SystemBootStrapper::noSiblingResolution, this, Core::_1), ios);
+         store->get_object( "sys", "info", Core::bind(&SystemBootStrapper::isRiakSetup, this, Core::_1, Core::_2, Core::_3) );
+         ios.run();
       } CoreCatch( boost::system::system_error& e ) {
          LOG(INFO) << e.what() << Core::Logger::endl;
          CoreReThrow;
+      } CoreCatchAll {
+         CoreReThrow;
       }
 
-      store = riak::make_client(connection, Core::bind(&SystemBootStrapper::noSiblingResolution, this, Core::_1), ios);
-      store->get_object( "sys", "info", Core::bind(&SystemBootStrapper::isRiakSetup, this, Core::_1, Core::_2, Core::_3) );
-      ios.run();
-
+   }
+   void allowDelete( bool enable ) {
+      deleteSystem = enable;
    }
 private:
-   std::string hostname;
-   int         port ;
-   boost::asio::io_service ios;
-   riak::transport::delivery_provider connection;
-   Core::shared_ptr<riak::client> store;
+   std::string                         hostname;
+   int                                 port;
+   bool                                deleteSystem;
+   boost::asio::io_service             ios;
+   riak::transport::delivery_provider  connection;
+   Core::shared_ptr<riak::client>      store;
 
    void readConfig() {
        std::ifstream is( "./config.json" );
@@ -63,10 +70,11 @@ private:
    }
 
    std::shared_ptr<riak::object> noSiblingResolution (const riak::siblings&) {
-       auto garbage = std::make_shared<riak::object>();
-       garbage->set_value("<result of sibling resolution>");
-       garbage->set_content_type("text/plain");
-       return garbage;
+      // TODO
+      auto garbage = std::make_shared<riak::object>();
+      garbage->set_value("<result of sibling resolution>");
+      garbage->set_content_type("application/json");
+      return garbage;
    }
 
    void isRiakSetup (
@@ -78,9 +86,14 @@ private:
          if (!! object) {
             LOG(INFO) << str(format("Fetch succeeded! Value is: %1%") % object->value()) << Core::Logger::endl;
             // Riak already exist, bail from set it up and wiping stuff
-            // TODO force deletion
-            LOG(INFO) << "Riak backend exists but already has a valid VT system on it, bailing to ensure no damge, delete it first if you really want too!" << Core::Logger::endl;
-            CoreThrowException( RiakSystemExists, "" );
+            // TODO force deletion option
+            if( deleteSystem ) {
+               LOG(INFO) << "Overwriting existing Riak system backend..." << Core::Logger::endl;
+               setupRiakVTSystem( object, updater );
+            } else {
+               LOG(INFO) << "Riak backend exists but already has a valid VT system on it, bailing to ensure no damge, use --delete if you really want to delete it" << Core::Logger::endl;
+               CoreThrowException( RiakSystemExists, "" );
+            }
          } else {
             LOG(INFO) << "Riak backend is ready to recieve a base system..." << Core::Logger::endl;
             setupRiakVTSystem( object, updater );
@@ -103,13 +116,13 @@ private:
 
       auto newObj = std::make_shared<riak::object>();
       newObj->set_value( os.str() );
-      newObj->set_content_type("text/plain");
+      newObj->set_content_type("application/json");
 
       riak::put_response_handler putHandler = Core::bind( &SystemBootStrapper::putSysInfoResult, this, Core::_1);
       updater(newObj, putHandler );
    }
-   void putSysInfoResult (const std::error_code& error)
-   {
+
+   void putSysInfoResult (const std::error_code& error) {
        if (!error) {
            LOG(INFO) << "Put succeeded!" << Core::Logger::endl;
        }
@@ -121,9 +134,26 @@ private:
 };
 
 int Main() {
+   namespace po = boost::program_options;
 
+   // Declare the supported options.
+   po::options_description desc("Allowed options");
+   desc.add_options()
+      ("help", "produce help message")
+      ("delete", "delete any previous system discovered, WARNING")
+   ;
    CoreTry {
       SystemBootStrapper strapper;
+      po::variables_map vm;
+      po::store(po::parse_command_line(Core::g_argc, Core::g_argv, desc), vm);
+      po::notify(vm);    
+
+      if (vm.count("help")) {
+          LOG(INFO) << desc << "\n";
+          return 1;
+      }
+      strapper.allowDelete( !!vm.count("delete") );
+
       strapper.Go();
    } 
    CoreCatchAllOurExceptions {
