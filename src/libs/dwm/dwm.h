@@ -12,15 +12,12 @@
 #include "core/file_path.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
-#include "llvm/Type.h"
-#include "llvm/ADT/Triple.h"
-#include "llvm/Bitcode/ReaderWriter.h"
-#include "llvm/CodeGen/LinkAllCodegenComponents.h"
-#include "llvm/ExecutionEngine/GenericValue.h"
-#include "llvm/ExecutionEngine/Interpreter.h"
 #include "core/fileio.h"
+#include "riak/core_types.hxx"
 
 class VMThread;
+
+typedef std::shared_ptr<riak::object> RiakObjPtr;
 
 class Dwm {
 public:
@@ -33,7 +30,15 @@ public:
 
    llvm::LLVMContext& getContext() const { return context; };
 
+   void setRiakAddress ( const std::string& addr ) { riakAddr = addr; }
+   void setRiakPort( const int port ) { riakPort = port; }
+
 private:
+   void checkSysInfoVersion( const std::string& str );
+
+   std::string                                           riakAddr;
+   int                                                   riakPort;
+
 	Core::vector<Core::shared_ptr<VMThread>>				   vmThreads;
 	llvm::LLVMContext&										      context;
 	Core::unordered_map< Core::FilePath, llvm::Module* >	modules;

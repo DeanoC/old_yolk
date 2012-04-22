@@ -6,16 +6,16 @@
  */
 #include "dwm.h"
 #include "core/fileio.h"
-#include "llvm/Support/IRReader.h"
-#include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Debug.h"
-#include "llvm/Support/raw_ostream.h"
+#include "llvm/Bitcode/ReaderWriter.h"
 #include "riak/client.hxx"
 #include "riak/transport.hxx"
 #include "riak/transports/single-serial-socket.hxx"
+#include "json_spirit/json_spirit_reader.h"
 
 #include "vmthread.h"
+
+DECLARE_EXCEPTION( DBBackEndHard, "Failure to contact backend DB" );
 
 #define DECL_INEXEBITCODE( NAME ) extern const unsigned char* binary_data_vm_code_##NAME##_cpp; extern size_t binary_data_vm_code_##NAME##_cpp_sizeof;
 #define MEMFILE_INEXEBITCODE( NAME )  MemFile( (uint8_t*) binary_data_vm_code_##NAME##_cpp, binary_data_vm_code_##NAME##_cpp_sizeof )
@@ -32,11 +32,9 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 }
 
 Dwm::Dwm() :
-	context( llvm::getGlobalContext() ) {
-
-   #ifndef NDEBUG
-      llvm::DebugFlag = false;
-   #endif
+	context( llvm::getGlobalContext() ),
+   riakAddr( "127.0.0.1" ),
+   riakPort( 8087 ) {
 }
 
 Dwm::~Dwm() {
@@ -69,25 +67,30 @@ llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
 	return mod;
 }
 
-void print_object_value (
-        const std::error_code& error,
-        std::shared_ptr<riak::object> object,
-        riak::value_updater& )
-{
-   using namespace boost;
-   if (!error) {
-      if (!! object)
-         LOG(INFO) << str(format("Fetch succeeded! Value is: %1%") % object->value());
-      else
-         LOG(INFO) << str(format("Fetch succeeded! No value found."));      
+void Dwm::checkSysInfoVersion( const std::string& str ) {
+   int version_major;
+   int version_minor;
+   int version_rev;
 
-   } else {
-      LOG(INFO) << "Could not receive the object from Riak due to a hard error.";
+   json_spirit::Value value;
+   json_spirit::read( str, value );
+   if( value.is_null() )
+      return;
+   auto obj = value.get_obj();
+
+   // decode json oject
+   for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
+      if( val->name_ == "version_major" ) {
+         version_major = val->value_.get_int();
+      } else if( val->name_ == "version_minor" ) {
+         version_minor = val->value_.get_int();
+      } else if( val->name_ == "version_rev" ) {
+         version_rev = val->value_.get_int();
+      }
    }
+   // TODO Reject any server side where major.minor > version we are compiled with
+
 }
-
-
-
 
 void Dwm::bootstrapLocal() {
 	using namespace Core;
@@ -100,16 +103,22 @@ void Dwm::bootstrapLocal() {
    // TODO fallback IPs, better error handling etc.
    riak::transport::delivery_provider connection;
    CoreTry {
-      connection = riak::make_single_socket_transport("192.168.254.95", 8081, ios);
+      connection = riak::make_single_socket_transport(riakAddr, riakPort, ios);
    } CoreCatch( boost::system::system_error& e ) {
       LOG(ERROR) << e.what() << Logger::endl;
       return;
    }
 
-   auto my_store = riak::make_client(connection, &no_sibling_resolution, ios);
-
-   my_store->get_object( "sys", "info", Core::bind(&print_object_value, Core::_1, Core::_2, Core::_3) );
-
+   auto store = riak::make_client(connection, &no_sibling_resolution, ios);
+   store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
+      if(!err) {
+         if( obj->has_value() ) {
+            checkSysInfoVersion( obj->value() );            
+            return;
+         }
+      } 
+      CoreThrowException( DBBackEndHard, "" );
+   });
    ios.run();
 
    // load initial bitcode modules

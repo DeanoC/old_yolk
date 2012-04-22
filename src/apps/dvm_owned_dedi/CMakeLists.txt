@@ -10,16 +10,16 @@ file( GLOB header_files *.h *.inl *.hpp *.hxx )
 list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
 # ADD_MSVC_PRECOMPILED_HEADER( "convertmesh_pch.h" "${cpp_src_files}" )
-add_executable( dvm_test WIN32 ${src_files} ${header_files} )
+add_executable( dvm_owned_dedi WIN32 ${src_files} ${header_files} )
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} dwm riak-cpp protobuf )
+list( APPEND targ_link_libs ${Core_LIBRARIES} dwm riak-cpp protobuf json_spirit )
 if( UNIX )
-list( APPEND targ_link_libs pthread dl )
+	list( APPEND targ_link_libs pthread dl )
 endif()
 
-target_link_libraries( dvm_test ${targ_link_libs} )
+target_link_libraries( dvm_owned_dedi ${targ_link_libs} )
 
-llvm_config( dvm_test   mcjit jit nativecodegen 
+llvm_config( dvm_owned_dedi   mcjit jit nativecodegen 
 					  interpreter
 					  BitReader
 					  AsmParser
@@ -28,5 +28,5 @@ llvm_config( dvm_test   mcjit jit nativecodegen
 )
 
 # make a nice hierachy
-set_target_properties( dvm_test PROPERTIES FOLDER "Apps")
+set_target_properties( dvm_owned_dedi PROPERTIES FOLDER "Apps")
 

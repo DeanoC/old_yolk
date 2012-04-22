@@ -28,8 +28,8 @@
 #define LOCAL_MEM
 
 // Boost needs building with the EXACT same settings, commands below (x86 and x64)
-// bjam -j8 -a --build-type=complete --without-mpi define=_SECURE_SCL=0 define=_HAS_ITERATOR_DEBUGGING=0 define=_CRT_NONSTDC_NO_DEPRECATE define=_CRT_SECURE_NO_DEPRECATE define=_SCL_SECURE_NO_DEPRECATE
-// bjam -j8 -a --build-type=complete --without-mpi define=_SECURE_SCL=0 define=_HAS_ITERATOR_DEBUGGING=0 define=_CRT_NONSTDC_NO_DEPRECATE define=_CRT_SECURE_NO_DEPRECATE define=_SCL_SECURE_NO_DEPRECATE msvc architecture=x86 address-model=64 --stagedir=./stage64
+// b2 -j5 -a --build-type=complete --without-mpi define=_SECURE_SCL=0 define=_HAS_ITERATOR_DEBUGGING=0 define=_CRT_NONSTDC_NO_DEPRECATE define=_CRT_SECURE_NO_DEPRECATE define=_SCL_SECURE_NO_DEPRECATE
+// b2 -j5 -a --build-type=complete --without-mpi define=_SECURE_SCL=0 define=_HAS_ITERATOR_DEBUGGING=0 define=_CRT_NONSTDC_NO_DEPRECATE define=_CRT_SECURE_NO_DEPRECATE define=_SCL_SECURE_NO_DEPRECATE msvc architecture=x86 address-model=64 --stagedir=./stage64
 #define _HAS_ITERATOR_DEBUGGING			0
 #define _CRT_NONSTDC_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE

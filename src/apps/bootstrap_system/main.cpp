@@ -118,17 +118,31 @@ private:
       newObj->set_value( os.str() );
       newObj->set_content_type("application/json");
 
-      riak::put_response_handler putHandler = Core::bind( &SystemBootStrapper::putSysInfoResult, this, Core::_1);
-      updater(newObj, putHandler );
-   }
+      updater(newObj, riak::put_response_handler([] (const std::error_code& error) {
+            if (!error) { LOG(INFO) << "sys/info put succeeded!" << Core::Logger::endl; }
+            else { CoreThrowException( RiakHardNetwork, error.message().c_str() ); } 
+         }));
+      store->get_object( "sys", "motd", []( const std::error_code& error, std::shared_ptr<riak::object> object, riak::value_updater& updater ) {
+         if (!error) {
+            json_spirit::Object jsonSysMotdObj;
+            Core::stringstream os;
 
-   void putSysInfoResult (const std::error_code& error) {
-       if (!error) {
-           LOG(INFO) << "Put succeeded!" << Core::Logger::endl;
-       }
-       else {
-           LOG(ERROR) << "Put succeeded!" << Core::Logger::endl;
-       }
+            jsonSysMotdObj.push_back( json_spirit::Pair( "page", "The first Motd from VT" ) );
+            json_spirit::write_formatted( jsonSysMotdObj, os );
+            LOG(INFO) << os.str();
+
+            auto newObj = std::make_shared<riak::object>();
+            newObj->set_value( os.str() );
+            newObj->set_content_type("application/json");
+            updater(newObj, riak::put_response_handler([] (const std::error_code& error) {
+                  if (!error) { LOG(INFO) << "sys/mtod put succeeded!" << Core::Logger::endl; }
+                  else { CoreThrowException( RiakHardNetwork, error.message().c_str() ); } 
+               }));
+         } else {
+            LOG(INFO) << "Could not receive the object from Riak due to a hard error. Bailing" << Core::Logger::endl;
+            CoreThrowException( RiakHardNetwork, error.message().c_str() );
+         }
+      });
    }
 
 };
