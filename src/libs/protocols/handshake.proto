@@ -1,0 +1,7 @@
+package Messages;
+
+message FirstContact 
+{
+	required uint32 magicId = 1;
+	required string clientString = 2;
+}

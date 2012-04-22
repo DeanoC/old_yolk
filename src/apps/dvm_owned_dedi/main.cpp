@@ -2,30 +2,27 @@
 #include "dwm/dwm.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
+#include "handshake.h"
 
 Core::shared_ptr<Dwm> dwm;
 
 void readConfig( std::string& hostname, int& port ) {
    std::ifstream is( "./config.json" );
-   if( is.bad() )
+   if( is.bad() || !is.is_open() )
       return;
-
+   
    json_spirit::Value value;
 
    json_spirit::read( is, value );
    if( value.is_null() )
       return;
 
-   const json_spirit::Array& configArray = value.get_array();
-   // array of json objects
-   for( unsigned int i = 0; i < configArray.size(); ++i ) {
-      auto obj = configArray[i].get_obj();
-      for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
-         if( val->name_ == "hostname" ) {
-            hostname = val->value_.get_str();
-         } else if( val->name_ == "port" ) {
-            port = val->value_.get_int();
-         }
+   auto obj = value.get_obj();
+   for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
+      if( val->name_ == "hostname" ) {
+         hostname = val->value_.get_str();
+      } else if( val->name_ == "port" ) {
+         port = val->value_.get_int();
       }
    }
 }
@@ -50,19 +47,23 @@ int Main() {
           return 1;
       }
 
-      std::string hostname( "192.168.254.95" );
-      int port( 8081 );
+      std::string hostname( "127.0.0.1" );
+      int port( 2045 );
 
       readConfig( hostname, port );
+      Handshake( hostname, port );
+//      dwm.reset( new Dwm );
+//      dwm->setRiakAddress( hostname );
+//      dwm->setRiakPort( port );
 
-      dwm.reset( new Dwm );
-      dwm->setRiakAddress( hostname );
-      dwm->setRiakPort( port );
-
-	   dwm->bootstrapLocal();
+//	   dwm->bootstrapLocal();
    } 
    CoreCatchAllOurExceptions {
       LogException( err );
+      return 1;
+   }
+   CoreCatchAllStdExceptions {
+      LOG(ERROR) << err.what();
       return 1;
    }
    CoreCatchAll {

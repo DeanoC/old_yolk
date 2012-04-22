@@ -1,8 +1,5 @@
 cmake_minimum_required( VERSION 2.8 )
 
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-# link_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 file( GLOB cpp_src_files *.cpp *.cxx)
 file( GLOB c_src_files *.c )
 file( GLOB header_files *.h *.inl *.hpp *.hxx)

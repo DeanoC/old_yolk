@@ -13,6 +13,8 @@
 #ifndef CORE_TCP_H_
 #define CORE_TCP_H_
 
+namespace Core {
+
 class TcpConnection
 	: public Core::enable_shared_from_this<TcpConnection> {
 public:
@@ -22,7 +24,7 @@ public:
 		return pointer( CORE_NEW TcpConnection( ioService ) );
 	}
 
-	Core::asio::ip::tcp::socket& socket() const {
+	Core::asio::ip::tcp::socket& socket() {
 		return m_socket;
 	}
 
@@ -66,7 +68,7 @@ public:
 		// TODO exit message
 		while( true ) {
 			// create new connection
-			TcpConnection::pointer newConn = TcpConnection::create( m_acceptor.io_service() );
+			TcpConnection::pointer newConn = TcpConnection::create( m_acceptor.get_io_service() );
 
 			// block until we get an incoming message
 			m_acceptor.accept( newConn->socket() );
@@ -81,5 +83,7 @@ private:
 	Core::asio::ip::tcp::acceptor	m_acceptor;
 	ConnectionFunc					m_func;
 };
+
+}; // end namspace Core;
 
 #endif // CORE_TCP_H_

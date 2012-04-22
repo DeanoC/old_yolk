@@ -45,28 +45,24 @@ private:
    Core::shared_ptr<riak::client>      store;
 
    void readConfig() {
-       std::ifstream is( "./config.json" );
-       if( is.bad() )
-          return;
+      std::ifstream is( "./config.json" );
+      if( is.bad() || !is.is_open() )
+         return;
+   
+      json_spirit::Value value;
 
-       json_spirit::Value value;
+      json_spirit::read( is, value );
+      if( value.is_null() )
+         return;
 
-       json_spirit::read( is, value );
-       if( value.is_null() )
-          return;
-
-       const json_spirit::Array& configArray = value.get_array();
-       // array of json objects
-       for( unsigned int i = 0; i < configArray.size(); ++i ) {
-          auto obj = configArray[i].get_obj();
-          for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
-             if( val->name_ == "hostname" ) {
-                hostname = val->value_.get_str();
-             } else if( val->name_ == "port" ) {
-                port = val->value_.get_int();
-             }
-           }
-       }
+      auto obj = value.get_obj();
+      for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
+         if( val->name_ == "hostname" ) {
+            hostname = val->value_.get_str();
+         } else if( val->name_ == "port" ) {
+            port = val->value_.get_int();
+         }
+      }
    }
 
    std::shared_ptr<riak::object> noSiblingResolution (const riak::siblings&) {

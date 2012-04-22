@@ -1,29 +1,25 @@
 #include "core/core.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
-
+#include "tcpserver.h"
 
 void readConfig( std::string& hostname, int& port ) {
    std::ifstream is( "./config.json" );
-   if( is.bad() )
+   if( is.bad() || !is.is_open() )
       return;
-
+   
    json_spirit::Value value;
 
    json_spirit::read( is, value );
    if( value.is_null() )
       return;
 
-   const json_spirit::Array& configArray = value.get_array();
-   // array of json objects
-   for( unsigned int i = 0; i < configArray.size(); ++i ) {
-      auto obj = configArray[i].get_obj();
-      for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
-         if( val->name_ == "hostname" ) {
-            hostname = val->value_.get_str();
-         } else if( val->name_ == "port" ) {
-            port = val->value_.get_int();
-         }
+   auto obj = value.get_obj();
+   for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
+      if( val->name_ == "hostname" ) {
+         hostname = val->value_.get_str();
+      } else if( val->name_ == "port" ) {
+         port = val->value_.get_int();
       }
    }
 }
@@ -52,9 +48,34 @@ int Main() {
       int port( 8081 );
 
       readConfig( hostname, port );
+
+		boost::asio::io_service io_service;
+
+      // Launch the initial server co-routine.
+		auto server = TcpServer(io_service, hostname, port );
+
+      server();
+		// Wait for signals indicating time to shut down.
+		boost::asio::signal_set signals(io_service);
+		signals.add(SIGINT);
+		signals.add(SIGTERM);
+		#if defined(SIGQUIT)
+			signals.add(SIGQUIT);
+		#endif // defined(SIGQUIT)
+		signals.async_wait(boost::bind(
+					&boost::asio::io_service::stop, &io_service));
+
+		// Run the server.
+		io_service.run();
+
+
    } 
    CoreCatchAllOurExceptions {
       LogException( err );
+      return 1;
+   }
+   CoreCatchAllStdExceptions {
+      LOG(ERROR) << err.what();
       return 1;
    }
    CoreCatchAll {

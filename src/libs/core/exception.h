@@ -15,6 +15,8 @@
 //---------------------------------------------------------------------------
 #if defined(USE_CPP_EXCEPTIONS)
 
+#include <exception>
+
 /// begin a try/catch block
 #	define CoreTry			try
 /// catch x type of exception 
@@ -25,6 +27,8 @@
 #	define CoreCatchAll	catch( ... )
 /// catch any of our Exception class
 #	define CoreCatchAllOurExceptions	catch( Except const& err)
+/// catch any of std::exception class
+#	define CoreCatchAllStdExceptions	catch( std::exception const& err)
 /// this functions makes no throws
 #	define CoreNoThrows	throw()
 /// throw an x type of exception
@@ -48,6 +52,8 @@
 #	define CoreCatchAll	if( false )
 /// catch any of our Exception class
 #	define CoreCatchAllOurExceptions	if( false )
+/// catch any of std::exception class
+#	define CoreCatchAllStdExceptions	if( false )
 /// this functions makes no throws
 #	define CoreNoThrows	
 /// throw an x type of exception
@@ -92,16 +98,16 @@ Base exception class.
 Exception inherits off this to have a uniform way of specifying exception data.
 */
 class Except
-#if defined( USE_CPP_EXCEPTION )
-: Core::exception 
+#if defined( USE_CPP_EXCEPTIONS )
+: std::exception 
 #endif	     
 {
 public:
 	Except()
 		: UserText(),File(), Line(0){};
 	Except(const Core::string UserData, const Core::string file, unsigned int line )
-#if defined( USE_CPP_EXCEPTION )
-     : Core::exception( UserData.c_str() ), UserText( UserData ), File(file), Line(line) 
+#if defined( USE_CPP_EXCEPTIONS )
+     : std::exception( UserData.c_str() ), UserText( UserData ), File(file), Line(line) 
 #endif       
        {};
 
