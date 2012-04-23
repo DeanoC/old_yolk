@@ -1,6 +1,6 @@
 #ifndef BINIFY_H
 #define BINIFY_H
-#include "Flexlexer.h"
+#include "FlexLexer.h"
 #include <vector>
 
 

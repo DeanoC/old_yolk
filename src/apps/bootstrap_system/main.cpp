@@ -42,7 +42,7 @@ private:
    bool                                deleteSystem;
    boost::asio::io_service             ios;
    riak::transport::delivery_provider  connection;
-   Core::shared_ptr<riak::client>      store;
+   std::shared_ptr<riak::client>      store;
 
    void readConfig() {
       std::ifstream is( "./config.json" );
@@ -114,10 +114,12 @@ private:
       newObj->set_value( os.str() );
       newObj->set_content_type("application/json");
 
-      updater(newObj, riak::put_response_handler([] (const std::error_code& error) {
+      riak::put_response_handler fn0 = [] (const std::error_code& error) {
             if (!error) { LOG(INFO) << "sys/info put succeeded!" << Core::Logger::endl; }
             else { CoreThrowException( RiakHardNetwork, error.message().c_str() ); } 
-         }));
+         };
+
+      updater(newObj, fn0 );
       store->get_object( "sys", "motd", []( const std::error_code& error, std::shared_ptr<riak::object> object, riak::value_updater& updater ) {
          if (!error) {
             json_spirit::Object jsonSysMotdObj;
@@ -130,10 +132,11 @@ private:
             auto newObj = std::make_shared<riak::object>();
             newObj->set_value( os.str() );
             newObj->set_content_type("application/json");
-            updater(newObj, riak::put_response_handler([] (const std::error_code& error) {
+            riak::put_response_handler fn1 = [] (const std::error_code& error) {
                   if (!error) { LOG(INFO) << "sys/mtod put succeeded!" << Core::Logger::endl; }
                   else { CoreThrowException( RiakHardNetwork, error.message().c_str() ); } 
-               }));
+               };
+            updater(newObj, fn1 );
          } else {
             LOG(INFO) << "Could not receive the object from Riak due to a hard error. Bailing" << Core::Logger::endl;
             CoreThrowException( RiakHardNetwork, error.message().c_str() );

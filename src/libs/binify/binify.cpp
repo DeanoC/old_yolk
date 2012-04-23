@@ -3,7 +3,7 @@
 #include <ostream>
 #include <vector>
 
-#include "Flexlexer.h"
+#include "FlexLexer.h"
 #include "binify.h"
 #include "parser.tab.hpp"
 

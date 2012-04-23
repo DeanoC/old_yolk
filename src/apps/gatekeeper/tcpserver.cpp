@@ -3,7 +3,7 @@
 
  Implements the tcpserver class.
  */
-#include "core\core.h"
+#include "core/core.h"
 #include "tcpserver.h"
 #include "protocols/handshake.proto.pb.h"
 // don't usually do this but makes the statement defs much shorter!

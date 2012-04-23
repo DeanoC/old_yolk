@@ -18,7 +18,7 @@
 DECLARE_EXCEPTION( DBBackEndHard, "Failure to contact backend DB" );
 
 #define DECL_INEXEBITCODE( NAME ) extern const unsigned char* binary_data_vm_code_##NAME##_cpp; extern size_t binary_data_vm_code_##NAME##_cpp_sizeof;
-#define MEMFILE_INEXEBITCODE( NAME )  MemFile( (uint8_t*) binary_data_vm_code_##NAME##_cpp, binary_data_vm_code_##NAME##_cpp_sizeof )
+#define MEMFILE_INEXEBITCODE( NAME ) Core::MemFile( (uint8_t*) binary_data_vm_code_##NAME##_cpp, binary_data_vm_code_##NAME##_cpp_sizeof ).inOut()
 
 DECL_INEXEBITCODE( helloworld );
 DECL_INEXEBITCODE( bootstrap );

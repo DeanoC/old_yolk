@@ -107,7 +107,7 @@ public:
 		: UserText(),File(), Line(0){};
 	Except(const Core::string UserData, const Core::string file, unsigned int line )
 #if defined( USE_CPP_EXCEPTIONS )
-     : std::exception( UserData.c_str() ), UserText( UserData ), File(file), Line(line) 
+     : std::exception(), UserText( UserData ), File(file), Line(line) 
 #endif       
        {};
 
@@ -122,6 +122,9 @@ public:
 	const Core::string getFile() const CoreNoThrows { return File; };
 	//! Line exception was thrown from
 	const unsigned int getLine() const CoreNoThrows { return Line; };
+	
+	// from std::exception
+	virtual const char* what() const CoreNoThrows { return UserText.c_str(); }
 
 private:
 	Core::string UserText;

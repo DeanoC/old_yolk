@@ -13,3 +13,6 @@
 [submodule "submodules/protobuf"]
 	path = submodules/protobuf
 	url = git@bitbucket.org:DeanoC/protobuf.git
+[submodule "submodules/clang"]
+	path = submodules/clang
+	url = git@bitbucket.org:DeanoC/clang.git

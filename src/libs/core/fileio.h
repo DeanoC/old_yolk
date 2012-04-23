@@ -106,6 +106,7 @@ public:
 	virtual uint64_t bytesLeft() {
 		return m_Size - m_Offset;
 	}
+	InOutInterface& inOut() { return (InOutInterface&)(*this); }
 				 
 protected:
 	uint8_t*	m_Buffer;

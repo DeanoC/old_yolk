@@ -3,7 +3,7 @@
 #endif
 
 #include <map>
-#include <string>
+#include <cstring>
 
 #include <cstdio>
 #include <cstdlib>
@@ -168,7 +168,7 @@ void EmitString( const char* str )
 	int len;
 	int i;
 
-	len = strlen(str);
+	len = std::strlen(str);
 	assert( len >= 2 );
 	assert( str[0] == '\"' );
 	assert( str[len-1] == '\"' );

@@ -10,10 +10,10 @@
 #define offsetof(s,m)   (size_t)&(((s *)0)->m)
 #endif
 
-#ifndef _SIZE_T_DEFINED
+//#ifndef _SIZE_T_DEFINED
 typedef unsigned int   size_t;
 #define _SIZE_T_DEFINED
-#endif
+//#endif
 
 #ifndef _INTPTR_T_DEFINED
 typedef int            intptr_t;
@@ -29,7 +29,7 @@ typedef unsigned int   uintptr_t;
 typedef  int            ptrdiff_t;
 #define _PTRDIFF_T_DEFINED
 #endif
-
+/*
 #ifndef _WCHAR_T_DEFINED
 typedef unsigned char wchar_t;
 #define _WCHAR_T_DEFINED
@@ -40,5 +40,5 @@ typedef unsigned char wint_t;
 typedef unsigned char wctype_t;
 #define _WCTYPE_T_DEFINED
 #endif
-
+*/
 #endif

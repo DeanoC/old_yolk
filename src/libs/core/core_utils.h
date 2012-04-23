@@ -6,10 +6,6 @@
 /// \details	
 ///		just some general helper macros and functions
 ///
-/// \remark	Copyright (c) 2010 Zombie House Studios. All rights reserved.
-/// \remark	mailto://deano@zombiehousestudios.com
-///
-/// \todo	Fill in detailed file description. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -90,7 +86,7 @@ namespace Core {
 CORE_INLINE int integer( float value )
 {
 	int output;
-#if CPU_FAMILY == CPU_X86
+#if CPU_FAMILY == CPU_X86 && COMPILER == MS_COMPILER
 	_asm
 	{
 		fld value

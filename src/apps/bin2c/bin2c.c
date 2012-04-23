@@ -58,7 +58,7 @@ int main (int argc, char **argv) {
 	fprintf( outFile, "};\n" );
 
 	fprintf( outFile, "const unsigned char* binary_data_%s = binary_data_%s_data;\n", argv[3], argv[3] );
-	fprintf( outFile, "size_t binary_data_%s_sizeof = %i; // without the final 0", argv[3], i );
+	fprintf( outFile, "unsigned int binary_data_%s_sizeof = %i; // without the final 0", argv[3], i );
 
 	fclose (inFile);
 	return (0);
