@@ -6,7 +6,7 @@
 	url = git@bitbucket.org:DeanoC/llvm.git
 [submodule "submodules/json-spirit"]
 	path = submodules/json-spirit
-	url = git://gitorious.org/json-spirit/json-spirit.git
+	url = git@bitbucket.org:DeanoC/json-spirit.git	
 [submodule "submodules/riak-cpp"]
 	path = submodules/riak-cpp
 	url = git@bitbucket.org:DeanoC/riak-cpp.git
