@@ -11,8 +11,24 @@
 
 #include "core/coroutine.h"
 
-struct request;
-class FSMHider;
+class HandShakeFSM;
+class TcpServer;
+
+class ClientConnection {
+public:
+   ClientConnection( boost::asio::io_service& io_service );
+   ~ClientConnection();
+
+	std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const { return socket; }
+	template<class Event>
+	void process_event(TcpServer* server, Event const& evt);
+
+	TcpServer* tmpServer; // internal detail
+private:
+   // note: we use naked pointers, so that we can decompile the FSM met-program fromt headers
+	HandShakeFSM*									fsm;
+	std::shared_ptr<boost::asio::ip::tcp::socket>	socket;
+};
 
 class TcpServer : public coroutine {
 public:
@@ -20,7 +36,6 @@ public:
 	/// serve up files from the given directory.
 	explicit TcpServer(boost::asio::io_service& io_service,
 		const std::string& address, const int& port );
-   ~TcpServer();
 
 	/// Perform work associated with the server.
 	void operator()(
@@ -28,19 +43,10 @@ public:
 		std::size_t length = 0);
 
 private:
-	typedef boost::asio::ip::tcp tcp;
+	std::shared_ptr<boost::asio::ip::tcp::acceptor>		acceptor; 	///< Acceptor used to listen for incoming connections.
+	std::shared_ptr<ClientConnection>					connection; ///< Socket and FSM 
+	std::shared_ptr<std::array<char, 8192> >			buffer; 	   ///< Buffer for incoming data.
 
-	/// Acceptor used to listen for incoming connections.
-	std::shared_ptr<tcp::acceptor> acceptor;
-
-	/// The current connection from a client.
-	std::shared_ptr<tcp::socket> socket;
-
-
-	/// Buffer for incoming data.
-	std::shared_ptr<boost::array<char, 8192> > buffer;
-
-   	FSMHider*               hider;
 };
 
 
