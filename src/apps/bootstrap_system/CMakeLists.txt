@@ -11,7 +11,7 @@ add_executable( bootstrap_system WIN32 ${src_files} ${header_files} )
 
 list( APPEND targ_link_libs ${Core_LIBRARIES} riak-cpp protobuf json_spirit )
 if( UNIX )
-list( APPEND targ_link_libs pthread dl )
+	list( APPEND targ_link_libs pthread dl boost_thread)
 endif()
 
 target_link_libraries( bootstrap_system ${targ_link_libs} )

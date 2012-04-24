@@ -40,9 +40,7 @@ private:
 	/// Buffer for incoming data.
 	std::shared_ptr<boost::array<char, 8192> > buffer;
 
-	/// The incoming request.
-	std::shared_ptr<request> request;
-   FSMHider*               hider;
+   	FSMHider*               hider;
 };
 
 
