@@ -4,7 +4,7 @@
 
 #include <map>
 #include <cstring>
-
+#include <string>
 #include <cstdio>
 #include <cstdlib>
 #include <assert.h>
