@@ -19,8 +19,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 	// list of events
 	struct Start {};
 	struct Resolved {};
-	struct McpReplys {};
-	struct Handoff {};
+	struct ServiceReply {};
 	struct ErrorEvent {};
 
 	// The list of FSM states
@@ -58,26 +57,24 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 	struct Hello : public front::state<> {
 		template <class EVT,class FSM>
 		void on_entry(EVT const& ,FSM& fsm ) {
-			Core::array<uint8_t, 1024> buffer;
-			size_t readSize = fsm.m_connection->syncRead( buffer.data(), buffer.size() );
+			size_t readSize = fsm.m_connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
 			Messages::FirstContact fc;
-			fc.ParseFromArray( buffer.data(), readSize );
+			fc.ParseFromArray( fsm.buffer.data(), readSize );
 			CORE_ASSERT( fc.has_clientstring() );
 			CORE_ASSERT( fc.has_magicid() );
 			CORE_ASSERT( fc.magicid() == 0xDEADDEAD );
-			LOG(INFO) << "MCP Contact made with Server : " << fc.clientstring();
+			LOG(INFO) << "Contact made with Server : " << fc.clientstring();
+			fsm.process_event( ServiceReply() );
 		}
 	};
 
-	struct ValidateMcp : public front::state<> {
-		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& ) {
-			LOG(INFO) << "ValidateMcp replied!\n";
-		}
-	};
-
-	struct McpHandoff : public front::state<> {
-		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& ) {
-			LOG(INFO) << "McpHandoff replied!\n";
+	struct DWMDediRequest : public front::state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			Messages::FirstResponse fr;
+			fr.Clear();
+			fr.set_service( Messages::FirstResponse_SERVICE_DWM_DEDICATED );
+			fr.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
+			fsm.m_connection->syncWrite( fsm.buffer.data(), fr.ByteSize() );
 		}
 	};
 
@@ -99,21 +96,23 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 
 	// Transition table for player
 	struct transition_table : Core::mpl::vector <
-// +--------------+--------------+--------------+-------------------------+----------------------+
-// |    Start     |  Event       |     Next     |         Action          |          Guard       |
-// +--------------+--------------+--------------+-------------------------+----------------------+
-Row< Empty        , Start        , ResolvingHost, none                    , none                >, 
-Row< ResolvingHost, Resolved	   , Hello		   , none                    , none                >,
-Row< Hello		   , McpReplys	   , ValidateMcp  , none                    , none                >, 
-Row< ValidateMcp  , Handoff		, McpHandoff   , none                    , none                >, 
-Row< AllOk		   , ErrorEvent	, ErrorMode    , none                    , none                > 
-//|+--------------+--------------+--------------+-------------------------+----------------------+
+// +--------------+-----------------+---------------+---------------+-----------+
+// |    Start     |  Event			|     Next		|     Action    |  Guard    |
+// +--------------+-----------------+---------------+---------------+-----------+
+Row< Empty        , Start			, ResolvingHost	, none			, none		>, 
+Row< ResolvingHost, Resolved		, Hello			, none			, none		>,
+Row< Hello		  , ServiceReply	, DWMDediRequest, none			, none		>, 
+// +--------------+-----------------+---------------+---------------+-----------+
+Row< AllOk		  , ErrorEvent		, ErrorMode		, none			, none		> 
+// +--------------+-----------------+---------------+---------------+-----------+
 > {};
 
 	Core::asio::io_service			m_ioService;	//!< The i/o service object
-	Core::string					   m_serverAddr;	//!< The server address string
-	Core::string					   m_serverPort;	//!< The server port string
+	Core::string					m_serverAddr;	//!< The server address string
+	Core::string					m_serverPort;	//!< The server port string
 	TcpConnection::pointer			m_connection;	//!< Connection to the server once resolved
+	std::array<uint8_t, 1024*8>		buffer;
+
 };
 
 } // end namespace 

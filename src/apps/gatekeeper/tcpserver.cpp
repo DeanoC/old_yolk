@@ -26,13 +26,13 @@ using namespace Core::msm::front;
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
-
 	ServerHandshakeFSM( ClientConnection* servr ) :
 		server( servr ) {}
 
 	// list of events
 	struct Contact {};
 	struct Response {};
+	struct ServiceRecv {};
 	struct ErrorEvent {};
 
 	// The list of FSM states  
@@ -40,25 +40,45 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 
 	struct FirstContact : public state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			LOG(INFO) << "First Contact";
 			Messages::FirstContact fc;
 			fc.Clear();
 			fc.set_magicid( 0xDEADDEAD );
-			fc.set_clientstring( "MCP" );
-			Core::array< uint8_t, 1024 > buffer;
+			fc.set_clientstring( "Gatekeeper" );
 			// write the protobuf into the buffer, leaving space for the size at the start
-			fc.SerializeToArray( buffer.data()+4, buffer.size()-4 );
+			fc.SerializeToArray( fsm.buffer.data()+4, fsm.buffer.size()-4 );
 			const uint32_t byteSize = fc.ByteSize();
-			memcpy( buffer.data(), &byteSize, 4 );
+			memcpy( fsm.buffer.data(), &byteSize, 4 );
 
-			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( buffer.data(), byteSize+4 ), *fsm.server->tmpServer );
+			LOG(INFO) << "First Contact sent";
+			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), byteSize+4 ), *fsm.server->tmpServer );
 		}
 	};
 
 	struct FirstResponse : public state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
-			Core::string message;
-			LOG(INFO) << "First Contact sent";
-//			m_connection->SyncRead( message );
+			LOG(INFO) << "First Response";
+			namespace asio = boost::asio;
+			Core::asio::async_read( *fsm.server->getSocket(), asio::buffer(fsm.buffer), 
+				[&](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
+					if( bytes_transferred >= 4 ) {
+						// first 4 bytes is size
+						uint32_t packetSize = 0;
+						memcpy( &packetSize, fsm.buffer.data(), 4 );
+						return std::min( (size_t)(packetSize + 4) - bytes_transferred, (size_t)0 );
+					} else {
+						return 4;
+					}
+				},
+				*fsm.server->tmpServer);
+		}
+	};
+
+	struct SelectService : public state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			LOG(INFO) << "Select Service";
+			Messages::FirstResponse fr;
+//			fr.ParseFromArray( fsm.buffer.data(), 
 		}
 	};
 
@@ -87,10 +107,14 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 // +----------------+-------------------+-----------------+-----------+--------+
 Row< Empty			, Contact			, FirstContact    , none      , none   >, 
 Row< FirstContact	, Response			, FirstResponse   , none      , none   >,
+Row< FirstResponse	, ServiceRecv		, SelectService   , none      , none   >,
+// +----------------+-------------------+-----------------+-----------+--------+
 Row< AllOk			, ErrorEvent		, ErrorMode       , none      , none   > 
 // +----------------+-------------------+-----------------+-----------+--------+
 > {};
 	ClientConnection* server;
+	std::array<uint8_t, 8192> buffer;
+
 };
 
 class HandShakeFSM : public Core::msm::back::state_machine<ServerHandshakeFSM> {
@@ -152,6 +176,7 @@ void TcpServer::operator()( boost::system::error_code ec, std::size_t length ) {
 			// child thread handles stuff here
 			yield connection->process_event( this, ServerHandshakeFSM::Contact() );
          	yield connection->process_event( this, ServerHandshakeFSM::Response() );
+         	yield connection->process_event( this, ServerHandshakeFSM::ServiceRecv() );
 
 			// finished talking, close the socket
 			connection.reset();
