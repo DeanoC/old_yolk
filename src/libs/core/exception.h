@@ -147,6 +147,7 @@ DECLARE_EXCEPTION(TodoError, TODO Not yet implemented);
 DECLARE_EXCEPTION(ParamError, Some parameter was incorrect);
 DECLARE_EXCEPTION(BoundCheckFail, A boundary check has failed);
 DECLARE_EXCEPTION(AssertError, Assert Failed);
+DECLARE_EXCEPTION(ProtocolError, Protocol is invalid);
 
 inline void LogException( const Except& Ex ) {
    /// Log an exception in VC6 IDE format for quick finding (just double click on the log)

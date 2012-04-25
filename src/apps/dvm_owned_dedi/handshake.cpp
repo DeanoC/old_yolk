@@ -72,7 +72,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			Messages::FirstResponse fr;
 			fr.Clear();
-			fr.set_service( Messages::FirstResponse_SERVICE_DWM_DEDICATED );
+			fr.set_service( Messages::FirstResponse_SERVICE_DWM );
 			fr.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
 			fsm.m_connection->syncWrite( fsm.buffer.data(), fr.ByteSize() );
 		}

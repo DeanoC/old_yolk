@@ -10,8 +10,7 @@ message FirstResponse
 {
 	enum SERVICE {
 		CLIENT			= 0;
-		DWM_SHARED		= 1;
-		DWM_DEDICATED	= 2;
+		DWM				= 1;
 	};
 	required SERVICE service = 1;
 

@@ -18,7 +18,6 @@ TcpServer::TcpServer( boost::asio::io_service& io_service,
 
 // don't usually do this but makes the statement defs much shorter!
 using namespace Core::msm::front;
-#include "core/yield.h"
 ///-------------------------------------------------------------------------------------------------
 /// \struct	ServerHandshakeFSM
 ///
@@ -34,6 +33,8 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 	struct Response {};
 	struct ServiceRecv {};
 	struct ErrorEvent {};
+	struct WantClientService {};	
+	struct WantDWMService {};	
 
 	// The list of FSM states  
 	struct Empty : public state<> {};
@@ -63,9 +64,9 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 				[&](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
 					if( bytes_transferred >= 4 ) {
 						// first 4 bytes is size
-						uint32_t packetSize = 0;
-						memcpy( &packetSize, fsm.buffer.data(), 4 );
-						return std::min( (size_t)(packetSize + 4) - bytes_transferred, (size_t)0 );
+						uint32_t protoSize = 0;
+						memcpy( &protoSize, fsm.buffer.data(), 4 );
+						return std::max( (size_t)(protoSize + 4) - bytes_transferred, (size_t)0 );
 					} else {
 						return 4;
 					}
@@ -78,7 +79,21 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			LOG(INFO) << "Select Service";
 			Messages::FirstResponse fr;
-//			fr.ParseFromArray( fsm.buffer.data(), 
+			uint32_t protoSize = 0;
+			memcpy( &protoSize, fsm.buffer.data(), 4 );
+			fr.ParseFromArray( fsm.buffer.data() + 4, protoSize );
+			(*fsm.server->tmpServer)( boost::system::error_code(), fr.service() );
+		}
+	};
+
+	struct ClientService : public state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			LOG(INFO) << "Client Service";
+		}
+	};
+	struct DWMService : public state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			LOG(INFO) << "DWM Service";
 		}
 	};
 
@@ -102,15 +117,17 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 
 	// Transition table for player
 	struct transition_table : Core::mpl::vector <
-// +----------------+-------------------+-----------------+-----------+--------+
-// |    Start		|      Event		|      Next       |  Action   | Guard  |
-// +----------------+-------------------+-----------------+-----------+--------+
-Row< Empty			, Contact			, FirstContact    , none      , none   >, 
-Row< FirstContact	, Response			, FirstResponse   , none      , none   >,
-Row< FirstResponse	, ServiceRecv		, SelectService   , none      , none   >,
-// +----------------+-------------------+-----------------+-----------+--------+
-Row< AllOk			, ErrorEvent		, ErrorMode       , none      , none   > 
-// +----------------+-------------------+-----------------+-----------+--------+
+// +----------------+-------------------+-------------------+-----------+--------+
+// |    Start		|      Event		|      Next			|  Action   | Guard  |
+// +----------------+-------------------+-------------------+-----------+--------+
+Row< Empty			, Contact			, FirstContact		, none      , none   >, 
+Row< FirstContact	, Response			, FirstResponse		, none      , none   >,
+Row< FirstResponse	, ServiceRecv		, SelectService		, none      , none   >,
+Row< SelectService	, WantClientService	, ClientService		, none      , none   >,
+Row< SelectService	, WantDWMService	, DWMService		, none      , none   >,
+// +----------------+-------------------+-------------------+-----------+--------+
+Row< AllOk			, ErrorEvent		, ErrorMode			, none      , none   > 
+// +----------------+-------------------+-------------------+-----------+--------+
 > {};
 	ClientConnection* server;
 	std::array<uint8_t, 8192> buffer;
@@ -158,7 +175,10 @@ void ClientConnection::process_event(TcpServer* server, Event const& evt) {
  be a problem in terms of caches (performance on snooped caches + explicit flush
  on DIY cache snooping platforms).
  */
-void TcpServer::operator()( boost::system::error_code ec, std::size_t length ) {
+#include "core/yield.h"
+// when called from io_service param == length when called directly can be whatever
+// you like
+void TcpServer::operator()( boost::system::error_code ec, std::size_t param ) {
    if(!ec) {
 		reenter(this) {
 			do {
@@ -177,11 +197,20 @@ void TcpServer::operator()( boost::system::error_code ec, std::size_t length ) {
 			yield connection->process_event( this, ServerHandshakeFSM::Contact() );
          	yield connection->process_event( this, ServerHandshakeFSM::Response() );
          	yield connection->process_event( this, ServerHandshakeFSM::ServiceRecv() );
+			switch( param ) {
+				case Messages::FirstResponse_SERVICE_CLIENT:
+         			/*yield */connection->process_event( this, ServerHandshakeFSM::WantClientService() );
+					break;
+				case Messages::FirstResponse_SERVICE_DWM:
+         			/*yield */connection->process_event( this, ServerHandshakeFSM::WantDWMService() );
+					break;
+				default:
+					CoreThrowException( ProtocolError, "Invalid service recv'ed" );
+			}
 
 			// finished talking, close the socket
 			connection.reset();
 		}
 	}
 }
-
 #include "core/unyield.h"
