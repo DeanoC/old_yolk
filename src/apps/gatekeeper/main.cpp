@@ -44,17 +44,22 @@ int Main() {
           return 1;
       }
 
-      std::string hostname( "192.168.254.95" );
-      int port( 8081 );
+		std::string hostname( "192.168.254.95" );
+		int port( 8081 );
 
-      readConfig( hostname, port );
+		readConfig( hostname, port );
 
 		boost::asio::io_service io_service;
 
-      // Launch the initial server co-routine.
-		auto server = TcpServer(io_service, hostname, port );
+		// Launch the initial gatekeeper co-routine server.
+		// once gatekeeper has decided it likes the incoming socket
+		// it hands it off to tunnel to route future packets where they
+		// need to go
+		auto server = TcpServer( io_service, hostname, port );
+//		auto tunnel = TcpTunnel( io_service );
+//		server->setTunnel( tunnel );
+		server();
 
-      server();
 		// Wait for signals indicating time to shut down.
 		boost::asio::signal_set signals(io_service);
 		signals.add(SIGINT);

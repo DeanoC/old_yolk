@@ -106,26 +106,28 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 		}
 	};
 
+	// the two main states, ok or error, any exception switches to error which is a terminition condition of the fsm
 	struct AllOk : public front::state<> {};
-	// this state is also made terminal so that all the events are blocked
-	struct ErrorMode : public terminate_state<> {};
+	struct ErrorMode : public terminate_state<> {}; 	///< this state is also made terminal so that all the events are blocked
 
+
+	/// development error, state can't handle the event thats been fired
 	template <class Fsm,class Event> void no_transition(Event const& e, Fsm& ,int state) {
 		LOG(INFO) << "no transition from state " << state << " on event " << typeid(e).name() << "\n";
 	}
 
+	/// exchange an exception into an Error event
 	template <class Fsm,class Event> void exception_caught(Event const& e,Fsm& fsm, std::exception&) {
 		fsm.process_event( ErrorEvent() );
 	}
 
-	// the initial state of the player SM. Must be defined
-	// two regions the standard state (0) and the error state (1)
+	// the initial state of the FSM. Must be defined for each main states
 	typedef Core::mpl::vector< Empty, AllOk > initial_state;
 
-	// Transition table for player
+	// Transition table for DWM
 	struct transition_table : Core::mpl::vector <
 // +--------------------+-------------------+-------------------+---------------+-----------+
-// |    Start			|  Event			|     Next			|     Action    |  Guard    |
+// |    State			|  Event			|     Next			|     Action    |  Guard    |
 // +--------------------+-------------------+-------------------+---------------+-----------+
 Row< Empty				, Start				, ResolvingHost		, none			, none		>, 
 Row< ResolvingHost		, Resolved			, Hello				, none			, none		>,

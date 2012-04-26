@@ -11,24 +11,8 @@
 
 #include "core/coroutine.h"
 
-class HandShakeFSM;
-class TcpServer;
+class Connection;
 
-class ClientConnection {
-public:
-   ClientConnection( boost::asio::io_service& io_service );
-   ~ClientConnection();
-
-	std::shared_ptr<boost::asio::ip::tcp::socket> getSocket() const { return socket; }
-	template<class Event>
-	void process_event(TcpServer* server, Event const& evt);
-
-	TcpServer* tmpServer; // internal detail
-private:
-   // note: we use naked pointers, so that we can decompile the FSM met-program fromt headers
-	HandShakeFSM*									fsm;
-	std::shared_ptr<boost::asio::ip::tcp::socket>	socket;
-};
 
 class TcpServer : public coroutine {
 public:
@@ -44,8 +28,7 @@ public:
 
 private:
 	std::shared_ptr<boost::asio::ip::tcp::acceptor>		acceptor; 	///< Acceptor used to listen for incoming connections.
-	std::shared_ptr<ClientConnection>					connection; ///< Socket and FSM 
-	std::shared_ptr<std::array<char, 8192> >			buffer; 	   ///< Buffer for incoming data.
+	std::shared_ptr<Connection>							connection; ///< Socket and FSM 
 
 };
 
