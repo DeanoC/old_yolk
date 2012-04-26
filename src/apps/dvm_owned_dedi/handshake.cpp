@@ -20,6 +20,9 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 	struct Start {};
 	struct Resolved {};
 	struct ServiceReply {};
+	struct DispatcherEvent {};
+	struct SendHWCapacity {};
+
 	struct ErrorEvent {};
 
 	// The list of FSM states
@@ -55,8 +58,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 	};
 
 	struct Hello : public front::state<> {
-		template <class EVT,class FSM>
-		void on_entry(EVT const& ,FSM& fsm ) {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm ) {
 			size_t readSize = fsm.m_connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
 			Messages::FirstContact fc;
 			fc.ParseFromArray( fsm.buffer.data(), readSize );
@@ -71,10 +73,36 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 	struct DWMDediRequest : public front::state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			Messages::FirstResponse fr;
-			fr.Clear();
-			fr.set_service( Messages::FirstResponse_SERVICE_DWM );
+			fr.set_service( Messages::FirstResponse::DWM );
 			fr.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
 			fsm.m_connection->syncWrite( fsm.buffer.data(), fr.ByteSize() );
+			fsm.process_event( DispatcherEvent() );
+		}
+	};
+	struct Dispatcher : public front::state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			size_t readSize = fsm.m_connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
+			Messages::RemoteDataRequest rdr;
+			rdr.ParseFromArray( fsm.buffer.data(), readSize );
+			switch( rdr.request() ) {
+			case Messages::RemoteDataRequest::HW_CAPACITY:
+				fsm.process_event( SendHWCapacity() );
+				break;
+			default:
+				break;
+			}
+		}
+	};
+
+	struct SendingHWCapacity : public front::state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			Messages::HWCapacity hc;
+			hc.set_numhwthreads( Core::thread::hardware_concurrency() );
+			hc.set_numcores( Core::thread::hardware_concurrency() ); // TODO physical core count not logical
+			hc.set_dwmmemory( 1024 * 1024 * 1024 ); // TODO fix at 1 GiB for now
+
+			hc.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
+			fsm.m_connection->syncWrite( fsm.buffer.data(), hc.ByteSize() );
 		}
 	};
 
@@ -96,12 +124,15 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 
 	// Transition table for player
 	struct transition_table : Core::mpl::vector <
-// +--------------+-----------------+---------------+---------------+-----------+
-// |    Start     |  Event			|     Next		|     Action    |  Guard    |
-// +--------------+-----------------+---------------+---------------+-----------+
-Row< Empty        , Start			, ResolvingHost	, none			, none		>, 
-Row< ResolvingHost, Resolved		, Hello			, none			, none		>,
-Row< Hello		  , ServiceReply	, DWMDediRequest, none			, none		>, 
+// +--------------------+-------------------+-------------------+---------------+-----------+
+// |    Start			|  Event			|     Next			|     Action    |  Guard    |
+// +--------------------+-------------------+-------------------+---------------+-----------+
+Row< Empty				, Start				, ResolvingHost		, none			, none		>, 
+Row< ResolvingHost		, Resolved			, Hello				, none			, none		>,
+Row< Hello				, ServiceReply		, DWMDediRequest	, none			, none		>, 
+Row< DWMDediRequest		, DispatcherEvent	, Dispatcher		, none			, none		>, 
+Row< Dispatcher			, SendHWCapacity	, SendingHWCapacity	, none			, none		>, 
+Row< SendingHWCapacity	, DispatcherEvent	, Dispatcher		, none			, none		>, 
 // +--------------+-----------------+---------------+---------------+-----------+
 Row< AllOk		  , ErrorEvent		, ErrorMode		, none			, none		> 
 // +--------------+-----------------+---------------+---------------+-----------+

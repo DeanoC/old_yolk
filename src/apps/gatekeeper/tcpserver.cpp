@@ -30,11 +30,12 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 
 	// list of events
 	struct Contact {};
-	struct Response {};
+	struct GetResponse {};
 	struct ServiceRecv {};
 	struct ErrorEvent {};
 	struct WantClientService {};	
 	struct WantDWMService {};	
+	struct HWCapacityRecv {};
 
 	// The list of FSM states  
 	struct Empty : public state<> {};
@@ -43,32 +44,26 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			LOG(INFO) << "First Contact";
 			Messages::FirstContact fc;
-			fc.Clear();
 			fc.set_magicid( 0xDEADDEAD );
 			fc.set_clientstring( "Gatekeeper" );
 			// write the protobuf into the buffer, leaving space for the size at the start
-			fc.SerializeToArray( fsm.buffer.data()+4, fsm.buffer.size()-4 );
-			const uint32_t byteSize = fc.ByteSize();
-			memcpy( fsm.buffer.data(), &byteSize, 4 );
-
-			LOG(INFO) << "First Contact sent";
-			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), byteSize+4 ), *fsm.server->tmpServer );
+			fc.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
+			*((uint32_t*)fsm.buffer.data()) = fc.ByteSize();
+			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), fc.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
 		}
 	};
 
-	struct FirstResponse : public state<> {
+	struct GeneralRecv : public state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
-			LOG(INFO) << "First Response";
+			LOG(INFO) << "GeneralRecv";
 			namespace asio = boost::asio;
 			Core::asio::async_read( *fsm.server->getSocket(), asio::buffer(fsm.buffer), 
 				[&](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
-					if( bytes_transferred >= 4 ) {
+					if( bytes_transferred >= sizeof(uint32_t) ) {
 						// first 4 bytes is size
-						uint32_t protoSize = 0;
-						memcpy( &protoSize, fsm.buffer.data(), 4 );
-						return std::max( (size_t)(protoSize + 4) - bytes_transferred, (size_t)0 );
+						return std::max( (size_t)(*((uint32_t*)fsm.buffer.data()) + sizeof(uint32_t)) - bytes_transferred, (size_t)0 );
 					} else {
-						return 4;
+						return sizeof(uint32_t);
 					}
 				},
 				*fsm.server->tmpServer);
@@ -79,9 +74,7 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			LOG(INFO) << "Select Service";
 			Messages::FirstResponse fr;
-			uint32_t protoSize = 0;
-			memcpy( &protoSize, fsm.buffer.data(), 4 );
-			fr.ParseFromArray( fsm.buffer.data() + 4, protoSize );
+			fr.ParseFromArray( fsm.buffer.data() + sizeof(uint32_t), *((uint32_t*)fsm.buffer.data()) );
 			(*fsm.server->tmpServer)( boost::system::error_code(), fr.service() );
 		}
 	};
@@ -94,8 +87,31 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 	struct DWMService : public state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			LOG(INFO) << "DWM Service";
+			auto remoteEndpoint = fsm.server->getSocket()->remote_endpoint();
+			// TODO decide where trusted or untrusted based on safe IP range
+			bool trusted = true;
+			if( trusted ) {
+				Messages::RemoteDataRequest req;
+				req.set_request( Messages::RemoteDataRequest::HW_CAPACITY );
+				req.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
+				*((uint32_t*)fsm.buffer.data()) = req.ByteSize();
+				Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
+			} else {
+				// TODO untrusted DWM server insertation
+				// reject it an exit communication llop
+				(*fsm.server->tmpServer)( boost::system::error_code(), 0 );
+			}
 		}
 	};
+
+	struct GotHWCapacity : public state<> {
+		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+			LOG(INFO) << "GotHWCapacity";
+			Messages::HWCapacity hc;
+			hc.ParseFromArray( fsm.buffer.data() + sizeof(uint32_t), *((uint32_t*)fsm.buffer.data()) );
+			LOG(INFO) << "New DWM Server with " << hc.numhwthreads() << " HW Threads\n";
+		}
+	};	
 
 	// the two main states, ok or error, any exception switches to error which is a terminition condition of the fsm
 	struct AllOk : public state<> {};
@@ -121,10 +137,12 @@ struct ServerHandshakeFSM : public state_machine_def<ServerHandshakeFSM> {
 // |    Start		|      Event		|      Next			|  Action   | Guard  |
 // +----------------+-------------------+-------------------+-----------+--------+
 Row< Empty			, Contact			, FirstContact		, none      , none   >, 
-Row< FirstContact	, Response			, FirstResponse		, none      , none   >,
-Row< FirstResponse	, ServiceRecv		, SelectService		, none      , none   >,
+Row< FirstContact	, GetResponse		, GeneralRecv		, none      , none   >,
+Row< GeneralRecv	, ServiceRecv		, SelectService		, none      , none   >,
+Row< GeneralRecv	, HWCapacityRecv	, GotHWCapacity		, none      , none   >,
 Row< SelectService	, WantClientService	, ClientService		, none      , none   >,
 Row< SelectService	, WantDWMService	, DWMService		, none      , none   >,
+Row< DWMService		, GetResponse		, GeneralRecv		, none      , none   >,
 // +----------------+-------------------+-------------------+-----------+--------+
 Row< AllOk			, ErrorEvent		, ErrorMode			, none      , none   > 
 // +----------------+-------------------+-------------------+-----------+--------+
@@ -155,7 +173,6 @@ template<class Event>
 void ClientConnection::process_event(TcpServer* server, Event const& evt) {
 	tmpServer = server;
 	fsm->process_event( evt );
-	tmpServer = nullptr;
 }
 
 /**
@@ -195,17 +212,16 @@ void TcpServer::operator()( boost::system::error_code ec, std::size_t param ) {
 
 			// child thread handles stuff here
 			yield connection->process_event( this, ServerHandshakeFSM::Contact() );
-         	yield connection->process_event( this, ServerHandshakeFSM::Response() );
+         	yield connection->process_event( this, ServerHandshakeFSM::GetResponse() );
          	yield connection->process_event( this, ServerHandshakeFSM::ServiceRecv() );
-			switch( param ) {
-				case Messages::FirstResponse_SERVICE_CLIENT:
-         			/*yield */connection->process_event( this, ServerHandshakeFSM::WantClientService() );
-					break;
-				case Messages::FirstResponse_SERVICE_DWM:
-         			/*yield */connection->process_event( this, ServerHandshakeFSM::WantDWMService() );
-					break;
-				default:
-					CoreThrowException( ProtocolError, "Invalid service recv'ed" );
+			if( param == Messages::FirstResponse::CLIENT ) {
+       			/*yield */connection->process_event( this, ServerHandshakeFSM::WantClientService() );
+			} else if( param == Messages::FirstResponse::DWM ) {
+	         	yield connection->process_event( this, ServerHandshakeFSM::WantDWMService() );
+				if( param != 0 ) {
+	         		yield connection->process_event( this, ServerHandshakeFSM::GetResponse() );
+	         		yield connection->process_event( this, ServerHandshakeFSM::HWCapacityRecv() );
+				}
 			}
 
 			// finished talking, close the socket

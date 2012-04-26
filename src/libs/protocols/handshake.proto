@@ -1,17 +1,28 @@
 package Messages;
 
-message FirstContact 
-{
+message FirstContact {
 	required uint32 magicId = 1;
 	required string clientString = 2;
-}
+};
 
-message FirstResponse
-{
+message FirstResponse {
 	enum SERVICE {
 		CLIENT			= 0;
 		DWM				= 1;
 	};
 	required SERVICE service = 1;
+};
 
-}
+message RemoteDataRequest {
+	enum DATA_REQUEST {
+		HW_CAPACITY = 1;
+	};
+	required DATA_REQUEST request = 1;
+};
+
+message HWCapacity {
+	required uint32 numCores = 1;
+	required uint32 numHWThreads = 2;
+	required uint64 dwmMemory = 3;
+	optional uint32 reservedHWThreads = 4;
+};
