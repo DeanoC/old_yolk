@@ -9,6 +9,7 @@
 
 #include "fsmevents.h"
 #include "heartbeat.h"
+#include "dwmman.h"
 class Connection;
 
 // don't usually do this but makes the statement defs much shorter!
@@ -62,13 +63,30 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			LOG(INFO) << "Select Service";
 			Messages::FirstResponse fr;
 			fr.ParseFromArray( fsm.buffer.data() + sizeof(uint32_t), *((uint32_t*)fsm.buffer.data()) );
+			if( fr.service() == Messages::FirstResponse::CLIENT && fr.has_id()) {
+				auto clientEvent = FSMEvents::WantClientService();
+				clientEvent.id = fr.id();
+				fsm.process_event( clientEvent );
+			}
 			(*fsm.server->tmpServer)( boost::system::error_code(), fr.service() );
 		}
 	};
 
 	struct ClientService : public state<> {
-		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
+		template <class EVT,class FSM> void on_entry(EVT const& evt,FSM& fsm) {
 			LOG(INFO) << "Client Service";
+			if( evt.id == 0 ) {
+				// special dummy client id
+				int area = 1;
+				if( DWMMan::Get()->isAreaActive( area ) ) {
+				} else {
+					// TODO get this party started
+					DWMMan::Get()->activateDWMForArea( area );
+				}
+			} else {
+				assert( false ); // TODO 
+			}
+
 		}
 	};
 
@@ -99,7 +117,7 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			hc.ParseFromArray( fsm.buffer.data() + sizeof(uint32_t), *((uint32_t*)fsm.buffer.data()) );
 			LOG(INFO) << "New DWM Server with " << hc.numhwthreads() << " HW Threads\n";
 
-			// now send a defib message which will then take over
+			// now send a defib message
 			Messages::RemoteDataRequest req;
 			req.set_request( Messages::RemoteDataRequest::DEFIB );
 			req.set_port( HB_PORT );
@@ -107,7 +125,8 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			req.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
 			*((uint32_t*)fsm.buffer.data()) = req.ByteSize();
 			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
-
+			// and add to the unused dwm list (riak? TODO)
+			DWMMan::Get()->addNewDWM( fsm.server->getSocket()->remote_endpoint().address() );
 		}
 	};	
 

@@ -14,7 +14,9 @@ namespace FSMEvents {
 	struct GetResponse {};
 	struct ServiceRecv {};
 	struct ErrorEvent {};
-	struct WantClientService {};	
+	struct WantClientService {
+		uint64_t id;
+	};	
 	struct WantDWMService {};	
 	struct HWCapacityRecv {};
 };

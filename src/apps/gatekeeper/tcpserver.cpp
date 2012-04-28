@@ -58,7 +58,6 @@ void TcpServer::operator()( boost::system::error_code ec, std::size_t param ) {
          	yield connection->process_event( this, FSMEvents::GetResponse() );
          	yield connection->process_event( this, FSMEvents::ServiceRecv() );
 			if( param == Messages::FirstResponse::CLIENT ) {
-       			/*yield */connection->process_event( this, FSMEvents::WantClientService() );
 			} else if( param == Messages::FirstResponse::DWM ) {
 	         	yield connection->process_event( this, FSMEvents::WantDWMService() );
 				if( param != 0 ) {

@@ -10,7 +10,8 @@ message FirstResponse {
 		CLIENT			= 0;
 		DWM				= 1;
 	};
-	required SERVICE service = 1;
+	required SERVICE	service = 1;
+	optional uint64		id = 2;
 };
 
 // tells the message reciever to send the asked for data to [ip]:port if specified

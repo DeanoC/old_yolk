@@ -1,9 +1,7 @@
 #include "core/core.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
-#include "heartbeat.h"
-#include "tcpserver.h"
-#include "dwmman.h"
+#include "handshake.h"
 
 void readConfig( std::string& hostname, int& port ) {
    std::ifstream is( "./config.json" );
@@ -46,58 +44,47 @@ int Main() {
 			return 1;
 		}
 
-		std::string hostname( "192.168.254.95" );
-		int port( 8081 );
+		std::string hostname( "127.0.0.1" );
+		int port( 2045 );
 
-		readConfig( hostname, port );
-
-		DWMMan::Init();
-
-		boost::asio::io_service io_service;
-		std::shared_ptr<boost::asio::io_service::work> work( CORE_NEW boost::asio::io_service::work(io_service) );
-		// Launch the initial gatekeeper co-routine server.
-		// once gatekeeper has decided it likes the incoming socket it hands it off 
-		auto server = TcpServer( io_service, hostname, port );
-		auto heart = HeartBeat( io_service );
-		server();
+		Core::asio::io_service io;
 
 		// Wait for signals indicating time to shut down.
-		boost::asio::signal_set signals(io_service);
+		boost::asio::signal_set signals(io);
 		signals.add(SIGINT);
 		signals.add(SIGTERM);
-		#if defined(SIGQUIT)
-			signals.add(SIGQUIT);
-		#endif // defined(SIGQUIT)
-		signals.async_wait( [&work](const boost::system::error_code&, int) { 
-			// handle signals, for now exit as soon as work queues are empty
-			work.reset(); 
-			// TODO handle exit now signal
-		});
+#if defined(SIGQUIT)
+		signals.add(SIGQUIT);
+#endif // defined(SIGQUIT)
+		signals.async_wait(boost::bind(&boost::asio::io_service::stop, &io));
 
 		// Create a pool of threads to run all of the io_services.
 		std::vector<std::shared_ptr<Core::thread> > threads;
 		for (std::size_t i = 0; i < Core::thread::hardware_concurrency(); ++i) {
-			threads.push_back( std::make_shared<Core::thread>( boost::bind( &boost::asio::io_service::run, &io_service ) ) );
-			threads[i]->join();
+			threads.push_back( std::make_shared<Core::thread>( boost::bind( &boost::asio::io_service::run, &io ) ) );
 		}
 
-		// Run the server.
-		io_service.run();
+		readConfig( hostname, port );
+		if( Handshake( io, hostname, port ) == true ) {
+
+			// Wait for all threads in the pool to exit.
+			for (std::size_t i = 0; i < threads.size(); ++i)
+				threads[i]->join();
+		}
 	} 
 	CoreCatchAllOurExceptions {
 		LogException( err );
-		DWMMan::Shutdown();
 		return 1;
 	}
 	CoreCatchAllStdExceptions {
 		LOG(ERROR) << err.what();
-		DWMMan::Shutdown();
 		return 1;
 	}
 	CoreCatchAll {
-		DWMMan::Shutdown();
 		return 1;
 	}
-	DWMMan::Shutdown();
+	return 0;
+
+
 	return 0;
 }
