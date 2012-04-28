@@ -13,11 +13,20 @@ message FirstResponse {
 	required SERVICE service = 1;
 };
 
+// tells the message reciever to send the asked for data to [ip]:port if specified
+// ip4 or ip6 or port not sent means same ip or port as the sender, if none sent just reply
+// if its ipN or port is set, send to that address instead
+// if rate is sent, it should repeat every rate seconds
 message RemoteDataRequest {
 	enum DATA_REQUEST {
 		HW_CAPACITY = 1;
+		DEFIB		= 2;
 	};
 	required DATA_REQUEST request = 1;
+	optional uint32	port = 2;
+	optional string	ip4 = 3;
+	optional string	ip6 = 4;
+	optional uint32 rate = 5;
 };
 
 message HWCapacity {

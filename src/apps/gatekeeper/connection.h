@@ -9,7 +9,8 @@
 #define GATEKEEPER_CONNECTION_H_
 
 #include "gatekeeperfsm.h"
-#include "tcpserver.h"
+class TcpServer;
+class TcpTunnel;
 
 class Connection {
 public:
@@ -22,18 +23,15 @@ public:
 	
 	template<class Event> void process_event(TcpServer* server, Event const& evt);
 
-	TcpServer* tmpServer; // internal detail
-//	std::function<void(boost::system::error_code, std::size_t)> callback;
+	TcpServer*	tmpServer; // internal detail
 private:
 	GatekeeperFSMHelper*							gkFSM;
-
 	std::shared_ptr<boost::asio::ip::tcp::socket>	socket;
 };
 
 template<class Event>
 void Connection::process_event(TcpServer* server, Event const& evt) {
 	tmpServer = server;
-//	callback = boost::bind(&TcpServer::operator(), boost::ref(server), _1, _2 );
 	gkFSM->process_event( evt );
 }
 #endif

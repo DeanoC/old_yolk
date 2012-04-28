@@ -67,7 +67,7 @@ void TcpServer::operator()( boost::system::error_code ec, std::size_t param ) {
 				}
 			}
 
-			// finished talking, close the socket
+			// finished talking, close the connection
 			connection.reset();
 		}
 	}

@@ -20,47 +20,47 @@ class TcpConnection
 public:
 	typedef Core::shared_ptr<TcpConnection> pointer;
 
-	static pointer create( Core::asio::io_service& ioService ) {
+	static pointer create( boost::asio::io_service& ioService ) {
 		return pointer( CORE_NEW TcpConnection( ioService ) );
 	}
 
-	Core::asio::ip::tcp::socket& socket() {
-		return m_socket;
+	boost::asio::ip::tcp::socket& socket() {
+		return sock;
 	}
 
 	void syncWrite( const uint8_t* buffer, const size_t size ) {
-		Core::asio::write( m_socket, Core::asio::buffer( &size, 4 ) );
-		Core::asio::write( m_socket, Core::asio::buffer( buffer, size ) );
+		boost::asio::write( sock, Core::asio::buffer( &size, 4 ) );
+		boost::asio::write( sock, Core::asio::buffer( buffer, size ) );
 	}
 	void syncWrite( const Core::string& buffer ) {
 		const size_t size = buffer.size();
-		Core::asio::write( m_socket, Core::asio::buffer( &size, 4 ) );
-		Core::asio::write( m_socket, Core::asio::buffer( buffer ) );
+		boost::asio::write( sock, Core::asio::buffer( &size, 4 ) );
+		boost::asio::write( sock, Core::asio::buffer( buffer ) );
 	}
 
 	size_t syncRead( uint8_t* buffer, const size_t maxSize ) {
 		size_t serverSize;
-		Core::asio::read( m_socket, Core::asio::buffer( &serverSize, 4 ) );
+		boost::asio::read( sock, Core::asio::buffer( &serverSize, 4 ) );
 		CORE_ASSERT( serverSize < maxSize );
 		size_t clientSize;
-		clientSize = Core::asio::read( m_socket, Core::asio::buffer( buffer, serverSize ) );
+		clientSize = boost::asio::read( sock, Core::asio::buffer( buffer, serverSize ) );
 		CORE_ASSERT( clientSize == serverSize );
 		return clientSize;
 	}
 
 private:
-	TcpConnection( Core::asio::io_service& ioService )
-		: m_socket( ioService ) {}	
+	TcpConnection( boost::asio::io_service& ioService )
+		: sock( ioService ) {}	
 
-	Core::asio::ip::tcp::socket m_socket;
+	boost::asio::ip::tcp::socket sock;
 };
 
 class TcpSimpleServer {
 public:
 	typedef void (*ConnectionFunc)( TcpConnection::pointer );
 
-	TcpSimpleServer(Core::asio::io_service& ioService, uint16_t port, ConnectionFunc func ) : 
-		m_acceptor(ioService, Core::asio::ip::tcp::endpoint( Core::asio::ip::tcp::v4(), port) ), 
+	TcpSimpleServer(boost::asio::io_service& ioService, uint16_t port, ConnectionFunc func ) : 
+		m_acceptor(ioService, boost::asio::ip::tcp::endpoint( Core::asio::ip::tcp::v4(), port) ), 
 		m_func( func ) {
 	}
 

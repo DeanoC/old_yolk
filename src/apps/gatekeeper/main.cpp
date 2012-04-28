@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
+#include "heartbeat.h"
 #include "tcpserver.h"
 
 void readConfig( std::string& hostname, int& port ) {
@@ -56,6 +57,7 @@ int Main() {
 		// it hands it off to tunnel to route future packets where they
 		// need to go
 		auto server = TcpServer( io_service, hostname, port );
+		auto heart = HeartBeat( io_service );
 //		auto tunnel = TcpTunnel( io_service );
 //		server->setTunnel( tunnel );
 		server();

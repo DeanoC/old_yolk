@@ -1,10 +1,12 @@
 #include "core/core.h"
 #include "core/tcp.h"
+#include "heart.h"
 
 #include "protocols/handshake.proto.pb.h"
 
 // don't usually do this but makes the statement defs much shorter!
 using namespace Core::msm::front;
+extern Core::shared_ptr<Heart>			g_heart;
 
 namespace {
 using namespace Core;
@@ -12,9 +14,9 @@ using namespace Core::msm; // for front::state (can't use without front as ambig
 using namespace Core::msm::front; // for Row
 
 // front-end: define the FSM structure 
-struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
-	HandshakeStateMachine( const Core::string& addr, const Core::string& port ) :
-		m_serverAddr( addr ), m_serverPort( port ) {}
+struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, private boost::noncopyable {
+	HandshakeStateMachine( boost::asio::io_service* _io, const std::string& addr, const std::string& port ) :
+		 io_service( *_io ), serverAddr( addr ), serverPort( port ) {}
 
 	// list of events
 	struct Start {};
@@ -30,14 +32,14 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 
 	struct ResolvingHost : public front::state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
-			LOG(INFO) << "Resolving " << fsm.m_serverAddr << ":" << fsm.m_serverPort << "\n";
+			LOG(INFO) << "Resolving " << fsm.serverAddr << ":" << fsm.serverPort << "\n";
 			// resolve the address and port into possible socket endpoints
-			asio::ip::tcp::resolver netResolver( fsm.m_ioService );
-			asio::ip::tcp::resolver::query endPoint( fsm.m_serverAddr, fsm.m_serverPort );
+			asio::ip::tcp::resolver netResolver( fsm.io_service );
+			asio::ip::tcp::resolver::query endPoint( fsm.serverAddr, fsm.serverPort );
 			asio::ip::tcp::resolver::iterator epIter = netResolver.resolve( endPoint );
 
 			// find the first valid endpoint that wants to communicate with us
-			TcpConnection::pointer connection = TcpConnection::create( fsm.m_ioService );
+			TcpConnection::pointer connection = TcpConnection::create( fsm.io_service );
 			const asio::ip::tcp::resolver::iterator endPointEnd;
 			system::error_code err = asio::error::host_not_found;
 			while (err && epIter != endPointEnd )
@@ -51,7 +53,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 				LOG(INFO) << "Resolve error : " << err.message();
 				fsm.process_event( ErrorEvent() );
 			} else {
-				fsm.m_connection = connection;
+				fsm.connection = connection;
 				fsm.process_event( Resolved() );
 			}
 		}
@@ -59,7 +61,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 
 	struct Hello : public front::state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm ) {
-			size_t readSize = fsm.m_connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
+			size_t readSize = fsm.connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
 			Messages::FirstContact fc;
 			fc.ParseFromArray( fsm.buffer.data(), readSize );
 			CORE_ASSERT( fc.has_clientstring() );
@@ -75,19 +77,47 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 			Messages::FirstResponse fr;
 			fr.set_service( Messages::FirstResponse::DWM );
 			fr.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
-			fsm.m_connection->syncWrite( fsm.buffer.data(), fr.ByteSize() );
+			fsm.connection->syncWrite( fsm.buffer.data(), fr.ByteSize() );
 			fsm.process_event( DispatcherEvent() );
 		}
 	};
 	struct Dispatcher : public front::state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
-			size_t readSize = fsm.m_connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
+			size_t readSize = fsm.connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
 			Messages::RemoteDataRequest rdr;
 			rdr.ParseFromArray( fsm.buffer.data(), readSize );
+
 			switch( rdr.request() ) {
 			case Messages::RemoteDataRequest::HW_CAPACITY:
+				//TODO another addresses + regular updates
+				assert( rdr.has_port() == false );
+				assert( rdr.has_ip4() == false );
+				assert( rdr.has_ip6() == false );
+				assert( rdr.has_rate() == false );
 				fsm.process_event( SendHWCapacity() );
 				break;
+			case Messages::RemoteDataRequest::DEFIB: {
+				std::string addr( fsm.serverAddr );
+				int port;
+				int rate = 15;
+				if( rdr.has_ip4() ) {
+					addr = rdr.ip4();
+				}
+				if( rdr.has_ip6() ) {
+					addr = rdr.ip6();
+				}
+				if( rdr.has_port() ) {
+					port = rdr.port();
+				} else {
+					port = atoi( fsm.serverPort.c_str() );
+				} 
+				if( rdr.has_rate() ) {
+					rate = rdr.rate();
+				}
+
+				g_heart->start( addr, port, rate );
+				break;
+				}
 			default:
 				break;
 			}
@@ -102,7 +132,8 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine> {
 			hc.set_dwmmemory( 1024 * 1024 * 1024 ); // TODO fix at 1 GiB for now
 
 			hc.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
-			fsm.m_connection->syncWrite( fsm.buffer.data(), hc.ByteSize() );
+			fsm.connection->syncWrite( fsm.buffer.data(), hc.ByteSize() );
+			fsm.process_event( DispatcherEvent() );
 		}
 	};
 
@@ -140,12 +171,11 @@ Row< AllOk		  , ErrorEvent		, ErrorMode		, none			, none		>
 // +--------------+-----------------+---------------+---------------+-----------+
 > {};
 
-	Core::asio::io_service			m_ioService;	//!< The i/o service object
-	Core::string					m_serverAddr;	//!< The server address string
-	Core::string					m_serverPort;	//!< The server port string
-	TcpConnection::pointer			m_connection;	//!< Connection to the server once resolved
+	boost::asio::io_service&		io_service;	//!< The i/o service object
+	std::string						serverAddr;	//!< The server address string
+	std::string						serverPort;	//!< The server port string
+	TcpConnection::pointer			connection;	//!< Connection to the server once resolved
 	std::array<uint8_t, 1024*8>		buffer;
-
 };
 
 } // end namespace 
@@ -154,15 +184,15 @@ Row< AllOk		  , ErrorEvent		, ErrorMode		, none			, none		>
 /// \fn	bool GameServer::Utils::HandshakeWithMcp()
 /// \return	true if it succeeds, false if it fails. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool Handshake( const Core::string& addr, const int& port ) {
-   std::stringstream ss;
-   ss << port;
+bool Handshake( boost::asio::io_service& io_service, const std::string& addr, int port ) {
 
-	Core::msm::back::state_machine<HandshakeStateMachine> sm( addr, ss.str() );
+	std::stringstream ss;
+	ss << port;
+	Core::msm::back::state_machine<HandshakeStateMachine> sm( &io_service, addr, ss.str() );
 
 	// needed to start the highest-level SM. This will call on_entry and mark the start of the SM
 	sm.start();
 	sm.process_event( HandshakeStateMachine::Start() );
 
-	return ( sm.is_flag_active<Core::msm::TerminateFlag>() );
+	return ( !sm.is_flag_active<Core::msm::TerminateFlag>() );
 }

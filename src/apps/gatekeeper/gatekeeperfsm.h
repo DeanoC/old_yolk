@@ -8,6 +8,7 @@
 #define GATEKEEPER_GATEKEEPERFSM_H_
 
 #include "fsmevents.h"
+#include "heartbeat.h"
 class Connection;
 
 // don't usually do this but makes the statement defs much shorter!
@@ -97,6 +98,16 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			Messages::HWCapacity hc;
 			hc.ParseFromArray( fsm.buffer.data() + sizeof(uint32_t), *((uint32_t*)fsm.buffer.data()) );
 			LOG(INFO) << "New DWM Server with " << hc.numhwthreads() << " HW Threads\n";
+
+			// now send a defib message which will then take over
+			Messages::RemoteDataRequest req;
+			req.set_request( Messages::RemoteDataRequest::DEFIB );
+			req.set_port( HB_PORT );
+			req.set_rate( HB_SECONDS );
+			req.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
+			*((uint32_t*)fsm.buffer.data()) = req.ByteSize();
+			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
+
 		}
 	};	
 

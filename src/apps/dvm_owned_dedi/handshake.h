@@ -1,8 +1,8 @@
 #pragma once
-#ifndef DWM_OWNED_DEDI_TCPSERVER_H_
-#define DWM_OWNED_DEDI_TCPSERVER_H_
+#ifndef DWM_OWNED_DEDI_HANDSHAKE_H_
+#define DWM_OWNED_DEDI_HANDSHAKE_H_
 
-bool Handshake( const Core::string& addr, const int& port );
+bool Handshake( boost::asio::io_service& io_service, const std::string& addr, int port );
 
 
 #endif

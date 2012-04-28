@@ -1,10 +1,12 @@
 #include "core/core.h"
 #include "dwm/dwm.h"
+#include "heart.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
 #include "handshake.h"
 
-Core::shared_ptr<Dwm> dwm;
+std::shared_ptr<Dwm>			g_dwm;
+std::shared_ptr<Heart>			g_heart;
 
 void readConfig( std::string& hostname, int& port ) {
    std::ifstream is( "./config.json" );
@@ -30,45 +32,68 @@ void readConfig( std::string& hostname, int& port ) {
 
 int Main() {
 	using namespace Core;
-   namespace po = boost::program_options;
+	namespace po = boost::program_options;
 
-   // Declare the supported options.
-   po::options_description desc("Allowed options");
-   desc.add_options()
-      ("help", "produce help message")
-   ;
-   CoreTry {
-      po::variables_map vm;
-      po::store(po::parse_command_line(Core::g_argc, Core::g_argv, desc), vm);
-      po::notify(vm);    
+	// Declare the supported options.
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help", "produce help message")
+	;
+	CoreTry {
+		po::variables_map vm;
+		po::store(po::parse_command_line(Core::g_argc, Core::g_argv, desc), vm);
+		po::notify(vm);    
 
-      if (vm.count("help")) {
-          LOG(INFO) << desc << "\n";
-          return 1;
-      }
+		if (vm.count("help")) {
+			LOG(INFO) << desc << "\n";
+			return 1;
+		}
 
-      std::string hostname( "127.0.0.1" );
-      int port( 2045 );
+		std::string hostname( "127.0.0.1" );
+		int port( 2045 );
 
-      readConfig( hostname, port );
-      Handshake( hostname, port );
-//      dwm.reset( new Dwm );
-//      dwm->setRiakAddress( hostname );
-//      dwm->setRiakPort( port );
+		Core::asio::io_service io;
+		g_heart = std::make_shared<Heart>(io);
 
-//	   dwm->bootstrapLocal();
-   } 
-   CoreCatchAllOurExceptions {
-      LogException( err );
-      return 1;
-   }
-   CoreCatchAllStdExceptions {
-      LOG(ERROR) << err.what();
-      return 1;
-   }
-   CoreCatchAll {
-      return 1;
-   }
+		// Wait for signals indicating time to shut down.
+		boost::asio::signal_set signals(io);
+		signals.add(SIGINT);
+		signals.add(SIGTERM);
+#if defined(SIGQUIT)
+		signals.add(SIGQUIT);
+#endif // defined(SIGQUIT)
+		signals.async_wait(boost::bind(&boost::asio::io_service::stop, &io));
+
+		// Create a pool of threads to run all of the io_services.
+		std::vector<std::shared_ptr<Core::thread> > threads;
+		for (std::size_t i = 0; i < Core::thread::hardware_concurrency(); ++i) {
+			threads.push_back( std::make_shared<Core::thread>( boost::bind( &boost::asio::io_service::run, &io ) ) );
+		}
+
+		readConfig( hostname, port );
+		if( Handshake( io, hostname, port ) == true ) {
+
+			// Wait for all threads in the pool to exit.
+			for (std::size_t i = 0; i < threads.size(); ++i)
+				threads[i]->join();
+		}
+	//      dwm.reset( new Dwm );
+	//      dwm->setRiakAddress( hostname );
+	//      dwm->setRiakPort( port );
+
+	//	   dwm->bootstrapLocal();
+	} 
+	CoreCatchAllOurExceptions {
+		LogException( err );
+		return 1;
+	}
+	CoreCatchAllStdExceptions {
+		LOG(ERROR) << err.what();
+		return 1;
+	}
+	CoreCatchAll {
+		return 1;
+	}
 	return 0;
 
 
