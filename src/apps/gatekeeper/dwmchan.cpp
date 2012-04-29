@@ -28,6 +28,6 @@ DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
 			}
 		});
 		LOG(INFO) << "Sending BP_RET_TCP_CHAN over the back passage to " << bpEndpoint.address().to_string() << ":" << bpEndpoint.port() << "\n";
-		Sleep( 50 );
+		Core::this_thread::sleep( boost::posix_time::milliseconds(50) );
 	} while( recved == false );
 }

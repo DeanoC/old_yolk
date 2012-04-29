@@ -9,6 +9,7 @@
 
 #include "fsmevents.h"
 #include "heartbeat.h"
+#include "protocols/handshake.proto.pb.h"
 #include "dwmman.h"
 class Connection;
 

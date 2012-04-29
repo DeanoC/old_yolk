@@ -493,6 +493,10 @@ namespace Core
 #include "core/aligned_vector.h"
 #include "core/thread.h"
 
+#include <chrono>
+namespace Core {
+	using namespace std::chrono;
+}
 namespace Core
 {	
 	// std namespace importation

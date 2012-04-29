@@ -24,6 +24,7 @@
 
 #if defined( USE_BOOST_THREADS )
 #	include <boost/thread.hpp>
+#	include <boost/chrono.hpp>
 #endif
 #if defined( USE_TBB_THREADS )
 #	include <tbb/tbb_thread.h>
@@ -36,7 +37,9 @@ namespace Core
 {
 #if defined( USE_BOOST_THREADS )
 	using boost::thread;
-	using namespace boost::this_thread;
+	namespace this_thread {
+		using namespace boost::this_thread;
+	}
 	using boost::thread_group;
 
 	using boost::thread_specific_ptr;

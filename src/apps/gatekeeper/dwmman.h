@@ -15,7 +15,7 @@ class DWMMan : public Core::Singleton<DWMMan> {
 public:
 	DWMMan();
 
-	void addNewDWM( const boost::asio::ip::address& addr );
+	void addNewDWM( boost::asio::ip::address addr );
 
 	bool isAreaActive( int area );
 
@@ -33,7 +33,7 @@ private:
 
 	Core::shared_mutex								dwmMutex;
 	std::map< int, std::shared_ptr<DWMChan> >		activeDWMs;
-	std::vector< const boost::asio::ip::address >	inactiveDWMs;
+	std::vector< boost::asio::ip::address >	inactiveDWMs;
 };
 
 #endif

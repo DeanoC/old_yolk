@@ -9,10 +9,10 @@
 
 DWMMan::DWMMan() {
 	Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
-	inactiveDWMs.reserve( 1000 );
+//	inactiveDWMs.reserve( 1000 );
 }
 
-void DWMMan::addNewDWM( const boost::asio::ip::address& addr ) { 
+void DWMMan::addNewDWM( boost::asio::ip::address addr ) { 
 	Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
 	inactiveDWMs.push_back( addr );
 }
