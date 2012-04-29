@@ -51,18 +51,20 @@ int Main() {
 
 		readConfig( hostname, port );
 
-		DWMMan::Init();
 
-		boost::asio::io_service io_service;
-		std::shared_ptr<boost::asio::io_service::work> work( CORE_NEW boost::asio::io_service::work(io_service) );
+		std::shared_ptr<boost::asio::io_service> ioService = std::make_shared<boost::asio::io_service>();
+		std::shared_ptr<boost::asio::io_service::work> work = std::make_shared<boost::asio::io_service::work>(*ioService);
+		DWMMan::Init();
+		DWMMan::Get()->setIoService( ioService );
+
 		// Launch the initial gatekeeper co-routine server.
 		// once gatekeeper has decided it likes the incoming socket it hands it off 
-		auto server = TcpServer( io_service, hostname, port );
-		auto heart = HeartBeat( io_service );
+		auto server = TcpServer( *ioService , hostname, port );
+		auto heart = HeartBeat( *ioService );
 		server();
 
 		// Wait for signals indicating time to shut down.
-		boost::asio::signal_set signals(io_service);
+		boost::asio::signal_set signals( *ioService );
 		signals.add(SIGINT);
 		signals.add(SIGTERM);
 		#if defined(SIGQUIT)
@@ -73,16 +75,16 @@ int Main() {
 			work.reset(); 
 			// TODO handle exit now signal
 		});
-
+		
 		// Create a pool of threads to run all of the io_services.
 		std::vector<std::shared_ptr<Core::thread> > threads;
 		for (std::size_t i = 0; i < Core::thread::hardware_concurrency(); ++i) {
-			threads.push_back( std::make_shared<Core::thread>( boost::bind( &boost::asio::io_service::run, &io_service ) ) );
+			threads.push_back( std::make_shared<Core::thread>( boost::bind( &boost::asio::io_service::run, &(*ioService) ) ) );
 			threads[i]->join();
 		}
-
+		
 		// Run the server.
-		io_service.run();
+		ioService->run();
 	} 
 	CoreCatchAllOurExceptions {
 		LogException( err );

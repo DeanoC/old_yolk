@@ -25,7 +25,7 @@ private:
 	std::shared_ptr<boost::asio::ip::udp::socket>		beatSock;
 	std::shared_ptr<boost::asio::deadline_timer>		beatTimer;
 	boost::asio::ip::udp::endpoint						beatRemoteEndpoint;
-	std::array<uint8_t, 128>							beatBuffer;
+	std::array<uint8_t, 4>								beatBuffer;
 	static int											beatCount;
 	static Core::shared_mutex							mapMutex;
 	static std::map< boost::asio::ip::address, int >	ip2Alive;

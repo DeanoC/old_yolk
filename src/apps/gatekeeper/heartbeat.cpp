@@ -39,6 +39,7 @@ void HeartBeat::beat( const boost::system::error_code& error ) {
 				boost::asio::buffer(beatBuffer), beatRemoteEndpoint,
 				boost::bind(&HeartBeat::beat, this, _1));
 }
+
 bool HeartBeat::checkAlive( const boost::asio::ip::address& addr ) {
 	Core::shared_lock< Core::shared_mutex > readerLock( mapMutex );
 	auto ipPair = ip2Alive.find( addr );

@@ -16,14 +16,18 @@ public:
 
 private:
 	void tick ( const boost::system::error_code& error );
+	void backmsg( const boost::system::error_code& error );
 
 	boost::asio::io_service&							io_service;
 	std::shared_ptr<boost::asio::ip::udp::socket>		beatSock;
 	std::shared_ptr<boost::asio::deadline_timer>		beatTimer;
 	boost::asio::ip::udp::endpoint						beatRemoteEndpoint;
-	std::array<uint8_t, 128>							beatBuffer;
 	int													rate;
 	boost::asio::ip::udp::endpoint						target;
+
+	std::array<uint8_t, 1>								beatBuffer;
+	std::array<uint8_t, 1>								beatPassageBuffer;
+
 };
 
 #endif

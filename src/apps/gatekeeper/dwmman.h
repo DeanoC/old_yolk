@@ -9,39 +9,30 @@
 #define GATEKEEPER_DWMMAN_H_
 
 #include "core/singleton.h"
+#include "dwmchan.h"
 
 class DWMMan : public Core::Singleton<DWMMan> {
 public:
-	DWMMan() {
-		Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
-		inactiveDWMs.reserve( 1000 );
-	}
+	DWMMan();
 
-	void addNewDWM( const boost::asio::ip::address& addr ) { 
-		Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
-		inactiveDWMs.push_back( addr );
-	}
+	void addNewDWM( const boost::asio::ip::address& addr );
 
-	bool isAreaActive( int area ) { 
-		Core::shared_lock< Core::shared_mutex > writerLock( dwmMutex );
-		return activeDWMs.find( area) != activeDWMs.end(); 
-	}
+	bool isAreaActive( int area );
+
 	size_t numInactiveDWMs() const { return inactiveDWMs.size(); }
 
-	const boost::asio::ip::address activateDWMForArea( int area ) {
-		Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
-		assert( activeDWMs.find( area) == activeDWMs.end() );
+	const boost::asio::ip::address activateDWMForArea( int area );
 
-		auto ret = inactiveDWMs.back();
-		inactiveDWMs.pop_back();
-		activeDWMs[ area ] = ret;
-		LOG(INFO) << "Area " << area << " activated\n";
-		return ret;
-	}
+	std::shared_ptr<boost::asio::io_service> getIoService() const { return ioService; }
 
+	void setIoService( std::shared_ptr<boost::asio::io_service> service ) { ioService = service; }
 private:
+	void activateArea( const boost::asio::ip::address& dwmAddy, const int area );
+
+	std::shared_ptr<boost::asio::io_service>			ioService;
+
 	Core::shared_mutex								dwmMutex;
-	std::map< int, boost::asio::ip::address >		activeDWMs;
+	std::map< int, std::shared_ptr<DWMChan> >		activeDWMs;
 	std::vector< const boost::asio::ip::address >	inactiveDWMs;
 };
 
