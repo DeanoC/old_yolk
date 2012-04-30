@@ -48,7 +48,7 @@ void Heart::tick ( const boost::system::error_code& error ) {
 		LOG(INFO) << "Sending heart beat to " << beatSock->remote_endpoint().address().to_string() << ":" << beatSock->remote_endpoint().port() << "\n";
 		beatSock->async_send( asio::buffer(beatBuffer), 
 			[](const boost::system::error_code& err, size_t len) {
-				if( err ) {
+				if( !!err ) {
 					LOG(INFO) << "Err " << err.message() << "\n";
 				} else {
 					LOG(INFO) << "Heart Sent " << len << " byte\n";
@@ -73,7 +73,7 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 			LOG(INFO) << "Back passage : BP_RET_TCP_CHAN recv'd"; 
 			// send back anything as ack
 			beatSock->async_send( asio::buffer(beatPassageBuffer), [](const boost::system::error_code&, size_t ) {});
-		}
+		}; break;
 		case BP_NO_MESSAGE:
 		default:
 			LOG(INFO) << "Back passage : BP_NO_MESSAGE recv'd"; 
@@ -82,5 +82,5 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 
 //	LOG(INFO) << "Waiting on the back passage from " << target.address().to_string() << ":" << target.port() << "\n";
 	// wait for next backpassage msg
-	beatSock->async_receive( asio::buffer(beatPassageBuffer), boost::bind(&Heart::backmsg, this, _1) );
+	beatSock->async_receive( asio::buffer(beatPassageBuffer,1), boost::bind(&Heart::backmsg, this, _1) );
 }

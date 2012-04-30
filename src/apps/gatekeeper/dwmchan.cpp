@@ -18,8 +18,7 @@ DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
 	bool recved = false;
 	do {
 		bpBuf[0] = BP_RET_TCP_CHAN;
-		asio::async_write( *backPassage, boost::asio::buffer(bpBuf,1), 
-			[]( const boost::system::error_code&, size_t ) {} );
+		asio::write( *backPassage, boost::asio::buffer(bpBuf,1) );
 		asio::async_read( *backPassage, boost::asio::buffer(bpBuf,1), 
 			[&recved]( const boost::system::error_code& error, size_t ) {
 				if( !error ) {
@@ -27,9 +26,11 @@ DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
 				} else {
 					LOG(INFO) << error.message() << "\n";
 				}
-		});
+			}
+		);
 
 		LOG(INFO) << "Sending BP_RET_TCP_CHAN over the back passage to " << backPassage->remote_endpoint().address().to_string() << ":" << backPassage->remote_endpoint().port() << "\n";
+		backPassage->get_io_service().poll();
 		Core::this_thread::sleep( boost::posix_time::milliseconds(50) );
 	} while( recved == false );
 }
