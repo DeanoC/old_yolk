@@ -12,8 +12,8 @@
 
 TcpTunnel::TcpTunnel( std::shared_ptr<boost::asio::ip::tcp::socket> r, std::shared_ptr<boost::asio::ip::tcp::socket> w ) :  
 	reader( r ),
-	chkTimer( std::make_shared<boost::asio::deadline_timer>( r->get_io_service() ) ),
-	heart( std::make_shared<HeartBeat>( r->get_io_service() ) )
+	chkTimer( std::make_shared<boost::asio::deadline_timer>( r->get_io_service() ) )
+//	, heart( std::make_shared<HeartBeat>( r->get_io_service() ) )
 {
 
 	chkTimer->expires_from_now( boost::posix_time::seconds( 120 ) );
@@ -43,9 +43,12 @@ void TcpTunnel::operator()( boost::system::error_code ec, std::size_t len ) {
 #include "core/unyield.h"
 
 void TcpTunnel::chk( const boost::system::error_code& error ) {
-	if( heart->checkAlive( reader->remote_endpoint().address() ) == true ) {
+//	if( heart->checkAlive( reader->remote_endpoint().address() ) == true ) 
+	{
 		chkTimer->async_wait( boost::bind(&TcpTunnel::chk, this, boost::asio::placeholders::error) );
-	} else {
+	} 
+	//else 
+	{
 		// TODO kill ourselves! we only do reader, as we assume our pair is doing writer... should be an option
 	}
 }

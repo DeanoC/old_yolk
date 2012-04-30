@@ -12,24 +12,32 @@
 #define HB_SECONDS 5
 #define HB_ITS_DEAD_JIM 8
 
-class HeartBeat {
-	public:
-	HeartBeat( boost::asio::io_service& io_service );
+#include "core/singleton.h"
 
-	static bool checkAlive( const boost::asio::ip::address& addr );
-	static int getReturnPort( const boost::asio::ip::address& addr );
+class HeartBeat : public Core::Singleton<HeartBeat> {
+public:
+	typedef std::shared_ptr<boost::asio::ip::tcp::socket> 		SocketPtr;
+	void setAddress( boost::asio::io_service& io_service, const std::string& addr );
+
+	bool checkAlive( const boost::asio::ip::address& addr );
+	SocketPtr getBeatingHeart( const boost::asio::ip::address& addr );
+
 private:
+	typedef std::shared_ptr<boost::asio::deadline_timer> 		DeadLineTimerPtr;
+	typedef std::shared_ptr<boost::asio::ip::tcp::acceptor>		AcceptorPtr;
+	typedef std::map<boost::asio::ip::address, std::pair<int, SocketPtr>> BeatMap;
 
-	void beat(const boost::system::error_code& error);
-	void tick ( const boost::system::error_code& error );
+	void recv();
+	void tick( const boost::system::error_code& error );
 
-	std::shared_ptr<boost::asio::ip::udp::socket>		beatSock;
-	std::shared_ptr<boost::asio::deadline_timer>		beatTimer;
-	boost::asio::ip::udp::endpoint						beatRemoteEndpoint;
-	std::array<uint8_t, 4>								beatBuffer;
-	static int											beatCount;
-	static Core::shared_mutex							mapMutex;
-	static std::map< boost::asio::ip::address, std::pair<int, int> >	ip2Alive;
+	DeadLineTimerPtr									timer;
+	std::array<uint8_t, 4096>							buffer;
+
+	boost::asio::io_service* 							ioService;
+	std::shared_ptr<boost::asio::ip::tcp::acceptor>		acceptor;
+	int													beatCount;
+	Core::shared_mutex									mapMutex;
+	BeatMap												ip2Alive;
 };
 
 #endif

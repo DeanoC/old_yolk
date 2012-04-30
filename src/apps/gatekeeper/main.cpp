@@ -30,6 +30,7 @@ void readConfig( std::string& hostname, int& port ) {
 int Main() {
 	using namespace Core;
 	namespace po = boost::program_options;
+	int ret  = 0;
 
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
@@ -55,27 +56,31 @@ int Main() {
 		std::shared_ptr<boost::asio::io_service> ioService = std::make_shared<boost::asio::io_service>();
 		std::shared_ptr<boost::asio::io_service::work> work = std::make_shared<boost::asio::io_service::work>(*ioService);
 		DWMMan::Init();
+		HeartBeat::Init();
 		DWMMan::Get()->setIoService( ioService );
+		HeartBeat::Get()->setAddress( *ioService, hostname );
 
 		// Launch the initial gatekeeper co-routine server.
 		// once gatekeeper has decided it likes the incoming socket it hands it off 
 		auto server = TcpServer( *ioService , hostname, port );
-		auto heart = HeartBeat( *ioService );
 		server();
 
 		// Wait for signals indicating time to shut down.
 		boost::asio::signal_set signals( *ioService );
 		signals.add(SIGINT);
 		signals.add(SIGTERM);
-		#if defined(SIGQUIT)
-			signals.add(SIGQUIT);
-		#endif // defined(SIGQUIT)
-		signals.async_wait( [&work, ioService](const boost::system::error_code&, int) { 
-			LOG(INFO) << "Signal Recv'ed, shutting down\n";
+#if defined(SIGQUIT)
+		signals.add(SIGQUIT);
+#endif // defined(SIGQUIT)
+		signals.async_wait( [&work, ioService](const boost::system::error_code&, int signal ) { 
+			LOG(INFO) << "Signal Recv'ed, exiting\n";
 			// handle signals, for now exit as soon as work queues are empty
 			work.reset(); 
 			// TODO handle exit now signal
-			ioService->stop();
+			if( signal == 9 ) {
+				LOG(INFO) << "Shutting down NOW!\n";
+				ioService->stop();
+			}
 		});
 		
 		// Create a pool of threads to run all of the io_services.
@@ -90,18 +95,16 @@ int Main() {
 	} 
 	CoreCatchAllOurExceptions {
 		LogException( err );
-		DWMMan::Shutdown();
-		return 1;
+		ret = 1;
 	}
 	CoreCatchAllStdExceptions {
 		LOG(ERROR) << err.what();
-		DWMMan::Shutdown();
-		return 1;
+		ret = 1;
 	}
 	CoreCatchAll {
-		DWMMan::Shutdown();
-		return 1;
+		ret = 1;
 	}
+	HeartBeat::Shutdown();
 	DWMMan::Shutdown();
-	return 0;
+	return ret;
 }

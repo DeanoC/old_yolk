@@ -23,7 +23,7 @@ private:
 	std::shared_ptr<boost::asio::ip::tcp::socket>		writer;
 
 	std::array<uint8_t, 8096>							buffer;
-	std::shared_ptr<HeartBeat>							heart;
+//	std::shared_ptr<HeartBeat>							heart;
 	std::shared_ptr<boost::asio::deadline_timer>		chkTimer;
 };
 

@@ -11,6 +11,7 @@
 #include "dwmchan.h"
 
 DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
+/*
 	// use the heartbeat back channel to get the dwm server to open up a TCP channel
 	bpEndpoint = boost::asio::ip::udp::endpoint( addr, HeartBeat::getReturnPort(addr) );
 	backPassage = std::make_shared<boost::asio::ip::udp::socket>( *DWMMan::Get()->getIoService() );
@@ -31,5 +32,5 @@ DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
 		});
 		LOG(INFO) << "Sending BP_RET_TCP_CHAN over the back passage to " << bpEndpoint.address().to_string() << ":" << bpEndpoint.port() << "\n";
 		Core::this_thread::sleep( boost::posix_time::milliseconds(50) );
-	} while( recved == false );
+	} while( recved == false );*/
 }
