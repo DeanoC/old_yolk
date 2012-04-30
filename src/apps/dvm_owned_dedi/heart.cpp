@@ -47,7 +47,13 @@ void Heart::tick ( const boost::system::error_code& error ) {
 	if( !error ) {
 		LOG(INFO) << "Sending heart beat to " << beatSock->remote_endpoint().address().to_string() << ":" << beatSock->remote_endpoint().port() << "\n";
 		beatSock->async_send( asio::buffer(beatBuffer), 
-			[](const boost::system::error_code&, size_t ) {} ); 
+			[](const boost::system::error_code& err, size_t len) {
+				if( err ) {
+					LOG(INFO) << "Err " << err.message() << "\n";
+				} else {
+					LOG(INFO) << "Heart Sent " << len << " byte\n";
+				}
+			} ); 
 	}
 
 	beatTimer->expires_from_now( boost::posix_time::seconds( rate ) );
