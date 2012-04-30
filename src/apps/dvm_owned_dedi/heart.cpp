@@ -45,7 +45,7 @@ void Heart::start( const std::string& addr, int port, int _rate ) {
 void Heart::tick ( const boost::system::error_code& error ) {
 	namespace asio = boost::asio;
 	if( !error ) {
-//		LOG(INFO) << "Sending heart beat to " << target.address().to_string() << ":" << target.port() << "\n";
+		LOG(INFO) << "Sending heart beat to " << beatSock->remote_endpoint().address().to_string() << ":" << beatSock->remote_endpoint().port() << "\n";
 		beatSock->async_send( asio::buffer(beatBuffer), 
 			[](const boost::system::error_code&, size_t ) {} ); 
 	}
@@ -55,6 +55,9 @@ void Heart::tick ( const boost::system::error_code& error ) {
 }
 
 void Heart::backmsg( const boost::system::error_code& error ) {
+	if( error ) {
+		LOG(INFO) << "Backmsg err : " << error.message() << "\n";
+	}
 	namespace asio = boost::asio;
 
 	uint8_t msg = beatPassageBuffer[0];

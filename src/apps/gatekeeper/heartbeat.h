@@ -27,7 +27,8 @@ private:
 	typedef std::shared_ptr<boost::asio::ip::tcp::acceptor>		AcceptorPtr;
 	typedef std::map<boost::asio::ip::address, std::pair<int, SocketPtr>> BeatMap;
 
-	void recv();
+	void accept();
+	void beat( SocketPtr socket );
 	void tick( const boost::system::error_code& error );
 
 	DeadLineTimerPtr									timer;
