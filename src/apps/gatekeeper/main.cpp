@@ -70,10 +70,12 @@ int Main() {
 		#if defined(SIGQUIT)
 			signals.add(SIGQUIT);
 		#endif // defined(SIGQUIT)
-		signals.async_wait( [&work](const boost::system::error_code&, int) { 
+		signals.async_wait( [&work, ioService](const boost::system::error_code&, int) { 
+			LOG(INFO) << "Signal Recv'ed, shutting down\n";
 			// handle signals, for now exit as soon as work queues are empty
 			work.reset(); 
 			// TODO handle exit now signal
+			ioService->stop();
 		});
 		
 		// Create a pool of threads to run all of the io_services.

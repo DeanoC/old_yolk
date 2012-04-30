@@ -8,7 +8,7 @@
 
 int HeartBeat::beatCount = 0;
 Core::shared_mutex							HeartBeat::mapMutex;
-std::map< boost::asio::ip::address, int >	HeartBeat::ip2Alive;
+std::map< boost::asio::ip::address, std::pair<int,int> >	HeartBeat::ip2Alive;
 
 HeartBeat::HeartBeat( boost::asio::io_service& io_service ) :
 	beatSock( std::make_shared<boost::asio::ip::udp::socket>( io_service,  boost::asio::ip::udp::endpoint( boost::asio::ip::address_v4::any(), HB_PORT ) ) ),
@@ -28,7 +28,8 @@ void HeartBeat::beat( const boost::system::error_code& error ) {
 		// port 0 is an internal call
 		if( beatRemoteEndpoint.port() != 0 ) {
 			Core::unique_lock< Core::shared_mutex > writerLock( mapMutex );
-			ip2Alive[ beatRemoteEndpoint.address() ] = beatCount;
+			ip2Alive[ beatRemoteEndpoint.address() ] = std::pair<int,int>(beatCount,HB_PORT);
+//			ip2Alive[ beatRemoteEndpoint.address() ] = std::pair<int,int>(beatCount,beatRemoteEndpoint.port());
 //			LOG(INFO) << "Ping from " << beatRemoteEndpoint.address().to_string() << ":" << beatRemoteEndpoint.port() << "\n";
 		} 
 	} else {
@@ -46,7 +47,7 @@ bool HeartBeat::checkAlive( const boost::asio::ip::address& addr ) {
 	if( ipPair == ip2Alive.end() ) {
 		return false;
 	}
-	if( beatCount - ipPair->second > HB_ITS_DEAD_JIM ) {
+	if( beatCount - ipPair->second.first > HB_ITS_DEAD_JIM ) {
 		readerLock.unlock();
 		// also delete whilst we are here as it dead
 		Core::unique_lock< Core::shared_mutex > writerLock( mapMutex );
@@ -56,3 +57,12 @@ bool HeartBeat::checkAlive( const boost::asio::ip::address& addr ) {
 	return true;
 }
 
+int HeartBeat::getReturnPort( const boost::asio::ip::address& addr ) {
+	Core::shared_lock< Core::shared_mutex > readerLock( mapMutex );
+	auto ipPair = ip2Alive.find( addr );
+	if( ipPair == ip2Alive.end() ) {
+		return 0;
+	} else {
+		return ipPair->second.second;
+	}
+}

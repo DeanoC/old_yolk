@@ -17,6 +17,7 @@ class HeartBeat {
 	HeartBeat( boost::asio::io_service& io_service );
 
 	static bool checkAlive( const boost::asio::ip::address& addr );
+	static int getReturnPort( const boost::asio::ip::address& addr );
 private:
 
 	void beat(const boost::system::error_code& error);
@@ -28,7 +29,7 @@ private:
 	std::array<uint8_t, 4>								beatBuffer;
 	static int											beatCount;
 	static Core::shared_mutex							mapMutex;
-	static std::map< boost::asio::ip::address, int >	ip2Alive;
+	static std::map< boost::asio::ip::address, std::pair<int, int> >	ip2Alive;
 };
 
 #endif
