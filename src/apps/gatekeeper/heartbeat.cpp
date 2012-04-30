@@ -43,6 +43,7 @@ void HeartBeat::accept() {
 				ip2Alive[ socket->remote_endpoint().address() ] = std::pair<int, SocketPtr>(beatCount, socket);
 				LOG(INFO) << "New Ping from " << socket->remote_endpoint().address().to_string() << ":" 
 														<< socket->remote_endpoint().port() << "\n";
+				beat(socket);
 			}
 			this->accept();
 		}
@@ -50,8 +51,9 @@ void HeartBeat::accept() {
 }
 
 void HeartBeat::beat( HeartBeat::SocketPtr socket ) {
-	Core::asio::async_read( *socket, Core::asio::buffer(buffer), 
+	Core::asio::async_read( *socket, Core::asio::buffer(buffer,1), 
 		[this, socket](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
+			LOG(INFO) << "beat";
 			if( !error ) {
 				Core::unique_lock< Core::shared_mutex > writerLock( mapMutex );
 				ip2Alive[ socket->remote_endpoint().address() ] = std::pair<int, SocketPtr>(beatCount, socket);
