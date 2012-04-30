@@ -11,26 +11,25 @@
 #include "dwmchan.h"
 
 DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
-/*
-	// use the heartbeat back channel to get the dwm server to open up a TCP channel
-	bpEndpoint = boost::asio::ip::udp::endpoint( addr, HeartBeat::getReturnPort(addr) );
-	backPassage = std::make_shared<boost::asio::ip::udp::socket>( *DWMMan::Get()->getIoService() );
-	backPassage->open( boost::asio::ip::udp::v4() );
+	auto backPassage = HeartBeat::Get()->getBeatingHeart( addr );
 
+	namespace asio = Core::asio;
 	// TODO improve semi busy loop
 	bool recved = false;
 	do {
 		bpBuf[0] = BP_RET_TCP_CHAN;
-		backPassage->async_send_to( boost::asio::buffer(bpBuf,4), bpEndpoint, [](  const boost::system::error_code& error, size_t ) {			
+		asio::async_write( *backPassage, boost::asio::buffer(bpBuf,1), 
+			[]( const boost::system::error_code&, size_t ) {} );
+		asio::async_read( *backPassage, boost::asio::buffer(bpBuf,1), 
+			[&recved]( const boost::system::error_code& error, size_t ) {
+				if( !error ) {
+					recved = true;
+				} else {
+					LOG(INFO) << error.message() << "\n";
+				}
 		});
-		backPassage->async_receive_from( boost::asio::buffer(bpBuf,4), bpEndpoint,	[&recved](  const boost::system::error_code& error, size_t ) {
-			if( !error ) {
-				recved = true;
-			} else {
-				LOG(INFO) << error.message() << "\n";
-			}
-		});
-		LOG(INFO) << "Sending BP_RET_TCP_CHAN over the back passage to " << bpEndpoint.address().to_string() << ":" << bpEndpoint.port() << "\n";
+
+		LOG(INFO) << "Sending BP_RET_TCP_CHAN over the back passage to " << backPassage->remote_endpoint().address().to_string() << ":" << backPassage->remote_endpoint().port() << "\n";
 		Core::this_thread::sleep( boost::posix_time::milliseconds(50) );
-	} while( recved == false );*/
+	} while( recved == false );
 }
