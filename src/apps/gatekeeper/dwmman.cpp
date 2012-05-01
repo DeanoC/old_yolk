@@ -45,6 +45,7 @@ void DWMMan::activateArea( const boost::asio::ip::address& addr, const int area 
 	auto dwm = std::make_shared<DWMChan>( addr, area );
 	activeDWMsByArea[ area ] = dwm;
 	activeDWMsByAddr[ addr ] = dwm;
+	dwm->useBackPassage();
 
 	LOG(INFO) << "Area " << area << " activated\n";
 }
@@ -76,6 +77,8 @@ void DWMMan::accept() {
 				if(  dwmIt != activeDWMsByAddr.end() ) {
 					auto dwm = *dwmIt;
 					dwm.second->accept( socket );
+				} else {
+					LOG(INFO) << "accept recv'ed but not in the last of active DWMs... " << socket->remote_endpoint().address().to_string() << "\n";
 				}
 			}
 			this->accept();

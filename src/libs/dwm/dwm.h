@@ -17,12 +17,20 @@
 
 class VMThread;
 
+// todo create the two seperate libs, for now trust everyone
+#define DWM_TRUSTED
+
+#if defined( DWM_TRUSTED )
 typedef std::shared_ptr<riak::object> RiakObjPtr;
+#endif
 
 class Dwm {
 public:
 	Dwm();
    ~Dwm();
+
+   bool openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std::string& hostname );
+
 	void bootstrapLocal();
 
 	llvm::Module* loadBitCode( const Core::FilePath& filepath );
@@ -30,15 +38,17 @@ public:
 
    llvm::LLVMContext& getContext() const { return context; };
 
-   void setRiakAddress ( const std::string& addr ) { riakAddr = addr; }
-   void setRiakPort( const int port ) { riakPort = port; }
-
 private:
    void checkSysInfoVersion( const std::string& str );
 
+#if defined( DWM_TRUSTED )
    std::string                                           riakAddr;
    int                                                   riakPort;
-
+#endif
+   std::string                                           dwmChanAddr;
+   int                                                   dwmChanPort;
+   std::shared_ptr<boost::asio::ip::tcp::socket>         dwmChanSock;
+   std::shared_ptr<boost::asio::io_service>              io;
 	Core::vector<Core::shared_ptr<VMThread>>				   vmThreads;
 	llvm::LLVMContext&										      context;
 	Core::unordered_map< Core::FilePath, llvm::Module* >	modules;

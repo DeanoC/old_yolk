@@ -10,8 +10,13 @@
 #include "protocols/backpassage.h"
 #include "dwmchan.h"
 
-DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
+DWMChan::DWMChan( const boost::asio::ip::address& _addr, const int _area ) :
+	addr( _addr ),
+	area( _area )
+{
+}
 
+void DWMChan::useBackPassage() {
 	auto backPassage = HeartBeat::Get()->getBeatingHeart( addr );
 	std::array< uint8_t, 1>	bpBuf;
 
@@ -40,4 +45,6 @@ DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
 void DWMChan::accept( std::shared_ptr<boost::asio::ip::tcp::socket> incoming ) {
 	LOG(INFO) << "DWM Channel open\n";
 	socket = incoming;
+
+	// DWMChan can now send and recieve info i.e player join, untrusted db access etc. 
 }

@@ -32,12 +32,67 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 }
 
 Dwm::Dwm() :
-	context( llvm::getGlobalContext() ),
-   riakAddr( "127.0.0.1" ),
-   riakPort( 8087 ) {
+	context( llvm::getGlobalContext() ) {
 }
 
 Dwm::~Dwm() {
+}
+
+bool Dwm::openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std::string& hostname ) {
+   io = _io;
+
+   // TODO get address and ports from remote
+   // hardcoded from base hostname for now
+#if defined( DWM_TRUSTED )
+   riakAddr = hostname;
+   riakPort = 8087;
+#endif
+   dwmChanAddr = hostname;
+   dwmChanPort = 5002;
+
+#if defined( DWM_TRUSTED )
+   // TODO fallback IPs, better error handling etc.
+   riak::transport::delivery_provider connection;
+   CoreTry {
+      connection = riak::make_single_socket_transport(riakAddr, riakPort, *io);
+   } CoreCatch( boost::system::system_error& e ) {
+      LOG(WARNING) << e.what() << "\n";
+      return false;
+   }
+#endif
+
+   namespace asio = boost::asio;
+   using namespace asio::ip;
+
+   std::stringstream ss;
+   ss << dwmChanPort;
+
+   dwmChanSock = std::make_shared<tcp::socket>( *io );
+
+   // resolve the address and port into possible socket endpoints
+   tcp::resolver netResolver( *io );
+   tcp::resolver::query endPoint( dwmChanAddr, ss.str() );
+   tcp::resolver::iterator epIter = netResolver.resolve( endPoint );
+   // find the first valid endpoint that wants to communicate with us
+   const tcp::resolver::iterator endPointEnd;
+   boost::system::error_code err = asio::error::host_not_found;
+   while (err && epIter != endPointEnd ) {
+      dwmChanSock->close();
+      dwmChanSock->connect(*epIter, err);
+      ++epIter;
+   }
+
+   if( err ) {
+      LOG(WARNING) << "Err " << err.message() << "\n";
+      return false;
+   }
+   bool ret = true;
+   // just a ping to wake t'other side
+   std::array< uint8_t, 1> buffer;
+   buffer[0] = 1;
+   asio::write( *dwmChanSock, asio::buffer(buffer) );
+
+   return true;
 }
 
 llvm::Module* Dwm::loadBitCode( const Core::FilePath& filepath ) {
@@ -98,18 +153,8 @@ void Dwm::bootstrapLocal() {
 
 	auto hwThreads = Core::thread::hardware_concurrency();
 
-   boost::asio::io_service ios;
-
-   // TODO fallback IPs, better error handling etc.
-   riak::transport::delivery_provider connection;
-   CoreTry {
-      connection = riak::make_single_socket_transport(riakAddr, riakPort, ios);
-   } CoreCatch( boost::system::system_error& e ) {
-      LOG(ERROR) << e.what() << Logger::endl;
-      return;
-   }
-
-   auto store = riak::make_client(connection, &no_sibling_resolution, ios);
+/*
+   auto store = riak::make_client(connection, &no_sibling_resolution, *io);
    store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
       if(!err) {
          if( obj->has_value() ) {
@@ -119,7 +164,6 @@ void Dwm::bootstrapLocal() {
       } 
       CoreThrowException( DBBackEndHard, "" );
    });
-   ios.run();
 
    // load initial bitcode modules
    auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
@@ -134,7 +178,7 @@ void Dwm::bootstrapLocal() {
 
    // lets start booting
    thread0->getEngine()->run( "bootstrap0", args );
-
+*/
 }
 
 
