@@ -17,7 +17,7 @@
 class HeartBeat : public Core::Singleton<HeartBeat> {
 public:
 	typedef std::shared_ptr<boost::asio::ip::tcp::socket> 		SocketPtr;
-	void setAddress( boost::asio::io_service& io_service, const std::string& addr );
+	void accept( boost::asio::io_service& io_service, const std::string& addr );
 
 	bool checkAlive( const boost::asio::ip::address& addr );
 	SocketPtr getBeatingHeart( const boost::asio::ip::address& addr );

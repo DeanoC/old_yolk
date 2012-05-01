@@ -10,11 +10,17 @@
 
 #include "tcptunnel.h"
 
+#define DWM_CHAN_PORT 5002
+ 
 class DWMChan {
 public:
 	DWMChan( const boost::asio::ip::address& addr, const int area );
+
+	void accept( std::shared_ptr<boost::asio::ip::tcp::socket> incoming );
 private:
-	std::array< uint8_t, 1>							bpBuf;
+	typedef std::shared_ptr<boost::asio::ip::tcp::socket> 		SocketPtr;
+
+	SocketPtr socket;
 
 //	std::scoped_ptr< TcpTunnel >		tunnel;
 

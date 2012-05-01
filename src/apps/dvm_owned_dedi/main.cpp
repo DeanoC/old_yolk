@@ -5,7 +5,6 @@
 #include "json_spirit/json_spirit_reader.h"
 #include "handshake.h"
 
-std::shared_ptr<Dwm>			g_dwm;
 std::shared_ptr<Heart>			g_heart;
 
 void readConfig( std::string& hostname, int& port ) {
@@ -51,12 +50,13 @@ int Main() {
 
 		std::string hostname( "127.0.0.1" );
 		int port( 2045 );
+		readConfig( hostname, port );
 
 		Core::asio::io_service io;
-		g_heart = std::make_shared<Heart>(io);
+		g_heart = std::make_shared<Heart>( io );
 
 		// Wait for signals indicating time to shut down.
-		boost::asio::signal_set signals(io);
+		boost::asio::signal_set signals( io );
 		signals.add(SIGINT);
 		signals.add(SIGTERM);
 #if defined(SIGQUIT)
@@ -70,18 +70,12 @@ int Main() {
 			threads.push_back( std::make_shared<Core::thread>( boost::bind( &boost::asio::io_service::run, &io ) ) );
 		}
 
-		readConfig( hostname, port );
 		if( Handshake( io, hostname, port ) == true ) {
 
 			// Wait for all threads in the pool to exit.
 			for (std::size_t i = 0; i < threads.size(); ++i)
 				threads[i]->join();
 		}
-	//      dwm.reset( new Dwm );
-	//      dwm->setRiakAddress( hostname );
-	//      dwm->setRiakPort( port );
-
-	//	   dwm->bootstrapLocal();
 	} 
 	CoreCatchAllOurExceptions {
 		LogException( err );
@@ -96,5 +90,17 @@ int Main() {
 	}
 
 	return 0;
+}
 
+void DWMMain( std::shared_ptr<Core::thread> leash ) {
+	//std::shared_ptr<Dwm>			g_dwm;
+	//      dwm.reset( new Dwm );
+	//      dwm->setRiakAddress( hostname );
+	//      dwm->setRiakPort( port );
+
+	//	   dwm->bootstrapLocal();
+	LOG(INFO) << "DWMMain running\n";
+	while( true ) {
+		Core::this_thread::sleep( boost::posix_time::millisec(50) );
+	}
 }

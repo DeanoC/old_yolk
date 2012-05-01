@@ -10,6 +10,7 @@
 DWMMan::DWMMan() {
 	Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
 //	inactiveDWMs.reserve( 1000 );
+
 }
 
 void DWMMan::addNewDWM( boost::asio::ip::address addr ) { 
@@ -19,11 +20,11 @@ void DWMMan::addNewDWM( boost::asio::ip::address addr ) {
 
 bool DWMMan::isAreaActive( int area ) { 
 	Core::shared_lock< Core::shared_mutex > writerLock( dwmMutex );
-	return activeDWMs.find( area) != activeDWMs.end(); 
+	return activeDWMsByArea.find( area) != activeDWMsByArea.end(); 
 }
 const boost::asio::ip::address DWMMan::activateDWMForArea( int area ) {
 	Core::unique_lock< Core::shared_mutex > writerLock( dwmMutex );
-	assert( activeDWMs.find( area ) == activeDWMs.end() );
+	assert( activeDWMsByArea.find( area ) == activeDWMsByArea.end() );
 
 	boost::asio::ip::address noAddr = boost::asio::ip::address();
 	boost::asio::ip::address dwmAddy;
@@ -40,7 +41,44 @@ const boost::asio::ip::address DWMMan::activateDWMForArea( int area ) {
 	return dwmAddy;
 }
 void DWMMan::activateArea( const boost::asio::ip::address& addr, const int area ) {
-	activeDWMs[ area ] = std::make_shared<DWMChan>( addr, area );
+	// NO lock as called from activateDWMForArea which holds it
+	auto dwm = std::make_shared<DWMChan>( addr, area );
+	activeDWMsByArea[ area ] = dwm;
+	activeDWMsByAddr[ addr ] = dwm;
 
 	LOG(INFO) << "Area " << area << " activated\n";
+}
+
+void DWMMan::accept( boost::asio::io_service& io_service, const std::string& addr ) {
+	ioService.reset( &io_service );
+
+	using namespace boost::asio::ip;
+	std::stringstream ss;
+	ss << DWM_CHAN_PORT;
+
+	tcp::resolver resolver( io_service );
+	tcp::resolver::query query( addr, ss.str() );
+	acceptor = std::make_shared<AcceptorPtr::element_type>( io_service, *resolver.resolve( query ) );
+
+	// enough for 1 accept per HW thread (thou will be 99.9% a sleep)
+	for (std::size_t i = 0; i < Core::thread::hardware_concurrency(); ++i) {
+		accept();
+	}
+}
+
+void DWMMan::accept() {
+
+	SocketPtr socket = std::make_shared<SocketPtr::element_type>( *ioService );
+	acceptor->async_accept( *socket, 
+		[this, socket]( const boost::system::error_code& error ) {
+			if (!error ) {
+				auto dwmIt = activeDWMsByAddr.find( socket->remote_endpoint().address() ); 
+				if(  dwmIt != activeDWMsByAddr.end() ) {
+					auto dwm = *dwmIt;
+					dwm.second->accept( socket );
+				}
+			}
+			this->accept();
+		}
+	);
 }

@@ -25,7 +25,8 @@ private:
 
 	std::array<uint8_t, 1>								beatBuffer;
 	std::array<uint8_t, 1>								beatPassageBuffer;
-
+	Core::shared_mutex									dwmMutex;
+	Core::weak_ptr<Core::thread>						dwm;
 };
 
 #endif

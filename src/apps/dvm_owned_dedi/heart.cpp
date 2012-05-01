@@ -4,6 +4,8 @@
 
 DECLARE_EXCEPTION( HeartCantStart, "Heart can't start up properly" );
 
+extern void DWMMain( std::shared_ptr<Core::thread> leash );
+
 Heart::Heart( boost::asio::io_service& _io_service ) :
 	io_service( _io_service ) {
 }
@@ -73,6 +75,28 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 			LOG(INFO) << "Back passage : BP_RET_TCP_CHAN recv'd"; 
 			// send back anything as ack
 			beatSock->async_send( asio::buffer(beatPassageBuffer), [](const boost::system::error_code&, size_t ) {});
+
+			// needs to be idempotant 
+			Core::unique_lock<Core::shared_mutex> mu(dwmMutex);
+			Core::shared_ptr<Core::thread> sp = dwm.lock();
+			// TODO use atomics, this won't work on non ordered memory semantics
+			bool dwmupdated = false;
+			bool waiter = true;
+			if( !sp ) {
+				sp.reset( CORE_NEW Core::thread( [&dwmupdated, &sp, &waiter]() {
+						// wait for weak ptr ownership semantics to be taken over, before
+						// taking a copy of sp for the thread to keep
+						while( dwmupdated == false ){ Core::this_thread::sleep( boost::posix_time::milliseconds(5) ); };
+
+						Core::shared_ptr<Core::thread> sp_copy = sp;
+						waiter = false;
+						DWMMain(sp_copy);
+					}) 
+				);
+				dwm = sp;
+				dwmupdated = true;
+				while( waiter ) { Core::this_thread::sleep( boost::posix_time::milliseconds(5) ); };
+			}
 		}; break;
 		case BP_NO_MESSAGE:
 		default:

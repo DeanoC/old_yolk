@@ -11,7 +11,9 @@
 #include "dwmchan.h"
 
 DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
+
 	auto backPassage = HeartBeat::Get()->getBeatingHeart( addr );
+	std::array< uint8_t, 1>	bpBuf;
 
 	namespace asio = Core::asio;
 	// TODO improve semi busy loop
@@ -33,4 +35,9 @@ DWMChan::DWMChan( const boost::asio::ip::address& addr, const int area ) {
 		backPassage->get_io_service().poll();
 		Core::this_thread::sleep( boost::posix_time::milliseconds(50) );
 	} while( recved == false );
+}
+
+void DWMChan::accept( std::shared_ptr<boost::asio::ip::tcp::socket> incoming ) {
+	LOG(INFO) << "DWM Channel open\n";
+	socket = incoming;
 }

@@ -6,7 +6,7 @@
 #include "core/core.h"
 #include "heartbeat.h"
 
-void HeartBeat::setAddress( boost::asio::io_service& io_service, const std::string& addr )
+void HeartBeat::accept( boost::asio::io_service& io_service, const std::string& addr )
 {
 	ioService = &io_service;
 
@@ -22,10 +22,10 @@ void HeartBeat::setAddress( boost::asio::io_service& io_service, const std::stri
 
 	tick( boost::system::error_code() );
 
-	// upto 2 heartbeat recvs, as low priority don't want any more threads (even though
-	// the time spend not waitign should be vanishingly small but does involve a mutex so...)
-	accept();
-	accept();
+	// enough for 1 accept per HW thread (thou will be 99.9% a sleep)
+	for (std::size_t i = 0; i < Core::thread::hardware_concurrency(); ++i) {
+		accept();
+	}
 }
 
 void HeartBeat::tick( const boost::system::error_code& error ) {
@@ -53,12 +53,11 @@ void HeartBeat::accept() {
 void HeartBeat::beat( HeartBeat::SocketPtr socket ) {
 	Core::asio::async_read( *socket, Core::asio::buffer(buffer,1), 
 		[this, socket](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
-			LOG(INFO) << "beat";
 			if( !error ) {
 				Core::unique_lock< Core::shared_mutex > writerLock( mapMutex );
 				ip2Alive[ socket->remote_endpoint().address() ] = std::pair<int, SocketPtr>(beatCount, socket);
-				LOG(INFO) << "Ping from " << socket->remote_endpoint().address().to_string() << ":" 
-														<< socket->remote_endpoint().port() << "\n";
+//				LOG(INFO) << "Ping from " << socket->remote_endpoint().address().to_string() << ":" 
+//														<< socket->remote_endpoint().port() << "\n";
 				beat(socket);
 			} else {
 				// any error and kill the heart, if its a glitch it will restart at next beat
