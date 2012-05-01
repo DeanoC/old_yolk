@@ -13,9 +13,9 @@ DECLARE_EXCEPTION(RiakHardNetwork, Hard Riak error likely unable to find DB chec
 class SystemBootStrapper {
 public:
    SystemBootStrapper() :
-      hostname( "192.168.254.95" ),
-      port( 8081 ),
-      deleteSystem( false )
+      hostname( "127.0.0.1" ),
+      port( 8087 ),
+      deleteSystem( true )
    {
    }
    void Go() {
