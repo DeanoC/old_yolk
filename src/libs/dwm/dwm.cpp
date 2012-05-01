@@ -44,17 +44,16 @@ bool Dwm::openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std
    // TODO get address and ports from remote
    // hardcoded from base hostname for now
 #if defined( DWM_TRUSTED )
-   riakAddr = hostname;
-   riakPort = 8087;
+   riakAddr = "192.168.254.95";//hostname;
+   riakPort = 8081;//8087;
 #endif
    dwmChanAddr = hostname;
    dwmChanPort = 5002;
 
 #if defined( DWM_TRUSTED )
    // TODO fallback IPs, better error handling etc.
-   riak::transport::delivery_provider connection;
    CoreTry {
-      connection = riak::make_single_socket_transport(riakAddr, riakPort, *io);
+      riakConn = riak::make_single_socket_transport(riakAddr, riakPort, *io);
    } CoreCatch( boost::system::system_error& e ) {
       LOG(WARNING) << e.what() << "\n";
       return false;
@@ -144,7 +143,9 @@ void Dwm::checkSysInfoVersion( const std::string& str ) {
       }
    }
    // TODO Reject any server side where major.minor > version we are compiled with
-
+   LOG(INFO) << "System Version: " << version_major << "." <<
+                                       version_minor << "." <<
+                                       version_rev << "\n"; 
 }
 
 void Dwm::bootstrapLocal() {
@@ -153,8 +154,7 @@ void Dwm::bootstrapLocal() {
 
 	auto hwThreads = Core::thread::hardware_concurrency();
 
-/*
-   auto store = riak::make_client(connection, &no_sibling_resolution, *io);
+   auto store = riak::make_client(riakConn, &no_sibling_resolution, *io);
    store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
       if(!err) {
          if( obj->has_value() ) {
@@ -164,7 +164,7 @@ void Dwm::bootstrapLocal() {
       } 
       CoreThrowException( DBBackEndHard, "" );
    });
-
+/*
    // load initial bitcode modules
    auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
 

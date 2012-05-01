@@ -14,6 +14,7 @@
 #include "llvm/Module.h"
 #include "core/fileio.h"
 #include "riak/core_types.hxx"
+#include "riak/transport.hxx"
 
 class VMThread;
 
@@ -44,6 +45,8 @@ private:
 #if defined( DWM_TRUSTED )
    std::string                                           riakAddr;
    int                                                   riakPort;
+   riak::transport::delivery_provider                    riakConn;
+
 #endif
    std::string                                           dwmChanAddr;
    int                                                   dwmChanPort;
