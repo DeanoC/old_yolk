@@ -279,7 +279,8 @@ CORE_INLINE unsigned int log2(unsigned int v)
 ///
 /// \return	k aligned to align. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-CALL CORE_INLINE unsigned int alignTo(unsigned int k, unsigned int align)
+template< typename T, typename T2 >
+CALL CORE_INLINE T alignTo(T k, T2 align)
 {
 	return ((k+align-1) & ~(align-1));
 }
