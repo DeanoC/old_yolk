@@ -12,6 +12,7 @@
 #include "riak/transport.hxx"
 #include "riak/transports/single-serial-socket.hxx"
 #include "json_spirit/json_spirit_reader.h"
+#include "bitcoder.h"
 
 #include "vmthread.h"
 
@@ -19,9 +20,6 @@ DECLARE_EXCEPTION( DBBackEndHard, "Failure to contact backend DB" );
 
 #define DECL_INEXEBITCODE( NAME ) extern const unsigned char* binary_data_vm_code_##NAME##_cpp; extern size_t binary_data_vm_code_##NAME##_cpp_sizeof;
 #define MEMFILE_INEXEBITCODE( NAME ) Core::MemFile( (uint8_t*) binary_data_vm_code_##NAME##_cpp, binary_data_vm_code_##NAME##_cpp_sizeof ).inOut()
-
-DECL_INEXEBITCODE( helloworld );
-DECL_INEXEBITCODE( bootstrap );
 
 std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 {
@@ -33,6 +31,9 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 
 Dwm::Dwm() :
 	context( llvm::getGlobalContext() ) {
+
+   auto libcbc = loadBitCode( Core::FilePath( "./libc.a" ) );
+   BitCoder::get()->addLibrary( libcbc );
 }
 
 Dwm::~Dwm() {
@@ -94,7 +95,7 @@ bool Dwm::openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std
    return true;
 }
 
-llvm::Module* Dwm::loadBitCode( const Core::FilePath& filepath ) {
+std::shared_ptr<llvm::Module> Dwm::loadBitCode( const Core::FilePath& filepath ) {
 	using namespace Core;
 	using namespace llvm;
 
@@ -107,7 +108,7 @@ llvm::Module* Dwm::loadBitCode( const Core::FilePath& filepath ) {
    return loadBitCode( bcFile );
 }
 
-llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
+std::shared_ptr<llvm::Module> Dwm::loadBitCode( Core::InOutInterface& inny ) {
 	using namespace Core;
 	using namespace llvm;
 
@@ -118,7 +119,7 @@ llvm::Module* Dwm::loadBitCode( Core::InOutInterface& inny ) {
 	inny.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
 	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, context );
 
-	return mod;
+	return std::shared_ptr<llvm::Module>(mod);
 }
 
 void Dwm::checkSysInfoVersion( const std::string& str ) {
@@ -149,10 +150,10 @@ void Dwm::checkSysInfoVersion( const std::string& str ) {
 }
 
 void Dwm::bootstrapLocal() {
-	using namespace Core;
+   using namespace Core;
    using namespace llvm;
 
-	auto hwThreads = Core::thread::hardware_concurrency();
+   auto hwThreads = Core::thread::hardware_concurrency();
 
    auto store = riak::make_client(riakConn, &no_sibling_resolution, *io);
    store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
@@ -164,22 +165,23 @@ void Dwm::bootstrapLocal() {
       } 
       CoreThrowException( DBBackEndHard, "" );
    });
-/*
+
    // load initial bitcode modules
-   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
+//   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
+   auto initbc = loadBitCode( Core::FilePath("./hello_world") );
+   initbc->setModuleIdentifier( "bootstrap" );
+   auto prg = BitCoder::get()->make( initbc );
+   // init thread0 into llvm execution environment
+   auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this ) );
+   vmThreads.push_back( thread0 );
 
-	// init thread0 into llvm execution environment
-	auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this, initbc ) );
-	vmThreads.push_back( thread0 );
+   thread0->getEngine()->process( prg );
 
-   std::vector<GenericValue> args;
-//   args.push_back( debugFnGV );
-//   thread0->getEngine()->exec->addGlobalMapping( debugFnGV, &DebugOutFn );
+//   std::vector<GenericValue> args;
+   //   args.push_back( debugFnGV );
+   //   thread0->getEngine()->exec->addGlobalMapping( debugFnGV, &DebugOutFn );
 
    // lets start booting
-   thread0->getEngine()->run( "bootstrap0", args );
-*/
+ //  thread0->getEngine()->run( "bootstrap0", args );
+
 }
-
-
-

@@ -17,7 +17,7 @@ DWMChan::DWMChan( const boost::asio::ip::address& _addr, const int _area ) :
 }
 
 void DWMChan::useBackPassage() {
-	auto backPassage = HeartBeat::Get()->getBeatingHeart( addr );
+	auto backPassage = HeartBeat::get()->getBeatingHeart( addr );
 	std::array< uint8_t, 1>	bpBuf;
 
 	namespace asio = Core::asio;

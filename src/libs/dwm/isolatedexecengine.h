@@ -7,22 +7,13 @@
 #ifndef DWM_ISOLATEDEXECENGINE_H_
 #define DWM_ISOLATEDEXECENGINE_H_
 
-#include "../lib/ExecutionEngine/Interpreter/Interpreter.h"
-
-typedef llvm::GenericValue (*ExtFnHandler)( const std::vector<llvm::GenericValue>& );
-
-class IsolatedExecEngine : public llvm::Interpreter {
+class IsolatedExecEngine {
 public:
-	explicit IsolatedExecEngine( llvm::Module* init );
+	IsolatedExecEngine();
 
-   void run( const char* funcname, const std::vector<llvm::GenericValue>& args );
+	void process( const std::string& elf );
 
-   virtual llvm::GenericValue callExternalFunction(llvm::Function *F,
-                                 const std::vector<llvm::GenericValue> &ArgVals);
 private:
-   typedef Core::unordered_map< uintptr_t, ExtFnHandler > ExtFnHash;
-
-   ExtFnHash      extFnHash;
 };
 
 #endif

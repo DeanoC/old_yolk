@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8 )
 
 
 # We incorporate the CMake features provided by LLVM:
-include(LLVMConfig)
+#include(LLVMConfig)
 
 file( GLOB cpp_src_files *.cpp *.cxx)
 file( GLOB c_src_files *.c )
@@ -18,14 +18,6 @@ if( UNIX )
 endif()
 
 target_link_libraries( dummy_client ${targ_link_libs} )
-
-llvm_config( dummy_client   mcjit jit nativecodegen 
-					  interpreter
-					  BitReader
-					  AsmParser
-					  Core
-					  Support
-)
 
 # make a nice hierachy
 set_target_properties( dummy_client PROPERTIES FOLDER "Apps")

@@ -55,11 +55,11 @@ int Main() {
 
 		std::shared_ptr<boost::asio::io_service> ioService = std::make_shared<boost::asio::io_service>();
 		std::shared_ptr<boost::asio::io_service::work> work = std::make_shared<boost::asio::io_service::work>(*ioService);
-		DWMMan::Init();
-		HeartBeat::Init();
+		DWMMan::init();
+		HeartBeat::init();
 
-		DWMMan::Get()->accept( *ioService, hostname );
-		HeartBeat::Get()->accept( *ioService, hostname );
+		DWMMan::get()->accept( *ioService, hostname );
+		HeartBeat::get()->accept( *ioService, hostname );
 
 		// Launch the initial gatekeeper co-routine server.
 		// once gatekeeper has decided it likes the incoming socket it hands it off 
@@ -105,7 +105,7 @@ int Main() {
 	CoreCatchAll {
 		ret = 1;
 	}
-	HeartBeat::Shutdown();
-	DWMMan::Shutdown();
+	HeartBeat::shutdown();
+	DWMMan::shutdown();
 	return ret;
 }

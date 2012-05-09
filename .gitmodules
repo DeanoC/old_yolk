@@ -1,6 +1,3 @@
-[submodule "submodules/llvm"]
-	path = submodules/llvm
-	url = git@bitbucket.org:DeanoC/llvm.git
 [submodule "submodules/json-spirit"]
 	path = submodules/json-spirit
 	url = git@bitbucket.org:DeanoC/json-spirit.git	
@@ -13,3 +10,6 @@
 [submodule "submodules/clang"]
 	path = submodules/clang
 	url = git@bitbucket.org:DeanoC/clang.git
+[submodule "submodules/native_client"]
+	path = submodules/native_client
+	url = git@bitbucket.org:DeanoC/native_client.git

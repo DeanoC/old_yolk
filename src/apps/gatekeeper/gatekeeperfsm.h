@@ -79,10 +79,10 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			if( evt.id == 0 ) {
 				// special dummy client id
 				int area = 1;
-				if( DWMMan::Get()->isAreaActive( area ) ) {
+				if( DWMMan::get()->isAreaActive( area ) ) {
 				} else {
 					// TODO get this party started
-					DWMMan::Get()->activateDWMForArea( area );
+					DWMMan::get()->activateDWMForArea( area );
 				}
 			} else {
 				assert( false ); // TODO 
@@ -127,7 +127,7 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			*((uint32_t*)fsm.buffer.data()) = req.ByteSize();
 			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
 			// and add to the unused dwm list (riak? TODO)
-			DWMMan::Get()->addNewDWM( fsm.server->getSocket()->remote_endpoint().address() );
+			DWMMan::get()->addNewDWM( fsm.server->getSocket()->remote_endpoint().address() );
 		}
 	};	
 

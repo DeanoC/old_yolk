@@ -63,9 +63,9 @@ char* g_argv[ MAX_CMDLINE_ARGS ];	//!< The argv cmdline parameter
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Init( void ) 
 {
-	Clock::Init();
-	SystemMessage::Init();
-	ResourceMan::Init();
+	Clock::init();
+	SystemMessage::init();
+	ResourceMan::init();
 	InstallResourceTypes();
 #if PLATFORM == WINDOWS 
 	_CrtSetDbgFlag( _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_ALLOC_MEM_DF);
@@ -76,9 +76,9 @@ void Init( void )
 	FLAGS_log_dir = ".";
 	FLAGS_alsologtostderr = true;
 #else
-	Logger::Init();
+	Logger::init();
 #endif 
-	DevelopmentContext::Init();
+	DevelopmentContext::init();
 #if defined(USE_GC)
 	GC_enable_incremental();
 	GC_init();
@@ -93,13 +93,13 @@ void Init( void )
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Shutdown( void ) 
 {
-	DevelopmentContext::Shutdown();
+	DevelopmentContext::shutdown();
 #if !defined( USE_GLOG )
-	Logger::Shutdown();
+	Logger::shutdown();
 #endif
-	ResourceMan::Shutdown();
-	SystemMessage::Shutdown();
-	Clock::Shutdown();
+	ResourceMan::shutdown();
+	SystemMessage::shutdown();
+	Clock::shutdown();
 #if PLATFORM == WINDOWS 
 	_CrtSetReportHook( NULL );
 	_CrtSetDbgFlag( 0 );
@@ -119,12 +119,12 @@ void HouseKeep( void )
 #endif
 
 #if PLATFORM == WINDOWS
-	if( KeyboardWin::Exists() ) {
-		KeyboardWin::Get()->update();
+	if( KeyboardWin::exists() ) {
+		KeyboardWin::get()->update();
 	}
 
-	if( MouseWin::Exists() ) {
-		Core::MouseWin::Get()->update();
+	if( MouseWin::exists() ) {
+		Core::MouseWin::get()->update();
 	}
 
 	WinGetMessages();
@@ -146,8 +146,8 @@ bool InitWindow( int width, int height, bool bFullscreen ) {
 #if PLATFORM == WINDOWS
 	bool ret = WinInitWindow( width, height, bFullscreen );
 	if( ret ) {
-		KeyboardWin::Init();
-//		MouseWin::Init();
+		KeyboardWin::init();
+//		MouseWin::init();
 	}
 
 	return ret;

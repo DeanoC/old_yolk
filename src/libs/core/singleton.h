@@ -19,22 +19,22 @@ template< class T>
 class Singleton
 {
 public:
-	static void Init( void ) 
+	static void init( void ) 
 	{
 		CORE_ASSERT( s_pSingleton == NULL && "Singleton already created" );
 		s_pSingleton = CORE_NEW T();
 	}
-	static void Shutdown( void ) 
+	static void shutdown( void ) 
 	{
 		CORE_DELETE( s_pSingleton );
 		s_pSingleton = 0;
 	}
-	static T* Get() 
+	static T* get() 
 	{
 		CORE_ASSERT( s_pSingleton != NULL && "Singleton not created" );
 		return s_pSingleton;
 	}
-	static bool Exists() 
+	static bool exists() 
 	{
 		return (s_pSingleton != NULL); 
 	}

@@ -26,7 +26,7 @@
 #define MS_COMPILER				(0x0)
 #define GCC_COMPILER			(0x1)
 #define CUDA_COMPILER			(0x2)
-#define LLVM_COMPILER			(0x3)
+#define CLANG_COMPILER			(0x3)
 
 // compiler version used with above
 #define MS_VS2005				(0x0)
@@ -69,7 +69,7 @@
 
 
 // compiler identifcation
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) && !defined(__clang__)
 
 // Minimum we support is VS 2005 (VS8 AKA 1400)
 #	if _MSC_VER < 1400
@@ -87,8 +87,8 @@
 
 #elif defined( __GNUC__ )
 #	define COMPILER							GCC_COMPILER
-#elif defined( __llvm__ )
-#	define COMPILER							LLVM_COMPILER
+#elif defined( __clang__ )
+#	define COMPILER							CLANG_COMPILER
 #else
 #	error Not supported
 #endif
@@ -141,6 +141,11 @@
 #		error Not supported
 #	endif
 
+#elif defined( __clang__ )
+// TODO pretend we are linux for now, as use clang on multi-os sa code checker 
+#define PLATFORM					POSIX
+#define PLATFORM_OS					LINUX
+#undef _MSC_VER
 #else
 
 #	error Not supported

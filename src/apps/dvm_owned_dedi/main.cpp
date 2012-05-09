@@ -1,5 +1,6 @@
 #include "core/core.h"
 #include "dwm/dwm.h"
+#include "dwm/bitcoder.h"
 #include "heart.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
@@ -36,6 +37,7 @@ int Main() {
 	using namespace Core;
 	namespace po = boost::program_options;
 
+	BitCoder::init();
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -96,6 +98,8 @@ int Main() {
 	CoreCatchAll {
 		return 1;
 	}
+
+	BitCoder::shutdown();
 
 	return 0;
 }

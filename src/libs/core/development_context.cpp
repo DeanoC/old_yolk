@@ -61,11 +61,11 @@ void DevelopmentContext::update( float fTimeInSecs ) {
 
 #if PLATFORM == WINDOWS
 	// in all contexts escape is exit
-	if( KeyboardWin::Exists() && KeyboardWin::Get()->keyDown( Core::KT_ESCAPE ) == true ) {
-		SystemMessage::Get()->Quit();
+	if( KeyboardWin::exists() && KeyboardWin::get()->keyDown( Core::KT_ESCAPE ) == true ) {
+		SystemMessage::get()->Quit();
 	}
 
-	if( KeyboardWin::Exists() && KeyboardWin::Get()->keyDownOnce( Core::KT_TAB ) == true ) {
+	if( KeyboardWin::exists() && KeyboardWin::get()->keyDownOnce( Core::KT_TAB ) == true ) {
 		activateNextContext();
 	}
 
@@ -82,40 +82,40 @@ void DevelopmentContext::update( float fTimeInSecs ) {
 #if PLATFORM == WINDOWS
 		// simulate pad input on keyboard for windows
 		float x = 0.f, y = 0.f;
-		if( KeyboardWin::Exists() ) {
-			x += KeyboardWin::Get()->keyDown(KT_A) ? 1.f : 0.f;
-			x += KeyboardWin::Get()->keyDown(KT_D) ? -1.f : 0.f;
-			y += KeyboardWin::Get()->keyDown(KT_W) ? 1.f : 0.f;
-			y += KeyboardWin::Get()->keyDown(KT_S) ? -1.f : 0.f;
+		if( KeyboardWin::exists() ) {
+			x += KeyboardWin::get()->keyDown(KT_A) ? 1.f : 0.f;
+			x += KeyboardWin::get()->keyDown(KT_D) ? -1.f : 0.f;
+			y += KeyboardWin::get()->keyDown(KT_W) ? 1.f : 0.f;
+			y += KeyboardWin::get()->keyDown(KT_S) ? -1.f : 0.f;
 
 
-			if( KeyboardWin::Get()->keyDown(KT_RCONTROL) ) {
+			if( KeyboardWin::get()->keyDown(KT_RCONTROL) ) {
 				pInterface->padButton1( 0 );
 			}
-			if( KeyboardWin::Get()->keyDown(KT_RSHIFT) ) {
+			if( KeyboardWin::get()->keyDown(KT_RSHIFT) ) {
 				pInterface->padButton2( 0 );
 			}
-			if( KeyboardWin::Get()->keyDown(KT_DELETE) | 
-				KeyboardWin::Get()->keyDown(KT_LBRACKET) ) {
+			if( KeyboardWin::get()->keyDown(KT_DELETE) | 
+				KeyboardWin::get()->keyDown(KT_LBRACKET) ) {
 					pInterface->padButton3( 0 );
 			}
-			if( KeyboardWin::Get()->keyDown(KT_INSERT) | 
-				KeyboardWin::Get()->keyDown(KT_RBRACKET) ) {
+			if( KeyboardWin::get()->keyDown(KT_INSERT) | 
+				KeyboardWin::get()->keyDown(KT_RBRACKET) ) {
 					pInterface->padButton4( 0 );
 			}
-			if( KeyboardWin::Get()->keyDownOnce(KT_F1) ) {
+			if( KeyboardWin::get()->keyDownOnce(KT_F1) ) {
 				pInterface->debugButton1( 0 );
 			}
-			if( KeyboardWin::Get()->keyDownOnce(KT_F2) ) {
+			if( KeyboardWin::get()->keyDownOnce(KT_F2) ) {
 				pInterface->debugButton2( 0 );
 			}
-			if( KeyboardWin::Get()->keyDownOnce(KT_F3) ) {
+			if( KeyboardWin::get()->keyDownOnce(KT_F3) ) {
 				pInterface->debugButton3( 0 );
 			}
-			if( KeyboardWin::Get()->keyDownOnce(KT_F4) ) {
+			if( KeyboardWin::get()->keyDownOnce(KT_F4) ) {
 				pInterface->debugButton4( 0 );
 			}
-			if( KeyboardWin::Get()->keyDownOnce(KT_F5) ) {
+			if( KeyboardWin::get()->keyDownOnce(KT_F5) ) {
 				pInterface->debugButton5( 0 );
 			}
 
@@ -125,22 +125,22 @@ void DevelopmentContext::update( float fTimeInSecs ) {
 
 		float dx = 0;
 		float dy = 0;
-		if( KeyboardWin::Exists() ) {
-			dx += KeyboardWin::Get()->keyDown(KT_LEFT) ? -0.005f : 0.f;
-			dx += KeyboardWin::Get()->keyDown(KT_RIGHT) ? 0.005f : 0.f;
-			dy += KeyboardWin::Get()->keyDown(KT_UP) ? 0.005f : 0.f;
-			dy += KeyboardWin::Get()->keyDown(KT_DOWN) ? -0.005f : 0.f;
+		if( KeyboardWin::exists() ) {
+			dx += KeyboardWin::get()->keyDown(KT_LEFT) ? -0.005f : 0.f;
+			dx += KeyboardWin::get()->keyDown(KT_RIGHT) ? 0.005f : 0.f;
+			dy += KeyboardWin::get()->keyDown(KT_UP) ? 0.005f : 0.f;
+			dy += KeyboardWin::get()->keyDown(KT_DOWN) ? -0.005f : 0.f;
 		}
 
 		//-=-=-=-=-=-=-=-=-=-=-=-=-
 		// update the mouse input
-		if( MouseWin::Exists() ) {
-			dx += MouseWin::Get()->getDeltaXAxis();
-			dy += MouseWin::Get()->getDeltaYAxis();
+		if( MouseWin::exists() ) {
+			dx += MouseWin::get()->getDeltaXAxis();
+			dy += MouseWin::get()->getDeltaYAxis();
 
-			if( MouseWin::Get()->getLeftMouseButton() )
+			if( MouseWin::get()->getLeftMouseButton() )
 				pInterface->mouseLeftButton( );
-			if( MouseWin::Get()->getRightMouseButton() )
+			if( MouseWin::get()->getRightMouseButton() )
 				pInterface->mouseRightButton( );
 		}
 

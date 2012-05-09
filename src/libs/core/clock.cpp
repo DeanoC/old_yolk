@@ -42,8 +42,8 @@ float Clock::update()
 	const int64_t dTicks = updateTicks();
 
 	// Time Ticks
-	const float dTime = Clock::Get()->time( dTicks ) * m_TimeScale;
-	m_nTimeTicks += Clock::Get()->ticks( dTime );
+	const float dTime = Clock::get()->time( dTicks ) * m_TimeScale;
+	m_nTimeTicks += Clock::get()->ticks( dTime );
 
 	return dTime;
 }
@@ -55,7 +55,7 @@ float Clock::step()
 	updateTicks();
 
 	// Time Ticks
-	m_nTimeTicks += Clock::Get()->ticks( FRAME_PERIOD );
+	m_nTimeTicks += Clock::get()->ticks( FRAME_PERIOD );
 
 	return FRAME_PERIOD;
 }

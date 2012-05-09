@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.8 )
 
 # We incorporate the CMake features provided by LLVM:
-include(LLVMConfig)
+#include(LLVMConfig)
 
 file( GLOB cpp_src_files *.cpp *.cxx)
 file( GLOB c_src_files *.c )

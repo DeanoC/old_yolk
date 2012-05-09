@@ -1,8 +1,9 @@
 cmake_minimum_required( VERSION 2.8 )
 
-
-# We incorporate the CMake features provided by LLVM:
-include(LLVMConfig)
+include_directories( ${CMAKE_SOURCE_DIR}/submodules/nacl-llvm/llvm/include/ )
+include_directories( ${CMAKE_BINARY_DIR}/submodules/nacl-llvm/llvm/include/ )
+link_directories( ${CMAKE_BINARY_DIR}/submodules/nacl-llvm/llvm/lib )
+include_directories( ${CMAKE_SOURCE_DIR}/submodules/native_client/src/ ) # slightly odd but same as the actual project uses...
 
 file( GLOB cpp_src_files *.cpp *.cxx)
 file( GLOB c_src_files *.c )
@@ -12,19 +13,30 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 # ADD_MSVC_PRECOMPILED_HEADER( "convertmesh_pch.h" "${cpp_src_files}" )
 add_executable( dvm_owned_dedi ${src_files} ${header_files} )
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} dwm riak-cpp protocols protobuf json_spirit )
+list( APPEND targ_link_libs ${Core_LIBRARIES} dwm riak-cpp protocols protobuf json_spirit native_client_yolk)
 if( UNIX )
 	list( APPEND targ_link_libs pthread dl )
 endif()
 
 target_link_libraries( dvm_owned_dedi ${targ_link_libs} )
 
-llvm_config( dvm_owned_dedi   mcjit jit nativecodegen 
-					  interpreter
-					  BitReader
-					  AsmParser
-					  Core
-					  Support
+llvm_config( dvm_owned_dedi   
+						nativecodegen 
+					  	interpreter
+					  	BitReader
+					  	AsmParser
+					  	Core
+					  	Support
+						X86CodeGen
+						mc
+						linker
+						ipo
+						runtimedyld
+						interpreter
+						instrumentation
+						executionengine
+						jit
+						mcjit						
 )
 
 # make a nice hierachy

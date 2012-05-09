@@ -13,8 +13,12 @@
 #ifndef WIERD_CORE_CORE_H
 #define WIERD_CORE_CORE_H
 
-#define __STDC_LIMIT_MACROS
-#define __STDC_CONSTANT_MACROS
+#if !defined( __STDC_LIMIT_MACROS )
+#	define __STDC_LIMIT_MACROS
+#endif
+#if !defined( __STDC_CONSTANT_MACROS )
+#	define __STDC_CONSTANT_MACROS
+#endif
 
 
 // set up the platform level defines

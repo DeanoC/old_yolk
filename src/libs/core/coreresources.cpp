@@ -69,7 +69,7 @@ Core::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::Resourc
 			inStream.read( rawArray, size );
 
 			pResource->entries.reset( (ManifestEntry*) rawArray );
-			ResourceMan::Get()->InternalProcessManifest( pResource->numEntries, pResource->entries.get() );
+			ResourceMan::get()->InternalProcessManifest( pResource->numEntries, pResource->entries.get() );
 
 		} else {
 			LOG(FATAL) << "Manifest " << pData << " Invalid\n";
@@ -85,7 +85,7 @@ void ManifestResourceDestroyer( Core::shared_ptr<Core::ResourceBase>& spBase ) {
 	using namespace Core;
 
 	Core::shared_ptr<ManifestResource> spActual = Core::static_pointer_cast<ManifestResource>(spBase);
-	ResourceMan::Get()->InternalCloseManifest( spActual->numEntries, spActual->entries.get() );
+	ResourceMan::get()->InternalCloseManifest( spActual->numEntries, spActual->entries.get() );
 
 	spBase.reset(); // the order of these two reset is vital for correct
 	spActual.reset(); // destruction
@@ -96,7 +96,7 @@ void ManifestResourceDestroyer( Core::shared_ptr<Core::ResourceBase>& spBase ) {
 namespace Core
 {
 	void InstallResourceTypes() {
-		ResourceMan::Get()->RegisterResourceType( TextType, TextCreateResource, &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
-		ResourceMan::Get()->RegisterResourceType( ManifestType, ManifestCreateResource, &ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
+		ResourceMan::get()->RegisterResourceType( TextType, TextCreateResource, &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
+		ResourceMan::get()->RegisterResourceType( ManifestType, ManifestCreateResource, &ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
 	}
 }

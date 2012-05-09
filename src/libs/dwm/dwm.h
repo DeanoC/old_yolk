@@ -4,12 +4,13 @@
  *  Created on: 15 Apr 2012
  *      Author: deanoc
  */
-
+#pragma once
 #ifndef YOLK_DWM_DWM_H_
 #define YOLK_DWM_DWM_H_
 
 #include "core/core.h"
 #include "core/file_path.h"
+//#include "llvm/LLVMContext.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 #include "core/fileio.h"
@@ -28,30 +29,29 @@ typedef std::shared_ptr<riak::object> RiakObjPtr;
 class Dwm {
 public:
 	Dwm();
-   ~Dwm();
+	~Dwm();
 
-   bool openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std::string& hostname );
+	bool openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std::string& hostname );
 
 	void bootstrapLocal();
 
-	llvm::Module* loadBitCode( const Core::FilePath& filepath );
-   llvm::Module* loadBitCode( Core::InOutInterface& inny );
+	std::shared_ptr<llvm::Module> loadBitCode( const Core::FilePath& filepath );
+	std::shared_ptr<llvm::Module> loadBitCode( Core::InOutInterface& inny );
 
-   llvm::LLVMContext& getContext() const { return context; };
+	llvm::LLVMContext& getContext() const { return context; };
 
 private:
-   void checkSysInfoVersion( const std::string& str );
+	void checkSysInfoVersion( const std::string& str );
 
 #if defined( DWM_TRUSTED )
-   std::string                                           riakAddr;
-   int                                                   riakPort;
-   riak::transport::delivery_provider                    riakConn;
-
+	std::string                                           riakAddr;
+	int                                                   riakPort;
+	riak::transport::delivery_provider                    riakConn;
 #endif
-   std::string                                           dwmChanAddr;
-   int                                                   dwmChanPort;
-   std::shared_ptr<boost::asio::ip::tcp::socket>         dwmChanSock;
-   std::shared_ptr<boost::asio::io_service>              io;
+	std::string                                           dwmChanAddr;
+	int                                                   dwmChanPort;
+	std::shared_ptr<boost::asio::ip::tcp::socket>         dwmChanSock;
+	std::shared_ptr<boost::asio::io_service>              io;
 	Core::vector<Core::shared_ptr<VMThread>>				   vmThreads;
 	llvm::LLVMContext&										      context;
 	Core::unordered_map< Core::FilePath, llvm::Module* >	modules;

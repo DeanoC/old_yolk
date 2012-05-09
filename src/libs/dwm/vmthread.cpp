@@ -7,7 +7,7 @@
 #include "isolatedexecengine.h"
 #include "vmthread.h"
 
-VMThread::VMThread( Dwm& dwm, llvm::Module* module ) :
+VMThread::VMThread( Dwm& dwm ) :
 	  world( dwm ),
-	  execEngine( CORE_NEW IsolatedExecEngine( module ) ) {
+	  execEngine( CORE_NEW IsolatedExecEngine() ) {
 }

@@ -53,7 +53,7 @@ void Heart::tick ( const boost::system::error_code& error ) {
 				if( !!err ) {
 					LOG(INFO) << "Err " << err.message() << "\n";
 				} else {
-					LOG(INFO) << "Heart Sent " << len << " byte\n";
+//					LOG(INFO) << "Heart Sent " << len << " byte\n";
 				}
 			} ); 
 	}
@@ -72,7 +72,7 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 	// process msg
 	switch( msg ) {
 		case BP_RET_TCP_CHAN: {
-			LOG(INFO) << "Back passage : BP_RET_TCP_CHAN recv'd"; 
+//			LOG(INFO) << "Back passage : BP_RET_TCP_CHAN recv'd"; 
 			// send back anything as ack
 			beatSock->async_send( asio::buffer(beatPassageBuffer), [](const boost::system::error_code&, size_t ) {});
 
@@ -100,7 +100,7 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 		}; break;
 		case BP_NO_MESSAGE:
 		default:
-			LOG(INFO) << "Back passage : BP_NO_MESSAGE recv'd"; 
+//			LOG(INFO) << "Back passage : BP_NO_MESSAGE recv'd"; 
 			break;
 	}
 

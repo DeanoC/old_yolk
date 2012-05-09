@@ -33,7 +33,7 @@ const boost::asio::ip::address DWMMan::activateDWMForArea( int area ) {
 		if( dwmAddy != noAddr ) {
 			inactiveDWMs.pop_back();
 		}
-	} while( dwmAddy != noAddr && HeartBeat::Get()->checkAlive( dwmAddy ) == false );
+	} while( dwmAddy != noAddr && HeartBeat::get()->checkAlive( dwmAddy ) == false );
 
 	if( dwmAddy != noAddr ) {
 		activateArea( dwmAddy, area );

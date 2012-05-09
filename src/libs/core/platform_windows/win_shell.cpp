@@ -170,17 +170,17 @@ void WinGetMessages( void ) {
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	if( Core::MouseWin::Exists() ) {
-		Core::MouseWin::Get()->processMouseMessages( message, wParam, lParam );
+	if( Core::MouseWin::exists() ) {
+		Core::MouseWin::get()->processMouseMessages( message, wParam, lParam );
 	}
-	if( Core::KeyboardWin::Exists() ) {
-		Core::KeyboardWin::Get()->processKeyMessages( message, wParam, lParam );
+	if( Core::KeyboardWin::exists() ) {
+		Core::KeyboardWin::get()->processKeyMessages( message, wParam, lParam );
 	}
 
 	switch (message) 
 	{
 	case WM_DESTROY:
-		Core::SystemMessage::Get()->Quit();
+		Core::SystemMessage::get()->Quit();
 		PostQuitMessage(0);
 		break;
 	default:

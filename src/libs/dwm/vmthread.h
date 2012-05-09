@@ -11,9 +11,8 @@
 
 class VMThread : public Core::thread {
 public:
-	VMThread( Dwm& dwm, llvm::Module* module );
-
-   IsolatedExecEngine* getEngine() { return &(*execEngine); }
+	VMThread( Dwm& dwm );
+	IsolatedExecEngine* getEngine() { return &(*execEngine); }
 
 private:
 	Dwm&										world;
