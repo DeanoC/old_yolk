@@ -39,10 +39,10 @@ public:
 	}
 
 	size_t syncRead( uint8_t* buffer, const size_t maxSize ) {
-		size_t serverSize;
+		uint32_t serverSize;
 		boost::asio::read( sock, Core::asio::buffer( &serverSize, 4 ) );
 		CORE_ASSERT( serverSize < maxSize );
-		size_t clientSize;
+		uint32_t clientSize;
 		clientSize = boost::asio::read( sock, Core::asio::buffer( buffer, serverSize ) );
 		CORE_ASSERT( clientSize == serverSize );
 		return clientSize;

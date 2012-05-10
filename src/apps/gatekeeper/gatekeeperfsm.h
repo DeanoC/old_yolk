@@ -14,7 +14,7 @@
 class Connection;
 
 // don't usually do this but makes the statement defs much shorter!
-using namespace Core::msm::front;
+using namespace boost::msm::front;
 using namespace FSMEvents;
 ///-------------------------------------------------------------------------------------------------
 /// \struct	GatekeeperFSM
@@ -146,10 +146,10 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 	}
 
 	// the initial state of the FSM. Must be defined for each main states
-	typedef Core::mpl::vector< Empty, AllOk > initial_state;
+	typedef boost::mpl::vector< Empty, AllOk > initial_state;
 
 	// Transition table for gatekeeper
-	struct transition_table : Core::mpl::vector <
+	struct transition_table : boost::mpl::vector <
 // +----------------+-------------------+-------------------+-----------+--------+
 // |    State		|      Event		|      Next			|  Action   | Guard  |
 // +----------------+-------------------+-------------------+-----------+--------+
@@ -169,10 +169,10 @@ Row< AllOk			, ErrorEvent		, ErrorMode			, none      , none   >
 
 };
 
-class GatekeeperFSMHelper : public Core::msm::back::state_machine<GatekeeperFSM> {
+class GatekeeperFSMHelper : public boost::msm::back::state_machine<GatekeeperFSM> {
 public:
 	GatekeeperFSMHelper( Connection* server ) :
-		Core::msm::back::state_machine<GatekeeperFSM>( server ) {}
+		boost::msm::back::state_machine<GatekeeperFSM>( server ) {}
 };
 
 

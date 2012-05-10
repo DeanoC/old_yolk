@@ -16,7 +16,7 @@ public:
 
 private:
 	Dwm&										world;
-	Core::scoped_ptr<IsolatedExecEngine>		execEngine;
+	boost::scoped_ptr<IsolatedExecEngine>		execEngine;
 };
 
 #endif

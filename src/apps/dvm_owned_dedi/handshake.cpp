@@ -4,14 +4,11 @@
 
 #include "protocols/handshake.proto.pb.h"
 
-// don't usually do this but makes the statement defs much shorter!
-using namespace Core::msm::front;
-extern Core::shared_ptr<Heart>			g_heart;
+extern std::shared_ptr<Heart>			g_heart;
 
-namespace {
-using namespace Core;
-using namespace Core::msm; // for front::state (can't use without front as ambigious)
-using namespace Core::msm::front; // for Row
+//namespace {
+using namespace boost::msm; // for front::state (can't use without front as ambigious)
+using namespace boost::msm::front; // for Row
 
 // front-end: define the FSM structure 
 struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, private boost::noncopyable {
@@ -34,14 +31,14 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			LOG(INFO) << "Resolving " << fsm.serverAddr << ":" << fsm.serverPort << "\n";
 			// resolve the address and port into possible socket endpoints
-			asio::ip::tcp::resolver netResolver( fsm.io_service );
-			asio::ip::tcp::resolver::query endPoint( fsm.serverAddr, fsm.serverPort );
-			asio::ip::tcp::resolver::iterator epIter = netResolver.resolve( endPoint );
+			boost::asio::ip::tcp::resolver netResolver( fsm.io_service );
+			boost::asio::ip::tcp::resolver::query endPoint( fsm.serverAddr, fsm.serverPort );
+			boost::asio::ip::tcp::resolver::iterator epIter = netResolver.resolve( endPoint );
 
 			// find the first valid endpoint that wants to communicate with us
-			TcpConnection::pointer connection = TcpConnection::create( fsm.io_service );
-			const asio::ip::tcp::resolver::iterator endPointEnd;
-			system::error_code err = asio::error::host_not_found;
+			Core::TcpConnection::pointer connection = Core::TcpConnection::create( fsm.io_service );
+			const boost::asio::ip::tcp::resolver::iterator endPointEnd;
+			boost::system::error_code err = boost::asio::error::host_not_found;
 			while (err && epIter != endPointEnd )
 			{
 				connection->socket().close();
@@ -63,7 +60,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm ) {
 			size_t readSize = fsm.connection->syncRead( fsm.buffer.data(), fsm.buffer.size() );
 			Messages::FirstContact fc;
-			fc.ParseFromArray( fsm.buffer.data(), readSize );
+			fc.ParseFromArray( fsm.buffer.data(), (int) readSize );
 			CORE_ASSERT( fc.has_clientstring() );
 			CORE_ASSERT( fc.has_magicid() );
 			CORE_ASSERT( fc.magicid() == 0xDEADDEAD );
@@ -131,7 +128,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 			hc.set_numcores( Core::thread::hardware_concurrency() ); // TODO physical core count not logical
 			hc.set_dwmmemory( 1024 * 1024 * 1024 ); // TODO fix at 1 GiB for now
 
-			hc.SerializeToArray( fsm.buffer.data(), fsm.buffer.size() );
+			hc.SerializeToArray( fsm.buffer.data(), (int) fsm.buffer.size() );
 			fsm.connection->syncWrite( fsm.buffer.data(), hc.ByteSize() );
 			fsm.process_event( DispatcherEvent() );
 		}
@@ -153,10 +150,10 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 	}
 
 	// the initial state of the FSM. Must be defined for each main states
-	typedef Core::mpl::vector< Empty, AllOk > initial_state;
+	typedef boost::mpl::vector< Empty, AllOk > initial_state;
 
 	// Transition table for DWM
-	struct transition_table : Core::mpl::vector <
+	struct transition_table : boost::mpl::vector <
 // +--------------------+-------------------+-------------------+---------------+-----------+
 // |    State			|  Event			|     Next			|     Action    |  Guard    |
 // +--------------------+-------------------+-------------------+---------------+-----------+
@@ -174,11 +171,11 @@ Row< AllOk		  , ErrorEvent		, ErrorMode		, none			, none		>
 	boost::asio::io_service&		io_service;	//!< The i/o service object
 	std::string						serverAddr;	//!< The server address string
 	std::string						serverPort;	//!< The server port string
-	TcpConnection::pointer			connection;	//!< Connection to the server once resolved
+	Core::TcpConnection::pointer	connection;	//!< Connection to the server once resolved
 	std::array<uint8_t, 1024*8>		buffer;
 };
 
-} // end namespace 
+//} // end namespace 
 
 ///-------------------------------------------------------------------------------------------------
 /// \fn	bool GameServer::Utils::HandshakeWithMcp()
@@ -188,11 +185,11 @@ bool Handshake( boost::asio::io_service& io_service, const std::string& addr, in
 
 	std::stringstream ss;
 	ss << port;
-	Core::msm::back::state_machine<HandshakeStateMachine> sm( &io_service, addr, ss.str() );
+	boost::msm::back::state_machine<HandshakeStateMachine> sm( &io_service, addr, ss.str() );
 
 	// needed to start the highest-level SM. This will call on_entry and mark the start of the SM
 	sm.start();
 	sm.process_event( HandshakeStateMachine::Start() );
 
-	return ( !sm.is_flag_active<Core::msm::TerminateFlag>() );
+	return ( !sm.is_flag_active<boost::msm::TerminateFlag>() );
 }

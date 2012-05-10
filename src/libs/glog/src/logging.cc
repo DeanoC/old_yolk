@@ -29,6 +29,8 @@
 
 #define _GNU_SOURCE 1 // needed for O_NOFOLLOW and pread()/pwrite()
 
+#include <vector>
+
 #include "utilities.h"
 
 #include <assert.h>
@@ -54,7 +56,6 @@
 #ifdef HAVE_SYSLOG_H
 # include <syslog.h>
 #endif
-#include <vector>
 #include <errno.h>                   // for errno
 #include <sstream>
 #include "base/commandlineflags.h"        // to get the program name
@@ -65,7 +66,7 @@
 #ifdef HAVE_STACKTRACE
 # include "stacktrace.h"
 #endif
-
+/*
 using std::string;
 using std::vector;
 using std::ostrstream;
@@ -77,7 +78,7 @@ using std::min;
 using std::ostream;
 using std::ostringstream;
 using std::strstream;
-
+*/
 // There is no thread annotation support.
 #define EXCLUSIVE_LOCKS_REQUIRED(mu)
 
@@ -168,7 +169,7 @@ GLOG_DEFINE_string(log_backtrace_at, "",
 // TODO(hamaji): consider windows
 #define PATH_SEPARATOR '/'
 
-static void GetHostName(string* hostname) {
+static void GetHostName(std::string* hostname) {
 #if defined(HAVE_SYS_UTSNAME_H)
   struct utsname buf;
   if (0 != uname(&buf)) {
@@ -265,9 +266,9 @@ class LogFileObject : public base::Logger {
 
   Mutex lock_;
   bool base_filename_selected_;
-  string base_filename_;
-  string symlink_basename_;
-  string filename_extension_;     // option users can specify (eg to add port#)
+  std::string base_filename_;
+  std::string symlink_basename_;
+  std::string filename_extension_;     // option users can specify (eg to add port#)
   FILE* file_;
   LogSeverity severity_;
   uint32 bytes_since_flush_;
@@ -310,7 +311,7 @@ class LogDestination {
   // Really this number is arbitrary.
   static const int kNetworkBytes = 1400;
 
-  static const string& hostname();
+  static const std::string& hostname();
  private:
 
   LogDestination(LogSeverity severity, const char* base_filename);
@@ -357,11 +358,11 @@ class LogDestination {
 
   static LogDestination* log_destinations_[NUM_SEVERITIES];
   static LogSeverity email_logging_severity_;
-  static string addresses_;
-  static string hostname_;
+  static std::string addresses_;
+  static std::string hostname_;
 
   // arbitrary global logging destinations.
-  static vector<LogSink*>* sinks_;
+  static std::vector<LogSink*>* sinks_;
 
   // Protects the vector sinks_,
   // but not the LogSink objects its elements reference.
@@ -375,14 +376,14 @@ class LogDestination {
 // Errors do not get logged to email by default.
 LogSeverity LogDestination::email_logging_severity_ = 99999;
 
-string LogDestination::addresses_;
-string LogDestination::hostname_;
+std::string LogDestination::addresses_;
+std::string LogDestination::hostname_;
 
-vector<LogSink*>* LogDestination::sinks_ = NULL;
+std::vector<LogSink*>* LogDestination::sinks_ = NULL;
 Mutex LogDestination::sink_mutex_;
 
 /* static */
-const string& LogDestination::hostname() {
+const std::string& LogDestination::hostname() {
   if (hostname_.empty()) {
     GetHostName(&hostname_);
     if (hostname_.empty()) {
@@ -444,7 +445,7 @@ inline void LogDestination::AddLogSink(LogSink *destination) {
   // Prevent any subtle race conditions by wrapping a mutex lock around
   // all this stuff.
   MutexLock l(&sink_mutex_);
-  if (!sinks_)  sinks_ = new vector<LogSink*>;
+  if (!sinks_)  sinks_ = new std::vector<LogSink*>;
   sinks_->push_back(destination);
 }
 
@@ -512,7 +513,7 @@ inline void LogDestination::MaybeLogToStderr(LogSeverity severity,
     WriteToStderr(message, len);
 #ifdef OS_WINDOWS
     // On Windows, also output to the debugger
-    ::OutputDebugStringA(string(message,len).c_str());
+    ::OutputDebugStringA(std::string(message,len).c_str());
 #endif
   }
 }
@@ -522,16 +523,16 @@ inline void LogDestination::MaybeLogToEmail(LogSeverity severity,
 					    const char* message, size_t len) {
   if (severity >= email_logging_severity_ ||
       severity >= FLAGS_logemaillevel) {
-    string to(FLAGS_alsologtoemail);
+    std::string to(FLAGS_alsologtoemail);
     if (!addresses_.empty()) {
       if (!to.empty()) {
         to += ",";
       }
       to += addresses_;
     }
-    const string subject(string("[LOG] ") + LogSeverityNames[severity] + ": " +
+    const std::string subject(std::string("[LOG] ") + LogSeverityNames[severity] + ": " +
                          glog_internal_namespace_::ProgramInvocationShortName());
-    string body(hostname());
+    std::string body(hostname());
     body += "\n\n";
     body.append(message, len);
 
@@ -682,7 +683,7 @@ void LogFileObject::FlushUnlocked(){
 }
 
 bool LogFileObject::CreateLogfile(const char* time_pid_string) {
-  string string_filename = base_filename_+filename_extension_+
+  std::string string_filename = base_filename_+filename_extension_+
                            time_pid_string;
   const char* filename = string_filename.c_str();
   int fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0664);
@@ -707,10 +708,10 @@ bool LogFileObject::CreateLogfile(const char* time_pid_string) {
   if (!symlink_basename_.empty()) {
     // take directory from filename
     const char* slash = strrchr(filename, PATH_SEPARATOR);
-    const string linkname =
+    const std::string linkname =
       symlink_basename_ + '.' + LogSeverityNames[severity_];
-    string linkpath;
-    if ( slash ) linkpath = string(filename, slash-filename+1);  // get dirname
+    std::string linkpath;
+    if ( slash ) linkpath = std::string(filename, slash-filename+1);  // get dirname
     linkpath += linkname;
     unlink(linkpath.c_str());                    // delete old one if it exists
 
@@ -765,15 +766,15 @@ void LogFileObject::Write(bool force_flush,
 
     // The logfile's filename will have the date/time & pid in it
     char time_pid_string[256];  // More than enough chars for time, pid, \0
-    ostrstream time_pid_stream(time_pid_string, sizeof(time_pid_string));
+    std::ostrstream time_pid_stream(time_pid_string, sizeof(time_pid_string));
     time_pid_stream.fill('0');
     time_pid_stream << 1900+tm_time.tm_year
-		    << setw(2) << 1+tm_time.tm_mon
-		    << setw(2) << tm_time.tm_mday
+		    << std::setw(2) << 1+tm_time.tm_mon
+		    << std::setw(2) << tm_time.tm_mday
 		    << '-'
-		    << setw(2) << tm_time.tm_hour
-		    << setw(2) << tm_time.tm_min
-		    << setw(2) << tm_time.tm_sec
+		    << std::setw(2) << tm_time.tm_hour
+		    << std::setw(2) << tm_time.tm_min
+		    << std::setw(2) << tm_time.tm_sec
 		    << '.'
 		    << GetMainThreadPid()
 		    << '\0';
@@ -796,12 +797,12 @@ void LogFileObject::Write(bool force_flush,
       //
       // Where does the file get put?  Successively try the directories
       // "/tmp", and "."
-      string stripped_filename(
+      std::string stripped_filename(
           glog_internal_namespace_::ProgramInvocationShortName());
-      string hostname;
+      std::string hostname;
       GetHostName(&hostname);
 
-      string uidname = MyUserName();
+      std::string uidname = MyUserName();
       // We should not call CHECK() here because this function can be
       // called after holding on to log_mutex. We don't want to
       // attempt to hold on to the same mutex, and get into a
@@ -812,12 +813,12 @@ void LogFileObject::Write(bool force_flush,
                           +uidname+".log."
                           +LogSeverityNames[severity_]+'.';
       // We're going to (potentially) try to put logs in several different dirs
-      const vector<string> & log_dirs = GetLoggingDirectories();
+      const std::vector<std::string> & log_dirs = GetLoggingDirectories();
 
       // Go through the list of dirs, and try to create the log file in each
       // until we succeed or run out of options
       bool success = false;
-      for (vector<string>::const_iterator dir = log_dirs.begin();
+      for (std::vector<std::string>::const_iterator dir = log_dirs.begin();
            dir != log_dirs.end();
            ++dir) {
         base_filename_ = *dir + "/" + stripped_filename;
@@ -836,17 +837,17 @@ void LogFileObject::Write(bool force_flush,
 
     // Write a header message into the log file
     char file_header_string[512];  // Enough chars for time and binary info
-    ostrstream file_header_stream(file_header_string,
+    std::ostrstream file_header_stream(file_header_string,
                                   sizeof(file_header_string));
     file_header_stream.fill('0');
     file_header_stream << "Log file created at: "
                        << 1900+tm_time.tm_year << '/'
-                       << setw(2) << 1+tm_time.tm_mon << '/'
-                       << setw(2) << tm_time.tm_mday
+                       << std::setw(2) << 1+tm_time.tm_mon << '/'
+                       << std::setw(2) << tm_time.tm_mday
                        << ' '
-                       << setw(2) << tm_time.tm_hour << ':'
-                       << setw(2) << tm_time.tm_min << ':'
-                       << setw(2) << tm_time.tm_sec << '\n'
+                       << std::setw(2) << tm_time.tm_hour << ':'
+                       << std::setw(2) << tm_time.tm_min << ':'
+                       << std::setw(2) << tm_time.tm_sec << '\n'
                        << "Running on machine: "
                        << LogDestination::hostname() << '\n'
                        << "Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu "
@@ -956,13 +957,13 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
 }
 
 LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
-                       vector<string> *outvec) {
+                       std::vector<std::string> *outvec) {
   Init(file, line, severity, &LogMessage::SaveOrSendToLog);
   data_->outvec_ = outvec; // override Init()'s setting to NULL
 }
 
 LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
-                       string *message) {
+                       std::string *message) {
   Init(file, line, severity, &LogMessage::WriteToStringAndLog);
   data_->message_ = message;  // override Init()'s setting to NULL
 }
@@ -1023,16 +1024,16 @@ void LogMessage::Init(const char* file,
   // We exclude the thread_id for the default thread.
   if (FLAGS_log_prefix && (line != kNoLogPrefix)) {
     stream() << LogSeverityNames[severity][0]
-             << setw(2) << 1+data_->tm_time_.tm_mon
-             << setw(2) << data_->tm_time_.tm_mday
+             << std::setw(2) << 1+data_->tm_time_.tm_mon
+             << std::setw(2) << data_->tm_time_.tm_mday
              << ' '
-             << setw(2) << data_->tm_time_.tm_hour  << ':'
-             << setw(2) << data_->tm_time_.tm_min   << ':'
-             << setw(2) << data_->tm_time_.tm_sec   << "."
-             << setw(6) << usecs
+             << std::setw(2) << data_->tm_time_.tm_hour  << ':'
+             << std::setw(2) << data_->tm_time_.tm_min   << ':'
+             << std::setw(2) << data_->tm_time_.tm_sec   << "."
+             << std::setw(6) << usecs
              << ' '
-             << setfill(' ') << setw(5)
-             << static_cast<unsigned int>(GetTID()) << setfill('0')
+             << std::setfill(' ') << std::setw(5)
+             << static_cast<unsigned int>(GetTID()) << std::setfill('0')
              << ' '
              << data_->basename_ << ':' << data_->line_ << "] ";
   }
@@ -1189,7 +1190,7 @@ void LogMessage::SendToLog() EXCLUSIVE_LOCKS_REQUIRED(log_mutex) {
       SetCrashReason(&crash_reason);
 
       // Store shortened fatal message for other logs and GWQ status
-      const int copy = min<int>(data_->num_chars_to_log_,
+      const int copy = std::min<int>(data_->num_chars_to_log_,
                                 sizeof(fatal_message)-1);
       memcpy(fatal_message, data_->message_text_, copy);
       fatal_message[copy] = '\0';
@@ -1283,7 +1284,7 @@ void LogMessage::SaveOrSendToLog() EXCLUSIVE_LOCKS_REQUIRED(log_mutex) {
     // Omit prefix of message and trailing newline when recording in outvec_.
     const char *start = data_->message_text_ + data_->num_prefix_chars_;
     int len = data_->num_chars_to_log_ - data_->num_prefix_chars_ - 1;
-    data_->outvec_->push_back(string(start, len));
+    data_->outvec_->push_back(std::string(start, len));
   } else {
     SendToLog();
   }
@@ -1342,7 +1343,7 @@ int64 LogMessage::num_messages(int severity) {
 
 // Output the COUNTER value. This is only valid if ostream is a
 // LogStream.
-ostream& operator<<(ostream &os, const PRIVATE_Counter&) {
+std::ostream& operator<<(std::ostream &os, const PRIVATE_Counter&) {
   LogMessage::LogStream *log = dynamic_cast<LogMessage::LogStream*>(&os);
   CHECK(log == log->self());
   os << log->ctr();
@@ -1386,10 +1387,10 @@ void LogSink::WaitTillSent() {
   // noop default
 }
 
-string LogSink::ToString(LogSeverity severity, const char* file, int line,
+std::string LogSink::ToString(LogSeverity severity, const char* file, int line,
                          const struct ::tm* tm_time,
                          const char* message, size_t message_len) {
-  ostringstream stream(string(message, message_len));
+  std::ostringstream stream(std::string(message, message_len));
   stream.fill('0');
 
   // FIXME(jrvb): Updating this to use the correct value for usecs
@@ -1399,19 +1400,19 @@ string LogSink::ToString(LogSeverity severity, const char* file, int line,
   int usecs = 0;
 
   stream << LogSeverityNames[severity][0]
-         << setw(2) << 1+tm_time->tm_mon
-         << setw(2) << tm_time->tm_mday
+         << std::setw(2) << 1+tm_time->tm_mon
+         << std::setw(2) << tm_time->tm_mday
          << ' '
-         << setw(2) << tm_time->tm_hour << ':'
-         << setw(2) << tm_time->tm_min << ':'
-         << setw(2) << tm_time->tm_sec << '.'
-         << setw(6) << usecs
+         << std::setw(2) << tm_time->tm_hour << ':'
+         << std::setw(2) << tm_time->tm_min << ':'
+         << std::setw(2) << tm_time->tm_sec << '.'
+         << std::setw(6) << usecs
          << ' '
-         << setfill(' ') << setw(5) << GetTID() << setfill('0')
+         << std::setfill(' ') << std::setw(5) << GetTID() << std::setfill('0')
          << ' '
          << file << ':' << line << "] ";
 
-  stream << string(message, message_len);
+  stream << std::string(message, message_len);
   return stream.str();
 }
 
@@ -1479,7 +1480,7 @@ static bool SendEmailInternal(const char*dest, const char *subject,
               subject, body, dest);
     }
 
-    string cmd =
+    std::string cmd =
         FLAGS_logmailer + " -s\"" + subject + "\" " + dest;
     FILE* pipe = popen(cmd.c_str(), "w");
     if (pipe != NULL) {
@@ -1514,7 +1515,7 @@ bool SendEmail(const char*dest, const char *subject, const char*body){
   return SendEmailInternal(dest, subject, body, true);
 }
 
-static void GetTempDirectories(vector<string>* list) {
+static void GetTempDirectories(std::vector<std::string>* list) {
   list->clear();
 #ifdef OS_WINDOWS
   // On windows we'll try to find a directory in this order:
@@ -1563,12 +1564,12 @@ static void GetTempDirectories(vector<string>* list) {
 #endif
 }
 
-static vector<string>* logging_directories_list;
+static std::vector<std::string>* logging_directories_list;
 
-const vector<string>& GetLoggingDirectories() {
+const std::vector<std::string>& GetLoggingDirectories() {
   // Not strictly thread-safe but we're called early in InitGoogle().
   if (logging_directories_list == NULL) {
-    logging_directories_list = new vector<string>;
+    logging_directories_list = new std::vector<std::string>;
 
     if ( !FLAGS_log_dir.empty() ) {
       // A dir was specified, we should use it
@@ -1595,9 +1596,9 @@ void TestOnly_ClearLoggingDirectoriesList() {
   logging_directories_list = NULL;
 }
 
-void GetExistingTempDirectories(vector<string>* list) {
+void GetExistingTempDirectories(std::vector<std::string>* list) {
   GetTempDirectories(list);
-  vector<string>::iterator i_dir = list->begin();
+  std::vector<std::string>::iterator i_dir = list->begin();
   while( i_dir != list->end() ) {
     // zero arg to access means test for existence; no constant
     // defined on windows
@@ -1698,16 +1699,16 @@ void TruncateStdoutStderr() {
 
 // Helper functions for string comparisons.
 #define DEFINE_CHECK_STROP_IMPL(name, func, expected)                   \
-  string* Check##func##expected##Impl(const char* s1, const char* s2,   \
+  std::string* Check##func##expected##Impl(const char* s1, const char* s2,   \
                                       const char* names) {              \
     bool equal = s1 == s2 || (s1 && s2 && !func(s1, s2));               \
     if (equal == expected) return NULL;                                 \
     else {                                                              \
-      strstream ss;                                                     \
+      std::strstream ss;                                                     \
       if (!s1) s1 = "";                                                 \
       if (!s2) s2 = "";                                                 \
       ss << #name " failed: " << names << " (" << s1 << " vs. " << s2 << ")"; \
-      return new string(ss.str(), ss.pcount());                         \
+      return new std::string(ss.str(), ss.pcount());                         \
     }                                                                   \
   }
 DEFINE_CHECK_STROP_IMPL(CHECK_STREQ, strcmp, true)

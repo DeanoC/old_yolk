@@ -32,6 +32,7 @@
 // Broken out from logging.cc by Soren Lassen
 // logging_unittest.cc covers the functionality herein
 
+#include <vector>
 #include "utilities.h"
 
 #include <string.h>

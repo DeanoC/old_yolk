@@ -13,6 +13,7 @@
 #include "riak/transports/single-serial-socket.hxx"
 #include "json_spirit/json_spirit_reader.h"
 #include "bitcoder.h"
+#include "mmu.h"
 
 #include "vmthread.h"
 
@@ -154,7 +155,7 @@ void Dwm::bootstrapLocal() {
    using namespace llvm;
 
    auto hwThreads = Core::thread::hardware_concurrency();
-
+   /* ust testing 
    auto store = riak::make_client(riakConn, &no_sibling_resolution, *io);
    store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
       if(!err) {
@@ -165,7 +166,7 @@ void Dwm::bootstrapLocal() {
       } 
       CoreThrowException( DBBackEndHard, "" );
    });
-
+   */
    // load initial bitcode modules
 //   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
    auto initbc = loadBitCode( Core::FilePath("./hello_world") );

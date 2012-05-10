@@ -26,14 +26,14 @@ struct TextResource : public Core::Resource<TextType> {
 	struct CreationStruct {};
 	struct LoadStruct {};
 
-	Core::scoped_array<char>		m_saText;
+	boost::scoped_array<char>		m_saText;
 };
 
 //! text Type
 //! A text file resource handle typedef
 typedef const Core::AsyncResourceHandle<TextType, TextResource> TextResourceHandle;
 typedef TextResourceHandle*										TextResourceHandlePtr;
-typedef Core::shared_ptr<TextResource>							TextResourcePtr;
+typedef std::shared_ptr<TextResource>							TextResourcePtr;
 
 //! Manifests
 // a binary file that list a bunch of resources, allowing easy grouping of multiple
@@ -52,12 +52,12 @@ struct ManifestResource : public Core::Resource<ManifestType> {
 	struct LoadStruct {};
 
 	uint16_t							numEntries;
-	Core::scoped_array<ManifestEntry>	entries;
+	boost::scoped_array<ManifestEntry>	entries;
 };
 
 typedef const Core::AsyncResourceHandle<ManifestType, ManifestResource >	ManifestResourceHandle;
 typedef ManifestResourceHandle*												ManifestResourceHandlePtr;
-typedef Core::shared_ptr<ManifestResource>									ManifestResourcePtr;
+typedef std::shared_ptr<ManifestResource>									ManifestResourcePtr;
 
 
 }

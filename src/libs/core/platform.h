@@ -58,13 +58,16 @@
 	defined( __THW_INTEL__ ) || defined( __I86__ ) || defined( __INTEL__ )
 #	define CPU_FAMILY						CPU_X86
 #	define CPU_ENDIANESS		 			CPU_LITTLE_ENDIAN
+#	define CPU_BIT_SIZE						32
 #elif defined( _M_X64 ) || defined( __amd64__ ) || defined( __amd64 ) ||		\
 	defined( __x86_64__ ) || defined( __x86_64 ) 
 #	define CPU_FAMILY						CPU_X64
 #	define CPU_ENDIANESS		 			CPU_LITTLE_ENDIAN
+#	define CPU_BIT_SIZE						64
 #elif defined( __arm__ ) || defined( __thumb__ ) || defined( __TARGET_ARCH_ARM ) || defined( __TARGET_ARCH_THUMB ) || defined( _ARM )
 #	define CPU_ENDIANESS		 			CPU_ARM
 #	define CPU_ENDIANESS		 			CPU_BIG_ENDIAN
+#	define CPU_BIT_SIZE						32
 #endif
 
 
@@ -81,8 +84,10 @@
 #		define COMPILER_VERSION				MS_VS2005
 #	elif _MSC_VER < 1600
 #		define COMPILER_VERSION				MS_VS2008
-#	else
+#	elif _MSC_VER < 1700
 #		define COMPILER_VERSION				MS_VS2010
+#	elif _MSC_VER < 1700
+#		define COMPILER_VERSION				MS_VS11
 #	endif
 
 #elif defined( __GNUC__ )

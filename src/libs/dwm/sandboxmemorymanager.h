@@ -11,12 +11,6 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/ExecutionEngine/JitMemoryManager.h"
 
-extern "C" int NaCl_page_alloc(void   **p, size_t size);
-extern "C" int NaCl_mprotect(void *addr, size_t len, int prot );
-
-#define NACL_ABI_PROT_READ        0x1   /* Page can be read.  */
-#define NACL_ABI_PROT_WRITE       0x2   /* Page can be written.  */
-#define NACL_ABI_PROT_EXEC        0x4   /* Page can be executed.  */
 #define NACL_TRAMPOLINE_END			64*1024
 
 namespace llvm {

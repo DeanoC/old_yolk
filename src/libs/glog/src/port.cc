@@ -36,12 +36,12 @@
 # error You should only be including windows/port.cc in a windows environment!
 #endif
 
+#include <vector>
 #include "config.h"
 #include <stdarg.h>    // for va_list, va_start, va_end
 #include <string.h>    // for strstr()
 #include <assert.h>
 #include <string>
-#include <vector>
 #include "port.h"
 
 using std::string;

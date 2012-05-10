@@ -12,6 +12,7 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/system_error.h"
+#include "mmu.h"
 
 #include "sandboxmemorymanager.h"
 
@@ -207,27 +208,27 @@ void SandboxMemoryManager::AllocateGOT() {
 
 void SandboxMemoryManager::protect() {
 	// make the entire range untouchable at first
-	NaCl_mprotect( 	(void*)slabAllocator.membase, 
+	MMU::get()->protectPages( (void*) slabAllocator.membase, 
 					(size_t)(slabAllocator.memend - slabAllocator.membase), 
-					0 );
+					MMU::PROT_NONE );
 	SectionTable::const_iterator it;
 	for( it = codeSectionTable.cbegin(); it != codeSectionTable.cend(); ++it ) {
 		// get address and size
 		auto addr = it->second.first;
 		auto size = it->second.second;
 
-		NaCl_mprotect( 	(void*) addr, 
-					(size_t)size, 
-					NACL_ABI_PROT_READ | NACL_ABI_PROT_EXEC );
+		MMU::get()->protectPages( 	(void*) addr, 
+									(size_t)size, 
+									MMU::PROT_READ | MMU::PROT_EXEC );
 	}
 	for( it = dataSectionTable.cbegin(); it != dataSectionTable.cend(); ++it ) {
 		// get address and size
 		// TODO ro date section
 		auto addr = it->second.first;
 		auto size = it->second.second;
-		NaCl_mprotect( 	(void*) addr, 
-					(size_t)size, 
-					NACL_ABI_PROT_READ | NACL_ABI_PROT_WRITE );
+		MMU::get()->protectPages( 	(void*) addr, 
+									(size_t)size, 
+									MMU::PROT_READ | MMU::PROT_WRITE );
 	}
 
 }
@@ -235,9 +236,9 @@ void SandboxMemoryManager::unprotect() {
 	// make entire memory range R/W but not executable, only
 	// trusted code should ever be in this state
 	// NOTE *MUST* be done at start as the range starts protected
-	NaCl_mprotect( 	(void*) slabAllocator.membase, 
+	MMU::get()->protectPages( (void*) slabAllocator.membase, 
 					(size_t)(slabAllocator.memend - slabAllocator.membase), 
-					NACL_ABI_PROT_READ | NACL_ABI_PROT_WRITE );
+					MMU::PROT_READ | MMU::PROT_WRITE );
 
 }
 // TODO 
@@ -247,7 +248,7 @@ llvm::MemSlab *YolkSlabAllocator::Allocate(size_t Size) {
 
 	llvm::MemSlab* slab = (llvm::MemSlab*)curbase;
 	curbase = curbase + Size;
-	slab->Size = Size;
+	slab->Size = Size;	
 	return slab;
 }
 

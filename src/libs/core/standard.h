@@ -342,17 +342,17 @@ namespace Core
 }
 
 // these are auto forwarding to the tr1 implementations of the platform if it supports them
-#	include <boost/tr1/functional.hpp>
-#	include <boost/tr1/memory.hpp>
-#	include <boost/tr1/type_traits.hpp>
-#	include <boost/tr1/random.hpp>
-#	include <boost/tr1/tuple.hpp>
-#	include <boost/tr1/utility.hpp>
-#	include <boost/tr1/array.hpp>
-#	include <boost/tr1/regex.hpp>
-#	include <boost/tr1/complex.hpp>
-#	include <boost/tr1/unordered_map.hpp>
-#	include <boost/tr1/unordered_set.hpp>
+#	include <functional>
+#	include <memory>
+#	include <type_traits>
+#	include <random>
+#	include <tuple>
+#	include <utility>
+#	include <array>
+#	include <regex>
+#	include <complex>
+#	include <unordered_map>
+#	include <unordered_set>
 
 #if defined( USE_GC )
 #	include "gc_allocator.h"
@@ -411,14 +411,14 @@ namespace Core
 {
 	namespace system 
 	{
-		using namespace boost::system;
+//		using namespace boost::system;
 	}
 }
 
 #include <boost/swap.hpp>
 namespace Core
 {
-	using boost::swap;
+//	using boost::swap;
 }
 
 #include <boost/static_assert.hpp>
@@ -428,7 +428,7 @@ namespace Core
 {
 	namespace algorithm
 	{
-		using namespace boost::algorithm;
+//		using namespace boost::algorithm;
 	}
 }
 
@@ -448,27 +448,27 @@ namespace Core
 #include <boost/scoped_array.hpp>
 namespace Core
 {
-	using boost::scoped_array;
+//	using boost::scoped_array;
 }
 
 #include <boost/scoped_ptr.hpp>
 namespace Core
 {
-	using boost::scoped_ptr;
+//	using boost::scoped_ptr;
 }
 
 #include <boost/make_shared.hpp>
 namespace Core
 {
-	using boost::make_shared;
-	using boost::allocate_shared;
+//	using boost::make_shared;
+//	using boost::allocate_shared;
 }
 
 namespace Core
 {
 	namespace mpl
 	{
-		using namespace boost::mpl;
+//		using namespace boost::mpl;
 	}
 }
 
@@ -482,7 +482,7 @@ namespace Core
 {
 	namespace msm
 	{
-		using namespace boost::msm;
+//		using namespace boost::msm;
 	}
 }
 
@@ -612,11 +612,9 @@ namespace Core
 	using std::tr1::regex_token_iterator;
 	using std::tr1::cregex_token_iterator;
 	using std::tr1::sregex_token_iterator;
-	using std::tr1::operator <<;
+	using std::operator <<;
 
 	// tr1 random
-	using std::tr1::variate_generator;
-	using std::tr1::linear_congruential;
 	using std::tr1::mersenne_twister;
 	using std::tr1::subtract_with_carry;
 	using std::tr1::subtract_with_carry_01;

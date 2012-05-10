@@ -86,12 +86,12 @@ void KDTree::buildSubtree( KDTreeNode* node, FaceArray& faces, AABB const& bound
 	// fill in the node as either a leaf or parent
 	if( faces.size() < g_minFacesPerLeaf || m_currentDepth == g_maxTreeDepth ) {
 		// push statistics
-		m_leafTriangleCount += faces.size();
+		m_leafTriangleCount += (unsigned int) faces.size();
 		m_leafDepthCount += m_currentDepth;
 		++m_leafCount;
 
 		// leaf node
-		node->setLeaf( faces.size() );
+		node->setLeaf( (unsigned int)faces.size() );
 		memcpy( node->getFaces(), &faces[0], faces.size()*sizeof( unsigned int ) );
 
 		// clear up our data

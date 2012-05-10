@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "dwm/dwm.h"
 #include "dwm/bitcoder.h"
+#include "dwm/mmu.h"
 #include "heart.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
@@ -38,6 +39,8 @@ int Main() {
 	namespace po = boost::program_options;
 
 	BitCoder::init();
+	MMU::init();
+
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -80,6 +83,8 @@ int Main() {
 				) 
 			);
 		}
+		Dwm test;
+		test.bootstrapLocal();
 
 		if( Handshake( *io, hostname, port ) == true ) {
 			// Wait for all threads in the pool to exit.
@@ -99,6 +104,7 @@ int Main() {
 		return 1;
 	}
 
+	MMU::shutdown();
 	BitCoder::shutdown();
 
 	return 0;

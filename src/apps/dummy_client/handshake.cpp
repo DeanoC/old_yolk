@@ -4,12 +4,12 @@
 #include "protocols/handshake.proto.pb.h"
 
 // don't usually do this but makes the statement defs much shorter!
-using namespace Core::msm::front;
+using namespace boost::msm::front;
 
 namespace {
 using namespace Core;
-using namespace Core::msm; // for front::state (can't use without front as ambigious)
-using namespace Core::msm::front; // for Row
+using namespace boost::msm; // for front::state (can't use without front as ambigious)
+using namespace boost::msm::front; // for Row
 
 // front-end: define the FSM structure 
 struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, private boost::noncopyable {
@@ -37,7 +37,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 			// find the first valid endpoint that wants to communicate with us
 			TcpConnection::pointer connection = TcpConnection::create( fsm.io_service );
 			const asio::ip::tcp::resolver::iterator endPointEnd;
-			system::error_code err = asio::error::host_not_found;
+			boost::system::error_code err = asio::error::host_not_found;
 			while (err && epIter != endPointEnd )
 			{
 				connection->socket().close();
@@ -94,10 +94,10 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 	}
 
 	// the initial state of the FSM. Must be defined for each main states
-	typedef Core::mpl::vector< Empty, AllOk > initial_state;
+	typedef boost::mpl::vector< Empty, AllOk > initial_state;
 
 	// Transition table for DWM
-	struct transition_table : Core::mpl::vector <
+	struct transition_table : boost::mpl::vector <
 // +--------------------+-------------------+-------------------+---------------+-----------+
 // |    State			|  Event			|     Next			|     Action    |  Guard    |
 // +--------------------+-------------------+-------------------+---------------+-----------+
@@ -126,11 +126,11 @@ bool Handshake( boost::asio::io_service& io_service, const std::string& addr, in
 
 	std::stringstream ss;
 	ss << port;
-	Core::msm::back::state_machine<HandshakeStateMachine> sm( &io_service, addr, ss.str() );
+	boost::msm::back::state_machine<HandshakeStateMachine> sm( &io_service, addr, ss.str() );
 
 	// needed to start the highest-level SM. This will call on_entry and mark the start of the SM
 	sm.start();
 	sm.process_event( HandshakeStateMachine::Start() );
 
-	return ( !sm.is_flag_active<Core::msm::TerminateFlag>() );
+	return ( !sm.is_flag_active<boost::msm::TerminateFlag>() );
 }

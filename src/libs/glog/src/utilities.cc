@@ -29,7 +29,6 @@
 //
 // Author: Shinichiro Hamaji
 
-#include "utilities.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +47,10 @@
 # include <syslog.h>
 #endif
 
+#include <string>
+#include <vector>
 #include "base/googleinit.h"
+#include "utilities.h"
 
 using std::string;
 

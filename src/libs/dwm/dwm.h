@@ -44,17 +44,17 @@ private:
 	void checkSysInfoVersion( const std::string& str );
 
 #if defined( DWM_TRUSTED )
-	std::string                                           riakAddr;
-	int                                                   riakPort;
-	riak::transport::delivery_provider                    riakConn;
+	std::string												riakAddr;
+	int														riakPort;
+	riak::transport::delivery_provider						riakConn;
 #endif
-	std::string                                           dwmChanAddr;
-	int                                                   dwmChanPort;
-	std::shared_ptr<boost::asio::ip::tcp::socket>         dwmChanSock;
-	std::shared_ptr<boost::asio::io_service>              io;
-	Core::vector<Core::shared_ptr<VMThread>>				   vmThreads;
-	llvm::LLVMContext&										      context;
-	Core::unordered_map< Core::FilePath, llvm::Module* >	modules;
+	std::string												dwmChanAddr;
+	int														dwmChanPort;
+	std::shared_ptr<boost::asio::ip::tcp::socket>			dwmChanSock;
+	std::shared_ptr<boost::asio::io_service>				io;
+	std::vector<std::shared_ptr<VMThread>>					vmThreads;
+	llvm::LLVMContext&										context;
+	std::unordered_map< std::string, llvm::Module* >		modules;
 };
 
 

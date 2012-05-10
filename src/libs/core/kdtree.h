@@ -56,11 +56,11 @@ public:
 	unsigned int getFaceCount() const { CORE_ASSERT( isLeaf() ); return m_faceCount; }
 
 private:
-	Core::scoped_array< KDTreeNode > m_children;
+	boost::scoped_array< KDTreeNode > m_children;
 	int m_axis;
 	float m_coordinate;
 
-	Core::scoped_array< unsigned int > m_faces;
+	boost::scoped_array< unsigned int > m_faces;
 	unsigned int m_faceCount;
 };
 
@@ -92,7 +92,7 @@ private:
 	float const* m_data;
 	unsigned int const* m_indices;
 
-	Core::scoped_ptr<KDTreeNode> m_root;
+	boost::scoped_ptr<KDTreeNode> m_root;
 	AABB m_bounds;
 
 	int m_currentDepth;

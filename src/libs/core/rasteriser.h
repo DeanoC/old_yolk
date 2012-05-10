@@ -74,7 +74,7 @@ public:
 
 private:
 	unsigned int m_width, m_height, m_subSampleCount;
-	Core::scoped_array< unsigned int > m_sampleSeeds;
+	boost::scoped_array< unsigned int > m_sampleSeeds;
 
 	RasteriserTriangle m_current;
 	unsigned int m_left, m_top, m_right, m_bottom;

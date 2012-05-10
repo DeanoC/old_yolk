@@ -31,7 +31,6 @@
 //
 // logging_unittest.cc covers the functionality herein
 
-#include "utilities.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -45,6 +44,7 @@
 #include "glog/logging.h"          // To pick up flag settings etc.
 #include "glog/raw_logging.h"
 #include "base/commandlineflags.h"
+#include "utilities.h"
 
 #ifdef HAVE_STACKTRACE
 # include "stacktrace.h"

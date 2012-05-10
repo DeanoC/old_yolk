@@ -80,7 +80,7 @@ private:
       using namespace boost;
       if (!error) {
          if (!! object) {
-            LOG(INFO) << str(format("Fetch succeeded! Value is: %1%") % object->value()) << Core::Logger::endl;
+//            LOG(INFO) << str(std::format("Fetch succeeded! Value is: %1%") % object->value()) << Core::Logger::endl;
             // Riak already exist, bail from set it up and wiping stuff
             // TODO force deletion option
             if( deleteSystem ) {

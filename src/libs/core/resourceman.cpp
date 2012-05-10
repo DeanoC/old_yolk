@@ -42,8 +42,8 @@ namespace Core
 struct ResourceData 
 {
 
-	Core::scoped_array<const char>				m_ResourceName;
-	Core::scoped_array<const char>				m_ResourceData;
+	boost::scoped_array<const char>				m_ResourceName;
+	boost::scoped_array<const char>				m_ResourceData;
 	ResourceHandleBase*							m_spHandle;
 	Core::shared_ptr<ResourceBase>				m_spResource;
 	uint32_t									m_iRefCount;
@@ -248,7 +248,7 @@ void ResourceMan::RegisterResourceType (	uint32_t type,
 	m_impl.m_ResourceTypeMap[ type ] = ResourceTypeData( pCreate, pDestroy, pChange, pDestroyHandle, dir, resourceHandleSize );
 }
 
-Core::shared_ptr<ResourceBase> ResourceMan::ImplAcquireResource( ResourceHandleBase* pHandle ) {
+std::shared_ptr<ResourceBase> ResourceMan::ImplAcquireResource( ResourceHandleBase* pHandle ) {
 	ResourceData* pRD = m_impl.m_ResourceHandleBaseMap[ pHandle ];
 	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ pHandle->m_Type ];
 #if defined( LOG_RESOURCE_ACQUIRE )
