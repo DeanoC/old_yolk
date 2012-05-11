@@ -36,7 +36,8 @@ llvm_config( dvm_owned_dedi
 						instrumentation
 						executionengine
 						jit
-						mcjit						
+						mcjit
+						x86asmparser
 )
 
 # make a nice hierachy

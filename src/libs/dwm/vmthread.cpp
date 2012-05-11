@@ -8,6 +8,7 @@
 #include "vmthread.h"
 
 VMThread::VMThread( Dwm& dwm ) :
-	  world( dwm ),
-	  execEngine( CORE_NEW IsolatedExecEngine() ) {
+	  world( dwm ) {
+
+	execEngine.reset( CORE_NEW IsolatedExecEngine( 4 * IsolatedExecEngine::MiB, 1 * IsolatedExecEngine::MiB) );	  	
 }

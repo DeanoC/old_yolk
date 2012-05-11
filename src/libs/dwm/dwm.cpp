@@ -6,8 +6,6 @@
  */
 #include "dwm.h"
 #include "core/fileio.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Bitcode/ReaderWriter.h"
 #include "riak/client.hxx"
 #include "riak/transport.hxx"
 #include "riak/transports/single-serial-socket.hxx"
@@ -30,10 +28,9 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
     return garbage;
 }
 
-Dwm::Dwm() :
-	context( llvm::getGlobalContext() ) {
+Dwm::Dwm() {
 
-   auto libcbc = loadBitCode( Core::FilePath( "./libc.a" ) );
+   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libc.a" ) );
    BitCoder::get()->addLibrary( libcbc );
 }
 
@@ -96,33 +93,6 @@ bool Dwm::openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std
    return true;
 }
 
-std::shared_ptr<llvm::Module> Dwm::loadBitCode( const Core::FilePath& filepath ) {
-	using namespace Core;
-	using namespace llvm;
-
-	File bcFile;
-	
-	if( bcFile.open( filepath.value().c_str() ) == false ) {
-		// file not found
-		return nullptr;
-	}
-   return loadBitCode( bcFile );
-}
-
-std::shared_ptr<llvm::Module> Dwm::loadBitCode( Core::InOutInterface& inny ) {
-	using namespace Core;
-	using namespace llvm;
-
-	uint64_t bcLen = inny.bytesLeft();
-
-	// note on 32 bit system only load max 32 bit file size (no harm)
-	MemoryBuffer *bcBuffer = MemoryBuffer::getNewMemBuffer( (size_t) bcLen );
-	inny.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
-	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, context );
-
-	return std::shared_ptr<llvm::Module>(mod);
-}
-
 void Dwm::checkSysInfoVersion( const std::string& str ) {
    int version_major;
    int version_minor;
@@ -169,13 +139,16 @@ void Dwm::bootstrapLocal() {
    */
    // load initial bitcode modules
 //   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
-   auto initbc = loadBitCode( Core::FilePath("./hello_world") );
+   auto assprg = BitCoder::get()->assemble( Core::FilePath("./switcher.S") );
+   auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world2") );
    initbc->setModuleIdentifier( "bootstrap" );
    auto prg = BitCoder::get()->make( initbc );
+
    // init thread0 into llvm execution environment
    auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this ) );
    vmThreads.push_back( thread0 );
 
+   thread0->getEngine()->addLibrary( assprg );
    thread0->getEngine()->process( prg );
 
 //   std::vector<GenericValue> args;

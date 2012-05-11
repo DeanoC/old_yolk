@@ -32,6 +32,7 @@
 #define MS_VS2005				(0x0)
 #define MS_VS2008				(0x1)
 #define MS_VS2010				(0x2)
+#define MS_VS11					(0x3)
 
 #define GCC_V2					(0x0)
 #define GCC_V3					(0x1)
@@ -86,7 +87,7 @@
 #		define COMPILER_VERSION				MS_VS2008
 #	elif _MSC_VER < 1700
 #		define COMPILER_VERSION				MS_VS2010
-#	elif _MSC_VER < 1700
+#	else
 #		define COMPILER_VERSION				MS_VS11
 #	endif
 

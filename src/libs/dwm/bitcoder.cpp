@@ -1,6 +1,9 @@
 /*
 */
 #include "core/core.h"
+#include "core/fileio.h"
+#include "core/file_path.h"
+
 #include "llvm/LLVMContext.h"
 #include "llvm/PassManager.h"
 #include "llvm/DerivedTypes.h"
@@ -28,6 +31,8 @@
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/FormattedStream.h"
 #include "llvm/Target/TargetData.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Bitcode/ReaderWriter.h"
 
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Pass.h"
@@ -40,11 +45,11 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/ADT/Statistic.h"
-#include <fstream>
-#include <set>
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/CodeGen/IntrinsicLowering.h" // @LOCALMOD
 #include "llvm/LinkAllPasses.h"
+#include "llvm/Support/SourceMgr.h"
+
 #include "bitcoder.h"
 
 namespace {
@@ -146,13 +151,14 @@ namespace {
 } // end anonymous namespace
 
 BitCoder::BitCoder() :
-	triple( "i686-unknown-nacl" )
+	triple( "x86_64-unknown-nacl" )
 {
 	using namespace llvm;
 
 	llvm::InitializeAllTargetInfos();
 	llvm::InitializeAllTargets();
 	llvm::InitializeAllTargetMCs();
+	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
 
 	// TODO de memory leak
@@ -171,6 +177,12 @@ BitCoder::BitCoder() :
 	
   	tm.reset( target->createTargetMachine( triple.getTriple(), cpu, featuresStr, TargetOptions() ) );
 
+	mcii.reset( target->createMCInstrInfo() );	
+	mcsti.reset( target->createMCSubtargetInfo( triple.getTriple(), cpu, featuresStr ) );
+	
+  	mcai.reset( target->createMCAsmInfo( triple.getTriple() ) );
+  	mcri.reset( target->createMCRegInfo( triple.getTriple() ) );
+	mcab.reset( target->createMCAsmBackend( triple.getTriple() ) );
 }
 
 void BitCoder::addLibrary( std::shared_ptr<llvm::Module> lib ) {	
@@ -228,3 +240,82 @@ std::string BitCoder::make( std::shared_ptr<llvm::Module> prg ) {
 //	LOG(INFO) << output << "\n";
 	return output;
 }
+
+std::shared_ptr<llvm::Module> BitCoder::loadBitCode( const Core::FilePath& filepath ) {
+	using namespace Core;
+
+	File bcFile;
+	
+	if( bcFile.open( filepath.value().c_str() ) == false ) {
+		// file not found
+		return nullptr;
+	}
+   return loadBitCode( bcFile );
+}
+
+std::shared_ptr<llvm::Module> BitCoder::loadBitCode( Core::InOutInterface& inny ) {
+	using namespace Core;
+	using namespace llvm;
+
+	uint64_t bcLen = inny.bytesLeft();
+
+	// note on 32 bit system only load max 32 bit file size (no harm)
+	MemoryBuffer *bcBuffer = MemoryBuffer::getNewMemBuffer( (size_t) bcLen );
+	inny.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
+	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, llvm::getGlobalContext() );
+
+	return std::shared_ptr<llvm::Module>(mod);
+}
+std::string BitCoder::assemble( const Core::FilePath& filepath ) {
+	using namespace Core;
+
+	File asmFile;
+	
+	if( asmFile.open( filepath.value().c_str() ) == false ) {
+		// file not found
+		return nullptr;
+	}
+   return assemble( asmFile );
+}
+std::string BitCoder::assemble( Core::InOutInterface& inny ) {
+	using namespace Core;
+	using namespace llvm;
+	using boost::scoped_ptr;
+
+	uint64_t asmLen = inny.bytesLeft();
+
+	// note on 32 bit system only load max 32 bit file size (no harm)
+	MemoryBuffer *asmBuffer = MemoryBuffer::getNewMemBuffer( (size_t) asmLen );
+	inny.read( (uint8_t*) asmBuffer->getBuffer().data(), (size_t) asmLen );
+
+	SourceMgr srcMgr;
+	srcMgr.AddNewSourceBuffer( asmBuffer, SMLoc());
+
+	std::string output;
+	raw_string_ostream os(output);
+    formatted_raw_ostream fos(os);
+
+	scoped_ptr<MCObjectFileInfo> mcofi( CORE_NEW MCObjectFileInfo() );
+	MCContext ctx(*mcai, *mcri, mcofi.get(), &srcMgr);
+	mcofi->InitMCObjectFileInfo( tm->getTargetTriple(), Reloc::Static, CodeModel::Small, ctx );
+	MCCodeEmitter* mcce( tm->getTarget().createMCCodeEmitter( *mcii, *mcsti, ctx ) );
+
+	scoped_ptr<MCStreamer> streamer( tm->getTarget().createMCObjectStreamer(	
+										tm->getTargetTriple(), ctx, 
+										*mcab, fos, mcce, true, true ) );
+	scoped_ptr<MCAsmParser> parser( createMCAsmParser(	srcMgr, 
+														ctx, 
+														*streamer, 
+														*tm->getMCAsmInfo() ) );
+	scoped_ptr<MCTargetAsmParser> tap( tm->getTarget().createMCAsmParser( *mcsti, *parser ) );
+
+	parser->setTargetParser( *tap.get() );
+
+	parser->Run(false);
+
+	fos.flush();
+	os.flush();
+
+	return output;
+}
+

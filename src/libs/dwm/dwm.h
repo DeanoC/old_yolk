@@ -10,10 +10,6 @@
 
 #include "core/core.h"
 #include "core/file_path.h"
-//#include "llvm/LLVMContext.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "core/fileio.h"
 #include "riak/core_types.hxx"
 #include "riak/transport.hxx"
 
@@ -35,11 +31,6 @@ public:
 
 	void bootstrapLocal();
 
-	std::shared_ptr<llvm::Module> loadBitCode( const Core::FilePath& filepath );
-	std::shared_ptr<llvm::Module> loadBitCode( Core::InOutInterface& inny );
-
-	llvm::LLVMContext& getContext() const { return context; };
-
 private:
 	void checkSysInfoVersion( const std::string& str );
 
@@ -53,8 +44,6 @@ private:
 	std::shared_ptr<boost::asio::ip::tcp::socket>			dwmChanSock;
 	std::shared_ptr<boost::asio::io_service>				io;
 	std::vector<std::shared_ptr<VMThread>>					vmThreads;
-	llvm::LLVMContext&										context;
-	std::unordered_map< std::string, llvm::Module* >		modules;
 };
 
 

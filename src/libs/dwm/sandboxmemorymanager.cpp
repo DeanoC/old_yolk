@@ -16,12 +16,52 @@
 
 #include "sandboxmemorymanager.h"
 
+struct FreeListNode {
+	uintptr_t address;
+	uintptr_t size;
+	FreeListNode *Prev;
+	FreeListNode *Next;
+	
+
+	FreeListNode( uintptr_t a, uintptr_t s ) : address(a), size(s) {}
+
+	FreeListNode *RemoveFromFreeList() {
+		assert(Next->Prev == this && Prev->Next == this && "Freelist broken!");
+		Next->Prev = Prev;
+		return Prev->Next = Next;
+	}
+	void AddToFreeList(FreeListNode *FreeList) {
+		Next = FreeList;
+		Prev = FreeList->Prev;
+		Prev->Next = this;
+		Next->Prev = this;
+	}
+
+	static void Init(FreeListNode **Head) {
+		// Make sure there is always at least one entry in the free list
+		*Head = new FreeListNode(0,0);
+		(*Head)->Next = (*Head)->Prev = *Head;
+	}
+
+	static void Destroy(FreeListNode *Head) {
+		FreeListNode *n = Head->Next;
+		while(n != Head) {
+			FreeListNode *next = n->Next;
+			delete n;
+			n = next;
+		}
+		delete Head;
+	}
+};
+
+
 // It's an open issue that lazy jitting is not thread safe (PR5184). However
 // NaCl's dyncode_create solves exactly this problem, so in the future
 // this allocator could (should?) be made thread safe
 
-SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase, uintptr_t memend ) :
-	slabAllocator( membase, memend ),
+SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase, uintptr_t memend, uintptr_t _stackSize ) :
+	stackSize(_stackSize),
+	slabAllocator( membase, memend - stackSize ),
 	codeAllocator( 4096, 4096, slabAllocator ),
 	dataAllocator( 4096, 4096, slabAllocator ),
 	GOTBase(NULL) {
@@ -29,8 +69,17 @@ SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase, uintptr_t memend 
 	FreeListNode::Init(&codeFreeListHead);
 	FreeListNode::Init(&dataFreeListHead);
 
+	unprotect();
+
+	// reserve 4K at the base of memory for the 0 page
+	slabAllocator.Allocate( 4 * 1024 );
+
 	LOG(INFO) << "SandboxMemoryManager: Pwned " << membase <<
 								" - " << memend << "\n";
+
+	stackStart = slabAllocator.memend - (64 * 1024);
+	stackEnd = stackStart - (stackSize - (2 * 64 * 1024));
+
 }
 
 SandboxMemoryManager::~SandboxMemoryManager() {
@@ -91,7 +140,7 @@ void SandboxMemoryManager::FreeListFinishAllocation(
 	
 	uintptr_t end = Core::alignTo(allocationEnd, kBundleSize);
 	assert(end <= block->address + block->size);
-	int allocationSize = end - block->address;
+	uintptr_t allocationSize = end - block->address;
 	table[allocationStart] = allocationSize;
 
 	block->size -= allocationSize;
@@ -209,7 +258,7 @@ void SandboxMemoryManager::AllocateGOT() {
 void SandboxMemoryManager::protect() {
 	// make the entire range untouchable at first
 	MMU::get()->protectPages( (void*) slabAllocator.membase, 
-					(size_t)(slabAllocator.memend - slabAllocator.membase), 
+					(size_t)((slabAllocator.memend + stackSize) - slabAllocator.membase), 
 					MMU::PROT_NONE );
 	SectionTable::const_iterator it;
 	for( it = codeSectionTable.cbegin(); it != codeSectionTable.cend(); ++it ) {
@@ -230,25 +279,38 @@ void SandboxMemoryManager::protect() {
 									(size_t)size, 
 									MMU::PROT_READ | MMU::PROT_WRITE );
 	}
+	// the untrusted stack is R/W except for the top and bottom 64K which
+	// are guard pages
 
+	MMU::get()->protectPages( 	(void*)stackEnd, 
+								stackStart - stackEnd, 
+								MMU::PROT_READ | MMU::PROT_WRITE );
 }
 void SandboxMemoryManager::unprotect() {
 	// make entire memory range R/W but not executable, only
 	// trusted code should ever be in this state
 	// NOTE *MUST* be done at start as the range starts protected
 	MMU::get()->protectPages( (void*) slabAllocator.membase, 
-					(size_t)(slabAllocator.memend - slabAllocator.membase), 
+					(size_t)((slabAllocator.memend + stackSize) - slabAllocator.membase), 
 					MMU::PROT_READ | MMU::PROT_WRITE );
 
 }
+
+YolkSlabAllocator::YolkSlabAllocator( uintptr_t _membase, uintptr_t _memend ) : 
+	membase( _membase ), memend( _memend ) {
+
+	FreeListNode::Init( &head );
+	curbase = membase;
+}
+
 // TODO 
 llvm::MemSlab *YolkSlabAllocator::Allocate(size_t Size) {
 	if( curbase >= memend )
 		return nullptr;
 
 	llvm::MemSlab* slab = (llvm::MemSlab*)curbase;
-	curbase = curbase + Size;
-	slab->Size = Size;	
+	slab->Size = Core::alignTo( Size, MMU::get()->getPageSize() );	
+	curbase = curbase + slab->Size;
 	return slab;
 }
 

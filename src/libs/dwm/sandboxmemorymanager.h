@@ -17,54 +17,13 @@ namespace llvm {
 	class Function;
 	class GlobalValue;
 }
-
-struct FreeListNode {
-	uintptr_t address;
-	uintptr_t size;
-	FreeListNode *Prev;
-	FreeListNode *Next;
-	
-
-	FreeListNode( uintptr_t a, uintptr_t s ) : address(a), size(s) {}
-
-	FreeListNode *RemoveFromFreeList() {
-		assert(Next->Prev == this && Prev->Next == this && "Freelist broken!");
-		Next->Prev = Prev;
-		return Prev->Next = Next;
-	}
-	void AddToFreeList(FreeListNode *FreeList) {
-		Next = FreeList;
-		Prev = FreeList->Prev;
-		Prev->Next = this;
-		Next->Prev = this;
-	}
-
-	static void Init(FreeListNode **Head) {
-		// Make sure there is always at least one entry in the free list
-		*Head = new FreeListNode(0,0);
-		(*Head)->Next = (*Head)->Prev = *Head;
-	}
-
-	static void Destroy(FreeListNode *Head) {
-		FreeListNode *n = Head->Next;
-		while(n != Head) {
-			FreeListNode *next = n->Next;
-			delete n;
-			n = next;
-		}
-		delete Head;
-	}
-};
+struct FreeListNode;
 
 // normally memslab points to the allocated memory
 class YolkSlabAllocator : public llvm::SlabAllocator {
 public:
-	YolkSlabAllocator( uintptr_t _membase, uintptr_t _memend ) : 
-		membase( _membase ), memend( _memend ) {
+	YolkSlabAllocator( uintptr_t _membase, uintptr_t _memend );
 
-		FreeListNode::Init( &head );
-		curbase = membase;
-	}
 	virtual ~YolkSlabAllocator() {};
 	virtual llvm::MemSlab *Allocate(size_t Size);
 	virtual void Deallocate(llvm::MemSlab *Slab);
@@ -79,52 +38,13 @@ private:
 class SandboxMemoryManager : 
 	public llvm::JITMemoryManager, 
 	public llvm::RTDyldMemoryManager {
-
-	typedef llvm::DenseMap<uintptr_t, size_t> 					AllocationTable;
-	typedef std::map<unsigned int, std::pair<uintptr_t,size_t>> SectionTable;
-
-	// Allocation metadata must be kept separate from code, so the free list is
-	// allocated with new rather than being a header in the code blocks
-	FreeListNode*			codeFreeListHead;
-	FreeListNode*			currentCodeBlock;
-	FreeListNode*			dataFreeListHead;
-	FreeListNode*			currentDataBlock;
-	llvm::BumpPtrAllocator	dataAllocator;
-	llvm::BumpPtrAllocator	codeAllocator;
-
-	// Mapping from pointer to allocated function/table, to size of allocation
-	AllocationTable 		allocatedFunctions;
-	AllocationTable			allocatedTables;
-
-	// actual memory manager
-	YolkSlabAllocator		slabAllocator;
-	// trace sectionID to address and type
-	SectionTable 			codeSectionTable;
-	SectionTable 			dataSectionTable;
-
-	uint8_t *GOTBase;     // Target Specific reserved memory
-
-	FreeListNode *allocateCodeSlab(size_t MinSize);
-	FreeListNode *allocateDataSlab(size_t MinSize);
-
-	// Functions for allocations using one of the free lists
-	FreeListNode *FreeListAllocate(uintptr_t &actualSize, FreeListNode *head,
-					FreeListNode * (SandboxMemoryManager::*allocate)(size_t) );
-
-	void FreeListFinishAllocation(FreeListNode *block, FreeListNode *head,
-						uintptr_t allocationStart, uintptr_t allocationEnd, 
-						AllocationTable &table );
-
-	void FreeListDeallocate(FreeListNode *head, AllocationTable &table, 
-						void *body);
-
  public:
 	static const size_t 	kDataSlabSize = 16 * 1024;
 	static const size_t 	kCodeSlabSize = 64 * 1024;
 	static const int 		kBundleSize = 32;
 	static const intptr_t 	kJumpMask = -32;
 
-	SandboxMemoryManager( uintptr_t membase, uintptr_t memend );
+	SandboxMemoryManager( uintptr_t membase, uintptr_t memend, uintptr_t stackSize );
 
 	virtual ~SandboxMemoryManager();
 
@@ -141,8 +61,9 @@ class SandboxMemoryManager :
 
 	virtual void *getPointerToNamedFunction(const std::string &Name,
 											bool AbortOnFailure = true) {
-		// TODO
-		return 0;
+		LOG(INFO) << "Code contains a externed function " << Name << " that doesn't exist, if called will crash\n";
+ 		// this is a valid sandbox addres, but any call to it will go pop
+		return (void*)slabAllocator.membase;
 	}
 
 	// set code to RX and data to RW TODO RO data sections
@@ -150,6 +71,11 @@ class SandboxMemoryManager :
 
 	// set all to RW no X, only allow in trusted code
 	void unprotect();
+
+	// top of the stack, stack goes downwards so Start > End 
+	void* getStackStart() const { return (void*)stackStart; }
+	// bottom of the stack, stack goes downwards so End has a lower value than Start 
+	void* getStackEnd() const { return (void*)stackEnd; }
 
 	//===--------------------------------------------------------------------===//
 	// Global Offset Table Management
@@ -191,6 +117,49 @@ class SandboxMemoryManager :
 								 uint8_t *TableEnd, uint8_t* FrameRegister);
 
 	virtual void deallocateExceptionTable(void *ET);
+
+private:
+	typedef llvm::DenseMap<uintptr_t, size_t> 					AllocationTable;
+	typedef std::map<unsigned int, std::pair<uintptr_t,size_t>> SectionTable;
+
+	uintptr_t stackSize;
+	uintptr_t stackStart;	// stack goes downwards so Start > End
+	uintptr_t stackEnd;
+
+	// Allocation metadata must be kept separate from code, so the free list is
+	// allocated with new rather than being a header in the code blocks
+	FreeListNode*			codeFreeListHead;
+	FreeListNode*			currentCodeBlock;
+	FreeListNode*			dataFreeListHead;
+	FreeListNode*			currentDataBlock;
+	llvm::BumpPtrAllocator	dataAllocator;
+	llvm::BumpPtrAllocator	codeAllocator;
+
+	// Mapping from pointer to allocated function/table, to size of allocation
+	AllocationTable 		allocatedFunctions;
+	AllocationTable			allocatedTables;
+
+	// actual memory manager
+	YolkSlabAllocator		slabAllocator;
+	// trace sectionID to address and type
+	SectionTable 			codeSectionTable;
+	SectionTable 			dataSectionTable;
+
+	uint8_t *GOTBase;     // Target Specific reserved memory
+
+	FreeListNode *allocateCodeSlab( size_t MinSize );
+	FreeListNode *allocateDataSlab( size_t MinSize );
+
+	// Functions for allocations using one of the free lists
+	FreeListNode *FreeListAllocate( uintptr_t &actualSize, FreeListNode *head,
+					FreeListNode * (SandboxMemoryManager::*allocate)(size_t) );
+
+	void FreeListFinishAllocation( FreeListNode *block, FreeListNode *head,
+						uintptr_t allocationStart, uintptr_t allocationEnd, 
+						AllocationTable &table );
+
+	void FreeListDeallocate( FreeListNode *head, AllocationTable &table, void *body );
+
 };
 
 

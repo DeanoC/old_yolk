@@ -12,7 +12,7 @@
 class VMThread : public Core::thread {
 public:
 	VMThread( Dwm& dwm );
-	IsolatedExecEngine* getEngine() { return &(*execEngine); }
+	IsolatedExecEngine* getEngine() { return execEngine.get(); }
 
 private:
 	Dwm&										world;

@@ -51,7 +51,7 @@ public:
 	static const unsigned int PROT_EXEC  = 0x4;   // Page can be executed.
 
 	// how big each page is
-	size_t getPageSize() { return pageSize; }
+	size_t getPageSize() const { return pageSize; }
 
 	// return a valid but random page address, to improve security
 //	uintptr_t getRandomPageAddress();
@@ -64,6 +64,9 @@ public:
 
 	// reserve without actually commiting a range of pages ala allocPages
 	void reservePages( void** hintOut, size_t numBytes );
+
+	// commit all or a subset of previously reserved pages
+	void commitPages( void** hintOut, size_t numBytes );
 
 	// free numBytes (rounded up) pages starting at pages address will uncommit as required
 	void freePages( void* pages, size_t numBytes );
@@ -82,6 +85,8 @@ public:
 #endif
 private:
 	MMU();
+	void allocPagesWithFlags( void** hintOut, size_t numBytes, unsigned int flags );
+
 	size_t pageSize;
 
 #if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32

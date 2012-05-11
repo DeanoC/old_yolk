@@ -81,7 +81,8 @@ MMU::MMU() {
 #endif
 }
 
-void MMU::allocPages( void** hintOut, size_t numBytes ) {
+void MMU::allocPagesWithFlags( void** hintOut, size_t numBytes, unsigned int flags ) {
+	*hintOut = (void*)( (uintptr_t)*hintOut & ~(pageSize-1) );
 	numBytes = Core::alignTo( numBytes, pageSize );
 
 #if PLATFORM_OS == LINUX 
@@ -89,38 +90,57 @@ void MMU::allocPages( void** hintOut, size_t numBytes ) {
 	if( *hintOut != 0 ) {
 		mapFlags |= MAP_FIXED;
 	}
-	auto addr = mmap( *hintOut, size, PROT_NONE,  mapFlags, -1, (off_t) 0);
+	auto addr = mmap( *hintOut, size, PROT_NONE,  flags, -1, (off_t) 0);
 	if( addr == MAP_FAILED ){
 		addr = nullptr;
 	}
 	*hintOut = addr;
 #elif PLATFORM_OS == MS_WINDOWS
-    auto addr = VirtualAlloc( *hintOut, numBytes, MEM_RESERVE | MEM_COMMIT, PAGE_NOACCESS);
+    auto addr = VirtualAlloc( *hintOut, numBytes, flags, PAGE_NOACCESS);
     *hintOut = addr;
 #endif
 }
 
-void MMU::reservePages( void** hintOut, size_t numBytes ) {
-	numBytes = Core::alignTo( numBytes, pageSize );
 
+void MMU::allocPages( void** hintOut, size_t numBytes ) {
+#if PLATFORM_OS == LINUX 
+	int mapFlags = MAP_PRIVATE | MAP_ANONYMOUS;
+	if( *hintOut != 0 ) {
+		mapFlags |= MAP_FIXED;
+	}
+	allocPagesWithFlags( hintOut, numBytes, mapFlags );
+#elif PLATFORM_OS == MS_WINDOWS
+	allocPagesWithFlags( hintOut, numBytes, MEM_RESERVE | MEM_COMMIT );
+#endif
+}
+
+void MMU::reservePages( void** hintOut, size_t numBytes ) {
 #if PLATFORM_OS == LINUX 
 	int mapFlags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE;
 	if( *hintOut != 0 ) {
 		mapFlags |= MAP_FIXED;
 	}
-	auto addr = mmap( *hintOut, size, PROT_NONE,  mapFlags, -1, (off_t) 0);
-	if( addr == MAP_FAILED ){
-		addr = nullptr;
-	}
-	*hintOut = addr;
+	allocPagesWithFlags( hintOut, numBytes, mapFlags );
 #elif PLATFORM_OS == MS_WINDOWS
-    auto addr = VirtualAlloc( *hintOut, numBytes, MEM_RESERVE, PAGE_NOACCESS);
-    *hintOut = addr;
+	allocPagesWithFlags( hintOut, numBytes, MEM_RESERVE );
+#endif
+}
+
+void MMU::commitPages( void** hintOut, size_t numBytes ) {
+#if PLATFORM_OS == LINUX 
+	int mapFlags = MAP_PRIVATE | MAP_ANONYMOUS;
+	if( *hintOut != 0 ) {
+		mapFlags |= MAP_FIXED;
+	}
+	allocPagesWithFlags( hintOut, numBytes, mapFlags );
+#elif PLATFORM_OS == MS_WINDOWS
+	allocPagesWithFlags( hintOut, numBytes, MEM_COMMIT );
 #endif
 }
 
 
 void MMU::freePages( void* pages, size_t numBytes ) {
+	pages = (void*)( (uintptr_t)pages & ~(pageSize-1) );
 #if PLATFORM_OS == LINUX
 	numBytes = Core::alignTo( numBytes, pageSize );
 	mmunmap( pages, numBytes );
@@ -130,6 +150,7 @@ void MMU::freePages( void* pages, size_t numBytes ) {
 }
 
 void MMU::protectPages( void* pages, size_t numBytes, unsigned int settings ) {
+	pages = (void*)( (uintptr_t)pages & ~(pageSize-1) );
 	numBytes = Core::alignTo( numBytes, pageSize );
 #if PLATFORM_OS == LINUX 
 	mprotect( pages, numBytes, settings );
