@@ -54,13 +54,16 @@ struct FreeListNode {
 	}
 };
 
-
 // It's an open issue that lazy jitting is not thread safe (PR5184). However
 // NaCl's dyncode_create solves exactly this problem, so in the future
 // this allocator could (should?) be made thread safe
 
-SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase, uintptr_t memend, uintptr_t _stackSize ) :
+SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase, 
+											uintptr_t memend, 
+											size_t _stackSize,
+											size_t _trustedSize ) :
 	stackSize(_stackSize),
+	trustedSize( _trustedSize ),
 	slabAllocator( membase, memend - stackSize ),
 	codeAllocator( 4096, 4096, slabAllocator ),
 	dataAllocator( 4096, 4096, slabAllocator ),
@@ -71,15 +74,18 @@ SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase, uintptr_t memend,
 
 	unprotect();
 
-	// reserve 4K at the base of memory for the 0 page
-	slabAllocator.Allocate( 4 * 1024 );
+	// write x86 HLT opcode over the entire space
+	memset( (void*)membase, 0xF4, memend - membase );
 
-	LOG(INFO) << "SandboxMemoryManager: Pwned " << membase <<
-								" - " << memend << "\n";
+	// reserve 4K at the base of memory for the 0 page, catch most nullptr violations (r or w)
+	slabAllocator.Allocate( MMU::get()->getPageSize() );
+	// next pages is r/o memory of the trusted block 
+	trustedStart = (uintptr_t) slabAllocator.Allocate( trustedSize );
 
-	stackStart = slabAllocator.memend - (64 * 1024);
-	stackEnd = stackStart - (stackSize - (2 * 64 * 1024));
+	LOG(INFO) << "SandboxMemoryManager: Pwned " << membase << " - " << memend << "\n";
 
+	stackStart = slabAllocator.memend - MMU::get()->getPageSize();
+	stackEnd = stackStart - (stackSize - (2 * MMU::get()->getPageSize()));
 }
 
 SandboxMemoryManager::~SandboxMemoryManager() {
@@ -281,10 +287,17 @@ void SandboxMemoryManager::protect() {
 	}
 	// the untrusted stack is R/W except for the top and bottom 64K which
 	// are guard pages
-
 	MMU::get()->protectPages( 	(void*)stackEnd, 
 								stackStart - stackEnd, 
 								MMU::PROT_READ | MMU::PROT_WRITE );
+
+	// read/exec trusted region TODO? split into data and code region?
+	// see how its used, currently its mostly used for tramps + a few variables
+	// these variable aren't likely to become a escape vector
+	MMU::get()->protectPages( 	(void*)trustedStart, 
+								trustedSize, 
+								MMU::PROT_READ | MMU::PROT_EXEC );
+
 }
 void SandboxMemoryManager::unprotect() {
 	// make entire memory range R/W but not executable, only

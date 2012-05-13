@@ -151,7 +151,8 @@ namespace {
 } // end anonymous namespace
 
 BitCoder::BitCoder() :
-	triple( "x86_64-unknown-nacl" )
+	untrustedTriple( "x86_64-unknown-linux" ),
+	trustedTriple( "x86_64-unknown-nacl" )
 {
 	using namespace llvm;
 
@@ -161,38 +162,46 @@ BitCoder::BitCoder() :
 	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
 
-	// TODO de memory leak
-	std::string Error;
-	const Target* target = TargetRegistry::lookupTarget( triple.getTriple(), Error);
-	if( !Error.empty() ) {
-	   LOG(ERROR) << Error << "\n";
-	}
-
 	const std::string cpu( "core2" );
 	// Package up features to be passed to target/subtarget
 	std::string featuresStr;
 	SubtargetFeatures Features;
-	Features.getDefaultSubtargetFeatures( triple );
-	featuresStr = Features.getString();
-	
-  	tm.reset( target->createTargetMachine( triple.getTriple(), cpu, featuresStr, TargetOptions() ) );
 
-	mcii.reset( target->createMCInstrInfo() );	
-	mcsti.reset( target->createMCSubtargetInfo( triple.getTriple(), cpu, featuresStr ) );
-	
-  	mcai.reset( target->createMCAsmInfo( triple.getTriple() ) );
-  	mcri.reset( target->createMCRegInfo( triple.getTriple() ) );
-	mcab.reset( target->createMCAsmBackend( triple.getTriple() ) );
+	// TODO de memory leak
+	std::string Error;
+	const Target* tUNTRUSTED = TargetRegistry::lookupTarget( untrustedTriple.getTriple(), Error );
+	if( !Error.empty() ) { LOG(ERROR) << Error << "\n"; }
+	const Target* tTRUSTED = TargetRegistry::lookupTarget( trustedTriple.getTriple(), Error );
+	if( !Error.empty() ) { LOG(ERROR) << Error << "\n"; }
+
+	Features.getDefaultSubtargetFeatures( untrustedTriple );
+	featuresStr = Features.getString();
+  	tm[UNTRUSTED].reset( tUNTRUSTED->createTargetMachine( untrustedTriple.getTriple(), cpu, featuresStr, TargetOptions() ) );
+	mcii[UNTRUSTED].reset( tUNTRUSTED->createMCInstrInfo() );	
+	mcsti[UNTRUSTED].reset( tUNTRUSTED->createMCSubtargetInfo( untrustedTriple.getTriple(), cpu, featuresStr ) );	
+  	mcai[UNTRUSTED].reset( tUNTRUSTED->createMCAsmInfo( untrustedTriple.getTriple() ) );
+  	mcri[UNTRUSTED].reset( tUNTRUSTED->createMCRegInfo( untrustedTriple.getTriple() ) );
+	mcab[UNTRUSTED].reset( tUNTRUSTED->createMCAsmBackend( untrustedTriple.getTriple() ) );
+	Features.getDefaultSubtargetFeatures( trustedTriple );
+	featuresStr = Features.getString();
+  	tm[TRUSTED].reset( tTRUSTED->createTargetMachine( trustedTriple.getTriple(), cpu, featuresStr, TargetOptions() ) );
+	mcii[TRUSTED].reset( tTRUSTED->createMCInstrInfo() );	
+	mcsti[TRUSTED].reset( tTRUSTED->createMCSubtargetInfo( trustedTriple.getTriple(), cpu, featuresStr ) );	
+  	mcai[TRUSTED].reset( tTRUSTED->createMCAsmInfo( trustedTriple.getTriple() ) );
+  	mcri[TRUSTED].reset( tTRUSTED->createMCRegInfo( trustedTriple.getTriple() ) );
+	mcab[TRUSTED].reset( tTRUSTED->createMCAsmBackend( trustedTriple.getTriple() ) );
+
 }
 
-void BitCoder::addLibrary( std::shared_ptr<llvm::Module> lib ) {	
+void BitCoder::addLibrary( llvm::Module* lib ) {	
 	libraries.push_back( lib );
 }
-void BitCoder::removeLibrary( std::shared_ptr<llvm::Module> lib ) {	
+void BitCoder::removeLibrary( llvm::Module* lib ) {	
 	libraries.remove( lib );
+	CORE_DELETE lib;
 }
 
-std::string BitCoder::make( std::shared_ptr<llvm::Module> prg ) {
+std::string BitCoder::make( const int type, llvm::Module* prg ) {
 	using namespace llvm;
 	std::string output;
 	raw_string_ostream os(output);
@@ -201,10 +210,10 @@ std::string BitCoder::make( std::shared_ptr<llvm::Module> prg ) {
     prg->setOutputFormat( Module::ExecutableOutputFormat );
 
 	// link together everything
-	Linker linker( StringRef("bitcoder"), prg.get(), Linker::Verbose);
+	Linker linker( StringRef("bitcoder"), prg, Linker::Verbose);
 	auto lkIt = libraries.begin();
 	while( lkIt != libraries.end() ) {
-		linker.LinkInModule( lkIt->get(), Linker::PreserveSource );
+		linker.LinkInModule( *lkIt, Linker::PreserveSource );
 		++lkIt;
 	}
 	Module* bc = linker.getModule(); // link result in bc owned by Linker
@@ -215,12 +224,12 @@ std::string BitCoder::make( std::shared_ptr<llvm::Module> prg ) {
 
 	// LTO passes 
 	PassManager pm;
-	pm.add( CORE_NEW TargetData( *tm->getTargetData() ) );
+	pm.add( CORE_NEW TargetData( *tm[type]->getTargetData() ) );
 	pm.add( CORE_NEW InternalizePass( mustKeep ) );
 	PassManagerBuilder().populateLTOPassManager(pm, false, false, false);
 	FunctionPassManager codeGenPasses(bc);
-	codeGenPasses.add( CORE_NEW TargetData( *tm->getTargetData() ) );
-	if( tm->addPassesToEmitFile( pm, fos, TargetMachine::CGFT_ObjectFile, false ) ) {
+	codeGenPasses.add( CORE_NEW TargetData( *tm[type]->getTargetData() ) );
+	if( tm[type]->addPassesToEmitFile( pm, fos, TargetMachine::CGFT_ObjectFile, false ) ) {
 		LOG(INFO) << "ERR\n";
 	}
 
@@ -241,7 +250,7 @@ std::string BitCoder::make( std::shared_ptr<llvm::Module> prg ) {
 	return output;
 }
 
-std::shared_ptr<llvm::Module> BitCoder::loadBitCode( const Core::FilePath& filepath ) {
+llvm::Module* BitCoder::loadBitCode( const Core::FilePath& filepath ) {
 	using namespace Core;
 
 	File bcFile;
@@ -253,7 +262,7 @@ std::shared_ptr<llvm::Module> BitCoder::loadBitCode( const Core::FilePath& filep
    return loadBitCode( bcFile );
 }
 
-std::shared_ptr<llvm::Module> BitCoder::loadBitCode( Core::InOutInterface& inny ) {
+llvm::Module* BitCoder::loadBitCode( Core::InOutInterface& inny ) {
 	using namespace Core;
 	using namespace llvm;
 
@@ -264,9 +273,9 @@ std::shared_ptr<llvm::Module> BitCoder::loadBitCode( Core::InOutInterface& inny 
 	inny.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
 	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, llvm::getGlobalContext() );
 
-	return std::shared_ptr<llvm::Module>(mod);
+	return mod;
 }
-std::string BitCoder::assemble( const Core::FilePath& filepath ) {
+std::string BitCoder::assemble( const int type, const Core::FilePath& filepath ) {
 	using namespace Core;
 
 	File asmFile;
@@ -275,9 +284,9 @@ std::string BitCoder::assemble( const Core::FilePath& filepath ) {
 		// file not found
 		return nullptr;
 	}
-   return assemble( asmFile );
+   return assemble( type, asmFile );
 }
-std::string BitCoder::assemble( Core::InOutInterface& inny ) {
+std::string BitCoder::assemble( const int type, Core::InOutInterface& inny ) {
 	using namespace Core;
 	using namespace llvm;
 	using boost::scoped_ptr;
@@ -296,18 +305,18 @@ std::string BitCoder::assemble( Core::InOutInterface& inny ) {
     formatted_raw_ostream fos(os);
 
 	scoped_ptr<MCObjectFileInfo> mcofi( CORE_NEW MCObjectFileInfo() );
-	MCContext ctx(*mcai, *mcri, mcofi.get(), &srcMgr);
-	mcofi->InitMCObjectFileInfo( tm->getTargetTriple(), Reloc::Static, CodeModel::Small, ctx );
-	MCCodeEmitter* mcce( tm->getTarget().createMCCodeEmitter( *mcii, *mcsti, ctx ) );
+	MCContext ctx(*mcai[type], *mcri[type], mcofi.get(), &srcMgr);
+	mcofi->InitMCObjectFileInfo( tm[type]->getTargetTriple(), Reloc::Static, CodeModel::Small, ctx );
+	MCCodeEmitter* mcce( tm[type]->getTarget().createMCCodeEmitter( *mcii[type], *mcsti[type], ctx ) );
 
-	scoped_ptr<MCStreamer> streamer( tm->getTarget().createMCObjectStreamer(	
-										tm->getTargetTriple(), ctx, 
-										*mcab, fos, mcce, true, true ) );
+	scoped_ptr<MCStreamer> streamer( tm[type]->getTarget().createMCObjectStreamer(	
+										tm[type]->getTargetTriple(), ctx, 
+										*mcab[type], fos, mcce, true, true ) );
 	scoped_ptr<MCAsmParser> parser( createMCAsmParser(	srcMgr, 
 														ctx, 
 														*streamer, 
-														*tm->getMCAsmInfo() ) );
-	scoped_ptr<MCTargetAsmParser> tap( tm->getTarget().createMCAsmParser( *mcsti, *parser ) );
+														*tm[type]->getMCAsmInfo() ) );
+	scoped_ptr<MCTargetAsmParser> tap( tm[type]->getTarget().createMCAsmParser( *mcsti[type], *parser ) );
 
 	parser->setTargetParser( *tap.get() );
 

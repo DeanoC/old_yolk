@@ -10,8 +10,7 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/ExecutionEngine/JitMemoryManager.h"
-
-#define NACL_TRAMPOLINE_END			64*1024
+#include "trustedregion.h"
 
 namespace llvm {
 	class Function;
@@ -44,7 +43,7 @@ class SandboxMemoryManager :
 	static const int 		kBundleSize = 32;
 	static const intptr_t 	kJumpMask = -32;
 
-	SandboxMemoryManager( uintptr_t membase, uintptr_t memend, uintptr_t stackSize );
+	SandboxMemoryManager( uintptr_t membase, uintptr_t memend, size_t _stackSize, size_t _trustedSize );
 
 	virtual ~SandboxMemoryManager();
 
@@ -59,11 +58,23 @@ class SandboxMemoryManager :
 	/// setPoisonMemory - No-op on NaCl - nothing unvalidated is ever executable
 	virtual void setPoisonMemory(bool poison) {}
 
-	virtual void *getPointerToNamedFunction(const std::string &Name,
+	virtual void *getPointerToNamedFunction(const std::string &name,
 											bool AbortOnFailure = true) {
-		LOG(INFO) << "Code contains a externed function " << Name << " that doesn't exist, if called will crash\n";
- 		// this is a valid sandbox addres, but any call to it will go pop
-		return (void*)slabAllocator.membase;
+		LOG(INFO) << "Code contains a externed function " << name << " that doesn't exist, if called will crash\n";
+		auto addr = trustedRegion->getAddress( name );
+		if( addr == nullptr ) {
+			auto func = [] () -> int { 
+					LOG(INFO) << "Called an external with no implementation!"; 
+					return 0; 
+				};
+			addr = trustedRegion->addFunctionTrampoline( "_nofunc_", func);
+		}
+		if( addr == nullptr ) {
+ 			// this is a valid sandbox addres, but any call to it will go pop
+			return (void*)slabAllocator.membase;
+		}
+
+		return addr;
 	}
 
 	// set code to RX and data to RW TODO RO data sections
@@ -76,6 +87,17 @@ class SandboxMemoryManager :
 	void* getStackStart() const { return (void*)stackStart; }
 	// bottom of the stack, stack goes downwards so End has a lower value than Start 
 	void* getStackEnd() const { return (void*)stackEnd; }
+
+	// trusted address of the trusted pages, these are read/only pages at the bottom
+	// of untrusted space, use to store trampolines, tls indices etc. Anything you 
+	// need to be safely stored, be careful not to leak info that could be used by 
+	// hackers
+	void* getTrustedStart() const { return (void*) trustedStart; }
+
+	size_t getTrustedSize() const { return trustedSize; }
+
+	// sets trusted region for lookup but does not own it 
+	void setTrustedRegion( TrustedRegion* region ) { trustedRegion = region; }
 
 	//===--------------------------------------------------------------------===//
 	// Global Offset Table Management
@@ -122,9 +144,11 @@ private:
 	typedef llvm::DenseMap<uintptr_t, size_t> 					AllocationTable;
 	typedef std::map<unsigned int, std::pair<uintptr_t,size_t>> SectionTable;
 
-	uintptr_t stackSize;
-	uintptr_t stackStart;	// stack goes downwards so Start > End
-	uintptr_t stackEnd;
+	size_t 		stackSize;
+	uintptr_t 	stackStart;	// stack goes downwards so Start > End
+	uintptr_t 	stackEnd;
+	uintptr_t	trustedStart; // a read-only portion of untrusted space for trampolines, tls index etc
+	size_t		trustedSize;
 
 	// Allocation metadata must be kept separate from code, so the free list is
 	// allocated with new rather than being a header in the code blocks
@@ -146,6 +170,8 @@ private:
 	SectionTable 			dataSectionTable;
 
 	uint8_t *GOTBase;     // Target Specific reserved memory
+
+	TrustedRegion*	trustedRegion; // used for external variable look ups
 
 	FreeListNode *allocateCodeSlab( size_t MinSize );
 	FreeListNode *allocateDataSlab( size_t MinSize );

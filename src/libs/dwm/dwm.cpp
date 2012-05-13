@@ -139,10 +139,10 @@ void Dwm::bootstrapLocal() {
    */
    // load initial bitcode modules
 //   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
-   auto assprg = BitCoder::get()->assemble( Core::FilePath("./switcher.S") );
+   auto assprg = BitCoder::get()->assemble( BitCoder::UNTRUSTED, Core::FilePath("./switcher.S") );
    auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world2") );
    initbc->setModuleIdentifier( "bootstrap" );
-   auto prg = BitCoder::get()->make( initbc );
+   auto prg = BitCoder::get()->make( BitCoder::TRUSTED, initbc );
 
    // init thread0 into llvm execution environment
    auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this ) );
