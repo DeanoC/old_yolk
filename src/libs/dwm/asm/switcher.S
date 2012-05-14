@@ -114,14 +114,16 @@ SwitchToTrusted:
 		movq	%rsp, 				32(%r15)		/* save the untrusted stack			*/
 		movq	64(%r15), 			%rsp			/* restore the trusted stack		*/
 		pushq						%rbp			/* save the untrusted ebp 			*/
+		subq	$32,				%rsp		/* windows shadow stack space		*/
 		// untrusted code uses Linux x86-64 call convention
 		// so we convert it to windows x86-64 here
-		// system calls only support 4 interger/pointer parameters
-		movq	%r8, 				%rdx
-		movq	%r9, 				%rcx
-		movq	%rcx, 				%rdi
-		movq	%rdx, 				%rsi
-		call 						*%rax
+		// system calls only support 3 interger/pointer parameters
+		movq	%rdx,				%r9				/* 3rd linux param = 4th win param */
+		movq	%rsi, 				%r8				/* 2nd linux param = 3rd win param */
+		movq	%rdi,				%rdx			/* 1st linux param = 2nd win param */
+		movq	%r15,				%rcx			/* 1st param IEEThreadContext  */
+		call 						*%rax			/* call into win64 abi function return in rax */
+		addq	$32,				%rsp
 		popq						%rbp			/* restore the untrusted ebp		*/
 		movq	32(%r15), 			%rsp			/* restore the untrusted stack		*/
 		movq	48(%r15), 			%r15			/* r15 back to untrusted base addr 	*/

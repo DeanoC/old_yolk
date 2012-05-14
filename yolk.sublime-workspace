@@ -4,6 +4,98 @@
 		"selected_items":
 		[
 			[
+				"th",
+				"threadCtx"
+			],
+			[
+				"g_",
+				"g_ThreadIdx"
+			],
+			[
+				"thunk",
+				"thunkCodeSize"
+			],
+			[
+				"uint",
+				"uintptr_t"
+			],
+			[
+				"cu",
+				"curThunkPtr"
+			],
+			[
+				"trustedS",
+				"trustedSize"
+			],
+			[
+				"sta",
+				"stackStart"
+			],
+			[
+				"stackS",
+				"stackSize"
+			],
+			[
+				"bot",
+				"botStack"
+			],
+			[
+				"yorkS",
+				"yorkStackSize"
+			],
+			[
+				"MEM",
+				"MEM_COMMIT"
+			],
+			[
+				"alloc",
+				"allocPagesWithFlags"
+			],
+			[
+				"yo",
+				"yorkSandboxMem"
+			],
+			[
+				"Pro",
+				"PROT_EXEC"
+			],
+			[
+				"win",
+				"winSettings"
+			],
+			[
+				"hint",
+				"hintOut"
+			],
+			[
+				"nu",
+				"numBytes"
+			],
+			[
+				"map",
+				"mapFlags"
+			],
+			[
+				"mem",
+				"membase"
+			],
+			[
+				"sl",
+				"slabAllocator"
+			],
+			[
+				"uin",
+				"uintptr_t"
+			],
+			[
+				"Memo",
+				"MemoryBuffer"
+			],
+			[
+				"Free",
+				"FreeListNode"
+			],
+			[
 				"rodata",
 				"rodata_start"
 			],
@@ -56,10 +148,6 @@
 				"_area"
 			],
 			[
-				"uint",
-				"uint8_t"
-			],
-			[
 				"active",
 				"activeDWMsByAddr"
 			],
@@ -95,18 +183,7 @@
 			"file": "src/libs/dwm/bitcoder.cpp",
 			"settings":
 			{
-				"buffer_size": 7402,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "#include \"dwm.h\"\n\n#include \"llvm/Object/ELF.h\"\n#include \"llvm/Support/Endian.h\"\n#include \"llvm/ExecutionEngine/RuntimeDyld.h\"\n#include \"llvm/ExecutionEngine/JitMemoryManager.h\"\n\n#include \"native_client/src/shared/gio/gio.h\"\n#include \"native_client/src/trusted/service_runtime/nacl_all_modules.h\"\n#include \"native_client/src/trusted/service_runtime/sel_ldr.h\"\n#include \"native_client/src/shared/platform/nacl_sync.h\"\n#include \"native_client/src/shared/platform/nacl_exit.h\"\n#include \"native_client/src/shared/platform/nacl_sync_checked.h\"\n\n#include \"llvm/Support/Debug.h\"\n#include \"llvm/Support/DynamicLibrary.h\"\n#include \"llvm/Support/ErrorHandling.h\"\n#include \"llvm/Support/MathExtras.h\"\n#include \"llvm/Support/raw_ostream.h\"\n\n\n#include \"isolatedexecengine.h\"\n\nextern \"C\" void NaClLogAddressSpaceLayout( struct NaClApp *nap );\n\n// like assert but x always is executed in all builds TODO release\n#define CHECK( x ) ec = (x); if( ec ) { LOG(ERROR) << \"ERR \" << ec.message() << \"\\n\"; }\n#define NACL_MAX_ADDR_BITS  (30)\n\n// The MCJIT memory manager is a layer between the standard JITMemoryManager\n// and the RuntimeDyld interface that maps objects, by name, onto their\n// matching LLVM IR counterparts in the module(s) being compiled.\nclass MemoryManager : public llvm::RTDyldMemoryManager {\n  virtual void anchor();\n  llvm::JITMemoryManager *JMM;\n\n  // FIXME: Multiple modules.\n  llvm::Module *M;\npublic:\n  MemoryManager(llvm::JITMemoryManager *jmm, llvm::Module *m) :\n    JMM( jmm ? jmm : llvm::JITMemoryManager::CreateDefaultMemManager()), M(m) {}\n  // We own the JMM, so make sure to delete it.\n  ~MemoryManager() { delete JMM; }\n\n  uint8_t *allocateDataSection(uintptr_t Size, unsigned Alignment,\n                               unsigned SectionID) {\n    return JMM->allocateSpace(Size, Alignment);\n  }\n\n  uint8_t *allocateCodeSection(uintptr_t Size, unsigned Alignment,\n                               unsigned SectionID) {\n    return JMM->allocateSpace(Size, Alignment);\n  }\n\n  virtual void *getPointerToNamedFunction(const std::string &Name,\n                                          bool AbortOnFailure = true) {\n    return JMM->getPointerToNamedFunction(Name, AbortOnFailure);\n  }\n};\nvoid MemoryManager::anchor(){}\n\n#include \"llvm/ADT/DenseMap.h\"\n#include \"llvm/ExecutionEngine/JITMemoryManager.h\"\n#include \"llvm/Support/Allocator.h\"\n\nnamespace llvm {\n\nclass Function;\nclass GlobalValue;\n\nstruct SimpleSlab {\n  uint8_t *address;\n  size_t size;\n  uint8_t *next_free;\n};\n\nstruct FreeListNode {\n  uint8_t *address;\n  uintptr_t size;\n  FreeListNode *Prev;\n  FreeListNode *Next;\n  FreeListNode *RemoveFromFreeList() {\n    assert(Next->Prev == this && Prev->Next == this && \"Freelist broken!\");\n    Next->Prev = Prev;\n    return Prev->Next = Next;\n  }\n  void AddToFreeList(FreeListNode *FreeList) {\n     Next = FreeList;\n     Prev = FreeList->Prev;\n     Prev->Next = this;\n     Next->Prev = this;\n  }\n};\n\nclass NaClJITMemoryManagerX : public JITMemoryManager {\n  // NaCl disallows writing into any code region, and disallows executing any\n  // data region. Thus we can never get any RWX memory and the the strategy\n  // used by the other allocators of colocation of allocation metadata\n  // with the allocated code won't work.\n  // Currently with NaCl we have one single pool of usable space between the\n  // text and rodata segments, defined by the linker\n  // so to support stub allocation in the middle of a function, we allocate\n  // them in slabs interspersed with the functions.\n\n  static const size_t kStubSlabSize = 16 * 1024;\n  static const size_t kDataSlabSize = 16 * 1024;\n  static const size_t kCodeSlabSize = 64 * 1024;\n\n  typedef DenseMap<uint8_t *, size_t> AllocationTable;\n\n  uint8_t *AllocatableRegionStart;\n  uint8_t *AllocatableRegionLimit;\n  uint8_t *NextCode;\n  SimpleSlab CurrentStubSlab;\n\n  // Allocation metadata must be kept separate from code, so the free list is\n  // allocated with new rather than being a header in the code blocks\n  FreeListNode *CodeFreeListHead;\n  FreeListNode *CurrentCodeBlock;\n  // Mapping from pointer to allocated function, to size of allocation\n  AllocationTable AllocatedFunctions;\n\n  // Since Exception tables are allocated like functions (i.e. we don't know\n  // ahead of time how large they are) we use the same allocation method for\n  // simplicity even though it's not strictly necessary to separate the\n  // allocation metadata from the allocated data.\n  FreeListNode *DataFreeListHead;\n  FreeListNode *CurrentDataBlock;\n  AllocationTable AllocatedTables;\n  BumpPtrAllocator DataAllocator;\n\n  uint8_t *GOTBase;     // Target Specific reserved memory\n\n  FreeListNode *allocateCodeSlab(size_t MinSize);\n  FreeListNode *allocateDataSlab(size_t MinSize);\n  SimpleSlab allocateStubSlab(size_t MinSize);\n\n  // Functions for allocations using one of the free lists\n  void InitFreeList(FreeListNode **Head);\n  void DestroyFreeList(FreeListNode *Head);\n  FreeListNode *FreeListAllocate(uintptr_t &ActualSize, FreeListNode *Head,\n      FreeListNode * (NaClJITMemoryManagerX::*allocate)(size_t));\n  void FreeListFinishAllocation(FreeListNode *Block, FreeListNode *Head,\n      uint8_t *AllocationStart, uint8_t *AllocationEnd, AllocationTable &table);\n  void FreeListDeallocate(FreeListNode *Head, AllocationTable &Table,\n                          void *Body);\n public:\n  // TODO(dschuff): how to find the real value? is it a flag?\n  static const int kBundleSize = 32;\n  static const intptr_t kJumpMask = -32;\n  NaClJITMemoryManagerX();\n  virtual ~NaClJITMemoryManagerX();\n  static inline bool classof(const JITMemoryManager*) { return true; }\n\n  /// setMemoryWritable - No-op on NaCl - code is never writable\n  virtual void setMemoryWritable() {}\n\n  /// setMemoryExecutable - No-op on NaCl - data is never executable\n  virtual void setMemoryExecutable() {}\n\n  /// setPoisonMemory - No-op on NaCl - nothing unvalidated is ever executable\n  virtual void setPoisonMemory(bool poison) {}\n\n  /// getPointerToNamedFunction - This method returns the address of the\n  /// specified function. As such it is only useful for resolving library\n  /// symbols, not code generated symbols.\n  ///\n  /// If AbortOnFailure is false and no function with the given name is\n  /// found, this function silently returns a null pointer. Otherwise,\n  /// it prints a message to stderr and aborts.\n  ///\n  virtual void *getPointerToNamedFunction(const std::string &Name,\n                                          bool AbortOnFailure = true) ;\n\n  //===--------------------------------------------------------------------===//\n  // Global Offset Table Management\n  //===--------------------------------------------------------------------===//\n\n  /// AllocateGOT - If the current table requires a Global Offset Table, this\n  /// method is invoked to allocate it.  This method is required to set HasGOT\n  /// to true.\n  virtual void AllocateGOT();\n\n  /// getGOTBase - If this is managing a Global Offset Table, this method should\n  /// return a pointer to its base.\n  virtual uint8_t *getGOTBase() const {\n    return GOTBase;\n  }\n\n  //===--------------------------------------------------------------------===//\n  // Main Allocation Functions\n  //===--------------------------------------------------------------------===//\n\n  /// startFunctionBody - When we start JITing a function, the JIT calls this\n  /// method to allocate a block of free RWX memory, which returns a pointer to\n  /// it.  If the JIT wants to request a block of memory of at least a certain\n  /// size, it passes that value as ActualSize, and this method returns a block\n  /// with at least that much space.  If the JIT doesn't know ahead of time how\n  /// much space it will need to emit the function, it passes 0 for the\n  /// ActualSize.  In either case, this method is required to pass back the size\n  /// of the allocated block through ActualSize.  The JIT will be careful to\n  /// not write more than the returned ActualSize bytes of memory.\n  virtual uint8_t *startFunctionBody(const Function *F,\n                                     uintptr_t &ActualSize);\n\n  /// allocateStub - This method is called by the JIT to allocate space for a\n  /// function stub (used to handle limited branch displacements) while it is\n  /// JIT compiling a function.  For example, if foo calls bar, and if bar\n  /// either needs to be lazily compiled or is a native function that exists too\n  /// far away from the call site to work, this method will be used to make a\n  /// thunk for it.  The stub should be \"close\" to the current function body,\n  /// but should not be included in the 'actualsize' returned by\n  /// startFunctionBody.\n  virtual uint8_t *allocateStub(const GlobalValue* F, unsigned StubSize,\n                                unsigned Alignment);\n\n  /// endFunctionBody - This method is called when the JIT is done codegen'ing\n  /// the specified function.  At this point we know the size of the JIT\n  /// compiled function.  This passes in FunctionStart (which was returned by\n  /// the startFunctionBody method) and FunctionEnd which is a pointer to the\n  /// actual end of the function.  This method should mark the space allocated\n  /// and remember where it is in case the client wants to deallocate it.\n  virtual void endFunctionBody(const Function *F, uint8_t *FunctionStart,\n                               uint8_t *FunctionEnd);\n\n  /// allocateCodeSection - Allocate a memory block of (at least) the given\n  /// size suitable for executable code. The SectionID is a unique identifier\n  /// assigned by the JIT and passed through to the memory manager for\n  /// the instance class to use if it needs to communicate to the JIT about\n  /// a given section after the fact.\n  virtual uint8_t *allocateCodeSection(uintptr_t Size, unsigned Alignment,\n                                       unsigned SectionID);\n\n  /// allocateDataSection - Allocate a memory block of (at least) the given\n  /// size suitable for data. The SectionID is a unique identifier\n  /// assigned by the JIT and passed through to the memory manager for\n  /// the instance class to use if it needs to communicate to the JIT about\n  /// a given section after the fact.\n  virtual uint8_t *allocateDataSection(uintptr_t Size, unsigned Alignment,\n                                       unsigned SectionID);\n\n  /// allocateSpace - Allocate a memory block of the given size.  This method\n  /// cannot be called between calls to startFunctionBody and endFunctionBody.\n  virtual uint8_t *allocateSpace(intptr_t Size, unsigned Alignment);\n\n  /// allocateGlobal - Allocate memory for a global.\n  virtual uint8_t *allocateGlobal(uintptr_t Size, unsigned Alignment);\n\n  /// deallocateFunctionBody - Free the specified function body.  The argument\n  /// must be the return value from a call to startFunctionBody() that hasn't\n  /// been deallocated yet.  This is never called when the JIT is currently\n  /// emitting a function.\n  virtual void deallocateFunctionBody(void *Body);\n\n  /// startExceptionTable - When we finished JITing the function, if exception\n  /// handling is set, we emit the exception table.\n  virtual uint8_t* startExceptionTable(const Function* F,\n                                       uintptr_t &ActualSize);\n\n  /// endExceptionTable - This method is called when the JIT is done emitting\n  /// the exception table.\n  virtual void endExceptionTable(const Function *F, uint8_t *TableStart,\n                                 uint8_t *TableEnd, uint8_t* FrameRegister);\n\n  /// deallocateExceptionTable - Free the specified exception table's memory.\n  /// The argument must be the return value from a call to startExceptionTable()\n  /// that hasn't been deallocated yet.  This is never called when the JIT is\n  /// currently emitting an exception table.\n  virtual void deallocateExceptionTable(void *ET);\n\n  virtual size_t GetDefaultCodeSlabSize() {\n    return kCodeSlabSize;\n  }\n  virtual size_t GetDefaultDataSlabSize() {\n    return kDataSlabSize;\n  }\n  virtual size_t GetDefaultStubSlabSize() {\n    return kStubSlabSize;\n  }\n\n};\n\n// The way NaCl linking is currently setup, there is a gap between the text\n// segment and the rodata segment where we can fill dyncode. The text ends\n// at etext, but there's no symbol for the start of rodata. Currently the\n// linker script puts it at 0x11000000\n// If we run out of space there, we can also allocate below the text segment\n// and keep going downward until we run into code loaded by the dynamic\n// linker. (TODO(dschuff): make that work)\n// For now, just start at etext and go until we hit rodata\n\n// It's an open issue that lazy jitting is not thread safe (PR5184). However\n// NaCl's dyncode_create solves exactly this problem, so in the future\n// this allocator could (should?) be made thread safe\n\n// TODO(dschuff) fix allocation start (etext + 64M is hopefully after where\n// glibc is loaded) and limit (maybe need a linker-provide symbol for the start\n// of the IRT or end of the segment gap)\n// (also fix allocateCodeSlab and maybe allocateStubSlab at that time)\n// what we really need is a usable nacl_dyncode_alloc(), but this could still\n// be improved upon using dl_iterate_phdr\nconst static intptr_t kNaClSegmentGapEnd = 0x11000000;\n\nNaClJITMemoryManagerX::NaClJITMemoryManagerX() :\n    AllocatableRegionLimit((uint8_t *)kNaClSegmentGapEnd),\n    NextCode(AllocatableRegionStart), GOTBase(NULL) {\n  AllocatableRegionStart = (uint8_t *)NACL_TRAMPOLINE_END;\n\n  AllocatableRegionStart =\n      (uint8_t *)RoundUpToAlignment((uint64_t)AllocatableRegionStart,\n                                    kBundleSize);\n  NextCode = AllocatableRegionStart;\n\n  // Allocate 1 stub slab to get us started\n  CurrentStubSlab = allocateStubSlab(0);\n  InitFreeList(&CodeFreeListHead);\n  InitFreeList(&DataFreeListHead);\n\n  LOG(INFO) << \"NaClJITMemoryManagerX: AllocatableRegionStart \" <<\n        (uint64_t)AllocatableRegionStart << \" Limit \" << (uint64_t)AllocatableRegionLimit << \"\\n\";\n}\n\nNaClJITMemoryManagerX::~NaClJITMemoryManagerX() {\n  delete [] GOTBase;\n  DestroyFreeList(CodeFreeListHead);\n  DestroyFreeList(DataFreeListHead);\n}\n\nFreeListNode *NaClJITMemoryManagerX::allocateCodeSlab(size_t MinSize) {\n  FreeListNode *node = new FreeListNode();\n  if (AllocatableRegionLimit - NextCode < (int)kCodeSlabSize) {\n    // TODO(dschuff): might be possible to try the space below text segment?\n    report_fatal_error(\"Ran out of code space\");\n  }\n  node->address = NextCode;\n  node->size = std::max(kCodeSlabSize, MinSize);\n  NextCode += node->size;\n  LOG(INFO) << \"allocated code slab \" << NextCode - node->size << \"-\" <<\n        NextCode << \"\\n\";\n  return node;\n}\n\nSimpleSlab NaClJITMemoryManagerX::allocateStubSlab(size_t MinSize) {\n  SimpleSlab s;\n  LOG(INFO) << \"allocateStubSlab: \";\n  // It's a little weird to just allocate and throw away the FreeListNode, but\n  // since code region allocation is still a bit ugly and magical, I decided\n  // it's better to reuse allocateCodeSlab than duplicate the logic.\n  FreeListNode *n = allocateCodeSlab(MinSize);\n  s.address = n->address;\n  s.size = n->size;\n  s.next_free = n->address;\n  delete n;\n  return s;\n}\n\nFreeListNode *NaClJITMemoryManagerX::allocateDataSlab(size_t MinSize) {\n  FreeListNode *node = new FreeListNode;\n  size_t size = std::max(kDataSlabSize, MinSize);\n  node->address = (uint8_t*)DataAllocator.Allocate(size, kBundleSize);\n  node->size = size;\n  return node;\n}\n\nvoid NaClJITMemoryManagerX::InitFreeList(FreeListNode **Head) {\n  // Make sure there is always at least one entry in the free list\n  *Head = new FreeListNode;\n  (*Head)->Next = (*Head)->Prev = *Head;\n  (*Head)->size = 0;\n}\n\nvoid NaClJITMemoryManagerX::DestroyFreeList(FreeListNode *Head) {\n  FreeListNode *n = Head->Next;\n  while(n != Head) {\n    FreeListNode *next = n->Next;\n    delete n;\n    n = next;\n  }\n  delete Head;\n}\n\nFreeListNode *NaClJITMemoryManagerX::FreeListAllocate(uintptr_t &ActualSize,\n    FreeListNode *Head,\n    FreeListNode * (NaClJITMemoryManagerX::*allocate)(size_t)) {\n  FreeListNode *candidateBlock = Head;\n  FreeListNode *iter = Head->Next;\n\n  uintptr_t largest = candidateBlock->size;\n  // Search for the largest free block\n  while (iter != Head) {\n    if (iter->size > largest) {\n      largest = iter->size;\n      candidateBlock = iter;\n    }\n    iter = iter->Next;\n  }\n\n  if (largest < ActualSize || largest == 0) {\n    candidateBlock = (this->*allocate)(ActualSize);\n  } else {\n    candidateBlock->RemoveFromFreeList();\n  }\n  return candidateBlock;\n}\n\nvoid NaClJITMemoryManagerX::FreeListFinishAllocation(FreeListNode *Block,\n    FreeListNode *Head, uint8_t *AllocationStart, uint8_t *AllocationEnd,\n    AllocationTable &Table) {\n  assert(AllocationEnd > AllocationStart);\n  assert(Block->address == AllocationStart);\n  uint8_t *End = (uint8_t *)RoundUpToAlignment((uint64_t)AllocationEnd,\n                                               kBundleSize);\n  assert(End <= Block->address + Block->size);\n  int AllocationSize = End - Block->address;\n  Table[AllocationStart] = AllocationSize;\n\n  Block->size -= AllocationSize;\n  if (Block->size >= kBundleSize * 2) {//TODO(dschuff): better heuristic?\n    Block->address = End;\n    Block->AddToFreeList(Head);\n  } else {\n    delete Block;\n  }\n  LOG(INFO) <<\"FinishAllocation size \"<< AllocationSize <<\" end \"<<End<<\"\\n\";\n}\n\nvoid NaClJITMemoryManagerX::FreeListDeallocate(FreeListNode *Head,\n                                              AllocationTable &Table,\n                                              void *Body) {\n  uint8_t *Allocation = (uint8_t *)Body;\n  LOG(INFO) << \"deallocating \"<<Body<<\" \";\n  assert(Table.count(Allocation) && \"FreeList Deallocation not found in table\");\n  FreeListNode *Block = new FreeListNode;\n  Block->address = Allocation;\n  Block->size = Table[Allocation];\n  Block->AddToFreeList(Head);\n  DEBUG(dbgs() << \"deallocated \"<< Allocation<< \" size \" << Block->size <<\"\\n\");\n}\n\nuint8_t *NaClJITMemoryManagerX::startFunctionBody(const Function *F,\n                                                 uintptr_t &ActualSize) {\n  CurrentCodeBlock = FreeListAllocate(ActualSize, CodeFreeListHead,\n                                  &NaClJITMemoryManagerX::allocateCodeSlab);\n  LOG(INFO) << \"startFunctionBody CurrentBlock \" << CurrentCodeBlock <<\n        \" addr \" << CurrentCodeBlock->address << \"\\n\";\n  ActualSize = CurrentCodeBlock->size;\n  return CurrentCodeBlock->address;\n}\n\nvoid NaClJITMemoryManagerX::endFunctionBody(const Function *F,\n                                           uint8_t *FunctionStart,\n                                           uint8_t *FunctionEnd) {\n  LOG(INFO) << \"endFunctionBody \";\n  FreeListFinishAllocation(CurrentCodeBlock, CodeFreeListHead,\n                           FunctionStart, FunctionEnd, AllocatedFunctions);\n\n}\n\nuint8_t *NaClJITMemoryManagerX::allocateCodeSection(uintptr_t Size,\n                                                   unsigned Alignment,\n                                                   unsigned SectionID) {\n  llvm_unreachable(\"Implement me! (or don't.)\");\n}\n\nuint8_t *NaClJITMemoryManagerX::allocateDataSection(uintptr_t Size,\n                                                   unsigned Alignment,\n                                                   unsigned SectionID) {\n  return (uint8_t *)DataAllocator.Allocate(Size, Alignment);\n}\n\nvoid NaClJITMemoryManagerX::deallocateFunctionBody(void *Body) {\n  LOG(INFO) << \"deallocateFunctionBody, \";\n  if (Body) FreeListDeallocate(CodeFreeListHead, AllocatedFunctions, Body);\n}\n\nuint8_t *NaClJITMemoryManagerX::allocateStub(const GlobalValue* F,\n                                            unsigned StubSize,\n                                            unsigned Alignment) {\n  uint8_t *StartAddress = (uint8_t *)(uintptr_t)\n      RoundUpToAlignment((uintptr_t)CurrentStubSlab.next_free, Alignment);\n  if (StartAddress + StubSize >\n      CurrentStubSlab.address + CurrentStubSlab.size) {\n    CurrentStubSlab = allocateStubSlab(kStubSlabSize);\n    StartAddress = (uint8_t *)(uintptr_t)\n        RoundUpToAlignment((uintptr_t)CurrentStubSlab.next_free, Alignment);\n  }\n  CurrentStubSlab.next_free = StartAddress + StubSize;\n  DEBUG(dbgs() <<\"allocated stub \"<<StartAddress<< \" size \"<<StubSize<<\"\\n\");\n  return StartAddress;\n}\n\nuint8_t *NaClJITMemoryManagerX::allocateSpace(intptr_t Size,\n                                             unsigned Alignment) {\n  uint8_t *r = (uint8_t*)DataAllocator.Allocate(Size, Alignment);\n  LOG(INFO) << \"allocateSpace \" << Size <<\"/\"<<Alignment<<\" ret 0x\" << (uintptr_t)r <<\"\\n\";\n  return r;\n}\n\nuint8_t *NaClJITMemoryManagerX::allocateGlobal(uintptr_t Size,\n                                              unsigned Alignment) {\n  uint8_t *r = (uint8_t*)DataAllocator.Allocate(Size, Alignment);\n  LOG(INFO) << \"allocateGlobal \" << Size <<\"/\"<<Alignment<<\" ret \"<<r<<\"\\n\";\n  return r;\n}\n\nuint8_t* NaClJITMemoryManagerX::startExceptionTable(const Function* F,\n                                                   uintptr_t &ActualSize) {\n  CurrentDataBlock = FreeListAllocate(ActualSize, DataFreeListHead,\n                                      &NaClJITMemoryManagerX::allocateDataSlab);\n  LOG(INFO) << \"startExceptionTable CurrentBlock \" << CurrentDataBlock <<\n        \" addr \" << CurrentDataBlock->address << \"\\n\";\n  ActualSize = CurrentDataBlock->size;\n  return CurrentDataBlock->address;\n}\n\nvoid NaClJITMemoryManagerX::endExceptionTable(const Function *F,\n                                           uint8_t *TableStart,\n                       uint8_t *TableEnd, uint8_t* FrameRegister) {\n  LOG(INFO) << \"endExceptionTable \";\n  FreeListFinishAllocation(CurrentDataBlock, DataFreeListHead,\n                           TableStart, TableEnd, AllocatedTables);\n}\n\nvoid NaClJITMemoryManagerX::deallocateExceptionTable(void *ET) {\n  LOG(INFO) << \"deallocateExceptionTable, \";\n  if (ET) FreeListDeallocate(DataFreeListHead, AllocatedTables, ET);\n}\n\n// Copy of DefaultJITMemoryManager's implementation\nvoid NaClJITMemoryManagerX::AllocateGOT() {\n  assert(GOTBase == 0 && \"Cannot allocate the got multiple times\");\n  GOTBase = new uint8_t[sizeof(void*) * 8192];\n  HasGOT = true;\n}\n\n//===----------------------------------------------------------------------===//\n// getPointerToNamedFunction() implementation.\n// This code is pasted directly from r153607 of JITMemoryManager.cpp and has\n// never been tested. It most likely doesn't work inside the sandbox.\n//===----------------------------------------------------------------------===//\n\n// AtExitHandlers - List of functions to call when the program exits,\n// registered with the atexit() library function.\nstatic std::vector<void (*)()> AtExitHandlers;\n\n/// runAtExitHandlers - Run any functions registered by the program's\n/// calls to atexit(3), which we intercept and store in\n/// AtExitHandlers.\n///\nstatic void runAtExitHandlers() {\n  while (!AtExitHandlers.empty()) {\n    void (*Fn)() = AtExitHandlers.back();\n    AtExitHandlers.pop_back();\n    Fn();\n  }\n}\n\n//===----------------------------------------------------------------------===//\n// Function stubs that are invoked instead of certain library calls\n//\n// Force the following functions to be linked in to anything that uses the\n// JIT. This is a hack designed to work around the all-too-clever Glibc\n// strategy of making these functions work differently when inlined vs. when\n// not inlined, and hiding their real definitions in a separate archive file\n// that the dynamic linker can't see. For more info, search for\n// 'libc_nonshared.a' on Google, or read http://llvm.org/PR274.\n#if defined(__linux__)\n/* stat functions are redirecting to __xstat with a version number.  On x86-64\n * linking with libc_nonshared.a and -Wl,--export-dynamic doesn't make 'stat'\n * available as an exported symbol, so we have to add it explicitly.\n */\nnamespace {\nclass StatSymbols {\npublic:\n  StatSymbols() {\n    sys::DynamicLibrary::AddSymbol(\"stat\", (void*)(intptr_t)stat);\n    sys::DynamicLibrary::AddSymbol(\"fstat\", (void*)(intptr_t)fstat);\n    sys::DynamicLibrary::AddSymbol(\"lstat\", (void*)(intptr_t)lstat);\n    sys::DynamicLibrary::AddSymbol(\"stat64\", (void*)(intptr_t)stat64);\n    sys::DynamicLibrary::AddSymbol(\"\\x1stat64\", (void*)(intptr_t)stat64);\n    sys::DynamicLibrary::AddSymbol(\"\\x1open64\", (void*)(intptr_t)open64);\n    sys::DynamicLibrary::AddSymbol(\"\\x1lseek64\", (void*)(intptr_t)lseek64);\n    sys::DynamicLibrary::AddSymbol(\"fstat64\", (void*)(intptr_t)fstat64);\n    sys::DynamicLibrary::AddSymbol(\"lstat64\", (void*)(intptr_t)lstat64);\n    sys::DynamicLibrary::AddSymbol(\"atexit\", (void*)(intptr_t)atexit);\n    sys::DynamicLibrary::AddSymbol(\"mknod\", (void*)(intptr_t)mknod);\n  }\n};\n}\nstatic StatSymbols initStatSymbols;\n#endif // __linux__\n\n// jit_exit - Used to intercept the \"exit\" library call.\nstatic void jit_exit(int Status) {\n  runAtExitHandlers();   // Run atexit handlers...\n  exit(Status);\n}\n\n// jit_atexit - Used to intercept the \"atexit\" library call.\nstatic int jit_atexit(void (*Fn)()) {\n  AtExitHandlers.push_back(Fn);    // Take note of atexit handler...\n  return 0;  // Always successful\n}\n\nstatic int jit_noop() {\n  return 0;\n}\n\n\n\n//===----------------------------------------------------------------------===//\n//\n/// getPointerToNamedFunction - This method returns the address of the specified\n/// function by using the dynamic loader interface.  As such it is only useful\n/// for resolving library symbols, not code generated symbols.\n///\nvoid *NaClJITMemoryManagerX::getPointerToNamedFunction(const std::string &Name,\n                                     bool AbortOnFailure) {\n  // Check to see if this is one of the functions we want to intercept.  Note,\n  // we cast to intptr_t here to silence a -pedantic warning that complains\n  // about casting a function pointer to a normal pointer.\n  if (Name == \"exit\") return (void*)(intptr_t)&jit_exit;\n  if (Name == \"atexit\") return (void*)(intptr_t)&jit_atexit;\n\n  // We should not invoke parent's ctors/dtors from generated main()!\n  // On Mingw and Cygwin, the symbol __main is resolved to\n  // callee's(eg. tools/lli) one, to invoke wrong duplicated ctors\n  // (and register wrong callee's dtors with atexit(3)).\n  // We expect ExecutionEngine::runStaticConstructorsDestructors()\n  // is called before ExecutionEngine::runFunctionAsMain() is called.\n  if (Name == \"__main\") return (void*)(intptr_t)&jit_noop;\n\n  const char *NameStr = Name.c_str();\n  // If this is an asm specifier, skip the sentinal.\n  if (NameStr[0] == 1) ++NameStr;\n\n  // If it's an external function, look it up in the process image...\n  void *Ptr = sys::DynamicLibrary::SearchForAddressOfSymbol(NameStr);\n  if (Ptr) return Ptr;\n\n  // If it wasn't found and if it starts with an underscore ('_') character,\n  // try again without the underscore.\n  if (NameStr[0] == '_') {\n    Ptr = sys::DynamicLibrary::SearchForAddressOfSymbol(NameStr+1);\n    if (Ptr) return Ptr;\n  }\n\n  // Darwin/PPC adds $LDBLStub suffixes to various symbols like printf.  These\n  // are references to hidden visibility symbols that dlsym cannot resolve.\n  // If we have one of these, strip off $LDBLStub and try again.\n#if defined(__APPLE__) && defined(__ppc__)\n  if (Name.size() > 9 && Name[Name.size()-9] == '$' &&\n      memcmp(&Name[Name.size()-8], \"LDBLStub\", 8) == 0) {\n    // First try turning $LDBLStub into $LDBL128. If that fails, strip it off.\n    // This mirrors logic in libSystemStubs.a.\n    std::string Prefix = std::string(Name.begin(), Name.end()-9);\n    if (void *Ptr = getPointerToNamedFunction(Prefix+\"$LDBL128\", false))\n      return Ptr;\n    if (void *Ptr = getPointerToNamedFunction(Prefix, false))\n      return Ptr;\n  }\n#endif\n\n  if (AbortOnFailure) {\n    report_fatal_error(\"Program used external function '\"+Name+\n                      \"' which could not be resolved!\");\n  }\n  return 0;\n}\n\n}\n\nIsolatedExecEngine::IsolatedExecEngine()\n{\n}\nvoid IsolatedExecEngine::process( const std::string& elfstr ) {\n	using namespace llvm;\n\n	std::string Error;\n\n	struct GioFile                gout;\n	struct NaClApp                state;\n	struct NaClApp                *nap;\n\n	NaClAllModulesInit();\n\n	// TODO Gio/Core::InOutInterface shim\n	if (!GioFileRefCtor(&gout, stdout)) { \n		LOG(ERROR) << \"Could not create general standard output channel\\n\";\n		return;\n	}\n\n	NaClLogSetGio( &gout.base );\n	NaClLogSetVerbosity( 2 );\n\n	if (!NaClAppCtor(&state)) {\n		LOG(ERROR) << \"Error while constructing app state\\n\";\n		return;\n	}\n	nap = &state;\n\n	// setup the basic nacl process\n	NaClAppInitialDescriptorHookup(nap);\n	NaClLogAddressSpaceLayout(nap);\n\n	// process loader \n	/* NACL_MAX_ADDR_BITS < 32 */\n	if (nap->addr_bits > NACL_MAX_ADDR_BITS) {\n		LOG(ERROR) << \"Error : NACL_MAX_ADDR_BITS\\n\";\n		return;\n	}\n\n	// only support one text, one rodata and one data segment\n	// not sure why yet, buts its what nacl supports so...\n	bool gotTextSegment = false;\n	bool gotDataSegment = false;\n	bool gotRODataSegment = false;\n\n	uint64_t maxvaddr = 0;\n	llvm::error_code ec;\n\n	// setup the linker and memory manager\n	NaClJITMemoryManagerX mmgr;\n	MemoryManager jitmmgr( &mmgr, nullptr );\n	RuntimeDyld dyld( &jitmmgr );\n\n	// transfer the elf string into an elf object \n	MemoryBuffer* mb = MemoryBuffer::getMemBuffer( elfstr );\n  MemoryBuffer* mb2 = MemoryBuffer::getMemBufferCopy( elfstr );\n	dyld.loadObject( mb ); // consumes mb and deletes it hence mb2\n	dyld.resolveRelocations();\n	object::ELFObjectFile<support::little, false> elfob( mb2, ec );\n\n	auto sec = elfob.begin_sections();\n	while( sec != elfob.end_sections() ) {\n		// skip 0 sized segments\n		uint64_t secSize = 0;\n		CHECK( sec->getSize( secSize ) );\n		if( secSize == 0 ) {\n			goto FinishedSegmentDecode;					\n		}\n\n		// log the name of the segment\n		StringRef sr;\n		CHECK( sec->getName( sr ) );\n		LOG(INFO) << \"ELF Segment : \" << sr.str() << \"\\n\";\n\n\n		// start and end virtual address\n		uint64_t svaddr = ~0;\n		uint64_t evaddr = ~0;\n		CHECK( sec->getAddress( svaddr ) );\n		if( ec ) goto FinishedSegmentDecode;					\n		if( svaddr >= (1ul << (uint64_t)nap->addr_bits) ) {\n			LOG(ERROR) << \"Segment start above \" << nap->addr_bits << \" bit address space\\n\";\n			goto FinishedSegmentDecode;					\n		}\n		evaddr = svaddr + secSize;\n		if( evaddr >= (1ul << (uint64_t)nap->addr_bits) ) {\n			LOG(ERROR) << \"Segment end above \" << nap->addr_bits << \" bit address space\\n\";\n			goto FinishedSegmentDecode;					\n		}\n		maxvaddr = std::max( maxvaddr, evaddr );\n\n\n		auto rawSec = reinterpret_cast<const Elf_Shdr *>(sec->getRawDataRefImpl().p );\n		// we default to ignoring most segments, the few we care about\n		// are set up\n		// text segment (code)\n		bool result = false;\n		CHECK( sec->isText( result ) );\n		if( result ) {\n			if( gotTextSegment ) {\n				LOG(INFO) << \"only 1 text segment used\\n\";\n				goto FinishedSegmentDecode;\n			}\n			if( rawSec->sh_flags & SHF_WRITE ) {\n				// if writable, ignore\n				LOG(INFO) << \"ignoring writable text segment\\n\";\n				goto FinishedSegmentDecode;\n			}\n			if( !(rawSec->sh_flags & SHF_EXECINSTR) ) {\n				// if not executable, ignore\n				LOG(INFO) << \"ignoring non executable text segment\\n\";\n				goto FinishedSegmentDecode;					\n			}\n			if( svaddr != NACL_TRAMPOLINE_END ) {\n				// text must start at the 2nd 64K\n				// page (after the trampoline)\n				LOG(INFO) << \"ignoring not at end of trampoline text segment\\n\";\n				goto FinishedSegmentDecode;\n			}\n\n			nap->static_text_end = NACL_TRAMPOLINE_END + evaddr;\n			nap->dynamic_text_start = 0;\n			nap->dynamic_text_end = 0;\n\n			goto FinishedSegmentDecode;\n		} \n		// data or rodata segment\n		CHECK( sec->isData( result ) );\n		if( result ) {\n			if( rawSec->sh_flags & SHF_EXECINSTR ) {\n				// [ro]data can't be executable\n				LOG(INFO) << \"ignoring executable data segment\\n\";\n				goto FinishedSegmentDecode;\n			}\n			if( rawSec->sh_flags & SHF_WRITE ) {\n				// its the data segment\n				if( gotDataSegment ) {\n					LOG(INFO) << \"only 1 data segment used\\n\";\n					goto FinishedSegmentDecode;\n\n				}\n		        nap->data_start = svaddr;\n		        // we don't actually really use this during the process\n		        // the data segment covers all the data space, this is purely\n		        // where teh next segment starts\n		        nap->data_end = evaddr;\n			} else {\n				// its the rodata segment\n				if( gotRODataSegment ) {\n					LOG(INFO) << \"only 1 rodata segment used\\n\";\n					goto FinishedSegmentDecode;\n				}\n		        nap->rodata_start = svaddr;\n		        // rodate_end == max virtual space\n		        // nap->rodata_end = evaddr;\n			}\n			goto FinishedSegmentDecode;\n		}\n		// bss segment\n		CHECK( sec->isBSS( result ) );\n		if( result ) {\n			goto FinishedSegmentDecode;\n		}\n\n		// ignore any others at the mo\nFinishedSegmentDecode:\n		sec.increment(ec);\n	}\n	if( !gotTextSegment  ) {\n		// must have a text segment to be valid\n		LOG(INFO) << \"Err missing text segment\\n\";		\n	}\n	\n	// fix up address space\n	nap->stack_size = NaClRoundAllocPage(nap->stack_size);\n	if( nap->data_start == 0) {\n		if( nap->rodata_start == 0 ) {\n			// its legal for both to be 0 but need to fix up some stuff\n			if (NaClRoundAllocPage(maxvaddr) - maxvaddr < NACL_HALT_SLED_SIZE) {\n				maxvaddr += NACL_MAP_PAGESIZE; // for the halt sled\n			}\n		}\n	    maxvaddr = NaClRoundAllocPage(maxvaddr);\n	}\n\n	// where malloc starts\n	nap->break_addr = maxvaddr;\n	// where the data segment ends\n	nap->data_end = maxvaddr;\n\n	nap->bundle_size = NACL_INSTR_BLOCK_SIZE;\n\n/*	auto sym = elfob.begin_symbols();\n	while( sym != elfob.end_symbols() ) {\n		StringRef sr;\n		sym->getName( sr );\n		LOG(INFO) << sr.str();\n		sym.increment(ec);\n	}\n	*/\n	// update the load status and notify any threads waiting on the processes cv\n	NaClXMutexLock(&nap->mu);\n//	nap->module_load_status = errcode;\n	NaClXCondVarBroadcast(&nap->cv);\n	NaClXMutexUnlock(&nap->mu);\n\n	// temp argc/v array\n	char* argv[] = { \"nacl\" };\n	if (!NaClCreateMainThread(nap, 1, argv, NULL ) ) {\n		LOG(ERROR) << \"creating main thread failed\\n\";\n	}\n\n	// stall for exit\n	int ret_code = NaClWaitForMainThreadToExit(nap);\n\n	// clean up \n	NaClAllModulesFini();\n	NaClExit(ret_code);\n}",
-			"file": "src/libs/dwm/isolatedexecengine.cpp",
-			"file_size": 34656,
-			"file_write_time": 129810331398908570,
-			"settings":
-			{
-				"buffer_size": 33883,
+				"buffer_size": 11294,
 				"line_ending": "Windows"
 			}
 		},
@@ -114,79 +191,65 @@
 			"file": "src/libs/dwm/bitcoder.h",
 			"settings":
 			{
-				"buffer_size": 746,
+				"buffer_size": 1636,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/dvm_owned_dedi/CMakeLists.txt",
+			"file": "src/libs/dwm/isolatedexecengine.cpp",
 			"settings":
 			{
-				"buffer_size": 1317,
+				"buffer_size": 7067,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.h",
+			"file": "src/libs/dwm/trustedregion.h",
 			"settings":
 			{
-				"buffer_size": 1792,
-				"line_ending": "Unix"
+				"buffer_size": 3255,
+				"line_ending": "Windows",
+				"name": "trustedregion.h"
 			}
 		},
 		{
-			"file": "submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/NaClJITMemoryManager.h",
+			"file": "src/libs/dwm/isolatedexecengine.h",
 			"settings":
 			{
-				"buffer_size": 10286,
-				"line_ending": "Unix"
+				"buffer_size": 817,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/JIT/NaClJITMemoryManager.cpp",
+			"file": "src/libs/dwm/asm/switcher.S",
 			"settings":
 			{
-				"buffer_size": 17032,
-				"line_ending": "Unix"
+				"buffer_size": 4928,
+				"line_ending": "Windows",
+				"name": "switcher.S"
 			}
 		},
 		{
-			"file": "submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/RuntimeDyld.h",
+			"file": "src/libs/dwm/sandboxmemorymanager.cpp",
 			"settings":
 			{
-				"buffer_size": 3360,
-				"line_ending": "Unix"
+				"buffer_size": 11057,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
+			"file": "src/libs/dwm/sandboxmemorymanager.h",
 			"settings":
 			{
-				"buffer_size": 9949,
-				"line_ending": "Unix"
+				"buffer_size": 6468,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.h",
+			"file": "src/libs/dwm/mmu.h",
 			"settings":
 			{
-				"buffer_size": 2107,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldImpl.h",
-			"settings":
-			{
-				"buffer_size": 9140,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Z/Projects/Cyberspace/llvm/include/llvm/Support/MemoryBuffer.h",
-			"settings":
-			{
-				"buffer_size": 6036,
+				"buffer_size": 3082,
 				"line_ending": "Windows"
 			}
 		}
@@ -223,41 +286,96 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/SublimeClang/SublimeClang.sublime-settings",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86BaseInfo.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCCodeEmitter.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86InstrSystem.td",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/mmu.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86NaClRewritePass.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/AsmParser/X86AsmParser.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/tramp_64.S",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_tls_64.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/arm/nacl_tls.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/arm/sel_rt.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_ldr_standard.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_syscall_64.S",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_stack_safety.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_app_thread.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_switch_to_app_64.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_handlers.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_common.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_copy.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_hook.c",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/vmthread.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/vmthread.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/dwm.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/dwm.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_switch_64.S",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llvm-mc/llvm-mc.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Target/TargetMachine.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/MC/MCAsmInfo.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/mmu.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/src/apps/dvm_owned_dedi/main.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/CMakeLists.txt",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/win/nacl_ldt.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/win/sel_memory.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86/nacl_ldt_x86.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/linux/x86/nacl_ldt.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/linux/sel_memory.c",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/bitcoder.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/core/platform.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86/nacl_ldt_x86.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/sel_addrspace_x86_32.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/sel_ldr_x86_32.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/sel_rt_32.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/nacl_app_32.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86/sel_ldr_x86.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/RuntimeDyld.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldImpl.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/MC/MCExpr.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/MC/MCParser/AsmParser.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/elf_util.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/platform/posix/nacl_host_desc.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/posix/sel_addrspace_posix.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_addrspace.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_addrspace.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/nacl_switch_to_app_32.c",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/Errno.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/ErrorHandling.h",
 		"/Z/Projects/Cyberspace/yolk_repo/yolk.sublime-project",
+		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Default/Preferences.sublime-settings",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/arm/sel_addrspace_arm.c",
+		"/Z/Projects/Cyberspace/llvm/include/llvm/Support/MemoryBuffer.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/apps/dvm_owned_dedi/CMakeLists.txt",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/NaClJITMemoryManager.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/JIT/NaClJITMemoryManager.cpp",
+		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/SublimeClang/SublimeClang.sublime-settings",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/AsmPrinterDwarf.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/lto/LTOCodeGenerator.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_ldr.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/elf_util.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_ldr_standard.c",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/bitcoder.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/vmthread.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/vmthread.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/dwm.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Object/ObjectFile.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Object/ELF.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/ELF.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/RuntimeDyld.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_main.c",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Linker.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/apps/dvm_owned_dedi/main.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Transforms/IPO/Internalize.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/apps/dvm_owned_dedi/CMakeLists.txt",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/CodeGen/LLVMTargetMachine.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Linker/LinkModules.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/src/libs/core/singleton.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Target/TargetMachine.h",
 		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Package Control/Package Control.sublime-settings",
 		"/C/boost/include/boost_1_48_0/boost/tr1/functional.hpp",
 		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/User/Package Control.sublime-settings",
 		"/Z/Projects/Cyberspace/llvm/include/llvm/MC/SubtargetFeature.h",
 		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/pnacl/driver/driver_env.py",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/pnacl/driver/driver_tools.py",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/gio/gio_mem_snapshot.c",
@@ -277,13 +395,10 @@
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_sync_cond_test.c",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/x86/decoder/ncop_exps.c",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/x86/error_reporter.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.h",
 		"/Z/Projects/Cyberspace/llvm/include/llvm/Target/TargetOptions.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm-gcc/gcc/llvm-backend.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86TargetMachine.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llvm-mc/llvm-mc.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm-c/TargetMachine.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/TargetInfo/X86TargetInfo.cpp",
@@ -298,59 +413,7 @@
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Support/Triple.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/Target.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Target/TargetData.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ADT/Triple.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/Registry.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/PassManager.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/CodeGen/Passes.h",
-		"/Z/Projects/Cyberspace/libcxx/include/support/win32/math_win32.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/MC/MCInstrInfo.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/MC/MCInst.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/lto/LTOModule.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86AsmBackend.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/MC/MCELF.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/MC/MCAssembler.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/bitcoder.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/dwm.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/make_vm_tools.bat",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCNaCl.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/yolk_setup.cmake",
-		"/Z/Projects/Cyberspace/yolk_repo/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86InstrXOP.td",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86NaClRewriteFinalPass.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86NaClJITInfo.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llc/StubWriter.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llc/StubMaker.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/VMCore/Module.cpp",
-		"/Z/Projects/Cyberspace/libcxx/include/cmath",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/core/core.h",
-		"/Z/Projects/Cyberspace/libcxx/include/__config",
-		"/Z/Projects/Cyberspace/vt_repo/include/sys/types.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/include/nacl_compiler_annotations.h",
-		"/Z/Projects/Cyberspace/vt_repo/include/stdio.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator_x86/nccopycode.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_validate_image.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/llvm/tools/clang/test/Driver/le32-unknown-nacl.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/llvm/tools/clang/lib/Basic/Targets.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/llvm/include/llvm/ADT/Triple.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_common.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_handlers_gen.py",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_all_modules.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_ldr.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/ncvalidate.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/ncfileutil.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/perf_counter/nacl_perf_counter.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/nonnacl_util/sel_ldr_launcher_base.cc",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/llvm/lib/ExecutionEngine/JIT/JIT.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_config.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/include/nacl_base.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/nacl_switch_32.S",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/osx/outer_sandbox.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/outer_sandbox.h"
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ADT/Triple.h"
 	],
 	"find":
 	{
@@ -375,6 +438,35 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"SegOvrMask",
+			"GS",
+			"hasFSGSBase",
+			"GS",
+			"GF",
+			"NaClThreadIdxAllocate",
+			"NaClTlsAllocate",
+			"NaClAppThreadAllocSegCtor",
+			"NaClSyscallCSegHook",
+			"NaClStackSafetyNowOnUntrustedStack",
+			"NaClStartThreadInApp",
+			"NaClSwitchSSE",
+			"NaClAddSyscall",
+			"NaClSyscallTableEntry",
+			"NaClCopyOutToUser",
+			"./b2",
+			"LDT_ENTRIES",
+			"modify_ldt",
+			"NaClLdtAllocateSelector",
+			"NaCl_page_alloc",
+			"NaClJITMemoryManagerX",
+			"NACL_ABI_PROT_READ",
+			"PROT_READ",
+			"SimpleSlab",
+			"NaClAddrSpaceBeforeAlloc",
+			"NaClAllocateSpace",
+			"NaClAllocAddrSpace",
+			"NaClElfImageLoad",
+			"mem_start",
 			"NaClJITMemoryManager",
 			"isBaseAddressKnownZero",
 			"OutputFormat",
@@ -473,23 +565,7 @@
 			"ApplyValidatorCopy",
 			"NaCl_ApplyValidatorCopy_x86_32",
 			"NCValidateFreeState",
-			"NaCl::TimeDelta",
-			"NaCl_ApplyValidatorCopy_x86_32",
-			"NaClFileMappingForValgrind",
-			"NaClSrpcInvokeBySignature",
-			"NaClNameServiceLaunch",
-			"NaClSimpleServiceStartServiceThread",
-			"NaClManifestProxyCtor",
-			"NaClPerfCounterIntervalTotal",
-			"NaClValidateImage",
-			"NaClLog_Function",
-			"NaClEnableOuterSandbox",
-			"DynamicLibrary",
-			"}",
-			"_PARAMS (",
-			"_VOID",
-			"_PTR",
-			"save"
+			"NaCl::TimeDelta"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -497,6 +573,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"SandboxMemoryManager",
 			"NaClJITMemoryManagerX",
 			"${BASE_DIR}",
 			"",
@@ -512,7 +589,6 @@
 	"groups":
 	[
 		{
-			"selected": 8,
 			"sheets":
 			[
 				{
@@ -520,15 +596,15 @@
 					"file": "src/libs/dwm/bitcoder.cpp",
 					"settings":
 					{
-						"buffer_size": 7402,
+						"buffer_size": 11294,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6737,
-								6737
+								7414,
+								7414
 							]
 						],
 						"settings":
@@ -537,45 +613,43 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4258.0,
+						"translation.y": 3657.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/dwm/isolatedexecengine.cpp",
+					"file": "src/libs/dwm/bitcoder.h",
 					"settings":
 					{
-						"buffer_size": 33883,
+						"buffer_size": 1636,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7047,
-								7047
+								632,
+								632
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 4150.0,
+						"translation.y": 394.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/dwm/bitcoder.h",
+					"file": "src/libs/dwm/isolatedexecengine.cpp",
 					"settings":
 					{
-						"buffer_size": 746,
+						"buffer_size": 7067,
 						"regions":
 						{
 						},
@@ -588,33 +662,8 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/apps/dvm_owned_dedi/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 1317,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1207,
-								1207
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/User/CMake Listfile.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
@@ -624,67 +673,11 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.h",
+					"buffer": 3,
+					"file": "src/libs/dwm/trustedregion.h",
 					"settings":
 					{
-						"buffer_size": 1792,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								976,
-								976
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 210.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/NaClJITMemoryManager.h",
-					"settings":
-					{
-						"buffer_size": 10286,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1126,
-								1126
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 736.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/JIT/NaClJITMemoryManager.cpp",
-					"settings":
-					{
-						"buffer_size": 17032,
+						"buffer_size": 3255,
 						"regions":
 						{
 						},
@@ -692,191 +685,151 @@
 						[
 							[
 								0,
-								17032
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_name": "trustedregion.h",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/libs/dwm/isolatedexecengine.h",
+					"settings":
+					{
+						"buffer_size": 817,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								805,
+								792
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 22.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/libs/dwm/asm/switcher.S",
+					"settings":
+					{
+						"buffer_size": 4928,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4603,
+								4603
+							]
+						],
+						"settings":
+						{
+							"auto_name": "switcher.S",
+							"syntax": "Packages/R/R.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2017.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/libs/dwm/sandboxmemorymanager.cpp",
+					"settings":
+					{
+						"buffer_size": 11057,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/RuntimeDyld.h",
+					"file": "src/libs/dwm/sandboxmemorymanager.h",
 					"settings":
 					{
-						"buffer_size": 3360,
+						"buffer_size": 6468,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2476,
-								2476
+								0,
+								0
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1311.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
+					"file": "src/libs/dwm/mmu.h",
 					"settings":
 					{
-						"buffer_size": 9949,
+						"buffer_size": 3082,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7622,
-								7622
+								1125,
+								1116
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 4552.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.h",
-					"settings":
-					{
-						"buffer_size": 2107,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2107,
-								2107
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 394.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldImpl.h",
-					"settings":
-					{
-						"buffer_size": 9140,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8282,
-								8282
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4554.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 1,
-					"file": "src/libs/dwm/isolatedexecengine.cpp",
-					"settings":
-					{
-						"buffer_size": 33883,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								30827,
-								30827
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 17963.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "/Z/Projects/Cyberspace/llvm/include/llvm/Support/MemoryBuffer.h",
-					"settings":
-					{
-						"buffer_size": 6036,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2961,
-								2961
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1679.0,
+						"translation.y": 828.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -890,7 +843,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 39.0
 	},
 	"layout":
 	{
@@ -901,12 +854,6 @@
 				0,
 				1,
 				1
-			],
-			[
-				0,
-				1,
-				1,
-				2
 			]
 		],
 		"cols":
@@ -917,7 +864,6 @@
 		"rows":
 		[
 			0.0,
-			0.5,
 			1.0
 		]
 	},
@@ -925,6 +871,10 @@
 	"output.clang":
 	{
 		"height": 142.0
+	},
+	"output.exec":
+	{
+		"height": 148.0
 	},
 	"replace":
 	{
@@ -936,6 +886,10 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"platform",
+				"src/libs/core/platform.h"
+			],
 			[
 				"registr",
 				"submodules/nacl-llvm/llvm/include/llvm/Support/Registry.h"
@@ -983,6 +937,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 257.0,
+	"side_bar_width": 296.0,
 	"status_bar_visible": true
 }

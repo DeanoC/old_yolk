@@ -60,17 +60,19 @@ class SandboxMemoryManager :
 
 	virtual void *getPointerToNamedFunction(const std::string &name,
 											bool AbortOnFailure = true) {
-		LOG(INFO) << "Code contains a externed function " << name << " that doesn't exist, if called will crash\n";
 		auto addr = trustedRegion->getAddress( name );
 		if( addr == nullptr ) {
 			auto func = [] () -> int { 
-					LOG(INFO) << "Called an external with no implementation!"; 
-					return 0; 
-				};
+				LOG(INFO) << "Called an external with no implementation!"; 
+				return 0; 
+			};
+
 			addr = trustedRegion->addFunctionTrampoline( "_nofunc_", func);
+			LOG(INFO) << "Code contains a trusted function " << name << " that doesn't exist, if called it will likely crash\n";
 		}
 		if( addr == nullptr ) {
  			// this is a valid sandbox addres, but any call to it will go pop
+			LOG(INFO) << "Code contains a trusted function " << name << " that doesn't exist, if called it will crash\n";
 			return (void*)slabAllocator.membase;
 		}
 

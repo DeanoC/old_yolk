@@ -30,8 +30,8 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 
 Dwm::Dwm() {
 
-   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libc.a" ) );
-   BitCoder::get()->addLibrary( libcbc );
+//   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libc.a" ) );
+//   BitCoder::get()->addLibrary( libcbc );
 }
 
 Dwm::~Dwm() {
@@ -140,7 +140,7 @@ void Dwm::bootstrapLocal() {
    // load initial bitcode modules
 //   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
    auto assprg = BitCoder::get()->assemble( BitCoder::UNTRUSTED, Core::FilePath("./switcher.S") );
-   auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world2") );
+   auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world") );
    initbc->setModuleIdentifier( "bootstrap" );
    auto prg = BitCoder::get()->make( BitCoder::TRUSTED, initbc );
 

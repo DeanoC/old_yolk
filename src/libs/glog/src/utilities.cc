@@ -269,7 +269,7 @@ const char* const_basename(const char* filepath) {
   return base ? (base+1) : filepath;
 }
 
-static string g_my_user_name;
+static string g_my_user_name;	
 const string& MyUserName() {
   return g_my_user_name;
 }

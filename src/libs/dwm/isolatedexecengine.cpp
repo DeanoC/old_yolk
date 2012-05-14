@@ -87,34 +87,57 @@ void IsolatedExecEngine::addLibrary( const std::string& elfstr ) {
 
 }
 
-void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
-	auto func0 = []() -> int { LOG(INFO) << "_malloc_r called with no implementation!\n"; return 0; };
-	auto func1 = []() -> int { LOG(INFO) << "__sprintf called with no implementation!\n"; return 0; };
-	auto func2 = []() -> int { LOG(INFO) << "_free_r called with no implementation!\n"; return 0; };
-	auto func3 = []() -> int { LOG(INFO) << "_lseek called with no implementation!\n"; return 0; };
-	auto func4 = []() -> int { LOG(INFO) << "_raise called with no implementation!\n"; return 0; };
-	auto func5 = []() -> int { LOG(INFO) << "__fpclassifyd called with no implementation!\n"; return 0; };
-	auto func6 = []() -> int { LOG(INFO) << "_exit called with no implementation!\n"; return 0; };
-	auto func7 = []() -> int { LOG(INFO) << "_read called with no implementation!\n"; return 0; };
-	auto func8 = []() -> int { LOG(INFO) << "_write called with no implementation!\n"; return 0; };
-	auto func9 = []() -> int { LOG(INFO) << "_close called with no implementation!\n"; return 0; };
-	auto func10 = []() -> int { LOG(INFO) << "_localeconv_r called with no implementation!\n"; return 0; };
-	auto func11 = []() -> int { LOG(INFO) << "_isatty called\n"; return 0; };
-	auto func12 = []() -> int { LOG(INFO) << "_calloc_r called with no implementation!\n"; return 0; };
+struct tmp_lconv
+{
+  char *decimal_point;
+  char *thousands_sep;
+  char *grouping;
+  char *int_curr_symbol;
+  char *currency_symbol;
+  char *mon_decimal_point;
+  char *mon_thousands_sep;
+  char *mon_grouping;
+  char *positive_sign;
+  char *negative_sign;
+  char int_frac_digits;
+  char frac_digits;
+  char p_cs_precedes;
+  char p_sep_by_space;
+  char n_cs_precedes;
+  char n_sep_by_space;
+  char p_sign_posn;
+  char n_sign_posn;
+  char int_n_cs_precedes;
+  char int_n_sep_by_space;
+  char int_n_sign_posn;
+  char int_p_cs_precedes;
+  char int_p_sep_by_space;
+  char int_p_sign_posn;
+} TMP_C_LCONV = 
+{
+	".", ",", ",",
+	"£", "£",
+	".",",",",",
+	"+","-",
+	2,2,
+	0,0,
+	0,0,
+	0,0,
+	0,0,0,
+	0,0,0
+};
 
-	trustedRegion->addFunctionTrampoline( "_malloc_r", func0 );
-	trustedRegion->addFunctionTrampoline( "__sprintf", func1 );
-	trustedRegion->addFunctionTrampoline( "_free_r", func2 );
-	trustedRegion->addFunctionTrampoline( "_lseek", func3 );
-	trustedRegion->addFunctionTrampoline( "_raise", func4 );
-	trustedRegion->addFunctionTrampoline( "__fpclassifyd", func5 );
-	trustedRegion->addFunctionTrampoline( "_exit", func6 );
-	trustedRegion->addFunctionTrampoline( "_read", func7 );
-	trustedRegion->addFunctionTrampoline( "_write", func8 );
-	trustedRegion->addFunctionTrampoline( "_close", func9 );
-	trustedRegion->addFunctionTrampoline( "_localeconv_r", func10 );
-	trustedRegion->addFunctionTrampoline( "_isatty", func11 );
-	trustedRegion->addFunctionTrampoline( "_calloc_r", func12 );
+// trusted functions can currently have 3 user params (besides the threadCtx) any must be integers or sandbox pointers
+// if pointer must adjust, and beware of other sandbox threads altering (copy before use in most cases!)
+// float support is minimal, not mixing is likely to work for the 4 four float/float vector parameters on 64 bit at least
+// TODO improve support for floats + varargs (which won't work) + handle stack parameters
+void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
+	auto func0 = []( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
+		const char* text = (const char*)( threadCtx->membase + sbTextptr);
+		LOG(INFO) << "DgStringOut: " << text << "\n"; 
+	};
+
+	trustedRegion->addFunctionTrampoline( "DgStringOut", func0 );
 }
 
 // TODO thread safe thread allocation
@@ -144,11 +167,11 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	dyld->loadObject( mb );
 	dyld->resolveRelocations();
 
+	// no code writting can occur once the protect are set
 	mmgr->protect();
 	trustedRegion->protect();
-
-
-	threadCtx->untrusted_stack = (uint64_t)mmgr->getStackStart() - 8; // dummy slot for initial pop off stack which is never used
+	
+	threadCtx->untrusted_stack = (uint64_t)mmgr->getStackStart() - 8;
 	unsigned int tmp;
 	_controlfp_s( &tmp, 0, 0);
 	threadCtx->fcw =  (uint16_t) tmp;
