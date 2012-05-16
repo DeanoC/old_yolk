@@ -183,7 +183,7 @@
 			"file": "src/libs/dwm/bitcoder.cpp",
 			"settings":
 			{
-				"buffer_size": 11294,
+				"buffer_size": 11287,
 				"line_ending": "Windows"
 			}
 		},
@@ -199,7 +199,7 @@
 			"file": "src/libs/dwm/isolatedexecengine.cpp",
 			"settings":
 			{
-				"buffer_size": 7067,
+				"buffer_size": 7264,
 				"line_ending": "Windows"
 			}
 		},
@@ -217,39 +217,6 @@
 			"settings":
 			{
 				"buffer_size": 817,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/asm/switcher.S",
-			"settings":
-			{
-				"buffer_size": 4928,
-				"line_ending": "Windows",
-				"name": "switcher.S"
-			}
-		},
-		{
-			"file": "src/libs/dwm/sandboxmemorymanager.cpp",
-			"settings":
-			{
-				"buffer_size": 11057,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/sandboxmemorymanager.h",
-			"settings":
-			{
-				"buffer_size": 6468,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/mmu.h",
-			"settings":
-			{
-				"buffer_size": 3082,
 				"line_ending": "Windows"
 			}
 		}
@@ -286,13 +253,15 @@
 	},
 	"file_history":
 	[
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/asm/switcher.S",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.cpp",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.h",
+		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/mmu.h",
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/MC/MCObjectStreamer.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86BaseInfo.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCCodeEmitter.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86InstrSystem.td",
 		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/mmu.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86NaClRewritePass.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/AsmParser/X86AsmParser.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/tramp_64.S",
@@ -411,9 +380,7 @@
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJIT.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/ExecutionEngine.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Support/Triple.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/Target.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Target/TargetData.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ADT/Triple.h"
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/Target.cpp"
 	],
 	"find":
 	{
@@ -421,7 +388,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 105.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"",
@@ -438,6 +405,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"EmitBundleAlignEnd",
+			"naclcall",
 			"SegOvrMask",
 			"GS",
 			"hasFSGSBase",
@@ -563,9 +532,7 @@
 			"NaClAllModulesInit",
 			"NaClAppLoadFile",
 			"ApplyValidatorCopy",
-			"NaCl_ApplyValidatorCopy_x86_32",
-			"NCValidateFreeState",
-			"NaCl::TimeDelta"
+			"NaCl_ApplyValidatorCopy_x86_32"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -589,6 +556,7 @@
 	"groups":
 	[
 		{
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -596,15 +564,15 @@
 					"file": "src/libs/dwm/bitcoder.cpp",
 					"settings":
 					{
-						"buffer_size": 11294,
+						"buffer_size": 11287,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7414,
-								7414
+								0,
+								0
 							]
 						],
 						"settings":
@@ -636,7 +604,8 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 394.0,
@@ -649,7 +618,7 @@
 					"file": "src/libs/dwm/isolatedexecengine.cpp",
 					"settings":
 					{
-						"buffer_size": 7067,
+						"buffer_size": 7264,
 						"regions":
 						{
 						},
@@ -726,113 +695,6 @@
 						"zoom_level": 1.0
 					},
 					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/libs/dwm/asm/switcher.S",
-					"settings":
-					{
-						"buffer_size": 4928,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4603,
-								4603
-							]
-						],
-						"settings":
-						{
-							"auto_name": "switcher.S",
-							"syntax": "Packages/R/R.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2017.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/libs/dwm/sandboxmemorymanager.cpp",
-					"settings":
-					{
-						"buffer_size": 11057,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 6.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "src/libs/dwm/sandboxmemorymanager.h",
-					"settings":
-					{
-						"buffer_size": 6468,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "src/libs/dwm/mmu.h",
-					"settings":
-					{
-						"buffer_size": 3082,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1125,
-								1116
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 828.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
 				}
 			]
 		}
@@ -868,14 +730,6 @@
 		]
 	},
 	"menu_visible": true,
-	"output.clang":
-	{
-		"height": 142.0
-	},
-	"output.exec":
-	{
-		"height": 148.0
-	},
 	"replace":
 	{
 		"height": 70.0
@@ -937,6 +791,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 296.0,
+	"side_bar_width": 277.0,
 	"status_bar_visible": true
 }

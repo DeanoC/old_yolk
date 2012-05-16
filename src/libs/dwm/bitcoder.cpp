@@ -116,7 +116,7 @@ namespace {
 					ExternalNode->removeOneAbstractEdgeTo((*CG)[I]);
 				}
 				Changed = true;
-				LOG(INFO) << "Internalizing func " << I->getName().str() << "\n";
+//				LOG(INFO) << "Internalizing func " << I->getName().str() << "\n";
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace {
 
 				I->setLinkage(GlobalValue::InternalLinkage);
 				Changed = true;
-				LOG(INFO) << "Internalized gvar " << I->getName().str() << "\n";
+//				LOG(INFO) << "Internalized gvar " << I->getName().str() << "\n";
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace {
 
 				I->setLinkage(GlobalValue::InternalLinkage);
 				Changed = true;
-				LOG(INFO) << "Internalized alias " << I->getName().str() << "\n";
+//				LOG(INFO) << "Internalized alias " << I->getName().str() << "\n";
 			}
 		}
 		return Changed;

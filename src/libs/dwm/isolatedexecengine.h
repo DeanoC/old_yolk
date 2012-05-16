@@ -22,6 +22,10 @@ public:
 
 	void addLibrary( const std::string& elfstr );
 	void process( const std::string& elfstr );
+
+	void* sandboxAllocate( size_t size );
+	void sandboxFree( void* ptr );
+
 private:
 	void* sandboxMem;
 	void* reservedMem;

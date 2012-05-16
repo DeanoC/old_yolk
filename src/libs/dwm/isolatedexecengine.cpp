@@ -1,32 +1,14 @@
 #include "dwm.h"
 
-#include "llvm/ExecutionEngine/RuntimeDyld.h"
 #include "llvm/Support/MemoryBuffer.h"
 
 #include "mmu.h"
 #include "sandboxmemorymanager.h"
 #include "trustedregion.h"
+#include "ieethreadcontext.h"
 #include "isolatedexecengine.h"
 
-
-#if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
-# error TODO
-#elif CPU_FAMILY == CPU_X64
-struct IEEThreadContext {
-	uint64_t  	rbx;				//  0
-	uint64_t  	r12;				//  8
-	uint64_t  	r13;				// 16
-	uint64_t  	r14;				// 24
-	uint64_t  	untrusted_stack;	// 32
-  	uint16_t    fcw;				// 40
-  	uint16_t	padd[3];			// 42
-	uint64_t  	membase;			// 48
-	// the above are the untrusted initial registers
-	uint64_t	untrusted_rip;		// 56
-	uint64_t	trusted_stack;		// 64
-};									// 72
-
-#endif
+extern void InstallVmApiFuncs( TrustedRegion* trustedRegion );
 
 IsolatedExecEngine::IsolatedExecEngine( uint32_t sandboxSize, 
 										uint32_t sandboxStackSize,
@@ -87,57 +69,70 @@ void IsolatedExecEngine::addLibrary( const std::string& elfstr ) {
 
 }
 
-struct tmp_lconv
-{
-  char *decimal_point;
-  char *thousands_sep;
-  char *grouping;
-  char *int_curr_symbol;
-  char *currency_symbol;
-  char *mon_decimal_point;
-  char *mon_thousands_sep;
-  char *mon_grouping;
-  char *positive_sign;
-  char *negative_sign;
-  char int_frac_digits;
-  char frac_digits;
-  char p_cs_precedes;
-  char p_sep_by_space;
-  char n_cs_precedes;
-  char n_sep_by_space;
-  char p_sign_posn;
-  char n_sign_posn;
-  char int_n_cs_precedes;
-  char int_n_sep_by_space;
-  char int_n_sign_posn;
-  char int_p_cs_precedes;
-  char int_p_sep_by_space;
-  char int_p_sign_posn;
-} TMP_C_LCONV = 
-{
-	".", ",", ",",
-	"£", "£",
-	".",",",",",
-	"+","-",
-	2,2,
-	0,0,
-	0,0,
-	0,0,
-	0,0,0,
-	0,0,0
-};
+void* IsolatedExecEngine::sandboxAllocate( size_t size) {
+	size = Core::alignTo( size, MMU::get()->getPageSize() );
+	uint8_t* mem = mmgr->allocateSpace( size, (unsigned int) MMU::get()->getPageSize() );
+	MMU::get()->protectPages( mem, size, MMU::PROT_READ | MMU::PROT_WRITE );
+	return mem;
+}
+void IsolatedExecEngine::sandboxFree( void* ptr ) {
+	// TODO
+}
 
 // trusted functions can currently have 3 user params (besides the threadCtx) any must be integers or sandbox pointers
 // if pointer must adjust, and beware of other sandbox threads altering (copy before use in most cases!)
 // float support is minimal, not mixing is likely to work for the 4 four float/float vector parameters on 64 bit at least
 // TODO improve support for floats + varargs (which won't work) + handle stack parameters
 void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
+	auto no_func = []( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
+		LOG(INFO) << "No func: " << threadCtx->untrusted_rip << "\n"; 
+	};
+
 	auto func0 = []( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
 		const char* text = (const char*)( threadCtx->membase + sbTextptr);
 		LOG(INFO) << "DgStringOut: " << text << "\n"; 
 	};
+	auto func1 = [] ( const IEEThreadContext* threadCtx, const uintptr_t sbDst, const int32_t val, const uint32_t size )  -> uintptr_t {
+		void* dst = (void*)( threadCtx->membase + sbDst);
+		void* ret = memset( dst, val, size );
+		return (uintptr_t)ret - threadCtx->membase;
+	};
+#define TRFUNC(X) \
+	auto func##X = [] ( const IEEThreadContext* threadCtx ) { \
+		LOG(INFO) << MACRO_TEXT(X) << "\n";\
+		DebugBreak(); \
+	}; \
+	trustedRegion->addFunctionTrampoline( MACRO_TEXT(X), func##X );
 
+	trustedRegion->addFunctionTrampoline( "_no_func_", no_func );
 	trustedRegion->addFunctionTrampoline( "DgStringOut", func0 );
+	trustedRegion->addFunctionTrampoline( "memset", func1 );
+	TRFUNC( __cxa_guard_abort )
+	TRFUNC( _Unwind_Resume )
+	TRFUNC( powf )
+	TRFUNC( memcpy )
+	TRFUNC( __assert_func )
+	TRFUNC( __dso_handle )
+	TRFUNC( __cxa_atexit )
+	TRFUNC( __cxa_guard_release )
+	TRFUNC( __cxa_pure_virtual )
+	TRFUNC( __gxx_personality_v0 )
+	TRFUNC( __cxa_guard_acquire )
+
+	TRFUNC( _ZTVN10__cxxabiv121__vmi_class_type_infoE )
+	TRFUNC( _Z21btAlignedFreeInternalPv )
+	TRFUNC( _ZN15CProfileManager5ResetEv )
+	TRFUNC( _ZN20btConvexHullComputer7computeEPKvbiiff )
+	TRFUNC( _ZN15CProfileManager12Stop_ProfileEv )
+	TRFUNC( _ZN15CProfileManager13Start_ProfileEPKc )
+	TRFUNC( _ZdlPv )
+	TRFUNC( _ZN15CProfileManager23Increment_Frame_CounterEv )
+	TRFUNC( _ZSt9terminatev )
+	TRFUNC( _ZTVN10__cxxabiv120__si_class_type_infoE )
+	TRFUNC( _Z22btAlignedAllocInternalji )
+	TRFUNC( _ZTVN10__cxxabiv117__class_type_infoE )
+	TRFUNC( _Znwj )
+
 }
 
 // TODO thread safe thread allocation
@@ -147,7 +142,7 @@ static int g_ThreadIdx = 0;
 void IsolatedExecEngine::process( const std::string& elfstr ) {
 	using namespace llvm;
 
-	static_assert( sizeof(IEEThreadContext)== 72, "IEEThreadContext size has changed" );
+	static_assert( sizeof(IEEThreadContext)== 80, "IEEThreadContext size has changed" );
 	IEEThreadContext* threadCtx = g_ThreadCtxs + g_ThreadIdx;
 	g_ThreadIdx++;
 	memset( threadCtx, 0, sizeof(IEEThreadContext) );
@@ -161,6 +156,7 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	memset( sttStart, 0xFE, (uintptr_t)sttEnd - (uintptr_t)sttStart ); 
 
 	InstallTrustedFuncs( trustedRegion );
+	InstallVmApiFuncs( trustedRegion );
 
 	// transfer the elf into the loader and get its ready to go
 	MemoryBuffer* mb = MemoryBuffer::getMemBuffer( elfstr );
@@ -184,6 +180,7 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	// TODO make sure automatic C++ clean up code is on the stack, post this (including all code getting here)
 	// easiest way is to create a new main thread that calls here leaving all the construction to its parent thread.
 	threadCtx->trusted_stack = (uint64_t) _AddressOfReturnAddress(); 
+	threadCtx->owner = this;
 
 	typedef void (*main_ptr)( const IEEThreadContext* ctx );
 	main_ptr mainp = (main_ptr) dyld->getSymbolAddress( llvm::StringRef("SwitchToUntrustedSSE") );

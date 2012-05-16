@@ -30,8 +30,8 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 
 Dwm::Dwm() {
 
-//   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libc.a" ) );
-//   BitCoder::get()->addLibrary( libcbc );
+   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libcommon.a" ) );
+   BitCoder::get()->addLibrary( libcbc );
 }
 
 Dwm::~Dwm() {

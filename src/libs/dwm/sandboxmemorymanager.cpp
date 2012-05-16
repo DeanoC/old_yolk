@@ -222,7 +222,13 @@ void SandboxMemoryManager::deallocateFunctionBody( void* body ) {
 uint8_t *SandboxMemoryManager::allocateSpace(intptr_t size,
 											 unsigned alignment) {
 	LOG(INFO) << "allocateSpace " << size << "/" << alignment << "\n";
-	return (uint8_t*)dataAllocator.Allocate( size, alignment );
+	// todo REWRITE data allocators, not fit for purpose and can be used
+	// to crash the trusted side post running untrusted code :O
+	if( size < 4096 ) {
+		return (uint8_t*)dataAllocator.Allocate( size, alignment );
+	} else {
+		return ( (uint8_t*) slabAllocator.AllocateRaw( size ) );
+	}
 }
 
 uint8_t *SandboxMemoryManager::allocateGlobal(uintptr_t size,
@@ -325,6 +331,17 @@ llvm::MemSlab *YolkSlabAllocator::Allocate(size_t Size) {
 	slab->Size = Core::alignTo( Size, MMU::get()->getPageSize() );	
 	curbase = curbase + slab->Size;
 	return slab;
+}
+
+// TODO 
+uint8_t* YolkSlabAllocator::AllocateRaw(size_t Size) {
+	if( curbase >= memend )
+		return nullptr;
+
+	uint8_t* mem = (uint8_t*) curbase;
+	Size = Core::alignTo( Size, MMU::get()->getPageSize() );	
+	curbase = curbase + Size;
+	return mem;
 }
 
 void YolkSlabAllocator::Deallocate(llvm::MemSlab *Slab) {

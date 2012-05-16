@@ -10,6 +10,7 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/ExecutionEngine/JitMemoryManager.h"
+#include "llvm/ExecutionEngine/RuntimeDyld.h"
 #include "trustedregion.h"
 
 namespace llvm {
@@ -26,6 +27,8 @@ public:
 	virtual ~YolkSlabAllocator() {};
 	virtual llvm::MemSlab *Allocate(size_t Size);
 	virtual void Deallocate(llvm::MemSlab *Slab);
+
+	uint8_t* AllocateRaw(size_t Size);
 
 	const uintptr_t membase;
 	const uintptr_t memend;
@@ -60,6 +63,10 @@ class SandboxMemoryManager :
 
 	virtual void *getPointerToNamedFunction(const std::string &name,
 											bool AbortOnFailure = true) {
+		if( name[0] == '.' ) {
+			// local var, never a function so ignore
+			return (void*)slabAllocator.membase;
+		}
 		auto addr = trustedRegion->getAddress( name );
 		if( addr == nullptr ) {
 			auto func = [] () -> int { 
