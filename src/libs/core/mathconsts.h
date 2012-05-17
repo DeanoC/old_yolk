@@ -32,7 +32,7 @@ template <typename T>
 static const T radian_to_degree() { return static_cast<T>(1) / degree_to_radian<T>(); }
 
 template <typename T>
-static const T infinity() { return Core::numeric_limits<T>::infinity(); }
+static const T infinity() { return std::numeric_limits<T>::infinity(); }
 
 
 }   // namespace Maths

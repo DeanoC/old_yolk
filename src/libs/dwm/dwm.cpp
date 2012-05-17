@@ -145,7 +145,7 @@ void Dwm::bootstrapLocal() {
    auto prg = BitCoder::get()->make( BitCoder::TRUSTED, initbc );
 
    // init thread0 into llvm execution environment
-   auto thread0 = Core::shared_ptr<VMThread>( new VMThread( *this ) );
+   auto thread0 = std::shared_ptr<VMThread>( new VMThread( *this ) );
    vmThreads.push_back( thread0 );
 
    thread0->getEngine()->addLibrary( assprg );

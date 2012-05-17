@@ -60,7 +60,7 @@ void LuaObjectPrint( const luabind::object& obj )
 		Log << "LUA : " << object_cast<float>(obj) << "\n";
 		break;
 	case LUA_TSTRING:
-		Log << "LUA : " << object_cast<Core::string>(obj) << "\n";
+		Log << "LUA : " << object_cast<std::string>(obj) << "\n";
 		break;
 	case LUA_TTABLE:
 		Log << "LUA : table ------\n";

@@ -10,6 +10,7 @@
 
 #include "core/singleton.h"
 
+
 #if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 struct LdtEntry {
   uint16_t limit_00to15;
@@ -36,8 +37,9 @@ struct LdtEntry {
 #	elif PLATFORM_OS == APPLE_MAC
 #		define LDT_ENTRIES 8192
 #	elif PLATFORM_OS == LINUX
-#		include <asm/ldt.h>
-		extern int modify_ldt(int func, void* ptr, unsigned long bytecount);
+//#		include <asm/ldt.h>
+#		include <sys/mman.h>
+//		extern int modify_ldt(int func, void* ptr, unsigned long bytecount);
 #	endif
 
 #endif // 32 bit x86
@@ -45,10 +47,17 @@ struct LdtEntry {
 class MMU : public Core::Singleton<MMU> {
 public:
 	friend class Core::Singleton<MMU>;
-	static const unsigned int PROT_NONE = 0x0;   // Page can't be accessed.
-	static const unsigned int PROT_READ = 0x1;   // Page can be read.
-	static const unsigned int PROT_WRITE = 0x2;   // Page can be written.
-	static const unsigned int PROT_EXEC  = 0x4;   // Page can be executed.
+#	if PLATFORM_OS == MS_WINDOWS
+	static const unsigned int PAGE_NONE = 0x0;   // Page can't be accessed.
+	static const unsigned int PAGE_READ = 0x1;   // Page can be read.
+	static const unsigned int PAGE_WRITE = 0x2;   // Page can be written.
+	static const unsigned int PAGE_EXEC  = 0x4;   // Page can be executed.
+#else
+	static const unsigned int PAGE_NONE = PROT_NONE;   // Page can't be accessed.
+	static const unsigned int PAGE_READ = PROT_READ;   // Page can be read.
+	static const unsigned int PAGE_WRITE = PROT_WRITE;   // Page can be written.
+	static const unsigned int PAGE_EXEC  = PROT_EXEC;   // Page can be executed.
+#endif
 
 	// how big each page is
 	size_t getPageSize() const { return pageSize; }
@@ -76,7 +85,8 @@ public:
 	void protectPages( void* pages, size_t numBytes, unsigned int settings );
 
 // 32bit x86 has selectors for segmented memory model
-#if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
+#if 0
+//CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 	// selectors can be code or data and are page sized and aligned (numBytes rounded up)
 	// the settings are a limited subset of page level, its either RWX or RX, R will map to RX 
 	// so beware! Use page protection for finer control
@@ -89,7 +99,8 @@ private:
 
 	size_t pageSize;
 
-#if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
+#if 0
+//CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 	std::array<LdtEntry, LDT_ENTRIES> ldtTable;
 #endif
 	

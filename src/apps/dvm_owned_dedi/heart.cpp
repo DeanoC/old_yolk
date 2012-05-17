@@ -78,7 +78,7 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 
 			// needs to be idempotant 
 			Core::unique_lock<Core::shared_mutex> mu(dwmMutex);
-			Core::shared_ptr<Core::thread> sp = dwm.lock();
+			std::shared_ptr<Core::thread> sp = dwm.lock();
 			// TODO use atomics, this won't work on non ordered memory semantics
 			bool dwmupdated = false;
 			bool waiter = true;
@@ -88,7 +88,7 @@ void Heart::backmsg( const boost::system::error_code& error ) {
 						// taking a copy of sp for the thread to keep
 						while( dwmupdated == false ){ Core::this_thread::sleep( boost::posix_time::milliseconds(5) ); };
 
-						Core::shared_ptr<Core::thread> sp_copy = sp;
+						std::shared_ptr<Core::thread> sp_copy = sp;
 						waiter = false;
 						DWMMain(sp_copy);
 					}) 

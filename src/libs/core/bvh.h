@@ -94,7 +94,7 @@ public:
 	virtual void drawDebug( const Core::TransformNode* transform, Core::Frustum* frustum );
 
 
-	Core::vector<Node>	m_nodes;	//!< The nodes of the bvh
+	std::vector<Node>	m_nodes;	//!< The nodes of the bvh
 // TODO made public to quickly get linux build to work. FIXME
 //protected:
 
@@ -116,7 +116,7 @@ protected:
 							int curLvl, uint64_t lastBit );
 
 	Math::Vector3		m_quantSize;				//!< Size of the quant
-	Core::vector<NodePrimCreator> m_triAABB;		//!< tmp vector of nodeprim creators extra data
+	std::vector<NodePrimCreator> m_triAABB;		//!< tmp vector of nodeprim creators extra data
 	int					m_lbvhSplitsPerLevel;		//!< The lbvh splits per level
 	int					m_lbvhMaxDescentLevel;		//!< The lbvh maximum descent level
 	int					m_lbvhTargetPrimsPerLeaf;	//!< The lbvh target prims per leaf

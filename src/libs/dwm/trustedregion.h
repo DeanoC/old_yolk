@@ -95,11 +95,11 @@ public:
 	}
 
 	void unprotect() {		
-		MMU::get()->protectPages( thunker, thunkSegSize, MMU::PROT_READ | MMU::PROT_WRITE );
+		MMU::get()->protectPages( thunker, thunkSegSize, MMU::PAGE_READ | MMU::PAGE_WRITE );
 	}
 
 	void protect() {
-		MMU::get()->protectPages( thunker, thunkSegSize, MMU::PROT_READ | MMU::PROT_EXEC );
+		MMU::get()->protectPages( thunker, thunkSegSize, MMU::PAGE_READ | MMU::PAGE_EXEC );
 	}
 
 private:

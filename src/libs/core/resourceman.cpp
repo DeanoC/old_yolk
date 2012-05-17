@@ -16,7 +16,7 @@
 
 namespace
 {
-Core::string GetResourceTypeAsString( uint32_t type ) {
+std::string getResourceTypeAsString( uint32_t type ) {
 	// get text version of the type number
 	// resource types are little endian 4 char strings
 	char typeName[5];
@@ -32,7 +32,7 @@ Core::string GetResourceTypeAsString( uint32_t type ) {
 	typeName[3] = (char)((type & 0x000000FF) >> 0);
 #endif
 	typeName[4] = 0;
-	return Core::string( typeName );
+	return std::string( typeName );
 }
 } // end anon namespace
 
@@ -45,10 +45,10 @@ struct ResourceData
 	boost::scoped_array<const char>				m_ResourceName;
 	boost::scoped_array<const char>				m_ResourceData;
 	ResourceHandleBase*							m_spHandle;
-	Core::shared_ptr<ResourceBase>				m_spResource;
+	std::shared_ptr<ResourceBase>				m_spResource;
 	uint32_t									m_iRefCount;
 	RESOURCE_FLAGS								m_Flags;
-	Core::string								cacheName;
+	std::string								cacheName;
 
 	ResourceData(	const char* pName, 
 					const char* pData, 
@@ -67,7 +67,7 @@ struct ResourceTypeData {
 	ResourceMan::DestroyResourceCallback			m_DestroyCallback;
 	ResourceMan::ChangeResourceCallback				m_ChangeResourceCallback;
 	ResourceMan::DestroyResourceHandleCallback		m_DestroyResourceHandleCallback;
-	Core::string									m_ResourceDirectory;
+	std::string										m_ResourceDirectory;
 	size_t											m_ResourceHandleSize;	
 
 	ResourceTypeData(){}
@@ -75,7 +75,7 @@ struct ResourceTypeData {
 						ResourceMan::DestroyResourceCallback& destroy,
 						ResourceMan::ChangeResourceCallback& change,
 						ResourceMan::DestroyResourceHandleCallback destroyHandle,
-						const Core::string& dir,
+						const std::string& dir,
 						const size_t _rhSize ) :
 		m_CreateCallback( create ), 
 		m_DestroyCallback( destroy ), 
@@ -90,10 +90,10 @@ struct ResourceTypeData {
 class ResourceManImpl {
 public:
 
-	typedef Core::list<ResourceData*>									ListResourceData;
-	typedef Core::unordered_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
-	typedef Core::unordered_map<Core::string, ResourceData*>			CacheIndex;
-	typedef Core::unordered_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
+	typedef std::list<ResourceData*>									ListResourceData;
+	typedef std::unordered_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
+	typedef std::unordered_map<std::string, ResourceData*>			CacheIndex;
+	typedef std::unordered_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
 
 	ListResourceData	m_ListResourceHandlePtrs;
 	PtrIndex			m_ResourceHandleBaseMap;
@@ -106,8 +106,8 @@ public:
 		}
 		ListResourceData::iterator rdIt = m_ListResourceHandlePtrs.begin();
 		while( rdIt != m_ListResourceHandlePtrs.end() ) {
-			uint32_t type = (*rdIt)->m_spHandle->GetType();
-			Core::string typeName = GetResourceTypeAsString( type );
+			uint32_t type = (*rdIt)->m_spHandle->getType();
+			std::string typeName = getResourceTypeAsString( type );
 			LOG(INFO) << "Type : " << typeName.c_str() << "(" << type << ")" << 
 						" - Name : " << (*rdIt)->m_ResourceName.get() << "\n";
 			++rdIt;
@@ -123,20 +123,20 @@ ResourceMan::~ResourceMan() {
 	CORE_DELETE &m_impl;
 }
 
-const ResourceHandleBase* ResourceMan::ImplOpenResource( const char* pName, const void* pData, size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags ) {
+const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, const void* pData, size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags ) {
 	CORE_ASSERT( (m_impl.m_ResourceTypeMap.find( type ) != m_impl.m_ResourceTypeMap.end() ) &&
 			"Resource type not registered" );
 	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ type ];
 
-	Core::string actualName;
+	std::string actualName;
 	if( flags & RMRF_LOADOFFDISK ) {
 		actualName = rtd.m_ResourceDirectory + pName;
 	} else {
 		actualName = pName;
 	}
 
-	Core::string cacheName;
-	Core::stringstream flagString;
+	std::string cacheName;
+	std::stringstream flagString;
 	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
 	cacheName = actualName + flagString.str();
 
@@ -171,7 +171,7 @@ const ResourceHandleBase* ResourceMan::ImplOpenResource( const char* pName, cons
 	}
 }
 
-void ResourceMan::ImplCloseResource( ResourceHandleBase* pHandle ) {
+void ResourceMan::implCloseResource( ResourceHandleBase* pHandle ) {
 	if( m_impl.m_ResourceHandleBaseMap.find( pHandle ) != m_impl.m_ResourceHandleBaseMap.end() ) {
 		ResourceData* pRD = m_impl.m_ResourceHandleBaseMap[ pHandle ];
 		CORE_ASSERT( pHandle == pRD->m_spHandle );
@@ -190,7 +190,7 @@ void ResourceMan::ImplCloseResource( ResourceHandleBase* pHandle ) {
 			}
 
 			ResourceManImpl::PtrIndex::iterator rhbIt = m_impl.m_ResourceHandleBaseMap.find( pRD->m_spHandle );
-			ResourceManImpl::ListResourceData::iterator lrdIt = Core::find( m_impl.m_ListResourceHandlePtrs.begin(),m_impl.m_ListResourceHandlePtrs.end(), pRD );
+			ResourceManImpl::ListResourceData::iterator lrdIt = std::find( m_impl.m_ListResourceHandlePtrs.begin(),m_impl.m_ListResourceHandlePtrs.end(), pRD );
 			m_impl.m_ResourceHandleBaseMap.erase( rhbIt );
 			m_impl.m_ListResourceHandlePtrs.erase( lrdIt );
 
@@ -203,21 +203,21 @@ void ResourceMan::ImplCloseResource( ResourceHandleBase* pHandle ) {
 		CORE_ASSERT( false && "ResourceHandle does not exist\n" );
 	}
 }
-void ResourceMan::ImplFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags ) {
+void ResourceMan::implFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags ) {
 	CORE_ASSERT( (m_impl.m_ResourceTypeMap.find( type ) != m_impl.m_ResourceTypeMap.end() ) &&
 			"Resource type not registered" );
 	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ type ];
 
 
-	Core::string actualName;
+	std::string actualName;
 	if( flags & RMRF_LOADOFFDISK ) {
 		actualName = rtd.m_ResourceDirectory + pName;
 	} else {
 		actualName = pName;
 	}
 
-	Core::string cacheName;
-	Core::stringstream flagString;
+	std::string cacheName;
+	std::stringstream flagString;
 	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
 	cacheName = actualName + flagString.str();
 
@@ -232,13 +232,13 @@ static void DefaultDestroyResourceHandleCallback( ResourceHandleBase* handle ) {
 	CORE_DELETE handle;
 }
 
-void ResourceMan::RegisterResourceType (	uint32_t type, 
+void ResourceMan::registerResourceType (	uint32_t type, 
 											CreateResourceCallback pCreate, 
 											DestroyResourceCallback pDestroy, 
 											const size_t resourceHandleSize, 
 											DestroyResourceHandleCallback pDestroyHandle,							
 											ChangeResourceCallback pChange,
-											const Core::string dir ) {
+											const std::string dir ) {
 	CORE_ASSERT( m_impl.m_ResourceTypeMap.find(type) == m_impl.m_ResourceTypeMap.end() );
 	if( pDestroyHandle == NULL ) {
 		pDestroyHandle = &DefaultDestroyResourceHandleCallback;
@@ -248,7 +248,7 @@ void ResourceMan::RegisterResourceType (	uint32_t type,
 	m_impl.m_ResourceTypeMap[ type ] = ResourceTypeData( pCreate, pDestroy, pChange, pDestroyHandle, dir, resourceHandleSize );
 }
 
-std::shared_ptr<ResourceBase> ResourceMan::ImplAcquireResource( ResourceHandleBase* pHandle ) {
+std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBase* pHandle ) {
 	ResourceData* pRD = m_impl.m_ResourceHandleBaseMap[ pHandle ];
 	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ pHandle->m_Type ];
 #if defined( LOG_RESOURCE_ACQUIRE )
@@ -261,7 +261,7 @@ std::shared_ptr<ResourceBase> ResourceMan::ImplAcquireResource( ResourceHandleBa
 #endif
 	pRD->m_spResource = rtd.m_CreateCallback( pHandle, pRD->m_Flags, pRD->m_ResourceName.get(), pRD->m_ResourceData.get() );
 	if( pRD->m_spResource != NULL ) {
-		Core::weak_ptr<ResourceBase> tmp( pRD->m_spResource );
+		std::weak_ptr<ResourceBase> tmp( pRD->m_spResource );
 		pHandle->m_wpResourceBase.swap( tmp );
 	}
 	pRD->m_Flags = (RESOURCE_FLAGS) (pRD->m_Flags & ~(RMRF_PRELOAD ));
@@ -269,20 +269,20 @@ std::shared_ptr<ResourceBase> ResourceMan::ImplAcquireResource( ResourceHandleBa
 	return pRD->m_spResource;
 }
 
-void ResourceMan::InternalProcessManifest( uint16_t numEntries, ManifestEntry* entries ) {
+void ResourceMan::internalProcessManifest( uint16_t numEntries, ManifestEntry* entries ) {
 	for( uint16_t i=0; i < numEntries; ++i ) {
 		uint32_t type = entries[i].type;
 		// fixup header
 		entries[i].name = fixupPointer<const char>( entries, entries[i].name );
 
 		const char* pFileName = entries[i].name;
-		entries[i].handle = ImplOpenResource( pFileName, NULL, 0, type, (RESOURCE_FLAGS)(RMRF_LOADOFFDISK | RMRF_PRELOAD) );
+		entries[i].handle = implOpenResource( pFileName, NULL, 0, type, (RESOURCE_FLAGS)(RMRF_LOADOFFDISK | RMRF_PRELOAD) );
 	}
 }
 
-void ResourceMan::InternalCloseManifest( uint16_t numEntries, ManifestEntry* entries ) {
+void ResourceMan::internalCloseManifest( uint16_t numEntries, ManifestEntry* entries ) {
 	for( uint16_t i=0; i < numEntries; ++i ) {
-		ImplCloseResource( (Core::ResourceHandleBase*) entries[i].handle );
+		implCloseResource( (Core::ResourceHandleBase*) entries[i].handle );
 		entries[i].handle = NULL;
 	}
 }

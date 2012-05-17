@@ -3,11 +3,9 @@
 
 #include "protocols/handshake.proto.pb.h"
 
-// don't usually do this but makes the statement defs much shorter!
-using namespace boost::msm::front;
 
 namespace {
-using namespace Core;
+namespace asio = boost::asio;
 using namespace boost::msm; // for front::state (can't use without front as ambigious)
 using namespace boost::msm::front; // for Row
 
@@ -35,7 +33,7 @@ struct HandshakeStateMachine : public state_machine_def<HandshakeStateMachine>, 
 			asio::ip::tcp::resolver::iterator epIter = netResolver.resolve( endPoint );
 
 			// find the first valid endpoint that wants to communicate with us
-			TcpConnection::pointer connection = TcpConnection::create( fsm.io_service );
+			Core::TcpConnection::pointer connection = Core::TcpConnection::create( fsm.io_service );
 			const asio::ip::tcp::resolver::iterator endPointEnd;
 			boost::system::error_code err = asio::error::host_not_found;
 			while (err && epIter != endPointEnd )
@@ -112,7 +110,7 @@ Row< AllOk		  , ErrorEvent		, ErrorMode		, none			, none		>
 	boost::asio::io_service&		io_service;	//!< The i/o service object
 	std::string						serverAddr;	//!< The server address string
 	std::string						serverPort;	//!< The server port string
-	TcpConnection::pointer			connection;	//!< Connection to the server once resolved
+	Core::TcpConnection::pointer			connection;	//!< Connection to the server once resolved
 	std::array<uint8_t, 1024*8>		buffer;
 };
 

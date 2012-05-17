@@ -23,10 +23,11 @@ IsolatedExecEngine::IsolatedExecEngine( uint32_t sandboxSize,
 #if CPU_BIT_SIZE == 32
 	// 32 bit we have to conserve virtual address space and use
 	// other techniques to ensure no peeking into the non sandbox region
-	MMU::get()->allocPages( &yorkSandboxMem, sandboxSize );
-	yorkReservedMem = yorkSandboxMem; // one and the same for 32 bit
+	MMU::get()->allocPages( &sandboxMem, sandboxSize );
+	reservedMem = sandboxMem; // one and the same for 32 bit
 
-#	if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
+#	if 0
+	//CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 	uint16_t dataSel = MMU::get()->allocSelector( true, &sandboxMem, sandboxSize, MMU::PROT_READ | MMU::PROT_WRITE );
 	uint16_t codeSel = MMU::get()->allocSelector( false, &sandboxMem, sandboxSize, MMU::PROT_READ | MMU::PROT_WRITE );
 #	endif
@@ -72,41 +73,69 @@ void IsolatedExecEngine::addLibrary( const std::string& elfstr ) {
 void* IsolatedExecEngine::sandboxAllocate( size_t size) {
 	size = Core::alignTo( size, MMU::get()->getPageSize() );
 	uint8_t* mem = mmgr->allocateSpace( size, (unsigned int) MMU::get()->getPageSize() );
-	MMU::get()->protectPages( mem, size, MMU::PROT_READ | MMU::PROT_WRITE );
+	MMU::get()->protectPages( mem, size, MMU::PAGE_READ | MMU::PAGE_WRITE );
 	return mem;
 }
 void IsolatedExecEngine::sandboxFree( void* ptr ) {
 	// TODO
 }
+void no_func( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
+	LOG(INFO) << "No func: " << threadCtx->untrusted_rip << "\n"; 
+};
 
+void func0( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
+	const char* text = (const char*)( threadCtx->membase + sbTextptr);
+	LOG(INFO) << "DgStringOut: " << text << "\n"; 
+};
+
+uintptr_t func1( const IEEThreadContext* threadCtx, const uintptr_t sbDst, const int32_t val, const uint32_t size ) {
+	void* dst = (void*)( threadCtx->membase + sbDst);
+	void* ret = memset( dst, val, size );
+	return (uintptr_t)ret - threadCtx->membase;
+};
+#define TRFUNC(X) \
+	void func##X ( const IEEThreadContext* threadCtx ) { \
+		LOG(INFO) << MACRO_TEXT(X) << "\n";\
+	};
+	TRFUNC( __cxa_guard_abort )
+	TRFUNC( _Unwind_Resume )
+	TRFUNC( powf )
+	TRFUNC( memcpy )
+	TRFUNC( __assert_func )
+	TRFUNC( __dso_handle )
+	TRFUNC( __cxa_atexit )
+	TRFUNC( __cxa_guard_release )
+	TRFUNC( __cxa_pure_virtual )
+	TRFUNC( __gxx_personality_v0 )
+	TRFUNC( __cxa_guard_acquire )
+
+	TRFUNC( _ZTVN10__cxxabiv121__vmi_class_type_infoE )
+	TRFUNC( _Z21btAlignedFreeInternalPv )
+	TRFUNC( _ZN15CProfileManager5ResetEv )
+	TRFUNC( _ZN20btConvexHullComputer7computeEPKvbiiff )
+	TRFUNC( _ZN15CProfileManager12Stop_ProfileEv )
+	TRFUNC( _ZN15CProfileManager13Start_ProfileEPKc )
+	TRFUNC( _ZdlPv )
+	TRFUNC( _ZN15CProfileManager23Increment_Frame_CounterEv )
+	TRFUNC( _ZSt9terminatev )
+	TRFUNC( _ZTVN10__cxxabiv120__si_class_type_infoE )
+	TRFUNC( _Z22btAlignedAllocInternalji )
+	TRFUNC( _ZTVN10__cxxabiv117__class_type_infoE )
+	TRFUNC( _Znwj )
 // trusted functions can currently have 3 user params (besides the threadCtx) any must be integers or sandbox pointers
 // if pointer must adjust, and beware of other sandbox threads altering (copy before use in most cases!)
 // float support is minimal, not mixing is likely to work for the 4 four float/float vector parameters on 64 bit at least
 // TODO improve support for floats + varargs (which won't work) + handle stack parameters
 void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
-	auto no_func = []( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
-		LOG(INFO) << "No func: " << threadCtx->untrusted_rip << "\n"; 
-	};
 
-	auto func0 = []( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
-		const char* text = (const char*)( threadCtx->membase + sbTextptr);
-		LOG(INFO) << "DgStringOut: " << text << "\n"; 
-	};
-	auto func1 = [] ( const IEEThreadContext* threadCtx, const uintptr_t sbDst, const int32_t val, const uint32_t size )  -> uintptr_t {
-		void* dst = (void*)( threadCtx->membase + sbDst);
-		void* ret = memset( dst, val, size );
-		return (uintptr_t)ret - threadCtx->membase;
-	};
+	trustedRegion->addFunctionTrampoline( "_no_func_", (void*) no_func );
+	trustedRegion->addFunctionTrampoline( "DgStringOut", (void*) func0 );
+	trustedRegion->addFunctionTrampoline( "memset", (void*) func1 );
+
+#undef TRFUNC
 #define TRFUNC(X) \
-	auto func##X = [] ( const IEEThreadContext* threadCtx ) { \
-		LOG(INFO) << MACRO_TEXT(X) << "\n";\
-		DebugBreak(); \
-	}; \
-	trustedRegion->addFunctionTrampoline( MACRO_TEXT(X), func##X );
+	trustedRegion->addFunctionTrampoline( MACRO_TEXT(X), (void*) func##X );
 
-	trustedRegion->addFunctionTrampoline( "_no_func_", no_func );
-	trustedRegion->addFunctionTrampoline( "DgStringOut", func0 );
-	trustedRegion->addFunctionTrampoline( "memset", func1 );
 	TRFUNC( __cxa_guard_abort )
 	TRFUNC( _Unwind_Resume )
 	TRFUNC( powf )
@@ -141,8 +170,11 @@ static IEEThreadContext g_ThreadCtxs[ MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCES
 static int g_ThreadIdx = 0;
 void IsolatedExecEngine::process( const std::string& elfstr ) {
 	using namespace llvm;
-
+#if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
+//	static_assert( sizeof(IEEThreadContext)== 80, "IEEThreadContext size has changed" );
+#elif CPU_FAMILY == CPU_X64
 	static_assert( sizeof(IEEThreadContext)== 80, "IEEThreadContext size has changed" );
+#endif
 	IEEThreadContext* threadCtx = g_ThreadCtxs + g_ThreadIdx;
 	g_ThreadIdx++;
 	memset( threadCtx, 0, sizeof(IEEThreadContext) );
@@ -168,8 +200,10 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	trustedRegion->protect();
 	
 	threadCtx->untrusted_stack = (uint64_t)mmgr->getStackStart() - 8;
-	unsigned int tmp;
+	unsigned int tmp = 0;
+#if PLATFORM_OS == MS_WINDOWS
 	_controlfp_s( &tmp, 0, 0);
+#endif
 	threadCtx->fcw =  (uint16_t) tmp;
 
 	threadCtx->membase = (uint64_t) sandboxMem;
@@ -179,7 +213,9 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	// and so we use its stack for the trusted calls from untrusted code
 	// TODO make sure automatic C++ clean up code is on the stack, post this (including all code getting here)
 	// easiest way is to create a new main thread that calls here leaving all the construction to its parent thread.
+#if PLATFORM_OS == MS_WINDOWS
 	threadCtx->trusted_stack = (uint64_t) _AddressOfReturnAddress(); 
+#endif
 	threadCtx->owner = this;
 
 	typedef void (*main_ptr)( const IEEThreadContext* ctx );

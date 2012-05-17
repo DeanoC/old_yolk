@@ -47,7 +47,7 @@ int Main() {
 		std::string hostname( "127.0.0.1" );
 		int port( 2045 );
 
-		Core::asio::io_service io;
+		boost::asio::io_service io;
 
 		// Wait for signals indicating time to shut down.
 		boost::asio::signal_set signals(io);

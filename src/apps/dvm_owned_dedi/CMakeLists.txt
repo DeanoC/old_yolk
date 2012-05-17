@@ -20,23 +20,20 @@ endif()
 target_link_libraries( dvm_owned_dedi ${targ_link_libs} )
 
 llvm_config( dvm_owned_dedi   
-						nativecodegen 
-					  	interpreter
-					  	BitReader
+						BitReader
 					  	AsmParser
 					  	Core
 					  	Support
 						X86CodeGen
-						mc
-						linker
-						ipo
-						runtimedyld
-						interpreter
-						instrumentation
-						executionengine
-						jit
-						mcjit
-						x86asmparser
+						MC
+						Linker
+						IPO
+						RuntimeDyld
+						ExecutionEngine
+						JIT
+						MCJIT
+						X86AsmParser
+						Instrumentation
 )
 
 # make a nice hierachy

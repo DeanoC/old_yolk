@@ -96,7 +96,7 @@ void Logger::Init( void )
 		++curChar;
 	}
 
-	Core::string iname = Core::string(modName) + "_info.log";
+	std::string iname = std::string(modName) + "_info.log";
 	g_WarnFile = CreateFile( iname.c_str(),			// filename
 							GENERIC_WRITE,	// write only
 							FILE_SHARE_WRITE,	// no sharing
@@ -105,7 +105,7 @@ void Logger::Init( void )
 							FILE_ATTRIBUTE_NORMAL | // normal file 
 							FILE_FLAG_WRITE_THROUGH, // no write cache
 							0 );				// no template
-	Core::string ename = Core::string(modName) + "_error.log";
+	std::string ename = std::string(modName) + "_error.log";
 	g_ErrFile = CreateFile(	ename.c_str(),			// filename
 							GENERIC_WRITE,	// write only
 							0,				// no sharing
@@ -114,7 +114,7 @@ void Logger::Init( void )
 							FILE_ATTRIBUTE_NORMAL | // normal file 
 							FILE_FLAG_WRITE_THROUGH, // no write cache
 							0 );				// no template
-	Core::string wname = Core::string(modName) + "_assert.log";
+	std::string wname = std::string(modName) + "_assert.log";
 	g_AssertFile = CreateFile(	wname.c_str(),			// filename
 							GENERIC_WRITE,	// write only
 							0,				// no sharing

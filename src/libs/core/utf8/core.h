@@ -96,7 +96,7 @@ namespace internal
     }
 
     template <typename octet_iterator>
-    inline typename Core::iterator_traits<octet_iterator>::difference_type
+    inline typename std::iterator_traits<octet_iterator>::difference_type
     sequence_length(octet_iterator lead_it)
     {
         uint8_t lead = mask8(*lead_it);

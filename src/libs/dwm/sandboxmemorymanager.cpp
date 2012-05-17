@@ -1,7 +1,7 @@
 #include "core/core.h"
 
 #include "llvm/ExecutionEngine/RuntimeDyld.h"
-#include "llvm/ExecutionEngine/JitMemoryManager.h"
+#include "llvm/ExecutionEngine/JITMemoryManager.h"
 
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/DynamicLibrary.h"
@@ -99,13 +99,13 @@ FreeListNode *SandboxMemoryManager::allocateCodeSlab(size_t minSize) {
 	// I think this can only be dynamic code allocations (else the elf will have
 	// allocated a section and have an ID). So we createa a slab sized section
 	// with an ID of ~0 (-1)
-	size_t size = std::max(kCodeSlabSize, minSize);
+	size_t size = std::max( (size_t)kCodeSlabSize, minSize);
 	return new FreeListNode( (uintptr_t)allocateCodeSection(size, kBundleSize,~0), size);
 }
 
 FreeListNode *SandboxMemoryManager::allocateDataSlab(size_t minSize) {
 	// see allocateCodeSlab just replace Code with Data
-	size_t size = std::max(kDataSlabSize, minSize);
+	size_t size = std::max( (size_t)kDataSlabSize, minSize);
 	return new FreeListNode( (uintptr_t)allocateDataSection(size, kBundleSize,~0), size);
 }
 
@@ -271,7 +271,7 @@ void SandboxMemoryManager::protect() {
 	// make the entire range untouchable at first
 	MMU::get()->protectPages( (void*) slabAllocator.membase, 
 					(size_t)((slabAllocator.memend + stackSize) - slabAllocator.membase), 
-					MMU::PROT_NONE );
+					MMU::PAGE_NONE );
 	SectionTable::const_iterator it;
 	for( it = codeSectionTable.cbegin(); it != codeSectionTable.cend(); ++it ) {
 		// get address and size
@@ -280,7 +280,7 @@ void SandboxMemoryManager::protect() {
 
 		MMU::get()->protectPages( 	(void*) addr, 
 									(size_t)size, 
-									MMU::PROT_READ | MMU::PROT_EXEC );
+									MMU::PAGE_READ | MMU::PAGE_EXEC );
 	}
 	for( it = dataSectionTable.cbegin(); it != dataSectionTable.cend(); ++it ) {
 		// get address and size
@@ -289,20 +289,20 @@ void SandboxMemoryManager::protect() {
 		auto size = it->second.second;
 		MMU::get()->protectPages( 	(void*) addr, 
 									(size_t)size, 
-									MMU::PROT_READ | MMU::PROT_WRITE );
+									MMU::PAGE_READ | MMU::PAGE_WRITE );
 	}
 	// the untrusted stack is R/W except for the top and bottom 64K which
 	// are guard pages
 	MMU::get()->protectPages( 	(void*)stackEnd, 
 								stackStart - stackEnd, 
-								MMU::PROT_READ | MMU::PROT_WRITE );
+								MMU::PAGE_READ | MMU::PAGE_WRITE );
 
 	// read/exec trusted region TODO? split into data and code region?
 	// see how its used, currently its mostly used for tramps + a few variables
 	// these variable aren't likely to become a escape vector
 	MMU::get()->protectPages( 	(void*)trustedStart, 
 								trustedSize, 
-								MMU::PROT_READ | MMU::PROT_EXEC );
+								MMU::PAGE_READ | MMU::PAGE_EXEC );
 
 }
 void SandboxMemoryManager::unprotect() {
@@ -311,7 +311,7 @@ void SandboxMemoryManager::unprotect() {
 	// NOTE *MUST* be done at start as the range starts protected
 	MMU::get()->protectPages( (void*) slabAllocator.membase, 
 					(size_t)((slabAllocator.memend + stackSize) - slabAllocator.membase), 
-					MMU::PROT_READ | MMU::PROT_WRITE );
+					MMU::PAGE_READ | MMU::PAGE_WRITE );
 
 }
 

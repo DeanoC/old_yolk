@@ -30,10 +30,10 @@ namespace Core
 class TransformNode
 {
 public:
-	typedef Core::vector< TransformNode* > NodeContainer;
+	typedef std::vector< TransformNode* > NodeContainer;
 
 public:
-	Core::string m_nodeName;
+	std::string m_nodeName;
 
 public:
 	//! ctor, the matrix is where the transform will be placed

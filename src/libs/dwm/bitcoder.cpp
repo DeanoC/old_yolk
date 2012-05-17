@@ -56,7 +56,7 @@ namespace {
 	class InternalizePass : public llvm::ModulePass {
 	public:
 		static char ID; // Pass identification, replacement for typeid
-		explicit InternalizePass(const std::vector<const std::string>& exportList);
+		explicit InternalizePass(const std::vector<std::string>& exportList);
 		virtual bool runOnModule(llvm::Module &M);
 
 		virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const {
@@ -68,11 +68,11 @@ namespace {
 	};
 
 	char InternalizePass::ID = 0;
-	InternalizePass::InternalizePass(const std::vector<const std::string>& exportList)
+	InternalizePass::InternalizePass(const std::vector<std::string>& exportList)
 	  : ModulePass(ID) {
 			using namespace llvm;
 			initializeInternalizePassPass(*PassRegistry::getPassRegistry());
-			for(std::vector<const std::string>::const_iterator itr = exportList.begin(); itr != exportList.end(); itr++) {
+			for(std::vector<std::string>::const_iterator itr = exportList.cbegin(); itr != exportList.cend(); itr++) {
 				ExternalNames.insert(*itr);
 			}
 
@@ -219,7 +219,7 @@ std::string BitCoder::make( const int type, llvm::Module* prg ) {
 	Module* bc = linker.getModule(); // link result in bc owned by Linker
     bc->setOutputFormat(  Module::ExecutableOutputFormat );
 
-	std::vector<const std::string> mustKeep;
+	std::vector<std::string> mustKeep;
 	mustKeep.push_back( "main" );
 
 	// LTO passes 
