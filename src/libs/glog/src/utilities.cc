@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 #include <signal.h>
-#ifdef HAVE_SYS_TIME_H
+#ifndef OS_WINDOWS
 # include <sys/time.h>
 #endif
 #include <time.h>

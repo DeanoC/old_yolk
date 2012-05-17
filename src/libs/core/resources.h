@@ -27,28 +27,28 @@ class AsyncResourceHandle : public Core::ResourceHandle<type> {
 public:
 	static const uint32_t Type = type;
 	typedef rclass								ResourceClass;
-	typedef Core::shared_ptr<ResourceClass>	ResourcePtr;
+	typedef std::shared_ptr<ResourceClass>	ResourcePtr;
 
 	// helper to acquire an class that inherits off Resource<type>
-	ResourcePtr Acquire() const {
-	  return Core::static_pointer_cast<ResourceClass>( Core::ResourceHandle<type>::BaseAcquire() );
+	ResourcePtr acquire() const {
+	  return std::static_pointer_cast<ResourceClass>( Core::ResourceHandle<type>::BaseAcquire() );
 	}
-	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* Load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::Get()->LoadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
+	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
 	}
-	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* Create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::Get()->LoadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
-	}
-
-	static void Flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  Core::ResourceMan::Get()->FlushResource<Type>( _name, _flags );
+	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
 	}
 
-	void Close() const {
-	  Core::ResourceMan::Get()->CloseResource<Type>( const_cast<AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>(this) );
+	static void flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  Core::ResourceMan::get()->flushResource<Type>( _name, _flags );
 	}
 
-	static void DestroyHandle( Core::ResourceHandleBase* rhb ) {
+	void close() const {
+	  Core::ResourceMan::get()->closeResource<Type>( const_cast<AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>(this) );
+	}
+
+	static void destroyHandle( Core::ResourceHandleBase* rhb ) {
 	  AsyncResourceHandle<type, rclass, resultType>* handle = static_cast<AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>(rhb);
 	  CORE_DELETE handle;
 	}
@@ -69,11 +69,11 @@ public:
 	explicit ScopedAsyncResourceHandle() : handle(NULL) {}
 
 	explicit ScopedAsyncResourceHandle( const arh* _handle ) : handle(_handle) {}
-	~ScopedAsyncResourceHandle() { if( handle ) handle->Close(); }
+	~ScopedAsyncResourceHandle() { if( handle ) handle->close(); }
 
 	void reset( const arh* _handle ){ handle = _handle; }
 
-	ResourcePtr Acquire() const { return handle->Acquire(); }
+	ResourcePtr acquire() const { return handle->acquire(); }
 
 	const arh* get() { return handle; }
 private:
@@ -84,8 +84,8 @@ private:
 
 //! most resource destroyers are the same, this automates the construction
 template< typename T >
-void SimpleResourceDestroyer( Core::shared_ptr<Core::ResourceBase>& spBase ) {
-	Core::shared_ptr<T> spActual = Core::static_pointer_cast<T>(spBase);
+void SimpleResourceDestroyer( std::shared_ptr<Core::ResourceBase>& spBase ) {
+	std::shared_ptr<T> spActual = std::static_pointer_cast<T>(spBase);
 	spBase.reset(); // the order of these two reset is vital for correct
 	spActual.reset(); // destruction
 }

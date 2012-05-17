@@ -95,7 +95,7 @@ class FilePath {
 	// in UTF-8.
 	// Wierd ignores native types and always encodes in UTF-8 convert when
 	// passed to system functions if required
-	typedef Core::string StringType;
+	typedef std::string StringType;
 
 	typedef StringType::value_type CharType;
 
@@ -142,7 +142,7 @@ class FilePath {
 	// Returns a vector of all of the components of the provided path. It is
 	// equivalent to calling DirName().value() on the path's root component,
 	// and BaseName().value() on each child component.
-	void GetComponents(Core::vector<FilePath::StringType>* components) const;
+	void GetComponents(std::vector<FilePath::StringType>* components) const;
 
 	// Returns true if this FilePath is a strict parent of the |child|. Absolute
 	// and relative paths are accepted i.e. is /foo parent to /foo/bar and

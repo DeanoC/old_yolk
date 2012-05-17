@@ -74,7 +74,8 @@ MMU::MMU() {
 #else
 	pageSize = getpagesize();
 
-#	if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
+#	if 0
+	//CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 	modify_ldt(0, ldtTable, sizeof( LdtEntry ) * LDT_ENTRIES );
 #	endif
 
@@ -90,7 +91,7 @@ void MMU::allocPagesWithFlags( void** hintOut, size_t numBytes, unsigned int fla
 	if( *hintOut != 0 ) {
 		mapFlags |= MAP_FIXED;
 	}
-	auto addr = mmap( *hintOut, size, PROT_NONE,  flags, -1, (off_t) 0);
+	auto addr = mmap( *hintOut, numBytes, PROT_NONE,  flags, -1, (off_t) 0);
 	if( addr == MAP_FAILED ){
 		addr = nullptr;
 	}
@@ -143,7 +144,7 @@ void MMU::freePages( void* pages, size_t numBytes ) {
 	pages = (void*)( (uintptr_t)pages & ~(pageSize-1) );
 #if PLATFORM_OS == LINUX
 	numBytes = Core::alignTo( numBytes, pageSize );
-	mmunmap( pages, numBytes );
+	munmap( pages, numBytes );
 #elif PLATFORM_OS == MS_WINDOWS
 	VirtualFree( pages, 0, MEM_RELEASE );
 #endif
@@ -182,7 +183,8 @@ void MMU::protectPages( void* pages, size_t numBytes, unsigned int settings ) {
 #endif
 }
 
-#if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
+#if 0
+//CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 
 uint16_t MMU::allocSelector( bool data, void* pages, size_t numBytes, unsigned int settings ) {
 	numBytes = Core::alignTo( numBytes, pageSize );

@@ -44,7 +44,7 @@ public:
 	friend class ResourceMan;	
 
 	//! returns the type of this resource
-	uint32_t GetType() const {
+	uint32_t getType() const {
 		return m_Type;
 	}
 
@@ -55,7 +55,7 @@ protected:
 	ResourceHandleBase( uint32_t type_ ) : m_Type( type_ ) {};
 
 	//! a weak ptr to the actual resource
-	mutable Core::weak_ptr<ResourceBase>	m_wpResourceBase;
+	mutable std::weak_ptr<ResourceBase>	m_wpResourceBase;
 	uint32_t m_Type;	//!< type this resource handle points to
 };
 
@@ -70,12 +70,12 @@ class ResourceHandle : public ResourceHandleBase {
 public:
 	// helper to acquire an class that inherits off Resource<type>
 	template<class T>
-	Core::shared_ptr<T> Acquire() const {
-		return boost::shared_static_cast<T>( BaseAcquire() );
+	std::shared_ptr<T> acquire() const {
+		return boost::shared_static_cast<T>( baseAcquire() );
 	}
 
 	//! acquire a typed resource 
-	Core::shared_ptr<Resource<type> > BaseAcquire() const;
+	std::shared_ptr<Resource<type> > baseAcquire() const;
 
 protected:
 	ResourceHandle() {};

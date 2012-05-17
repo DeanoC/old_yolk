@@ -31,8 +31,8 @@ template<typename Char> struct CaseInsensitiveCompare {
   }
 };
 
-bool StartsWith(const Core::string& str,
-                     const Core::string& search,
+bool StartsWith(const std::string& str,
+                     const std::string& search,
                      bool case_sensitive) {
   if (case_sensitive)
     return str.compare(0, search.length(), search) == 0;
@@ -146,7 +146,7 @@ bool FilePath::IsSeparator(CharType character) {
   return false;
 }
 
-void FilePath::GetComponents(Core::vector<FilePath::StringType>* components)
+void FilePath::GetComponents(std::vector<FilePath::StringType>* components)
     const {
   DCHECK(components);
   if (!components)
@@ -155,7 +155,7 @@ void FilePath::GetComponents(Core::vector<FilePath::StringType>* components)
   if (value().empty())
     return;
 
-  Core::vector<FilePath::StringType> ret_val;
+  std::vector<FilePath::StringType> ret_val;
   FilePath current = *this;
   FilePath base;
 
@@ -179,7 +179,7 @@ void FilePath::GetComponents(Core::vector<FilePath::StringType>* components)
     ret_val.push_back(FilePath::StringType(dir.value(), 0, letter + 1));
   }
 
-  *components = Core::vector<FilePath::StringType>(ret_val.rbegin(),
+  *components = std::vector<FilePath::StringType>(ret_val.rbegin(),
                                                   ret_val.rend());
 }
 
@@ -200,8 +200,8 @@ bool FilePath::operator!=(const FilePath& that) const {
 }
 
 bool FilePath::IsParent(const FilePath& child) const {
-  Core::vector<FilePath::StringType> parent_components;
-  Core::vector<FilePath::StringType> child_components;
+  std::vector<FilePath::StringType> parent_components;
+  std::vector<FilePath::StringType> child_components;
   GetComponents(&parent_components);
   child.GetComponents(&child_components);
 
@@ -210,9 +210,9 @@ bool FilePath::IsParent(const FilePath& child) const {
   if (parent_components.size() == 0)
     return false;
 
-  Core::vector<FilePath::StringType>::const_iterator parent_comp =
+  std::vector<FilePath::StringType>::const_iterator parent_comp =
       parent_components.begin();
-  Core::vector<FilePath::StringType>::const_iterator child_comp =
+  std::vector<FilePath::StringType>::const_iterator child_comp =
       child_components.begin();
 
 #if defined(FILE_PATH_USES_DRIVE_LETTERS)
@@ -383,7 +383,7 @@ bool FilePath::MatchesExtension(const StringType& extension) const {
   if (current_extension.length() != extension.length())
     return false;
 
-  return Core::equal(extension.begin(),
+  return std::equal(extension.begin(),
                     extension.end(),
                     current_extension.begin(),
                     CaseInsensitiveCompare<FilePath::CharType>());

@@ -95,7 +95,7 @@ void TransformNode::addChild( TransformNode* child ) {
 }
 
 void TransformNode::removeChild( TransformNode* child ) {
-	NodeContainer::iterator chIt = Core::find( children.begin(), children.end(),  child );
+	NodeContainer::iterator chIt = std::find( children.begin(), children.end(),  child );
 	CORE_ASSERT( chIt != children.end() && "node isn't my child" );
 	CORE_ASSERT( (child->parent == this) && "node isn't my child" );
 	child->parent = 0;

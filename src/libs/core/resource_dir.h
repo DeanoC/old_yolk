@@ -22,13 +22,13 @@ namespace Core
 
 
 struct ResourceManifestEntry {
-	ResourceManifestEntry( uint32_t _type, const Core::string& _filename ) : 
+	ResourceManifestEntry( uint32_t _type, const std::string& _filename ) : 
 		type(_type), filename(_filename ) {};
 	uint32_t	type;
-	Core::string filename;
+	std::string filename;
 };
 
-typedef Core::vector<ResourceManifestEntry> ResourceManifestEntryVector;
+typedef std::vector<ResourceManifestEntry> ResourceManifestEntryVector;
 
 
 //! An entry in the resource directory...
@@ -40,14 +40,14 @@ public:
 
 	//! the meat returns the typed resource handle
 	template<uint32_t type>	
-	const ResourceHandle<type>* Get() const
+	const ResourceHandle<type>* get() const
 	{
-		CORE_ASSERT( type == m_iType && type == m_pResourceHandle->GetType() )
+		CORE_ASSERT( type == m_iType && type == m_pResourceHandle->getType() )
 		return (const ResourceHandle<type>*) m_pResourceHandle;
 	}
 
 	//! return the original filename, mainly a debug aid as almost never needed
-	const char* GetFilename() const {
+	const char* getFilename() const {
 		return m_pFilename;
 	}
 private:

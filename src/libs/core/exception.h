@@ -72,13 +72,13 @@
 class Name ## _Exception : public Except	 						\
 {								                					\
 public:																\
-	Name ## _Exception ( const Core::string& ExtraText, 				\
-			const Core::string& file, unsigned int line ) 			\
+	Name ## _Exception ( const std::string& ExtraText, 				\
+			const std::string& file, unsigned int line ) 			\
 		: Except(ExtraText, file, line ){};							\
-	const Core::string getName( void ) const CoreNoThrows			\
-		{ return Core::string( #Name " Exception" ); };				\
-	const Core::string getDescription( void ) const CoreNoThrows		\
-		{ return Core::string( #Description ); }; 					\
+	const std::string getName( void ) const CoreNoThrows			\
+		{ return std::string( #Name " Exception" ); };				\
+	const std::string getDescription( void ) const CoreNoThrows		\
+		{ return std::string( #Description ); }; 					\
 }
 
 //---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ class Except
 public:
 	Except()
 		: UserText(),File(), Line(0){};
-	Except(const Core::string UserData, const Core::string file, unsigned int line )
+	Except(const std::string UserData, const std::string file, unsigned int line )
 #if defined( USE_CPP_EXCEPTIONS )
      : std::exception(), UserText( UserData ), File(file), Line(line) 
 #endif       
@@ -113,13 +113,13 @@ public:
 
 	virtual ~Except() CoreNoThrows {};
 	//! text name of exception
-	virtual const Core::string getName() const CoreNoThrows { return Core::string("Except"); };
+	virtual const std::string getName() const CoreNoThrows { return std::string("Except"); };
 	//! text description of exception
-	virtual const Core::string getDescription() const CoreNoThrows { return Core::string("Unspecified exception occured"); };
+	virtual const std::string getDescription() const CoreNoThrows { return std::string("Unspecified exception occured"); };
 	//! user text from description
-	const Core::string getUserText() const CoreNoThrows { return UserText; };
+	const std::string getUserText() const CoreNoThrows { return UserText; };
 	//! File exception was thrown from
-	const Core::string getFile() const CoreNoThrows { return File; };
+	const std::string getFile() const CoreNoThrows { return File; };
 	//! Line exception was thrown from
 	const unsigned int getLine() const CoreNoThrows { return Line; };
 	
@@ -127,8 +127,8 @@ public:
 	virtual const char* what() const CoreNoThrows { return UserText.c_str(); }
 
 private:
-	Core::string UserText;
-	Core::string File;
+	std::string UserText;
+	std::string File;
 	unsigned int Line;
 
 };

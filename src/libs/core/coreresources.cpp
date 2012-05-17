@@ -13,11 +13,11 @@
 namespace 
 {
 //! Callback from the resource manager to create a text resource
-Core::shared_ptr<Core::ResourceBase> TextCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData )
+std::shared_ptr<Core::ResourceBase> TextCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData )
 {
 	using namespace Core;
 
-	Core::shared_ptr<TextResource> pResource( CORE_NEW TextResource );
+	std::shared_ptr<TextResource> pResource( CORE_NEW TextResource );
 
 	if( flags & RMRF_LOADOFFDISK ) {
 		FILE* fh = fopen( pName, "rt" );
@@ -39,13 +39,13 @@ Core::shared_ptr<Core::ResourceBase> TextCreateResource( const Core::ResourceHan
 		pResource->m_saText.get()[ strlen((char*)pData) ] = 0;
 	}
 
-	return Core::shared_ptr<ResourceBase>(pResource);
+	return std::shared_ptr<ResourceBase>(pResource);
 }
 
 //! Callback from the resource manager to create a text resource
-Core::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData ) {
+std::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData ) {
 	using namespace Core;
-	Core::shared_ptr<ManifestResource> pResource( CORE_NEW ManifestResource );
+	std::shared_ptr<ManifestResource> pResource( CORE_NEW ManifestResource );
 
 	if( flags & RMRF_LOADOFFDISK ) {
 		uint32_t magic = 0;
@@ -55,7 +55,7 @@ Core::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::Resourc
 		path = path.ReplaceExtension( ".man" );
 		const char* pManPath = path.value().c_str();
 
-		Core::ifstream inStream( pManPath, Core::ifstream::binary );
+		std::ifstream inStream( pManPath, std::ifstream::binary );
 		inStream.read( (char*)&magic, sizeof(magic) );
 		if( !inStream.good() ) {
 			LOG(FATAL) << "Manifest " << path.value() << " not found\n";
@@ -69,7 +69,7 @@ Core::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::Resourc
 			inStream.read( rawArray, size );
 
 			pResource->entries.reset( (ManifestEntry*) rawArray );
-			ResourceMan::get()->InternalProcessManifest( pResource->numEntries, pResource->entries.get() );
+			ResourceMan::get()->internalProcessManifest( pResource->numEntries, pResource->entries.get() );
 
 		} else {
 			LOG(FATAL) << "Manifest " << pData << " Invalid\n";
@@ -78,14 +78,14 @@ Core::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::Resourc
 		CORE_ASSERT( false );
 	}
 
-	return Core::shared_ptr<ResourceBase>(pResource);
+	return std::shared_ptr<ResourceBase>(pResource);
 }
 
-void ManifestResourceDestroyer( Core::shared_ptr<Core::ResourceBase>& spBase ) {
+void ManifestResourceDestroyer( std::shared_ptr<Core::ResourceBase>& spBase ) {
 	using namespace Core;
 
-	Core::shared_ptr<ManifestResource> spActual = Core::static_pointer_cast<ManifestResource>(spBase);
-	ResourceMan::get()->InternalCloseManifest( spActual->numEntries, spActual->entries.get() );
+	std::shared_ptr<ManifestResource> spActual = std::static_pointer_cast<ManifestResource>(spBase);
+	ResourceMan::get()->internalCloseManifest( spActual->numEntries, spActual->entries.get() );
 
 	spBase.reset(); // the order of these two reset is vital for correct
 	spActual.reset(); // destruction
@@ -96,7 +96,7 @@ void ManifestResourceDestroyer( Core::shared_ptr<Core::ResourceBase>& spBase ) {
 namespace Core
 {
 	void InstallResourceTypes() {
-		ResourceMan::get()->RegisterResourceType( TextType, TextCreateResource, &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
-		ResourceMan::get()->RegisterResourceType( ManifestType, ManifestCreateResource, &ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
+		ResourceMan::get()->registerResourceType( TextType, TextCreateResource, &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
+		ResourceMan::get()->registerResourceType( ManifestType, ManifestCreateResource, &ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
 	}
 }

@@ -60,7 +60,7 @@ namespace
 	void lua_ALERT( const luabind::object& obj )
 	{
 		using namespace luabind;
-		Log << "Lua ALERT : " << object_cast<Core::string>(obj) << "\n";
+		Log << "Lua ALERT : " << object_cast<std::string>(obj) << "\n";
 	}
 #endif
 

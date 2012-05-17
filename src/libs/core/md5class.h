@@ -26,12 +26,12 @@ then safely post the digest of the password on a highway billboard.
     
 Example pseudocode:
 {
-Core::string storedPasswordDigest = GetPasswordDigestFromStorage();
-Core::string passwordEnteredbyUser;
+std::string storedPasswordDigest = GetPasswordDigestFromStorage();
+std::string passwordEnteredbyUser;
 cout << "Enter password:" ;
 cin >> passwordEnteredbyUser;
 	
-CMD5 md5(passwordEnteredbyUser.c_str()); //note c_str() returns a pointer to the Core::string's character buffer, just like CString's "GetBuffer" member function.
+CMD5 md5(passwordEnteredbyUser.c_str()); //note c_str() returns a pointer to the std::string's character buffer, just like CString's "GetBuffer" member function.
 	
 if(md5.getMD5Digest != storedPasswordDigest)
 {
@@ -64,7 +64,7 @@ class MD5
 public:
 	MD5( const char* plainText );  //set plaintext in ctor
 
-	Core::string getMD5String() const; 
+	std::string getMD5String() const; 
 	const uint8_t* getDigest() const { return m_digest; }
 	void copyDigest( uint8_t* _digest ) const { memcpy( _digest, m_digest, 16 ); }
 

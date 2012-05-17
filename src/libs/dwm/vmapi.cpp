@@ -15,6 +15,6 @@ static void VmFree( const IEEThreadContext* threadCtx, uintptr_t sAddr ) {
 }
 
 void InstallVmApiFuncs( TrustedRegion* trustedRegion ) {
-	trustedRegion->addFunctionTrampoline( "VmAlloc", VmAlloc );
-	trustedRegion->addFunctionTrampoline( "VmFree", VmFree );
+	trustedRegion->addFunctionTrampoline( "VmAlloc", (void*) VmAlloc );
+	trustedRegion->addFunctionTrampoline( "VmFree", (void*) VmFree );
 }

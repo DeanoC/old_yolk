@@ -38,14 +38,14 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			// write the protobuf into the buffer, leaving space for the size at the start
 			fc.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
 			*((uint32_t*)fsm.buffer.data()) = fc.ByteSize();
-			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), fc.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
+			boost::asio::async_write( *fsm.server->getSocket(), boost::asio::buffer( fsm.buffer.data(), fc.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
 		}
 	};
 
 	struct GeneralRecv : public state<> {
 		template <class EVT,class FSM> void on_entry(EVT const& ,FSM& fsm) {
 			LOG(INFO) << "GeneralRecv";
-			namespace asio = Core::asio;
+			namespace asio = boost::asio;
 			asio::async_read( *fsm.server->getSocket(), asio::buffer(fsm.buffer), 
 				[&fsm](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
 					if( bytes_transferred >= sizeof(uint32_t) ) {
@@ -102,7 +102,7 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 				req.set_request( Messages::RemoteDataRequest::HW_CAPACITY );
 				req.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
 				*((uint32_t*)fsm.buffer.data()) = req.ByteSize();
-				Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
+				boost::asio::async_write( *fsm.server->getSocket(), boost::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
 			} else {
 				// TODO untrusted DWM server insertation
 				// reject it an exit communication llop
@@ -125,7 +125,7 @@ struct GatekeeperFSM : public state_machine_def<GatekeeperFSM> {
 			req.set_rate( HB_SECONDS );
 			req.SerializeToArray( fsm.buffer.data()+sizeof(uint32_t), fsm.buffer.size()-sizeof(uint32_t) );
 			*((uint32_t*)fsm.buffer.data()) = req.ByteSize();
-			Core::asio::async_write( *fsm.server->getSocket(), Core::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
+			boost::asio::async_write( *fsm.server->getSocket(), boost::asio::buffer( fsm.buffer.data(), req.ByteSize()+sizeof(uint32_t) ), *fsm.server->tmpServer );
 			// and add to the unused dwm list (riak? TODO)
 			DWMMan::get()->addNewDWM( fsm.server->getSocket()->remote_endpoint().address() );
 		}

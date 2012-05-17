@@ -20,7 +20,7 @@ void DWMChan::useBackPassage() {
 	auto backPassage = HeartBeat::get()->getBeatingHeart( addr );
 	std::array< uint8_t, 1>	bpBuf;
 
-	namespace asio = Core::asio;
+	namespace asio = boost::asio;
 	// TODO improve semi busy loop
 	bool recved = false;
 	do {

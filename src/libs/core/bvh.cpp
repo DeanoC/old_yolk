@@ -82,7 +82,7 @@ namespace Core {
 		// first sort by morton curve this gives a simple spatial subvision by diving
 		// each node into N subnodes (8=octree). This can be done extremely fast but isn't
 		// as good for raytracing as a true SAH
-		Core::sort( m_triAABB.begin(), m_triAABB.end(), mortonPred );
+		std::sort( m_triAABB.begin(), m_triAABB.end(), mortonPred );
 		
 		m_lbvhSplitsPerLevel = splitsPerLevel;
 		m_lbvhTargetPrimsPerLeaf = targetPrimsPerLeaf;
@@ -169,8 +169,8 @@ namespace Core {
 	}
 
 	void BVH::drawDebug( const Core::TransformNode* transform, Core::Frustum* frustum ) {
-		Core::stack< Node* > nodeStack;
-		Core::stack< float > levelStack;
+		std::stack< Node* > nodeStack;
+		std::stack< float > levelStack;
 		nodeStack.push( &m_nodes[0] );
 		levelStack.push(0.f);
 

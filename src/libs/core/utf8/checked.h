@@ -194,10 +194,10 @@ namespace utf8
     }
 
     template <typename octet_iterator>
-    typename Core::iterator_traits<octet_iterator>::difference_type
+    typename std::iterator_traits<octet_iterator>::difference_type
     distance (octet_iterator first, octet_iterator last)
     {
-        typename Core::iterator_traits<octet_iterator>::difference_type dist;
+        typename std::iterator_traits<octet_iterator>::difference_type dist;
         for (dist = 0; first < last; ++dist)
             next(first, last);
         return dist;
@@ -265,7 +265,7 @@ namespace utf8
 
     // The iterator class
     template <typename octet_iterator>
-    class iterator : public Core::iterator <Core::bidirectional_iterator_tag, uint32_t> {
+    class iterator : public std::iterator <std::bidirectional_iterator_tag, uint32_t> {
       octet_iterator it;
       octet_iterator range_start;
       octet_iterator range_end;

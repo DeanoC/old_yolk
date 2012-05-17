@@ -79,7 +79,7 @@ public:
 	bool intersectsRay( Ray const& ray, float maxRange, KDTREE_COLLISION* collision ) const;
 
 private:
-	typedef Core::vector< unsigned int > FaceArray;
+	typedef std::vector< unsigned int > FaceArray;
 
 	void buildSubtree( KDTreeNode* node, 
 		FaceArray& faces, 

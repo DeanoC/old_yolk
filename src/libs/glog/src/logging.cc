@@ -1044,7 +1044,7 @@ void LogMessage::Init(const char* file,
     snprintf(fileline, sizeof(fileline), "%s:%d", data_->basename_, line);
 #ifdef HAVE_STACKTRACE
     if (!strcmp(FLAGS_log_backtrace_at.c_str(), fileline)) {
-      string stacktrace;
+      std::string stacktrace;
       DumpStackTraceToString(&stacktrace);
       stream() << " (stacktrace:\n" << stacktrace << ") ";
     }
@@ -1548,7 +1548,7 @@ static void GetTempDirectories(std::vector<std::string>* list) {
     if (!d) continue;  // Empty env var
 
     // Make sure we don't surprise anyone who's expecting a '/'
-    string dstr = d;
+    std::string dstr = d;
     if (dstr[dstr.size() - 1] != '/') {
       dstr += "/";
     }

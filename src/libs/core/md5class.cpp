@@ -39,7 +39,7 @@ MD5::MD5( const char* plainText) {
 // Implementation
 //////////////////////////////////////////////////////////////////////
 
-Core::string MD5::getMD5String() const {
+std::string MD5::getMD5String() const {
 	char digestString[33];
 	//make a string version of the numeric digest value
 	int p=0;
@@ -49,7 +49,7 @@ Core::string MD5::getMD5String() const {
 	}
 	digestString[32] = 0;
  
-	return Core::string( digestString );
+	return std::string( digestString );
 }
 
 void MD5::calcDigest( const char* _plainText ) {

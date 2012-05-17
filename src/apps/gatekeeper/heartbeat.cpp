@@ -51,7 +51,7 @@ void HeartBeat::accept() {
 }
 
 void HeartBeat::beat( HeartBeat::SocketPtr socket ) {
-	Core::asio::async_read( *socket, Core::asio::buffer(buffer,1), 
+	boost::asio::async_read( *socket, boost::asio::buffer(buffer,1), 
 		[this, socket](const boost::system::error_code& error, std::size_t bytes_transferred ) -> size_t {
 			if( !error ) {
 				Core::unique_lock< Core::shared_mutex > writerLock( mapMutex );

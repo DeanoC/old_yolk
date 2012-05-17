@@ -44,7 +44,7 @@ public:
 	~DevelopmentContext();
 
 	//! add a new context
-	void addContext( const char* pName, Core::shared_ptr<DevelopmentContextInterface> pInterface );
+	void addContext( const char* pName, std::shared_ptr<DevelopmentContextInterface> pInterface );
 
 	//! update the context
 	void update(float fTimeInSecs);
@@ -59,10 +59,10 @@ public:
 	void activateContext( const char* pName );
 
 	//! returns a named context
-	Core::shared_ptr<DevelopmentContextInterface> getContext( const char* pName );
+	std::shared_ptr<DevelopmentContextInterface> getContext( const char* pName );
 
 	//! return the current context
-	Core::shared_ptr<DevelopmentContextInterface> getContext();
+	std::shared_ptr<DevelopmentContextInterface> getContext();
 
 private:
 	static const int MAX_CONTEXTS = 10;

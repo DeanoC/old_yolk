@@ -18,7 +18,7 @@ namespace Core
 
 struct Context {
 	char* m_pName;
-	Core::shared_ptr<Core::DevelopmentContextInterface> m_pInterface;
+	std::shared_ptr<Core::DevelopmentContextInterface> m_pInterface;
 };
 
 DevelopmentContext::DevelopmentContext() :
@@ -40,7 +40,7 @@ DevelopmentContext::~DevelopmentContext() {
 	CORE_DELETE_ARRAY( m_Contexts );
 }
 
-void DevelopmentContext::addContext( const char *pName, Core::shared_ptr<DevelopmentContextInterface> pInterface ) {
+void DevelopmentContext::addContext( const char *pName, std::shared_ptr<DevelopmentContextInterface> pInterface ) {
 	// find first free slot
 	for(int i=0;i < MAX_CONTEXTS;i++)
 	{
@@ -188,7 +188,7 @@ void DevelopmentContext::display() {
 	}
 }
 
-Core::shared_ptr<DevelopmentContextInterface> DevelopmentContext::getContext( const char* pName ) {
+std::shared_ptr<DevelopmentContextInterface> DevelopmentContext::getContext( const char* pName ) {
 	for(int i=0;i < MAX_CONTEXTS;i++) {
 		if( m_Contexts[i].m_pInterface && (strcmp(pName, m_Contexts[i].m_pName)==0) ) {
 			return m_Contexts[i].m_pInterface;
@@ -196,10 +196,10 @@ Core::shared_ptr<DevelopmentContextInterface> DevelopmentContext::getContext( co
 	}
 	LOG(INFO) << "No context of name: " << pName << "\n";
 
-	return Core::shared_ptr<DevelopmentContextInterface>();
+	return std::shared_ptr<DevelopmentContextInterface>();
 }
 
-Core::shared_ptr<DevelopmentContextInterface> DevelopmentContext::getContext() {
+std::shared_ptr<DevelopmentContextInterface> DevelopmentContext::getContext() {
 	return m_Contexts[m_iCurrentContext].m_pInterface;
 }
 

@@ -19,11 +19,13 @@ public:
    {
    }
    void Go() {
+      using namespace boost;
+
       readConfig();
       CoreTry {
          connection = riak::make_single_socket_transport(hostname, port, ios);
-         store = riak::make_client(connection, Core::bind(&SystemBootStrapper::noSiblingResolution, this, Core::_1), ios);
-         store->get_object( "sys", "info", Core::bind(&SystemBootStrapper::isRiakSetup, this, Core::_1, Core::_2, Core::_3) );
+         store = riak::make_client(connection, boost::bind(&SystemBootStrapper::noSiblingResolution, this, _1), ios);
+         store->get_object( "sys", "info", boost::bind(&SystemBootStrapper::isRiakSetup, this, _1, _2, _3) );
          ios.run();
       } CoreCatch( boost::system::system_error& e ) {
          LOG(INFO) << e.what() << Core::Logger::endl;
@@ -106,7 +108,7 @@ private:
       jsonSysInfoObj.push_back( json_spirit::Pair( "version_minor", 0 ) );
       jsonSysInfoObj.push_back( json_spirit::Pair( "version_rev", 0 ) );
 
-      Core::stringstream os;
+      std::stringstream os;
       json_spirit::write_formatted( jsonSysInfoObj, os );
       LOG(INFO) << os.str();
 
@@ -123,7 +125,7 @@ private:
       store->get_object( "sys", "motd", []( const std::error_code& error, std::shared_ptr<riak::object> object, riak::value_updater& updater ) {
          if (!error) {
             json_spirit::Object jsonSysMotdObj;
-            Core::stringstream os;
+            std::stringstream os;
 
             jsonSysMotdObj.push_back( json_spirit::Pair( "page", "The first Motd from VT" ) );
             json_spirit::write_formatted( jsonSysMotdObj, os );
