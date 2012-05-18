@@ -66,7 +66,7 @@ private:
 
 	void WatchThread(const SafeParams* params );
 
-	Core::list<SafeParams*>	m_Directories;
+	std::list<SafeParams*>	m_Directories;
 };
 
 

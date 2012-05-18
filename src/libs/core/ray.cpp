@@ -53,7 +53,7 @@ bool Ray::intersectsAABB( AABB const& bounds, float& min, float& max ) const
 		float c2 = p2[axis]*rcp;
 
 		// check for stuff blowing up (when ray perpendicular to an axis)
-		if( std::isfinite( c1 ) && std::isfinite( c2 ) )
+		if( Core::isfinite( c1 ) && Core::isfinite( c2 ) )
 		{
 			// if we get decent slab bounds then clip the ray extents
 			if( c1 > c2 )

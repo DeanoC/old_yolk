@@ -204,7 +204,7 @@ namespace
 	public:
 		// brain tells me there must be a key only container in std c++ but 
 		// buggered if I can think/find it at the mo..
-		typedef Core::unordered_map< void*, void* > KeyArray;
+		typedef std::unordered_map< void*, void* > KeyArray;
 		KeyArray leakedPtrs;
 		
 		static void CrtClientDumper( void* data, void* context )

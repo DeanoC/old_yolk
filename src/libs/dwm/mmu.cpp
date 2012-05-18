@@ -157,21 +157,21 @@ void MMU::protectPages( void* pages, size_t numBytes, unsigned int settings ) {
 	mprotect( pages, numBytes, settings );
 #elif PLATFORM_OS == MS_WINDOWS
 	uint32_t winSettings = 0;
-	if( settings & PROT_EXEC ) {
-		if( settings & PROT_WRITE ) {
+	if( settings & PAGE_EXEC ) {
+		if( settings & PAGE_WRITE ) {
 			// on windows write always means reads aswell
 			winSettings = PAGE_EXECUTE_READWRITE;
-		} else if( settings & PROT_READ ) {
+		} else if( settings & PAGE_READ ) {
 			winSettings = PAGE_EXECUTE_READ;
 		}
 		if( winSettings == 0 ) {
 			winSettings = PAGE_EXECUTE;
 		}
 	} else {
-		if( settings & PROT_WRITE ) {
+		if( settings & PAGE_WRITE ) {
 			// on windows write always means reads aswell
 			winSettings = PAGE_READWRITE;
-		} else if( settings & PROT_READ ) {
+		} else if( settings & PAGE_READ ) {
 			winSettings = PAGE_READONLY;
 		}
 	}

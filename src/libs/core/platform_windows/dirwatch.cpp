@@ -27,7 +27,7 @@ DirectoryWatcher::DirectoryWatcher() :
 
 DirectoryWatcher::~DirectoryWatcher()
 {
-	Core::list<SafeParams*>::iterator diIt = m_Directories.begin();
+	std::list<SafeParams*>::iterator diIt = m_Directories.begin();
 	while( diIt != m_Directories.end() )
 	{
 		(*diIt)->bActive = false;
@@ -130,7 +130,7 @@ void DirectoryWatcher::AddDirectory( const char* pDirectory )
 	pParams->bActive = true;
 
 	// one thread per directory
-	if( Core::find( m_Directories.begin(), m_Directories.end(), pParams ) == m_Directories.end() )
+	if( std::find( m_Directories.begin(), m_Directories.end(), pParams ) == m_Directories.end() )
 	{
 		m_Directories.push_back( pParams );
 
