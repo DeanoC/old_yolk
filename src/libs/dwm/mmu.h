@@ -9,6 +9,7 @@
 #define DWM_MMU_H_ 1
 
 #include "core/singleton.h"
+#include <sys/mman.h>
 
 
 #if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32

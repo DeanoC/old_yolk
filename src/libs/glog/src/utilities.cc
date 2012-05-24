@@ -229,8 +229,8 @@ pid_t GetTID() {
 #ifndef __NR_gettid
 #ifdef OS_MACOSX
 #define __NR_gettid SYS_gettid
-#elif ! defined __i386__
-#error "Must define __NR_gettid for non-x86 platforms"
+//#elif ! defined __i386__
+//#error "Must define __NR_gettid for non-x86 platforms"
 #else
 #define __NR_gettid 224
 #endif
