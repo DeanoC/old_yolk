@@ -37,6 +37,7 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/Function.h"
 #include "llvm/Constant.h"
+#include "llvm/Constants.h"
 #include "llvm/Instructions.h"
 #include "llvm/Object/ObjectFile.h"
 #include "llvm/Object/ELF.h"
@@ -55,15 +56,60 @@
 using namespace llvm;
 using namespace llvm::object;
 
-static cl::opt<std::string>
+namespace {
+
+cl::opt<std::string>
 InputFilename(cl::Positional, cl::desc("<input native shared object>"),
               cl::init(""));
 
-static cl::opt<std::string>
+cl::opt<std::string>
 OutputFilename("o", cl::desc("Output filename"), cl::value_desc("filename"));
 
+// Variables / declarations to place in llvm.used array.
+std::vector<GlobalValue*> LLVMUsed;
+
+void AddUsedGlobal(GlobalValue *GV) {
+  // Clang normally asserts that these are not decls.  We do need
+  // decls to survive though, and those are really the ones we
+  // worry about, so only add those.
+  // We run verifyModule() below, so that we know this is somewhat valid.
+  if (GV->isDeclaration()) {
+    LLVMUsed.push_back(GV);
+  }
+}
+
+// Emit llvm.used array.
+// This is almost exactly like clang/lib/CodeGen/CodeGenModule.cpp::EmitLLVMUsed
+void EmitLLVMUsed(Module *M) {
+  // Don't create llvm.used if there is no need.
+  if (LLVMUsed.empty())
+    return;
+
+  Type *Int8PtrTy = Type::getInt8PtrTy(M->getContext());
+  // Convert LLVMUsed to what ConstantArray needs.
+  SmallVector<llvm::Constant*, 8> UsedArray;
+  UsedArray.resize(LLVMUsed.size());
+  for (unsigned i = 0, e = LLVMUsed.size(); i != e; ++i) {
+    UsedArray[i] =
+     llvm::ConstantExpr::getBitCast(cast<llvm::Constant>(&*LLVMUsed[i]),
+                                    Int8PtrTy);
+  }
+
+  if (UsedArray.empty())
+    return;
+  llvm::ArrayType *ATy = llvm::ArrayType::get(Int8PtrTy, UsedArray.size());
+
+  llvm::GlobalVariable *GV =
+    new llvm::GlobalVariable(*M, ATy, false,
+                             llvm::GlobalValue::AppendingLinkage,
+                             llvm::ConstantArray::get(ATy, UsedArray),
+                             "llvm.used");
+
+  GV->setSection("llvm.metadata");
+}
+
 // Add a stub function definition or declaration
-static void
+void
 AddFunction(Module *M,
             GlobalValue::LinkageTypes Linkage,
             const StringRef &Name,
@@ -78,10 +124,11 @@ AddFunction(Module *M,
     BasicBlock *BB = BasicBlock::Create(F->getContext(), "", F);
     BB->getInstList().push_back(ReturnInst::Create(F->getContext()));
   }
+  AddUsedGlobal(F);
 }
 
 // Add a stub global variable declaration or definition.
-static void
+void
 AddGlobalVariable(Module *M,
           GlobalValue::LinkageTypes Linkage,
           const StringRef &Name,
@@ -95,10 +142,12 @@ AddGlobalVariable(Module *M,
     // Define to dummy value, 0.
     InitVal = Constant::getIntegerValue(Ty, APInt(32, 0));
   }
-  new GlobalVariable(*M, Ty, /*isConstant=*/ false,
-                     Linkage, /*Initializer=*/ InitVal,
-                     Twine(Name), /*InsertBefore=*/ NULL, isTLS,
-                     /*AddressSpace=*/ 0);
+  GlobalVariable *GV =
+    new GlobalVariable(*M, Ty, /*isConstant=*/ false,
+                       Linkage, /*Initializer=*/ InitVal,
+                       Twine(Name), /*InsertBefore=*/ NULL, isTLS,
+                       /*AddressSpace=*/ 0);
+  AddUsedGlobal(GV);
 }
 
 // Iterate through the ObjectFile's needed libraries, and
@@ -192,6 +241,9 @@ void TransferDynamicSymbols(Module *M, const ObjectFile *obj) {
   }
 }
 
+}  // namespace
+
+
 int main(int argc, const char** argv) {
   sys::PrintStackTraceOnErrorSignal();
   PrettyStackTraceProgram X(argc, argv);
@@ -230,6 +282,7 @@ int main(int argc, const char** argv) {
   TransferLibrariesNeeded(M.get(), obj);
   TransferLibraryName(M.get(), obj);
   TransferDynamicSymbols(M.get(), obj);
+  EmitLLVMUsed(M.get());
 
   // Verify the module
   std::string Err;

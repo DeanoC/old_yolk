@@ -1005,6 +1005,16 @@ let TargetPrefix = "x86" in { // All intrinsics start with "llvm.x86.".
 }
 
 //===----------------------------------------------------------------------===//
+// SSE4A
+
+let TargetPrefix = "x86" in {  // All intrinsics start with "llvm.x86.".
+  def int_x86_sse4a_movnt_ss : GCCBuiltin<"__builtin_ia32_movntss">,
+    Intrinsic<[], [llvm_ptr_ty, llvm_v4f32_ty], []>;
+  def int_x86_sse4a_movnt_sd : GCCBuiltin<"__builtin_ia32_movntsd">,
+    Intrinsic<[], [llvm_ptr_ty, llvm_v2f64_ty], []>;
+}
+
+//===----------------------------------------------------------------------===//
 // AVX
 
 // Arithmetic ops
@@ -1091,20 +1101,6 @@ let TargetPrefix = "x86" in {  // All intrinsics start with "llvm.x86.".
         GCCBuiltin<"__builtin_ia32_vperm2f128_si256">,
         Intrinsic<[llvm_v8i32_ty], [llvm_v8i32_ty,
                   llvm_v8i32_ty, llvm_i8_ty], [IntrNoMem]>;
-
-  def int_x86_avx_vpermil_pd :
-        Intrinsic<[llvm_v2f64_ty], [llvm_v2f64_ty,
-                  llvm_i8_ty], [IntrNoMem]>;
-  def int_x86_avx_vpermil_ps :
-        Intrinsic<[llvm_v4f32_ty], [llvm_v4f32_ty,
-                  llvm_i8_ty], [IntrNoMem]>;
-
-  def int_x86_avx_vpermil_pd_256 :
-        Intrinsic<[llvm_v4f64_ty], [llvm_v4f64_ty,
-                  llvm_i8_ty], [IntrNoMem]>;
-  def int_x86_avx_vpermil_ps_256 :
-        Intrinsic<[llvm_v8f32_ty], [llvm_v8f32_ty,
-                  llvm_i8_ty], [IntrNoMem]>;
 }
 
 // Vector blend
@@ -1284,16 +1280,6 @@ let TargetPrefix = "x86" in {  // All intrinsics start with "llvm.x86.".
         Intrinsic<[], [llvm_ptr_ty, llvm_v8f32_ty], []>;
   def int_x86_avx_storeu_dq_256 : GCCBuiltin<"__builtin_ia32_storedqu256">,
         Intrinsic<[], [llvm_ptr_ty, llvm_v32i8_ty], []>;
-}
-
-// Cacheability support ops
-let TargetPrefix = "x86" in {  // All intrinsics start with "llvm.x86.".
-  def int_x86_avx_movnt_dq_256 : GCCBuiltin<"__builtin_ia32_movntdq256">,
-        Intrinsic<[], [llvm_ptr_ty, llvm_v4i64_ty], []>;
-  def int_x86_avx_movnt_pd_256 : GCCBuiltin<"__builtin_ia32_movntpd256">,
-        Intrinsic<[], [llvm_ptr_ty, llvm_v4f64_ty], []>;
-  def int_x86_avx_movnt_ps_256 : GCCBuiltin<"__builtin_ia32_movntps256">,
-        Intrinsic<[], [llvm_ptr_ty, llvm_v8f32_ty], []>;
 }
 
 // Conditional load ops

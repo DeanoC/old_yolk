@@ -804,14 +804,28 @@ void Verifier::visitSwitchInst(SwitchInst &SI) {
   // Check to make sure that all of the constants in the switch instruction
   // have the same type as the switched-on value.
   Type *SwitchTy = SI.getCondition()->getType();
-  SmallPtrSet<ConstantInt*, 32> Constants;
+  CRSBuilder Builder;
+  std::map<ConstantRangesSet::Range, unsigned> RangeSetMap;
   for (SwitchInst::CaseIt i = SI.case_begin(), e = SI.case_end(); i != e; ++i) {
-    Assert1(i.getCaseValue()->getType() == SwitchTy,
-            "Switch constants must all be same type as switch value!", &SI);
-    Assert2(Constants.insert(i.getCaseValue()),
-            "Duplicate integer as switch case", &SI, i.getCaseValue());
+    ConstantRangesSet RS = i.getCaseValueEx();
+    for (unsigned ri = 0, rie = RS.getNumItems(); ri < rie; ++ri) {
+      ConstantRangesSet::Range r = RS.getItem(ri);
+      Assert1(r.Low->getType() == SwitchTy,
+              "Switch constants must all be same type as switch value!", &SI);
+      Assert1(r.High->getType() == SwitchTy,
+              "Switch constants must all be same type as switch value!", &SI);
+      Builder.add(r);
+      RangeSetMap[r] = i.getCaseIndex();
+    }
   }
-
+  
+  CRSBuilder::RangeIterator errItem;
+  if (!Builder.verify(errItem)) {
+    unsigned CaseIndex = RangeSetMap[errItem->first];
+    SwitchInst::CaseIt i(&SI, CaseIndex);
+    Assert2(false, "Duplicate integer as switch case", &SI, i.getCaseValueEx());
+  }
+  
   visitTerminatorInst(SI);
 }
 
@@ -1657,12 +1671,14 @@ void Verifier::visitInstruction(Instruction &I) {
     Assert1(I.getType()->isFPOrFPVectorTy(),
             "fpmath requires a floating point result!", &I);
     Assert1(MD->getNumOperands() == 1, "fpmath takes one operand!", &I);
-    ConstantFP *Op = dyn_cast_or_null<ConstantFP>(MD->getOperand(0));
-    Assert1(Op, "fpmath ULPs not a floating point number!", &I);
-    APFloat ULPs = Op->getValueAPF();
-    Assert1(ULPs.isNormal() || ULPs.isZero(),
-            "fpmath ULPs not a normal number!", &I);
-    Assert1(!ULPs.isNegative(), "fpmath ULPs is negative!", &I);
+    Value *Op0 = MD->getOperand(0);
+    if (ConstantFP *CFP0 = dyn_cast_or_null<ConstantFP>(Op0)) {
+      APFloat Accuracy = CFP0->getValueAPF();
+      Assert1(Accuracy.isNormal() && !Accuracy.isNegative(),
+              "fpmath accuracy not a positive number!", &I);
+    } else {
+      Assert1(false, "invalid fpmath accuracy!", &I);
+    }
   }
 
   MDNode *MD = I.getMetadata(LLVMContext::MD_range);

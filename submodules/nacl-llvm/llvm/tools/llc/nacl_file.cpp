@@ -1,4 +1,4 @@
-/* Copyright 2010 The Native Client Authors. All rights reserved.
+/* Copyright 2012 The Native Client Authors. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can
  * be found in the LICENSE file.
 
@@ -332,17 +332,17 @@ string_vector* GetDefaultCommandLine() {
                                           "-mcpu=core2",
                                           "-mtriple=x86_64-none-nacl-gnu",
                                           NULL };
-      static const char* llc_args_arm[] = { "-mcpu=cortex-a8",
+  static const char* llc_args_arm[] = { "-mcpu=cortex-a8",
                                         "-mtriple=armv7a-none-nacl-gnueabi",
                                         "-arm-reserve-r9",
                                         "-sfi-disable-cp",
-                                        "-arm_static_tls",
                                         "-sfi-store",
                                         "-sfi-load",
                                         "-sfi-stack",
                                         "-sfi-branch",
                                         "-sfi-data",
                                         "-no-inline-jumptables",
+                                        "-float-abi=hard",
                                         NULL };
 
   const char **llc_args = NULL;

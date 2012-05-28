@@ -100,6 +100,7 @@ $(LLVMBuildMakeFrag): $(PROJ_SRC_ROOT)/Makefile.rules \
 	$(Verb) $(LLVMBuildTool) \
 	  --native-target "$(TARGET_NATIVE_ARCH)" \
 	  --enable-targets "$(TARGETS_TO_BUILD)" \
+	  --enable-optional-components "$(OPTIONAL_COMPONENTS)" \
 	  --write-library-table $(LLVMConfigLibraryDependenciesInc) \
 	  --write-make-fragment $(LLVMBuildMakeFrag)
 
@@ -536,9 +537,6 @@ ifeq ($(LLVM_CROSS_COMPILING),1)
   LLVM_CONFIG := $(BuildLLVMToolDir)/llvm-config$(BUILD_EXEEXT)
 else
   LLVM_CONFIG := $(LLVMToolDir)/llvm-config$(EXEEXT)
-endif
-ifndef LLVMLD
-LLVMLD    := $(LLVMToolDir)/llvm-ld$(EXEEXT)
 endif
 ifndef LLVMDIS
 LLVMDIS  := $(LLVMToolDir)/llvm-dis$(EXEEXT)

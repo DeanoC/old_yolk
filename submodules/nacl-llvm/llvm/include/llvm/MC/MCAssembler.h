@@ -157,7 +157,7 @@ class MCTinyFragment : public MCFragment {
 
 class MCDataFragment : public MCFragment {
   virtual void anchor();
-  SmallString<6> Contents;  // @LOCALMOD: Memory efficiency
+  SmallString<32> Contents;
 
   /// Fixups - The list of fixups in this fragment.
   std::vector<MCFixup> Fixups;
@@ -172,8 +172,8 @@ public:
   /// @name Accessors
   /// @{
 
-  SmallString<6> &getContents() { return Contents; }  // @LOCALMOD
-  const SmallString<6> &getContents() const { return Contents; } // @LOCALMOD
+  SmallString<32> &getContents() { return Contents; }
+  const SmallString<32> &getContents() const { return Contents; }
 
   /// @}
   /// @name Fixup Access
@@ -731,6 +731,16 @@ struct IndirectSymbolData {
   MCSectionData *SectionData;
 };
 
+// FIXME: Ditto this. Purely so the Streamer and the ObjectWriter can talk
+// to one another.
+struct DataRegionData {
+  // This enum should be kept in sync w/ the mach-o definition in
+  // llvm/Object/MachOFormat.h.
+  enum KindTy { Data = 1, JumpTable8, JumpTable16, JumpTable32 } Kind;
+  MCSymbol *Start;
+  MCSymbol *End;
+};
+
 class MCAssembler {
   friend class MCAsmLayout;
 
@@ -747,6 +757,10 @@ public:
   typedef std::vector<IndirectSymbolData>::const_iterator
     const_indirect_symbol_iterator;
   typedef std::vector<IndirectSymbolData>::iterator indirect_symbol_iterator;
+
+  typedef std::vector<DataRegionData>::const_iterator
+    const_data_region_iterator;
+  typedef std::vector<DataRegionData>::iterator data_region_iterator;
 
 private:
   MCAssembler(const MCAssembler&);    // DO NOT IMPLEMENT
@@ -778,6 +792,7 @@ private:
 
   std::vector<IndirectSymbolData> IndirectSymbols;
 
+  std::vector<DataRegionData> DataRegions;
   /// The set of function symbols for which a .thumb_func directive has
   /// been seen.
   //
@@ -975,6 +990,33 @@ public:
   }
 
   size_t indirect_symbol_size() const { return IndirectSymbols.size(); }
+
+  /// @}
+  /// @name Data Region List Access
+  /// @{
+
+  // FIXME: This is a total hack, this should not be here. Once things are
+  // factored so that the streamer has direct access to the .o writer, it can
+  // disappear.
+  std::vector<DataRegionData> &getDataRegions() {
+    return DataRegions;
+  }
+
+  data_region_iterator data_region_begin() {
+    return DataRegions.begin();
+  }
+  const_data_region_iterator data_region_begin() const {
+    return DataRegions.begin();
+  }
+
+  data_region_iterator data_region_end() {
+    return DataRegions.end();
+  }
+  const_data_region_iterator data_region_end() const {
+    return DataRegions.end();
+  }
+
+  size_t data_region_size() const { return DataRegions.size(); }
 
   /// @}
   /// @name Backend Data Access

@@ -17,6 +17,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "Unix.h"
+#include "llvm/Support/Process.h"
 #if HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
@@ -311,8 +312,8 @@ error_code exists(const Twine &path, bool &result) {
 
 bool equivalent(file_status A, file_status B) {
   assert(status_known(A) && status_known(B));
-  return A.st_dev == B.st_dev &&
-         A.st_ino == B.st_ino;
+  return A.fs_st_dev == B.fs_st_dev &&
+         A.fs_st_ino == B.fs_st_ino;
 }
 
 error_code equivalent(const Twine &A, const Twine &B, bool &result) {
@@ -366,8 +367,8 @@ error_code status(const Twine &path, file_status &result) {
   else
     result = file_status(file_type::type_unknown);
 
-  result.st_dev = status.st_dev;
-  result.st_ino = status.st_ino;
+  result.fs_st_dev = status.st_dev;
+  result.fs_st_ino = status.st_ino;
 
   return error_code::success();
 }
@@ -394,33 +395,16 @@ error_code unique_file(const Twine &model, int &result_fd,
     }
   }
 
-  // Replace '%' with random chars. From here on, DO NOT modify model. It may be
-  // needed if the randomly chosen path already exists.
-  SmallString<128> RandomPath;
-  RandomPath.reserve(Model.size() + 1);
-  ::srand(::time(NULL));
+  // From here on, DO NOT modify model. It may be needed if the randomly chosen
+  // path already exists.
+  SmallString<128> RandomPath = Model;
 
 retry_random_path:
-  // This is opened here instead of above to make it easier to track when to
-  // close it. Collisions should be rare enough for the possible extra syscalls
-  // not to matter.
-  FILE *RandomSource = ::fopen("/dev/urandom", "r");
-  RandomPath.set_size(0);
-  for (SmallVectorImpl<char>::const_iterator i = Model.begin(),
-                                             e = Model.end(); i != e; ++i) {
-    if (*i == '%') {
-      char val = 0;
-      if (RandomSource)
-        val = fgetc(RandomSource);
-      else
-        val = ::rand();
-      RandomPath.push_back("0123456789abcdef"[val & 15]);
-    } else
-      RandomPath.push_back(*i);
+  // Replace '%' with random chars.
+  for (unsigned i = 0, e = Model.size(); i != e; ++i) {
+    if (Model[i] == '%')
+      RandomPath[i] = "0123456789abcdef"[sys::Process::GetRandomNumber() & 15];
   }
-
-  if (RandomSource)
-    ::fclose(RandomSource);
 
   // Try to open + create the file.
 rety_open_create:

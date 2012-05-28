@@ -54,7 +54,6 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
-#include <map>
 
 using namespace llvm;
 
@@ -78,7 +77,7 @@ void HexagonAsmPrinter::printOperand(const MachineInstr *MI, unsigned OpNo,
   const MachineOperand &MO = MI->getOperand(OpNo);
 
   switch (MO.getType()) {
-  default: llvm_unreachable("<unknown operand type>");
+  default: llvm_unreachable ("<unknown operand type>");
   case MachineOperand::MO_Register:
     O << HexagonInstPrinter::getRegisterName(MO.getReg());
     return;
@@ -276,8 +275,8 @@ void HexagonAsmPrinter::printGlobalOperand(const MachineInstr *MI, int OpNo,
 void HexagonAsmPrinter::printJumpTable(const MachineInstr *MI, int OpNo,
                                        raw_ostream &O) {
   const MachineOperand &MO = MI->getOperand(OpNo);
-  assert( (MO.getType() == MachineOperand::MO_JumpTableIndex) &&
-    "Expecting jump table index");
+  assert( (MO.getType() == MachineOperand::MO_JumpTableIndex) && 
+           "Expecting jump table index");
 
   // Hexagon_TODO: Do we need name mangling?
   O << *GetJTISymbol(MO.getIndex());
@@ -287,7 +286,7 @@ void HexagonAsmPrinter::printConstantPool(const MachineInstr *MI, int OpNo,
                                        raw_ostream &O) {
   const MachineOperand &MO = MI->getOperand(OpNo);
   assert( (MO.getType() == MachineOperand::MO_ConstantPoolIndex) &&
-   "Expecting constant pool index");
+          "Expecting constant pool index");
 
   // Hexagon_TODO: Do we need name mangling?
   O << *GetCPISymbol(MO.getIndex());

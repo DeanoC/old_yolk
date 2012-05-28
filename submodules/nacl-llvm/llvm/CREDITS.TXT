@@ -56,7 +56,9 @@ D: Loop unrolling with run-time trip counts.
 
 N: Chandler Carruth
 E: chandlerc@gmail.com
-D: LinkTimeOptimizer for Linux, via binutils integration, and C API
+D: Hashing algorithms and interfaces
+D: Inline cost analysis
+D: Machine block placement pass
 
 N: Casey Carter
 E: ccarter@uiuc.edu
@@ -339,6 +341,10 @@ N: Vladimir Prus
 W: http://vladimir_prus.blogspot.com
 E: ghost@cs.msu.su
 D: Made inst_iterator behave like a proper iterator, LowerConstantExprs pass
+
+N: Kalle Raiskila
+E: kalle.rasikila@nokia.com
+D: Some bugfixes to CellSPU
 
 N: Xerxes Ranby
 E: xerxes@zafena.se

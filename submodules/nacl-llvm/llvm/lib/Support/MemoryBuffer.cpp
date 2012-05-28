@@ -231,7 +231,7 @@ error_code MemoryBuffer::getFile(const char *Filename,
 static bool shouldUseMmap(int FD,
                           size_t FileSize,
                           size_t MapSize,
-                          int64_t Offset,
+                          off_t Offset,
                           bool RequiresNullTerminator,
                           int PageSize) {
   // We don't use mmap for small files because this can severely fragment our

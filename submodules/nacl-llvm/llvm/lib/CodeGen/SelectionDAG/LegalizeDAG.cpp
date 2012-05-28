@@ -150,21 +150,21 @@ public:
   // Node replacement helpers
   void ReplacedNode(SDNode *N) {
     if (N->use_empty()) {
-      DAG.RemoveDeadNode(N, this);
+      DAG.RemoveDeadNode(N);
     } else {
       ForgetNode(N);
     }
   }
   void ReplaceNode(SDNode *Old, SDNode *New) {
-    DAG.ReplaceAllUsesWith(Old, New, this);
+    DAG.ReplaceAllUsesWith(Old, New);
     ReplacedNode(Old);
   }
   void ReplaceNode(SDValue Old, SDValue New) {
-    DAG.ReplaceAllUsesWith(Old, New, this);
+    DAG.ReplaceAllUsesWith(Old, New);
     ReplacedNode(Old.getNode());
   }
   void ReplaceNode(SDNode *Old, const SDValue *New) {
-    DAG.ReplaceAllUsesWith(Old, New, this);
+    DAG.ReplaceAllUsesWith(Old, New);
     ReplacedNode(Old);
   }
 };
@@ -203,7 +203,8 @@ SelectionDAGLegalize::ShuffleWithNarrowerEltType(EVT NVT, EVT VT,  DebugLoc dl,
 }
 
 SelectionDAGLegalize::SelectionDAGLegalize(SelectionDAG &dag)
-  : TM(dag.getTarget()), TLI(dag.getTargetLoweringInfo()),
+  : SelectionDAG::DAGUpdateListener(dag),
+    TM(dag.getTarget()), TLI(dag.getTargetLoweringInfo()),
     DAG(dag) {
 }
 
@@ -816,9 +817,7 @@ void SelectionDAGLegalize::LegalizeOp(SDNode *Node) {
   }
 
   if (SimpleFinishLegalizing) {
-    SmallVector<SDValue, 8> Ops;
-    for (unsigned i = 0, e = Node->getNumOperands(); i != e; ++i)
-      Ops.push_back(Node->getOperand(i));
+    SDNode *NewNode = Node;
     switch (Node->getOpcode()) {
     default: break;
     case ISD::SHL:
@@ -828,11 +827,14 @@ void SelectionDAGLegalize::LegalizeOp(SDNode *Node) {
     case ISD::ROTR:
       // Legalizing shifts/rotates requires adjusting the shift amount
       // to the appropriate width.
-      if (!Ops[1].getValueType().isVector()) {
-        SDValue SAO = DAG.getShiftAmountOperand(Ops[0].getValueType(), Ops[1]);
+      if (!Node->getOperand(1).getValueType().isVector()) {
+        SDValue SAO =
+          DAG.getShiftAmountOperand(Node->getOperand(0).getValueType(),
+                                    Node->getOperand(1));
         HandleSDNode Handle(SAO);
         LegalizeOp(SAO.getNode());
-        Ops[1] = Handle.getValue();
+        NewNode = DAG.UpdateNodeOperands(Node, Node->getOperand(0),
+                                         Handle.getValue());
       }
       break;
     case ISD::SRL_PARTS:
@@ -840,18 +842,21 @@ void SelectionDAGLegalize::LegalizeOp(SDNode *Node) {
     case ISD::SHL_PARTS:
       // Legalizing shifts/rotates requires adjusting the shift amount
       // to the appropriate width.
-      if (!Ops[2].getValueType().isVector()) {
-        SDValue SAO = DAG.getShiftAmountOperand(Ops[0].getValueType(), Ops[2]);
+      if (!Node->getOperand(2).getValueType().isVector()) {
+        SDValue SAO =
+          DAG.getShiftAmountOperand(Node->getOperand(0).getValueType(),
+                                    Node->getOperand(2));
         HandleSDNode Handle(SAO);
         LegalizeOp(SAO.getNode());
-        Ops[2] = Handle.getValue();
+        NewNode = DAG.UpdateNodeOperands(Node, Node->getOperand(0),
+                                         Node->getOperand(1),
+                                         Handle.getValue());
       }
       break;
     }
 
-    SDNode *NewNode = DAG.UpdateNodeOperands(Node, Ops.data(), Ops.size());
     if (NewNode != Node) {
-      DAG.ReplaceAllUsesWith(Node, NewNode, this);
+      DAG.ReplaceAllUsesWith(Node, NewNode);
       for (unsigned i = 0, e = Node->getNumValues(); i != e; ++i)
         DAG.TransferDbgValues(SDValue(Node, i), SDValue(NewNode, i));
       ReplacedNode(Node);
@@ -873,7 +878,7 @@ void SelectionDAGLegalize::LegalizeOp(SDNode *Node) {
             ResultVals.push_back(Tmp1.getValue(i));
         }
         if (Tmp1.getNode() != Node || Tmp1.getResNo() != 0) {
-          DAG.ReplaceAllUsesWith(Node, ResultVals.data(), this);
+          DAG.ReplaceAllUsesWith(Node, ResultVals.data());
           for (unsigned i = 0, e = Node->getNumValues(); i != e; ++i)
             DAG.TransferDbgValues(SDValue(Node, i), ResultVals[i]);
           ReplacedNode(Node);
@@ -3059,7 +3064,7 @@ void SelectionDAGLegalize::ExpandNode(SDNode *Node) {
            "Don't know how to expand this subtraction!");
     Tmp1 = DAG.getNode(ISD::XOR, dl, VT, Node->getOperand(1),
                DAG.getConstant(APInt::getAllOnesValue(VT.getSizeInBits()), VT));
-    Tmp1 = DAG.getNode(ISD::ADD, dl, VT, Tmp2, DAG.getConstant(1, VT));
+    Tmp1 = DAG.getNode(ISD::ADD, dl, VT, Tmp1, DAG.getConstant(1, VT));
     Results.push_back(DAG.getNode(ISD::ADD, dl, VT, Node->getOperand(0), Tmp1));
     break;
   }

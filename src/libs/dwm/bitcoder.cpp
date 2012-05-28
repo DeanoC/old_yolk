@@ -267,11 +267,12 @@ llvm::Module* BitCoder::loadBitCode( Core::InOutInterface& inny ) {
 	using namespace llvm;
 
 	uint64_t bcLen = inny.bytesLeft();
+	std::string errMsg;
 
 	// note on 32 bit system only load max 32 bit file size (no harm)
 	MemoryBuffer *bcBuffer = MemoryBuffer::getNewMemBuffer( (size_t) bcLen );
 	inny.read( (uint8_t*) bcBuffer->getBuffer().data(), (size_t) bcLen );
-	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, llvm::getGlobalContext() );
+	llvm::Module* mod = llvm::ParseBitcodeFile( bcBuffer, llvm::getGlobalContext(), &errMsg );
 
 	return mod;
 }
@@ -282,7 +283,7 @@ std::string BitCoder::assemble( const int type, const Core::FilePath& filepath )
 	
 	if( asmFile.open( filepath.value().c_str() ) == false ) {
 		// file not found
-		return nullptr;
+		return std::string();
 	}
    return assemble( type, asmFile );
 }
@@ -307,7 +308,7 @@ std::string BitCoder::assemble( const int type, Core::InOutInterface& inny ) {
 	scoped_ptr<MCObjectFileInfo> mcofi( CORE_NEW MCObjectFileInfo() );
 	MCContext ctx(*mcai[type], *mcri[type], mcofi.get(), &srcMgr);
 	mcofi->InitMCObjectFileInfo( tm[type]->getTargetTriple(), Reloc::Static, CodeModel::Small, ctx );
-	MCCodeEmitter* mcce( tm[type]->getTarget().createMCCodeEmitter( *mcii[type], *mcsti[type], ctx ) );
+	MCCodeEmitter* mcce( tm[type]->getTarget().createMCCodeEmitter( *mcii[type], *mcri[type], *mcsti[type], ctx ) );
 
 	scoped_ptr<MCStreamer> streamer( tm[type]->getTarget().createMCObjectStreamer(	
 										tm[type]->getTargetTriple(), ctx, 

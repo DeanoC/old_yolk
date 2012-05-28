@@ -33,7 +33,7 @@ using namespace llvm;
 
 /// CompileUnit - Compile unit constructor.
 CompileUnit::CompileUnit(unsigned I, unsigned L, DIE *D, AsmPrinter *A,
-			 DwarfDebug *DW)
+                         DwarfDebug *DW)
   : ID(I), Language(L), CUDie(D), Asm(A), DD(DW), IndexTyDie(0) {
   DIEIntegerOne = new (DIEValueAllocator) DIEInteger(1);
 }
@@ -198,7 +198,7 @@ void CompileUnit::addSourceLine(DIE *Die, DIObjCProperty Ty) {
     return;
   DIFile File = Ty.getFile();
   unsigned FileID = DD->GetOrCreateSourceID(File.getFilename(),
-					    File.getDirectory());
+                                            File.getDirectory());
   assert(FileID && "Invalid file id");
   addUInt(Die, dwarf::DW_AT_decl_file, 0, FileID);
   addUInt(Die, dwarf::DW_AT_decl_line, 0, Line);
@@ -308,7 +308,8 @@ void CompileUnit::addComplexAddress(DbgVariable *&DV, DIE *Die,
       addUInt(Block, 0, dwarf::DW_FORM_data1, dwarf::DW_OP_plus_uconst);
       addUInt(Block, 0, dwarf::DW_FORM_udata, DV->getAddrElement(++i));
     } else if (Element == DIBuilder::OpDeref) {
-      addUInt(Block, 0, dwarf::DW_FORM_data1, dwarf::DW_OP_deref);
+      if (!Location.isReg())
+        addUInt(Block, 0, dwarf::DW_FORM_data1, dwarf::DW_OP_deref);
     } else llvm_unreachable("unknown DIBuilder Opcode");
   }
 
@@ -646,8 +647,7 @@ DIE *CompileUnit::getOrCreateTypeDIE(const MDNode *TyNode) {
 }
 
 /// addType - Add a new type attribute to the specified entity.
-void CompileUnit::addType(DIE *Entity, DIType Ty,
-			  unsigned Attribute) {
+void CompileUnit::addType(DIE *Entity, DIType Ty, unsigned Attribute) {
   if (!Ty.Verify())
     return;
 
@@ -775,6 +775,11 @@ void CompileUnit::constructTypeDIE(DIE &Buffer, DICompositeType CTy) {
         ElemDie = constructEnumTypeDIE(DIEnumerator(Enum));
         Buffer.addChild(ElemDie);
       }
+    }
+    DIType DTy = CTy.getTypeDerivedFrom();
+    if (DTy.Verify()) {
+      addType(&Buffer, DTy);
+      addUInt(&Buffer, dwarf::DW_AT_enum_class, dwarf::DW_FORM_flag, 1);
     }
   }
     break;
@@ -1032,9 +1037,10 @@ DIE *CompileUnit::getOrCreateSubprogramDIE(DISubprogram SP) {
   // Add function template parameters.
   addTemplateParams(*SPDie, SP.getTemplateParams());
 
-  // Unfortunately this code needs to stay here to work around
-  // a bug in older gdbs that requires the linkage name to resolve
-  // multiple template functions.
+  // Unfortunately this code needs to stay here instead of below the
+  // AT_specification code in order to work around a bug in older
+  // gdbs that requires the linkage name to resolve multiple template
+  // functions.
   StringRef LinkageName = SP.getLinkageName();
   if (!LinkageName.empty())
     addString(SPDie, dwarf::DW_AT_MIPS_linkage_name,

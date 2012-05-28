@@ -290,7 +290,7 @@ public:
 
   /// getCurrentPCOffset - Return the offset from the start of the emitted
   /// buffer that we are currently writing to.
-  virtual uintptr_t getCurrentPCOffset() const { // @LOCALMOD
+  uintptr_t getCurrentPCOffset() const {
     return CurBufferPtr-BufferBegin;
   }
 

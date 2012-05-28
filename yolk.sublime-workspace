@@ -180,44 +180,11 @@
 	"buffers":
 	[
 		{
-			"file": "src/libs/dwm/bitcoder.cpp",
+			"file": "src/libs/dwm/mmu.h",
 			"settings":
 			{
-				"buffer_size": 11287,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/bitcoder.h",
-			"settings":
-			{
-				"buffer_size": 1636,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/isolatedexecengine.cpp",
-			"settings":
-			{
-				"buffer_size": 7264,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/trustedregion.h",
-			"settings":
-			{
-				"buffer_size": 3255,
-				"line_ending": "Windows",
-				"name": "trustedregion.h"
-			}
-		},
-		{
-			"file": "src/libs/dwm/isolatedexecengine.h",
-			"settings":
-			{
-				"buffer_size": 817,
-				"line_ending": "Windows"
+				"buffer_size": 3493,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -253,6 +220,22 @@
 	},
 	"file_history":
 	[
+		"/home/deano/.xinitrc",
+		"/home/deano/projects/yolk/src/libs/glog/src/utilities.cc",
+		"/home/deano/projects/yolk/src/libs/dwm/bitcoder.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/bitcoder.h",
+		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/trustedregion.h",
+		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.h",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/llvm-lit/llvm-lit.in",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/lit/lit/ProgressBar.py",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/lit/lit.py",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/llvm-build/llvm-build",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/DSAextract.py",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/DSAclean.py",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/LLVMBuild.txt",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/LLVMBuild.txt",
+		"/home/deano/projects/yolk/yolk.sublime-project",
 		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/asm/switcher.S",
 		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.cpp",
 		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.h",
@@ -364,23 +347,7 @@
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_sync_cond_test.c",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/x86/decoder/ncop_exps.c",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/x86/error_reporter.h",
-		"/Z/Projects/Cyberspace/llvm/include/llvm/Target/TargetOptions.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm-gcc/gcc/llvm-backend.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86TargetMachine.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm-c/TargetMachine.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/TargetInfo/X86TargetInfo.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/lto/LTOCodeGenerator.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/TargetRegistry.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/TargetSelect.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/ExecutionEngine.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/lli/lli.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJIT.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJIT.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/ExecutionEngine.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Support/Triple.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/Target.cpp"
+		"/Z/Projects/Cyberspace/llvm/include/llvm/Target/TargetOptions.h"
 	],
 	"find":
 	{
@@ -405,6 +372,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"python",
+			"PythonInter",
 			"EmitBundleAlignEnd",
 			"naclcall",
 			"SegOvrMask",
@@ -530,9 +499,7 @@
 			"NACL_MAX_SYSCALLS",
 			"NaClSyscallTableInit",
 			"NaClAllModulesInit",
-			"NaClAppLoadFile",
-			"ApplyValidatorCopy",
-			"NaCl_ApplyValidatorCopy_x86_32"
+			"NaClAppLoadFile"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -556,142 +523,31 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/dwm/bitcoder.cpp",
+					"file": "src/libs/dwm/mmu.h",
 					"settings":
 					{
-						"buffer_size": 11287,
+						"buffer_size": 3493,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								205,
+								205
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 3657.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/libs/dwm/bitcoder.h",
-					"settings":
-					{
-						"buffer_size": 1636,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								632,
-								632
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 394.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/libs/dwm/isolatedexecengine.cpp",
-					"settings":
-					{
-						"buffer_size": 7264,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/libs/dwm/trustedregion.h",
-					"settings":
-					{
-						"buffer_size": 3255,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_name": "trustedregion.h",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/libs/dwm/isolatedexecengine.h",
-					"settings":
-					{
-						"buffer_size": 817,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								805,
-								792
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 80.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

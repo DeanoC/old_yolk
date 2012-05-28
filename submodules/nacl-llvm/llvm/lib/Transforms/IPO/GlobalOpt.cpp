@@ -1870,6 +1870,8 @@ bool GlobalOpt::ProcessInternalGlobal(GlobalVariable *GV,
 /// function, changing them to FastCC.
 static void ChangeCalleesToFastCall(Function *F) {
   for (Value::use_iterator UI = F->use_begin(), E = F->use_end(); UI != E;++UI){
+    if (isa<BlockAddress>(*UI))
+      continue;
     CallSite User(cast<Instruction>(*UI));
     User.setCallingConv(CallingConv::Fast);
   }
@@ -1890,6 +1892,8 @@ static AttrListPtr StripNest(const AttrListPtr &Attrs) {
 static void RemoveNestAttribute(Function *F) {
   F->setAttributes(StripNest(F->getAttributes()));
   for (Value::use_iterator UI = F->use_begin(), E = F->use_end(); UI != E;++UI){
+    if (isa<BlockAddress>(*UI))
+      continue;
     CallSite User(cast<Instruction>(*UI));
     User.setAttributes(StripNest(User.getAttributes()));
   }
@@ -2933,6 +2937,7 @@ bool GlobalOpt::runOnModule(Module &M) {
   // Try to find the llvm.globalctors list.
   GlobalVariable *GlobalCtors = FindGlobalCtors(M);
 
+  Function *CXAAtExitFn = FindCXAAtExit(M, TLI);
 
   bool LocalChange = true;
   while (LocalChange) {
@@ -2952,8 +2957,6 @@ bool GlobalOpt::runOnModule(Module &M) {
     LocalChange |= OptimizeGlobalAliases(M);
 
     // Try to remove trivial global destructors.
-	Function *CXAAtExitFn = FindCXAAtExit(M, TLI);
-
     if (CXAAtExitFn)
       LocalChange |= OptimizeEmptyGlobalCXXDtors(CXAAtExitFn);
 

@@ -24,6 +24,9 @@ std::string LibShortname(const std::string &fullname) {
   return result;
 }
 
+const ELF::Elf32_Half kDummyCodeShndx = 5;
+const ELF::Elf32_Half kDummyDataShndx = 6;
+
 }  // namespace
 
 namespace llvm {
@@ -34,17 +37,7 @@ namespace llvm {
 void WriteTextELFStub(const ELFStub *Stub, std::string *output) {
   std::stringstream ss;
 
-  // TODO(jvoung): Figure out if we need to avoid stubbing out ld.so for
-  // pnacl.  When that is done with gold in the non-nacl case, we ended up
-  // jumping to address 0 on startup. Usually ld.so is not in the list of
-  // DT_NEEDED anyway, and having a meta-wrapper makes it show up in DT_NEEDED.
-  // For now, skip.
-  std::string ld_so_prefix("ld-nacl-");
-  if (Stub->SOName.compare(0, ld_so_prefix.length(), ld_so_prefix) == 0) {
-    return;
-  }
-
-  ss << "####\n";
+  ss << "#### Symtab for " << Stub->SOName << "\n";
   ss << "@obj " << LibShortname(Stub->SOName) << " " << Stub->SOName << "\n";
 
   // st_value is usually a relative address for .so, and .exe files.
@@ -52,19 +45,39 @@ void WriteTextELFStub(const ELFStub *Stub, std::string *output) {
   ELF::Elf32_Addr fake_relative_addr = 0;
   for (size_t i = 0; i < Stub->Symbols.size(); ++i) {
     const SymbolStub &sym = Stub->Symbols[i];
+
+    ELF::Elf32_Addr st_value = fake_relative_addr;
+    ELF::Elf32_Word st_size = sym.Size;
+    unsigned int st_info = sym.Type | (sym.Binding << 4);
+    unsigned int st_other = sym.Visibility;
+    ELF::Elf32_Half st_shndx = sym.Type == ELF::STT_FUNC ?
+      kDummyCodeShndx : kDummyDataShndx;
+    ELF::Elf32_Half vd_ndx = sym.VersionIndex;
+    // Mark non-default versions hidden.
+    if (!sym.IsDefault) {
+      vd_ndx |= ELF::VERSYM_HIDDEN;
+    }
+
     ss << "@sym "
        << sym.Name << " " // Representative for st_name.
-       << fake_relative_addr << " " // st_value.
-       << sym.Size << " " // st_size (may be unknown, or 0)
-       << (sym.Type | (sym.Binding << 4)) << " " // st_info
-       << (int)(sym.Visibility) << " " // st_other
-       << ((sym.Type == ELF::STT_FUNC) ? "5" : "6") // Dummy st_shndx.
+       << (st_value) << " "
+       << (st_size) << " "
+       << (st_info) << " "
+       << (st_other) << " "
+       << (st_shndx) << " "
+       << (vd_ndx) << " "
        << "\n";
     fake_relative_addr += (sym.Size == 0 ? 4 : sym.Size);
   }
-  ss << "\n";
 
-  // TODO(jvoung): handle versions.
+  // Now dump the version map.
+  ss << "#### VerDefs for " << Stub->SOName << "\n";
+  for (size_t i = 0; i < Stub->VerDefs.size(); ++i) {
+    const VersionDefinition &verdef = Stub->VerDefs[i];
+    ss << "@ver " << (Elf32_Half)(verdef.Index) << " " << verdef.Name << "\n";
+  }
+
+  ss << "\n";
 
   output->append(ss.str());
 }

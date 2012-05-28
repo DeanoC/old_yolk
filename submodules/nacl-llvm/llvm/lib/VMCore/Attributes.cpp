@@ -90,9 +90,7 @@ std::string Attribute::getAsString(Attributes Attrs) {
   }
   // Trim the trailing space.
   assert(!Result.empty() && "Unknown attribute!");
-  // @LOCALMOD
-  // BUG: http://code.google.com/p/nativeclient/issues/detail?id=2388
-  Result.erase(Result.size()-1);
+  Result.erase(Result.end()-1);
   return Result;
 }
 

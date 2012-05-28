@@ -135,6 +135,8 @@ namespace llvm {
     SDValue LowerFRAMEADDR(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerMEMBARRIER(SDValue Op, SelectionDAG& DAG) const;
     SDValue LowerATOMIC_FENCE(SDValue Op, SelectionDAG& DAG) const;
+    SDValue LowerShiftLeftParts(SDValue Op, SelectionDAG& DAG) const;
+    SDValue LowerShiftRightParts(SDValue Op, SelectionDAG& DAG, bool IsSRA) const;
 
     virtual SDValue
       LowerFormalArguments(SDValue Chain,
@@ -175,6 +177,15 @@ namespace llvm {
     std::pair<unsigned, const TargetRegisterClass*>
               getRegForInlineAsmConstraint(const std::string &Constraint,
               EVT VT) const;
+
+    /// LowerAsmOperandForConstraint - Lower the specified operand into the Ops
+    /// vector.  If it is invalid, don't add anything to Ops. If hasMemory is
+    /// true it means one of the asm constraint of the inline asm instruction
+    /// being processed is 'm'.
+    virtual void LowerAsmOperandForConstraint(SDValue Op,
+                                              std::string &Constraint,
+                                              std::vector<SDValue> &Ops,
+                                              SelectionDAG &DAG) const;
 
     virtual bool isOffsetFoldingLegal(const GlobalAddressSDNode *GA) const;
 

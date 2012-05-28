@@ -93,35 +93,6 @@ uintptr_t func1( const IEEThreadContext* threadCtx, const uintptr_t sbDst, const
 	void* ret = memset( dst, val, size );
 	return (uintptr_t)ret - threadCtx->membase;
 };
-#define TRFUNC(X) \
-	void func##X ( const IEEThreadContext* threadCtx ) { \
-		LOG(INFO) << MACRO_TEXT(X) << "\n";\
-	};
-	TRFUNC( __cxa_guard_abort )
-	TRFUNC( _Unwind_Resume )
-	TRFUNC( powf )
-	TRFUNC( memcpy )
-	TRFUNC( __assert_func )
-	TRFUNC( __dso_handle )
-	TRFUNC( __cxa_atexit )
-	TRFUNC( __cxa_guard_release )
-	TRFUNC( __cxa_pure_virtual )
-	TRFUNC( __gxx_personality_v0 )
-	TRFUNC( __cxa_guard_acquire )
-
-	TRFUNC( _ZTVN10__cxxabiv121__vmi_class_type_infoE )
-	TRFUNC( _Z21btAlignedFreeInternalPv )
-	TRFUNC( _ZN15CProfileManager5ResetEv )
-	TRFUNC( _ZN20btConvexHullComputer7computeEPKvbiiff )
-	TRFUNC( _ZN15CProfileManager12Stop_ProfileEv )
-	TRFUNC( _ZN15CProfileManager13Start_ProfileEPKc )
-	TRFUNC( _ZdlPv )
-	TRFUNC( _ZN15CProfileManager23Increment_Frame_CounterEv )
-	TRFUNC( _ZSt9terminatev )
-	TRFUNC( _ZTVN10__cxxabiv120__si_class_type_infoE )
-	TRFUNC( _Z22btAlignedAllocInternalji )
-	TRFUNC( _ZTVN10__cxxabiv117__class_type_infoE )
-	TRFUNC( _Znwj )
 // trusted functions can currently have 3 user params (besides the threadCtx) any must be integers or sandbox pointers
 // if pointer must adjust, and beware of other sandbox threads altering (copy before use in most cases!)
 // float support is minimal, not mixing is likely to work for the 4 four float/float vector parameters on 64 bit at least
@@ -130,38 +101,6 @@ void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
 
 	trustedRegion->addFunctionTrampoline( "_no_func_", (void*) no_func );
 	trustedRegion->addFunctionTrampoline( "DgStringOut", (void*) func0 );
-	trustedRegion->addFunctionTrampoline( "memset", (void*) func1 );
-
-#undef TRFUNC
-#define TRFUNC(X) \
-	trustedRegion->addFunctionTrampoline( MACRO_TEXT(X), (void*) func##X );
-
-	TRFUNC( __cxa_guard_abort )
-	TRFUNC( _Unwind_Resume )
-	TRFUNC( powf )
-	TRFUNC( memcpy )
-	TRFUNC( __assert_func )
-	TRFUNC( __dso_handle )
-	TRFUNC( __cxa_atexit )
-	TRFUNC( __cxa_guard_release )
-	TRFUNC( __cxa_pure_virtual )
-	TRFUNC( __gxx_personality_v0 )
-	TRFUNC( __cxa_guard_acquire )
-
-	TRFUNC( _ZTVN10__cxxabiv121__vmi_class_type_infoE )
-	TRFUNC( _Z21btAlignedFreeInternalPv )
-	TRFUNC( _ZN15CProfileManager5ResetEv )
-	TRFUNC( _ZN20btConvexHullComputer7computeEPKvbiiff )
-	TRFUNC( _ZN15CProfileManager12Stop_ProfileEv )
-	TRFUNC( _ZN15CProfileManager13Start_ProfileEPKc )
-	TRFUNC( _ZdlPv )
-	TRFUNC( _ZN15CProfileManager23Increment_Frame_CounterEv )
-	TRFUNC( _ZSt9terminatev )
-	TRFUNC( _ZTVN10__cxxabiv120__si_class_type_infoE )
-	TRFUNC( _Z22btAlignedAllocInternalji )
-	TRFUNC( _ZTVN10__cxxabiv117__class_type_infoE )
-	TRFUNC( _Znwj )
-
 }
 
 // TODO thread safe thread allocation
@@ -180,8 +119,8 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	memset( threadCtx, 0, sizeof(IEEThreadContext) );
 
 	// add the thunks
-	void* sttStart = dyld->getSymbolAddress( llvm::StringRef("SwitchToTrusted") );
-	void* sttEnd = dyld->getSymbolAddress( llvm::StringRef("SwitchToTrustedEnd") );
+	void* sttStart = dyld->getSymbolAddress( llvm::StringRef("SwitchToTrustedLinux") );
+	void* sttEnd = dyld->getSymbolAddress( llvm::StringRef("SwitchToTrustedLinuxEnd") );
 	trustedRegion->setThunkCode( sttStart, sttEnd );
 	trustedRegion->setThreadContext( threadCtx );
 	// wipe out (HLT) the untrusted thunk code now its been copied into trusted space
@@ -219,7 +158,8 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	threadCtx->owner = this;
 
 	typedef void (*main_ptr)( const IEEThreadContext* ctx );
-	main_ptr mainp = (main_ptr) dyld->getSymbolAddress( llvm::StringRef("SwitchToUntrustedSSE") );
+	main_ptr mainp = (main_ptr) dyld->getSymbolAddress( llvm::StringRef("SwitchToUntrustedSSELinux") );
+	assert( mainp != nullptr );
 	mainp( threadCtx );
 	// never ever ever gets here!
 }

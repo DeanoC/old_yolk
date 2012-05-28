@@ -106,12 +106,12 @@ namespace {
     virtual void EmitCFIEndProcImpl(MCDwarfFrameInfo &Frame) {
       RecordProcEnd(Frame);
     }
-    
+
     /// @}
   };
 
 }
-    
+
 MCStreamer *llvm::createNullStreamer(MCContext &Context) {
   return new MCNullStreamer(Context);
 }

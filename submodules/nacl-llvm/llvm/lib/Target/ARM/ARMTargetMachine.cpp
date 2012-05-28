@@ -143,22 +143,22 @@ TargetPassConfig *ARMBaseTargetMachine::createPassConfig(PassManagerBase &PM) {
 
 bool ARMPassConfig::addPreISel() {
   if (TM->getOptLevel() != CodeGenOpt::None && EnableGlobalMerge)
-    PM.add(createGlobalMergePass(TM->getTargetLowering()));
+    PM->add(createGlobalMergePass(TM->getTargetLowering()));
 
   return false;
 }
 
 bool ARMPassConfig::addInstSelector() {
-  PM.add(createARMISelDag(getARMTargetMachine(), getOptLevel()));
+  PM->add(createARMISelDag(getARMTargetMachine(), getOptLevel()));
   return false;
 }
 
 bool ARMPassConfig::addPreRegAlloc() {
   // FIXME: temporarily disabling load / store optimization pass for Thumb1.
   if (getOptLevel() != CodeGenOpt::None && !getARMSubtarget().isThumb1Only())
-    PM.add(createARMLoadStoreOptimizationPass(true));
+    PM->add(createARMLoadStoreOptimizationPass(true));
   if (getOptLevel() != CodeGenOpt::None && getARMSubtarget().isCortexA9())
-    PM.add(createMLxExpansionPass());
+    PM->add(createMLxExpansionPass());
   return true;
 }
 
@@ -166,23 +166,23 @@ bool ARMPassConfig::addPreSched2() {
   // FIXME: temporarily disabling load / store optimization pass for Thumb1.
   if (getOptLevel() != CodeGenOpt::None) {
     if (!getARMSubtarget().isThumb1Only()) {
-      PM.add(createARMLoadStoreOptimizationPass());
+      PM->add(createARMLoadStoreOptimizationPass());
       printAndVerify("After ARM load / store optimizer");
     }
     if (getARMSubtarget().hasNEON())
-      PM.add(createExecutionDependencyFixPass(&ARM::DPRRegClass));
+      PM->add(createExecutionDependencyFixPass(&ARM::DPRRegClass));
   }
 
   // Expand some pseudo instructions into multiple instructions to allow
   // proper scheduling.
-  PM.add(createARMExpandPseudoPass());
+  PM->add(createARMExpandPseudoPass());
 
   if (getOptLevel() != CodeGenOpt::None) {
     if (!getARMSubtarget().isThumb1Only())
       addPass(IfConverterID);
   }
   if (getARMSubtarget().isThumb2())
-    PM.add(createThumb2ITBlockPass());
+    PM->add(createThumb2ITBlockPass());
 
   return true;
 }
@@ -190,7 +190,7 @@ bool ARMPassConfig::addPreSched2() {
 bool ARMPassConfig::addPreEmitPass() {
   if (getARMSubtarget().isThumb2()) {
     if (!getARMSubtarget().prefers32BitThumb())
-      PM.add(createThumb2SizeReductionPass());
+      PM->add(createThumb2SizeReductionPass());
 
     // Constant island pass work on unbundled instructions.
     addPass(UnpackMachineBundlesID);
@@ -205,12 +205,12 @@ bool ARMPassConfig::addPreEmitPass() {
   }
   // @LOCALMOD-END
 
-  PM.add(createARMConstantIslandPass());
+  PM->add(createARMConstantIslandPass());
 
   // @LOCALMOD-START
   // This pass does all the heavy sfi lifting.
   if (getARMSubtarget().isTargetNaCl()) {
-    PM.add(createARMNaClRewritePass());
+    PM->add(createARMNaClRewritePass());
   }
   // @LOCALMOD-END
  

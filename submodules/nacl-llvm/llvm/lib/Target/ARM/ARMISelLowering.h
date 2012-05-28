@@ -425,10 +425,10 @@ namespace llvm {
     SDValue LowerGlobalTLSAddress(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerToTLSGeneralDynamicModel(GlobalAddressSDNode *GA,
                                             SelectionDAG &DAG) const;
-    // @LOCALMOD-START
     SDValue LowerToTLSExecModels(GlobalAddressSDNode *GA,
                                  SelectionDAG &DAG,
-                                 bool InitialExec) const;
+                                 TLSModel::Model model) const;
+    // @LOCALMOD-START
     SDValue LowerJumpTable(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerEH_RETURN(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerNaClThreadStackPadding(SDValue Op, SelectionDAG &DAG) const;

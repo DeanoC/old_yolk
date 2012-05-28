@@ -35,19 +35,6 @@ AsmWriterFlavor("x86-asm-syntax", cl::init(ATT),
              clEnumValEnd));
 
 
-static const char *const x86_asm_table[] = {
-  "{si}", "S",
-  "{di}", "D",
-  "{ax}", "a",
-  "{cx}", "c",
-  "{memory}", "memory",
-  "{flags}", "",
-  "{dirflag}", "",
-  "{fpsr}", "",
-  "{fpcr}", "",
-  "{cc}", "cc",
-  0,0};
-
 void X86MCAsmInfoDarwin::anchor() { }
 
 X86MCAsmInfoDarwin::X86MCAsmInfoDarwin(const Triple &T) {
@@ -55,7 +42,6 @@ X86MCAsmInfoDarwin::X86MCAsmInfoDarwin(const Triple &T) {
   if (is64Bit)
     PointerSize = 8;
 
-  AsmTransCBE = x86_asm_table;
   AssemblerDialect = AsmWriterFlavor;
 
   TextAlignFillValue = 0x90;
@@ -98,7 +84,6 @@ X86ELFMCAsmInfo::X86ELFMCAsmInfo(const Triple &T) {
   }
   // @LOCALMOD-END
 
-  AsmTransCBE = x86_asm_table;
   AssemblerDialect = AsmWriterFlavor;
 
   TextAlignFillValue = 0x90;
@@ -147,7 +132,6 @@ X86MCAsmInfoMicrosoft::X86MCAsmInfoMicrosoft(const Triple &Triple) {
     PrivateGlobalPrefix = ".L";
   }
 
-  AsmTransCBE = x86_asm_table;
   AssemblerDialect = AsmWriterFlavor;
 
   TextAlignFillValue = 0x90;
@@ -161,7 +145,6 @@ X86MCAsmInfoGNUCOFF::X86MCAsmInfoGNUCOFF(const Triple &Triple) {
     PrivateGlobalPrefix = ".L";
   }
 
-  AsmTransCBE = x86_asm_table;
   AssemblerDialect = AsmWriterFlavor;
 
   TextAlignFillValue = 0x90;

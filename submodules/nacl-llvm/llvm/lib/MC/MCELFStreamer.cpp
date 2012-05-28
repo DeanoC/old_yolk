@@ -13,6 +13,8 @@
 
 #include "MCELF.h"
 #include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/Twine.h"
 #include "llvm/MC/MCAssembler.h"
 #include "llvm/MC/MCCodeEmitter.h"
 #include "llvm/MC/MCContext.h"
@@ -160,7 +162,8 @@ void MCELFStreamer::InitSections() {
 }
 
 void MCELFStreamer::EmitLabel(MCSymbol *Symbol) {
-  assert(Symbol->isUndefined() && "Cannot define a symbol twice!");
+  if( !Symbol->isUndefined() ) return;
+  //assert(Symbol->isUndefined() && "Cannot define a symbol twice!");
 
   MCObjectStreamer::EmitLabel(Symbol);
 
@@ -464,6 +467,7 @@ void MCELFStreamer::EmitInstToFragment(const MCInst &Inst) {
 }
 
 void MCELFStreamer::EmitInstToData(const MCInst &Inst) {
+  MCDataFragment *DF = getOrCreateDataFragment();
 
   SmallVector<MCFixup, 4> Fixups;
   SmallString<256> Code;

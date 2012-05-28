@@ -123,6 +123,7 @@ static bool RedirectIO(const Path *Path, int FD, std::string* ErrMsg) {
               + (FD == 0 ? "input" : "output"));
     return true;
   }
+
   // Install it as the requested FD
   if (dup2(InFD, FD) == -1) {
     MakeErrMsg(ErrMsg, "Cannot dup2");

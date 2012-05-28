@@ -598,13 +598,15 @@ error_code MachOObjectFile::isSectionZeroInit(DataRefImpl DRI,
   if (MachOObj->is64Bit()) {
     InMemoryStruct<macho::Section64> Sect;
     getSection64(DRI, Sect);
-    Result = (Sect->Flags & MachO::SectionTypeZeroFill ||
-              Sect->Flags & MachO::SectionTypeZeroFillLarge);
+    unsigned SectionType = Sect->Flags & MachO::SectionFlagMaskSectionType;
+    Result = (SectionType == MachO::SectionTypeZeroFill ||
+              SectionType == MachO::SectionTypeZeroFillLarge);
   } else {
     InMemoryStruct<macho::Section> Sect;
     getSection(DRI, Sect);
-    Result = (Sect->Flags & MachO::SectionTypeZeroFill ||
-              Sect->Flags & MachO::SectionTypeZeroFillLarge);
+    unsigned SectionType = Sect->Flags & MachO::SectionFlagMaskSectionType;
+    Result = (SectionType == MachO::SectionTypeZeroFill ||
+              SectionType == MachO::SectionTypeZeroFillLarge);
   }
 
   return object_error::success;
@@ -786,7 +788,7 @@ error_code MachOObjectFile::getRelocationTypeName(DataRefImpl Rel,
 
   switch (Arch) {
     case Triple::x86: {
-      const char* Table[] =  {
+      static const char *const Table[] =  {
         "GENERIC_RELOC_VANILLA",
         "GENERIC_RELOC_PAIR",
         "GENERIC_RELOC_SECTDIFF",

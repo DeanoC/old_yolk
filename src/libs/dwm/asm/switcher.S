@@ -5,21 +5,21 @@
  * Customized to york and rpg.sh by deano@cloudpixies.com
  */
         .text
-        .globl SwitchToUntrustedSSELinux
-        .type SwitchToUntrustedSSELinux, @function
-SwitchToUntrustedSSELinux:
+        .globl SwitchToUntrustedAVXLinux
+        .type SwitchToUntrustedAVXLinux, @function
+SwitchToUntrustedAVXLinux:
         /* if Windows, 1st param is already in %rcx, not %rdi */
         /* elif Linux/OSX, 1st param is already in %rdi. */
         mov     %rdi, %rcx
-        .globl SwitchToUntrustedAVX
-        .type SwitchToUntrustedAVX, @function
+.globl SwitchToUntrustedAVX
+.type SwitchToUntrustedAVX, @function
 SwitchToUntrustedAVX:
-		/* rcx = IEEThreadContext* */
+	/* rcx = IEEThreadContext* */
         movq    0(%rcx), 			%rbx
         movq    8(%rcx), 			%r12
         movq    16(%rcx), 			%r13 
         movq    24(%rcx), 			%r14
-
+        movq    %rsp,                           64(%rcx) /* save trusted stack */
         movq    32(%rcx), 			%rsp  	/* rsp -- switch stack */
         movq    32(%rcx), 			%rbp	/* rbp == rsp initially */
 
@@ -55,15 +55,21 @@ SwitchToUntrustedAVX:
         movq    56(%rcx), 			%rcx 	/* two instructions to hide ThreadContext and set untrusted rip */
         jmp     *%rcx
 
-
-        .globl SwitchToUntrustedSSE
-        .type SwitchToUntrustedSSE, @function
+.globl SwitchToUntrustedSSELinux
+.type SwitchToUntrustedSSELinux, @function
+SwitchToUntrustedSSELinux:
+        /* if Windows, 1st param is already in %rcx */
+        /* elif Linux/OSX, 1st param is in %rdi. */
+        mov     %rdi, %rcx
+.globl SwitchToUntrustedSSE
+.type SwitchToUntrustedSSE, @function
 SwitchToUntrustedSSE:
         movq    0(%rcx), 			%rbx
         movq    8(%rcx), 			%r12
         movq    16(%rcx), 			%r13 
         movq    24(%rcx), 			%r14
 
+        movq    %rsp,                           64(%rcx) /* save trusted stack */
         movq    32(%rcx), 			%rsp  	/* rsp -- switch stack */
         movq    32(%rcx), 			%rbp	/* rbp == rsp initially */
 
@@ -99,36 +105,51 @@ SwitchToUntrustedSSE:
         movq    56(%rcx), 			%rcx 	/* two instructions to hide ThreadContext and set untrusted rip */
         jmp     *%rcx
 
-        .globl GetTLSBase
-        .type GetTLSBase, @function
-GetTLSBase:
-        movq	4096(%r15), 		%rax			/* fixed address for tls_index
-        movq	%fs: 88, 			%rcx			/* address of TLS array from Win32 TEB
-        movq	(%rcx, %rax, 8),	%rax			/* TLS array + uintptr_t * tls_index
-        ret
+/* synthesise  instructions (movq threadCtx, %rax; mov %rax, %r15; movq fptr, %rax) at the label */
+.globl SwitchToTrustedWin
+.type SwitchToTrustedWin, @function
+SwitchToTrustedWin:
+	movq	%rsp, 				32(%r15)	/* save the untrusted stack		*/
+	movq	64(%r15), 			%rsp		/* restore the trusted stack		*/
+	pushq					%rbp	/* save the untrusted ebp 			*/
+	subq	$32,				%rsp		/* windows shadow stack space		*/
+	/* untrusted code uses Linux x86-64 call convention
+	   so we convert it to windows x86-64 here
+	   system calls only support 3 interger/pointer parameters */
+	movq	%rdx,				%r9		/* 3rd linux param = 4th win param */
+	movq	%rsi, 				%r8		/* 2nd linux param = 3rd win param */
+	movq	%rdi,				%rdx		/* 1st linux param = 2nd win param */
+	movq	%r15,				%rcx		/* 1st param IEEThreadContext  */
+	call 					*%rax		/* call into win64 abi function return in rax */
+	addq	$32,				%rsp
+	popq					%rbp		/* restore the untrusted ebp		*/
+	movq	32(%r15), 			%rsp		/* restore the untrusted stack		*/
+	movq	48(%r15), 			%r15		/* r15 back to untrusted base addr 	*/
 
-		/* synthesise  instructions (movq threadCtx, %rax; mov %rax, %r15; movq fptr, %rax) at the label */
-		.globl SwitchToTrusted
-        .type SwitchToTrusted, @function
-SwitchToTrusted:
-		movq	%rsp, 				32(%r15)		/* save the untrusted stack			*/
-		movq	64(%r15), 			%rsp			/* restore the trusted stack		*/
-		pushq						%rbp			/* save the untrusted ebp 			*/
-		subq	$32,				%rsp		/* windows shadow stack space		*/
-		// untrusted code uses Linux x86-64 call convention
-		// so we convert it to windows x86-64 here
-		// system calls only support 3 interger/pointer parameters
-		movq	%rdx,				%r9				/* 3rd linux param = 4th win param */
-		movq	%rsi, 				%r8				/* 2nd linux param = 3rd win param */
-		movq	%rdi,				%rdx			/* 1st linux param = 2nd win param */
-		movq	%r15,				%rcx			/* 1st param IEEThreadContext  */
-		call 						*%rax			/* call into win64 abi function return in rax */
-		addq	$32,				%rsp
-		popq						%rbp			/* restore the untrusted ebp		*/
-		movq	32(%r15), 			%rsp			/* restore the untrusted stack		*/
-		movq	48(%r15), 			%r15			/* r15 back to untrusted base addr 	*/
+	ret 										/* return to the untrusted code 	*/
+.globl SwitchToTrustedWinEnd
+.type SwitchToTrustedWinEnd, @function
+SwitchToTrustedWinEnd:
 
-		ret 										/* return to the untrusted code 	*/
-		.globl SwitchToTrustedEnd
-        .type SwitchToTrustedEnd, @function
-SwitchToTrustedEnd:
+/* synthesise  instructions (movq threadCtx, %rax; mov %rax, %r15; movq fptr, %rax) at the label */
+.globl SwitchToTrustedLinux
+.type SwitchToTrustedLinux, @function
+SwitchToTrustedLinux:
+        movq    %rsp,                           32(%r15)        /* save the untrusted stack             */
+        movq    64(%r15),                       %rsp            /* restore the trusted stack            */
+        pushq                                   %rbp            /* save the untrusted ebp               */
+
+        /* system calls only support 3 interger/pointer parameters (for compat with windows code ) */
+        movq    %rdx,                           %rcx             /* 3rd untrusted param = 4th linux param */
+        movq    %rsi,                           %rdx             /* 2nd untrusted param = 3rd linux param */
+        movq    %rdi,                           %rsi            /* 1st untrusted param = 2nd linux param */
+        movq    %r15,                           %rdi            /* 1st param IEEThreadContext  */
+
+        call                                    *%rax           /* call into linux64 abi function return in rax,rbx */
+        popq                                    %rbp            /* restore the untrusted ebp            */
+        movq    32(%r15),                       %rsp            /* restore the untrusted stack          */
+        movq    48(%r15),                       %r15            /* r15 back to untrusted base addr      */
+        ret                                                     /* return to the untrusted code         */
+.globl SwitchToTrustedLinuxEnd
+.type SwitchToTrustedLinuxEnd, @function
+SwitchToTrustedLinuxEnd:

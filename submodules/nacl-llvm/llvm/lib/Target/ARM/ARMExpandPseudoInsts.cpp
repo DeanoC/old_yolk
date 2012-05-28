@@ -489,8 +489,10 @@ void ARMExpandPseudo::ExpandVST(MachineBasicBlock::iterator &MBBI) {
   if (SrcIsKill) // Add an implicit kill for the super-reg.
     MIB->addRegisterKilled(SrcReg, TRI, true);
   TransferImpOps(MI, MIB, MIB);
+
   // Transfer memoperands.
   MIB->setMemRefs(MI.memoperands_begin(), MI.memoperands_end());
+
   MI.eraseFromParent();
 }
 
@@ -1022,7 +1024,7 @@ bool ARMExpandPseudo::ExpandMI(MachineBasicBlock &MBB,
       if (isARM) {
         AddDefaultPred(MIB3);
         if (Opcode == ARM::MOV_ga_pcrel_ldr)
-          MIB2->setMemRefs(MI.memoperands_begin(), MI.memoperands_end());
+          MIB3->setMemRefs(MI.memoperands_begin(), MI.memoperands_end());
       }
       TransferImpOps(MI, MIB1, MIB3);
       MI.eraseFromParent();
@@ -1386,7 +1388,6 @@ bool ARMExpandPseudo::runOnMachineFunction(MachineFunction &MF) {
   TRI = TM.getRegisterInfo();
   STI = &TM.getSubtarget<ARMSubtarget>();
   AFI = MF.getInfo<ARMFunctionInfo>();
-  IsRelocPIC = MF.getTarget().getRelocationModel() == Reloc::PIC_;
 
   bool Modified = false;
   for (MachineFunction::iterator MFI = MF.begin(), E = MF.end(); MFI != E;

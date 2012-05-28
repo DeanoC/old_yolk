@@ -1,7 +1,7 @@
 /*
  * /Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/bitcoder.h
  *
- * (c) Copywrite Cloud Pixies Ltd.
+ * (c) Copyright Cloud Pixies Ltd.
  */
 #pragma once
 

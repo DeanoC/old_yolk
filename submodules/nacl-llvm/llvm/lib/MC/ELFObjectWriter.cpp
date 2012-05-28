@@ -627,7 +627,7 @@ void ELFObjectWriter::WriteSymbolTable(MCDataFragment *SymtabF,
 
 const MCSymbol *ELFObjectWriter::SymbolToReloc(const MCAssembler &Asm,
                                                const MCValue &Target,
-                                               const MCFragment &F, 
+                                               const MCFragment &F,
                                                const MCFixup &Fixup,
                                                bool IsPCRel) const {
   const MCSymbol &Symbol = Target.getSymA()->getSymbol();
@@ -667,12 +667,7 @@ const MCSymbol *ELFObjectWriter::SymbolToReloc(const MCAssembler &Asm,
   if (&Sec2 != &Section &&
       (Kind == MCSymbolRefExpr::VK_PLT ||
        Kind == MCSymbolRefExpr::VK_GOTPCREL ||
-       Kind == MCSymbolRefExpr::VK_GOTOFF ||
-  // @LOCALMOD-BEGIN-IS-UPSTREAM
-  // Fixes an LLVM bug. This bug has already been fixed upstream
-  // and should disappear on the next merge.
-       Kind == MCSymbolRefExpr::VK_NTPOFF)) {
-  // @LOCALMOD-END
+       Kind == MCSymbolRefExpr::VK_GOTOFF)) {
     if (Renamed)
       return Renamed;
     return &Symbol;
@@ -1557,5 +1552,4 @@ MCObjectWriter *llvm::createELFObjectWriter(MCELFObjectTargetWriter *MOTW,
                                             raw_ostream &OS,
                                             bool IsLittleEndian) {
   return new ELFObjectWriter(MOTW, OS, IsLittleEndian);
-
 }

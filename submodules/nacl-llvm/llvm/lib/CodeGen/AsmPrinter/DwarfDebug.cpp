@@ -117,7 +117,6 @@ DIType DbgVariable::getType() const {
       if (getName() == DT.getName())
         return (DT.getTypeDerivedFrom());
     }
-    return Ty;
   }
   return Ty;
 }
@@ -1407,37 +1406,39 @@ void DwarfDebug::endFunction(const MachineFunction *MF) {
   
   LexicalScope *FnScope = LScopes.getCurrentFunctionScope();
   CompileUnit *TheCU = SPMap.lookup(FnScope->getScopeNode());
-  assert(TheCU && "Unable to find compile unit!");
+  if( TheCU != nullptr ) {
+    assert(TheCU && "Unable to find compile unit!");
 
-  // Construct abstract scopes.
-  ArrayRef<LexicalScope *> AList = LScopes.getAbstractScopesList();
-  for (unsigned i = 0, e = AList.size(); i != e; ++i) {
-    LexicalScope *AScope = AList[i];
-    DISubprogram SP(AScope->getScopeNode());
-    if (SP.Verify()) {
-      // Collect info for variables that were optimized out.
-      DIArray Variables = SP.getVariables();
-      for (unsigned i = 0, e = Variables.getNumElements(); i != e; ++i) {
-        DIVariable DV(Variables.getElement(i));
-        if (!DV || !DV.Verify() || !ProcessedVars.insert(DV))
-          continue;
-        if (LexicalScope *Scope = LScopes.findAbstractScope(DV.getContext()))
-          addScopeVariable(Scope, new DbgVariable(DV, NULL));
+    // Construct abstract scopes.
+    ArrayRef<LexicalScope *> AList = LScopes.getAbstractScopesList();
+    for (unsigned i = 0, e = AList.size(); i != e; ++i) {
+      LexicalScope *AScope = AList[i];
+      DISubprogram SP(AScope->getScopeNode());
+      if (SP.Verify()) {
+        // Collect info for variables that were optimized out.
+        DIArray Variables = SP.getVariables();
+        for (unsigned i = 0, e = Variables.getNumElements(); i != e; ++i) {
+          DIVariable DV(Variables.getElement(i));
+          if (!DV || !DV.Verify() || !ProcessedVars.insert(DV))
+            continue;
+          if (LexicalScope *Scope = LScopes.findAbstractScope(DV.getContext()))
+            addScopeVariable(Scope, new DbgVariable(DV, NULL));
+        }
       }
+      if (ProcessedSPNodes.count(AScope->getScopeNode()) == 0)
+        constructScopeDIE(TheCU, AScope);
     }
-    if (ProcessedSPNodes.count(AScope->getScopeNode()) == 0)
-      constructScopeDIE(TheCU, AScope);
+    
+    DIE *CurFnDIE = constructScopeDIE(TheCU, FnScope);
+    
+    if (!MF->getTarget().Options.DisableFramePointerElim(*MF))
+      TheCU->addUInt(CurFnDIE, dwarf::DW_AT_APPLE_omit_frame_ptr,
+                     dwarf::DW_FORM_flag, 1);
+
+    DebugFrames.push_back(FunctionDebugFrameInfo(Asm->getFunctionNumber(),
+                                                 MMI->getFrameMoves()));
   }
   
-  DIE *CurFnDIE = constructScopeDIE(TheCU, FnScope);
-  
-  if (!MF->getTarget().Options.DisableFramePointerElim(*MF))
-    TheCU->addUInt(CurFnDIE, dwarf::DW_AT_APPLE_omit_frame_ptr,
-                   dwarf::DW_FORM_flag, 1);
-
-  DebugFrames.push_back(FunctionDebugFrameInfo(Asm->getFunctionNumber(),
-                                               MMI->getFrameMoves()));
-
   // Clear debug info
   for (DenseMap<LexicalScope *, SmallVector<DbgVariable *, 8> >::iterator
          I = ScopeVariables.begin(), E = ScopeVariables.end(); I != E; ++I)
@@ -2049,9 +2050,11 @@ void DwarfDebug::emitDebugLoc() {
             if (Element == DIBuilder::OpPlus) {
               Asm->EmitInt8(dwarf::DW_OP_plus_uconst);
               Asm->EmitULEB128(DV.getAddrElement(++i));
-            } else if (Element == DIBuilder::OpDeref)
-              Asm->EmitInt8(dwarf::DW_OP_deref);
-            else llvm_unreachable("unknown Opcode found in complex address");
+            } else if (Element == DIBuilder::OpDeref) {
+              if (!Entry.Loc.isReg())
+                Asm->EmitInt8(dwarf::DW_OP_deref);
+            } else
+              llvm_unreachable("unknown Opcode found in complex address");
           }
         }
       }
