@@ -180,10 +180,68 @@
 	"buffers":
 	[
 		{
-			"file": "src/libs/dwm/mmu.h",
+			"file": "src/libs/dwm/bitcoder.cpp",
 			"settings":
 			{
-				"buffer_size": 3493,
+				"buffer_size": 11365,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/deano/projects/nacl-newlib/newlib/libc/sys/linux/brk.c",
+			"settings":
+			{
+				"buffer_size": 851,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/deano/projects/nacl-newlib/newlib/libc/syscalls/sysclose.c",
+			"settings":
+			{
+				"buffer_size": 141,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/dwm/dwm.cpp",
+			"settings":
+			{
+				"buffer_size": 5118,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/dwm/bitcoder.h",
+			"settings":
+			{
+				"buffer_size": 1636,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/dwm/isolatedexecengine.cpp",
+			"settings":
+			{
+				"buffer_size": 6357,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 10059 files for \"JIT_REGISTER_FN\"\n\n/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/GDBRegistrar.cpp:\n   22    typedef enum {\n   23      JIT_NOACTION = 0,\n   24:     JIT_REGISTER_FN,\n   25      JIT_UNREGISTER_FN\n   26    } jit_actions_t;\n   ..\n  100  void NotifyDebugger(jit_code_entry* JITCodeEntry) {\n  101    llvm::MutexGuard locked(JITDebugLock);\n  102:   __jit_debug_descriptor.action_flag = JIT_REGISTER_FN;\n  103  \n  104    // Insert this entry at the head of the list.\n\n2 matches in 1 file\n",
+			"settings":
+			{
+				"buffer_size": 543,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/GDBRegistrar.cpp",
+			"settings":
+			{
+				"buffer_size": 6819,
 				"line_ending": "Unix"
 			}
 		}
@@ -191,19 +249,19 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 35.0,
+		"height": 272.0,
 		"selected_items":
 		[
 			[
-				"",
-				"Bookmarks: Clear All"
-			],
-			[
 				"Package Control: ",
 				"Package Control: Discover Packages"
+			],
+			[
+				"",
+				"Bookmarks: Clear All"
 			]
 		],
-		"width": 400.0
+		"width": 449.0
 	},
 	"console":
 	{
@@ -220,7 +278,45 @@
 	},
 	"file_history":
 	[
+		"/home/deano/projects/nacl-newlib/newlib/libc/sys/linux/crt1.c",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/DwarfDebug.cpp",
+		"/home/deano/.cache/.fr-lGG1G5/nacl-gdb/gdb/solib-nacl.c",
+		"/home/deano/.cache/.fr-EiJeIn/nacl-gdb/README",
+		"/home/deano/.cache/.fr-kujDwC/nacl-gdb/gdb/nacl-tdep.c",
+		"/home/deano/.cache/.fr-6QBmnS/nacl-gdb/gdb/nacl-multiarch.c",
+		"/home/deano/.cache/.fr-2gf1RI/nacl-gdb/gdb/nacl-manifest.c",
+		"/home/deano/.cache/.fr-0U1Prt/nacl-gdb/gdb/gnu-nat.c",
+		"/home/deano/.cache/.fr-1VAVzy/nacl-gdb/gdb/amd64-linux-nat.c",
+		"/home/deano/.cache/.fr-fQ6WYS/nacl-gdb/gdb/amd64-nat.c",
+		"/home/deano/.cache/.fr-2TJuCy/nacl-gdb/bfd/elf64-x86-64.c",
+		"/home/deano/.cache/.fr-8JN0nE/nacl-gdb/bfd/cpu-i386.c",
+		"/home/deano/.cache/.fr-PP4lnQ/nacl-gdb/opcodes/i386-gen.c",
+		"/home/deano/builds/yolk/src/apps/dvm_owned_dedi/hello_world.ll",
+		"/home/deano/builds/vt/src/apps/hello_world/hello_world_opt.ll",
+		"/home/deano/builds/vt/src/apps/hello_world/hello_world_opt",
+		"/home/deano/projects/yolk/src/libs/dwm/asm/switcher.S",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Bitcode/Reader/BitcodeReader.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Target/X86/X86ISelLowering.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/MC/MCELFStreamer.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/cmake/modules/LLVMProcessSources.cmake",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Target/X86/X86Subtarget.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.cpp",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Support/Host.cpp",
+		"/home/deano/projects/yolk/submodules/clang/lib/Headers/cpuid.h",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/TableGen/CMakeLists.txt",
+		"/home/deano/projects/yolk/CMakeLists.txt",
+		"/home/deano/dvm_owned_dedi.WARNING",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/tools/CMakeLists.txt",
+		"/home/deano/builds/yolk/CMakeCache.txt",
+		"/home/deano/projects/yolk/.gitmodules",
+		"/home/deano/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/deano/projects/yolk/src/libs/dwm/cpufeatures.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/mmu.h",
 		"/home/deano/.xinitrc",
+		"/usr/share/xfce4/helpers/aterm.desktop",
 		"/home/deano/projects/yolk/src/libs/glog/src/utilities.cc",
 		"/home/deano/projects/yolk/src/libs/dwm/bitcoder.cpp",
 		"/home/deano/projects/yolk/src/libs/dwm/bitcoder.h",
@@ -309,49 +405,11 @@
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/NaClJITMemoryManager.h",
 		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/JIT/NaClJITMemoryManager.cpp",
 		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/SublimeClang/SublimeClang.sublime-settings",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/AsmPrinterDwarf.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/lto/LTOCodeGenerator.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_ldr.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Object/ObjectFile.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Object/ELF.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/ELF.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_main.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Linker.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Transforms/IPO/Internalize.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/CodeGen/LLVMTargetMachine.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Linker/LinkModules.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/core/singleton.h",
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Package Control/Package Control.sublime-settings",
-		"/C/boost/include/boost_1_48_0/boost/tr1/functional.hpp",
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/User/Package Control.sublime-settings",
-		"/Z/Projects/Cyberspace/llvm/include/llvm/MC/SubtargetFeature.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/pnacl/driver/driver_env.py",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/pnacl/driver/driver_tools.py",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/gio/gio_mem_snapshot.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/pnacl/driver/pnacl-ld.py",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llvm-ld/llvm-ld.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llc/llc.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/pnacl/driver/pnacl-driver.py",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/core/fileio.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/platform/nacl_log.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/platform/nacl_log.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/gio/gio_mem.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/raw_ostream.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/gio/gio.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/gioadaptor.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/gioadaptor.cpp",
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/User/header_start.sublime-snippet",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_sync_cond_test.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/x86/decoder/ncop_exps.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/validator/x86/error_reporter.h",
-		"/Z/Projects/Cyberspace/llvm/include/llvm/Target/TargetOptions.h"
+		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.cpp"
 	],
 	"find":
 	{
-		"height": 39.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
@@ -372,6 +430,22 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"JIT_REGISTER_FN",
+			"main",
+			"_start",
+			"sbrk",
+			"LowerToTLSExecModel",
+			"TAILJMPd64",
+			"le32",
+			"main",
+			".Linfo",
+			"BUNDLE_ALIGN_START",
+			"Invalid Switch Record",
+			"CXX_FLAGS",
+			"C_FLAGS",
+			"LLVM_REQUIRES_",
+			"RTTI",
+			"cpuid",
 			"python",
 			"PythonInter",
 			"EmitBundleAlignEnd",
@@ -483,23 +557,7 @@
 			"src/native_client/src",
 			"ELF",
 			"libelf",
-			"raw_ostream",
-			"NaClExit",
-			"NaClCreateMainThread",
-			"error",
-			"NaClAppLoadFile",
-			"NaClElfImageLoadDynamically",
-			"NaClAppLoadFileDynamically",
-			"pnacl",
-			"NaClAppLoadFile",
-			"NaClAppInitialDescriptorHookup",
-			"GioMemoryFileSnapshotCtor",
-			"GioFile",
-			"GioFileRefCtor",
-			"NACL_MAX_SYSCALLS",
-			"NaClSyscallTableInit",
-			"NaClAllModulesInit",
-			"NaClAppLoadFile"
+			"raw_ostream"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -523,31 +581,243 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/dwm/mmu.h",
+					"file": "src/libs/dwm/bitcoder.cpp",
 					"settings":
 					{
-						"buffer_size": 3493,
+						"buffer_size": 11365,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								205,
-								205
+								5430,
+								5430
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 80.0,
+						"translation.y": 3322.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/home/deano/projects/nacl-newlib/newlib/libc/sys/linux/brk.c",
+					"settings":
+					{
+						"buffer_size": 851,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								242,
+								242
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/home/deano/projects/nacl-newlib/newlib/libc/syscalls/sysclose.c",
+					"settings":
+					{
+						"buffer_size": 141,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/libs/dwm/dwm.cpp",
+					"settings":
+					{
+						"buffer_size": 5118,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3738,
+								3738
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2684.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/libs/dwm/bitcoder.h",
+					"settings":
+					{
+						"buffer_size": 1636,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								965,
+								965
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 728.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/libs/dwm/isolatedexecengine.cpp",
+					"settings":
+					{
+						"buffer_size": 6357,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2147,
+								2147
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1276.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"settings":
+					{
+						"buffer_size": 543,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										211,
+										226
+									],
+									[
+										442,
+										457
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								429,
+								429
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/GDBRegistrar.cpp",
+					"settings":
+					{
+						"buffer_size": 6819,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1809,
+								1809
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1012.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -596,6 +866,30 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"dwarf",
+				"submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/DwarfDebug.cpp"
+			],
+			[
+				"dwarfde",
+				"submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/DwarfDebug.cpp"
+			],
+			[
+				"bitcodere",
+				"submodules/nacl-llvm/llvm/lib/Bitcode/Reader/BitcodeReader.cpp"
+			],
+			[
+				"runtimey",
+				"submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp"
+			],
+			[
+				"",
+				"submodules/nacl-llvm/llvm/lib/MC/MCELFStreamer.cpp"
+			],
+			[
+				"runtime",
+				"submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp"
+			],
 			[
 				"platform",
 				"src/libs/core/platform.h"
@@ -647,6 +941,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 277.0,
+	"side_bar_width": 263.0,
 	"status_bar_visible": true
 }

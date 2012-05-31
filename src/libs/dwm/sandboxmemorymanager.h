@@ -62,25 +62,7 @@ class SandboxMemoryManager :
 	/// setPoisonMemory - No-op on NaCl - nothing unvalidated is ever executable
 	virtual void setPoisonMemory(bool poison) {}
 
-	virtual void *getPointerToNamedFunction(const std::string &name,
-											bool AbortOnFailure = true) {
-		if( name[0] == '.' ) {
-			// local var, never a function so ignore
-			return (void*)slabAllocator.membase;
-		}
-		auto addr = trustedRegion->getAddress( name );
-		if( addr == nullptr ) {
-			addr = trustedRegion->addFunctionTrampoline( "_nofunc_", (void*) nofunc);
-			LOG(INFO) << "Code contains a trusted function " << name << " that doesn't exist, if called it will likely crash\n";
-		}
-		if( addr == nullptr ) {
- 			// this is a valid sandbox addres, but any call to it will go pop
-			LOG(INFO) << "Code contains a trusted function " << name << " that doesn't exist, if called it will crash\n";
-			return (void*)slabAllocator.membase;
-		}
-
-		return (void*)addr;
-	}
+	virtual void *getPointerToNamedFunction(const std::string &name, bool AbortOnFailure = true);
 
 	// set code to RX and data to RW TODO RO data sections
 	void protect();
@@ -190,12 +172,6 @@ private:
 						AllocationTable &table );
 
 	void FreeListDeallocate( FreeListNode *head, AllocationTable &table, void *body );
-
-	// for compiliers without non capture lamba = function pointer detection
-	static inline int nofunc() { 
-		LOG(INFO) << "Called an external with no implementation!"; 
-		return 0; 
-	};
 
 };
 

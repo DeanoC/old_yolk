@@ -13,6 +13,7 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/system_error.h"
 #include "mmu.h"
+#include "ieethreadcontext.h"
 
 #include "sandboxmemorymanager.h"
 
@@ -82,7 +83,7 @@ SandboxMemoryManager::SandboxMemoryManager( uintptr_t membase,
 	// next pages is r/o memory of the trusted block 
 	trustedStart = (uintptr_t) slabAllocator.Allocate( trustedSize );
 
-	LOG(INFO) << "SandboxMemoryManager: Pwned " << membase << " - " << memend << "\n";
+	LOG(INFO) << "SandboxMemoryManager: Pwned " << (void*)membase << " - " << (void*)memend << "\n";
 
 	stackStart = slabAllocator.memend - MMU::get()->getPageSize();
 	stackEnd = stackStart - (stackSize - (2 * MMU::get()->getPageSize()));
@@ -345,4 +346,27 @@ uint8_t* YolkSlabAllocator::AllocateRaw(size_t Size) {
 }
 
 void YolkSlabAllocator::Deallocate(llvm::MemSlab *Slab) {
+}
+
+static void DbgNotLinked(  const IEEThreadContext* threadCtx, const char* name ) {
+	LOG(INFO) << "Not Linked FUNC : " << name << " called!! CRASH 3.2.1.... \n"; 
+}
+
+void *SandboxMemoryManager::getPointerToNamedFunction(const std::string &name, bool AbortOnFailure) {
+	if( name[0] == '.' ) {
+		// local var, never a function so ignore
+		return (void*)slabAllocator.membase;
+	}
+	auto addr = trustedRegion->getAddress( name );
+	if( addr == nullptr ) {
+		addr = trustedRegion->addNotLinkedTrampoline( name, (void*)&DbgNotLinked );
+//			LOG(INFO) << "Code contains a trusted function " << name << " that doesn't exist, if called it will likely crash\n";
+	}
+	if( addr == nullptr ) {
+			// this is a valid sandbox addres, but any call to it will go pop
+		LOG(INFO) << "Code contains a trusted function " << name << " that doesn't exist, if called it will crash\n";
+		return (void*)slabAllocator.membase;
+	}
+
+	return (void*)addr;
 }

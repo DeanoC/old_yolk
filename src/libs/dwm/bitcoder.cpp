@@ -88,6 +88,9 @@ namespace {
 			ExternalNames.insert("llvm.global_dtors");
 			ExternalNames.insert("llvm.global.annotations");
 			ExternalNames.insert("__stack_chk_guard");
+			ExternalNames.insert("__libc_init");
+			ExternalNames.insert("__libc_init_common");
+			ExternalNames.insert("_init_thread");
 
 	}
 
@@ -146,13 +149,15 @@ namespace {
 //				LOG(INFO) << "Internalized alias " << I->getName().str() << "\n";
 			}
 		}
+		
 		return Changed;
 	}
 } // end anonymous namespace
 
 BitCoder::BitCoder() :
-	untrustedTriple( "x86_64-unknown-linux" ),
-	trustedTriple( "x86_64-unknown-nacl" )
+	trustedTriple( "x86_64-unknown-linux" ),
+//	untrustedTriple( "x86_64-unknown-nacl" )
+	untrustedTriple( "x86_64-unknown-linux" ) // debug
 {
 	using namespace llvm;
 
@@ -162,7 +167,7 @@ BitCoder::BitCoder() :
 	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
 
-	const std::string cpu( "core2" );
+	const std::string cpu( "bdver1" );
 	// Package up features to be passed to target/subtarget
 	std::string featuresStr;
 	SubtargetFeatures Features;
@@ -176,7 +181,7 @@ BitCoder::BitCoder() :
 
 	Features.getDefaultSubtargetFeatures( untrustedTriple );
 	featuresStr = Features.getString();
-  	tm[UNTRUSTED].reset( tUNTRUSTED->createTargetMachine( untrustedTriple.getTriple(), cpu, featuresStr, TargetOptions() ) );
+  	tm[UNTRUSTED].reset( tUNTRUSTED->createTargetMachine( untrustedTriple.getTriple(), cpu, featuresStr, TargetOptions(), Reloc::Static, CodeModel::Large ) );
 	mcii[UNTRUSTED].reset( tUNTRUSTED->createMCInstrInfo() );	
 	mcsti[UNTRUSTED].reset( tUNTRUSTED->createMCSubtargetInfo( untrustedTriple.getTriple(), cpu, featuresStr ) );	
   	mcai[UNTRUSTED].reset( tUNTRUSTED->createMCAsmInfo( untrustedTriple.getTriple() ) );

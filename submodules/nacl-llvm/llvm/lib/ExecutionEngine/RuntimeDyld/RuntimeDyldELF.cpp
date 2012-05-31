@@ -196,6 +196,13 @@ void RuntimeDyldELF::resolveX86_64Relocation(uint8_t *LocalAddress,
                                              uint64_t Value,
                                              uint32_t Type,
                                              int64_t Addend) {
+  DEBUG(dbgs() << "resolveX86_64Relocation, LocalAddress: " << LocalAddress
+               << " FinalAddress: " << format("%p",FinalAddress)
+               << " Value: " << format("%x",Value)
+               << " Type: " << format("%x",Type)
+               << " Addend: " << format("%x",Addend)
+               << "\n");
+
   switch (Type) {
   default:
     llvm_unreachable("Relocation type not implemented yet!");
@@ -209,9 +216,9 @@ void RuntimeDyldELF::resolveX86_64Relocation(uint8_t *LocalAddress,
   case ELF::R_X86_64_32S: {
     Value += Addend;
     // FIXME: Handle the possibility of this assertion failing
-    //assert((Type == ELF::R_X86_64_32 && !(Value & 0xFFFFFFFF00000000ULL)) ||
-    //       (Type == ELF::R_X86_64_32S &&
-    //        (Value & 0xFFFFFFFF00000000ULL) == 0xFFFFFFFF00000000ULL));
+    assert((Type == ELF::R_X86_64_32 && !(Value & 0xFFFFFFFF00000000ULL)) ||
+           (Type == ELF::R_X86_64_32S &&
+            (Value & 0xFFFFFFFF00000000ULL) == 0xFFFFFFFF00000000ULL));
 	// under nacl sandbox this is fine i think...
     uint32_t TruncatedAddr = (Value & 0xFFFFFFFF);
     uint32_t *Target = reinterpret_cast<uint32_t*>(LocalAddress);
@@ -226,6 +233,28 @@ void RuntimeDyldELF::resolveX86_64Relocation(uint8_t *LocalAddress,
     *Placeholder = TruncOffset;
     break;
   }
+  case ELF::R_X86_64_GOT32: {    
+    llvm_unreachable( "ELF::R_X86_64_GOT32" );
+    break;
+  }
+  case ELF::R_X86_64_PLT32: {
+    uint32_t *Placeholder = reinterpret_cast<uint32_t*>(LocalAddress);
+    int64_t RealOffset = (*Placeholder + Value + Addend) - FinalAddress;
+    assert(RealOffset <= 214783647 && RealOffset >= -214783648);
+    int32_t TruncOffset = (RealOffset & 0xFFFFFFFF);
+    *Placeholder = TruncOffset;
+    break;
+  }
+
+  case ELF::R_X86_64_GOTPCREL: {
+    uint32_t *Placeholder = reinterpret_cast<uint32_t*>(LocalAddress);
+    int64_t RealOffset = (*Placeholder + Value + Addend) - FinalAddress;
+    assert(RealOffset <= 214783647 && RealOffset >= -214783648);
+    int32_t TruncOffset = (RealOffset & 0xFFFFFFFF);
+    *Placeholder = TruncOffset;
+    break;
+  }
+
   }
 }
 
@@ -373,15 +402,24 @@ void RuntimeDyldELF::processRelocationRef(const ObjRelocationInfo &Rel,
           section_iterator si(Obj.end_sections());
           Symbol.getSection(si);
           if (si == Obj.end_sections())
-            llvm_unreachable("Symbol section not found, bad object file format!");
-          DEBUG(dbgs() << "\t\tThis is section symbol\n");
+            llvm_unreachable("Symbol section not found, bad object file format!");  
+//            dbgs() << "\t\tThis is section symbol " << TargetName.data() << "\n";
           Value.SectionID = findOrEmitSection(Obj, (*si), true, ObjSectionToID);
           Value.Addend = Addend;
           break;
         }
         case SymbolRef::ST_Data:
+//            dbgs() << "\t\tThis is ST_Data symbol " << TargetName.data() << "\n";
+          Value.SymbolName = TargetName.data();
+          Value.Addend = Addend;
+          break;
     		case SymbolRef::ST_Function:
+//            dbgs() << "\t\tThis is ST_Function symbol " << TargetName.data() << "\n";
+          Value.SymbolName = TargetName.data();
+          Value.Addend = Addend;
+          break;
         case SymbolRef::ST_Unknown: {
+//            dbgs() << "\t\tThis is ST_Unknown symbol " << TargetName.data() << "\n";
           Value.SymbolName = TargetName.data();
           Value.Addend = Addend;
           break;

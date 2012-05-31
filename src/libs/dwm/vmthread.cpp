@@ -12,6 +12,6 @@ VMThread::VMThread( Dwm& dwm ) :
 
 	execEngine.reset( CORE_NEW IsolatedExecEngine(	4 * IsolatedExecEngine::MiB, // memory size include stack + trusted
 													1 * IsolatedExecEngine::MiB, // stack size 
-													4 * IsolatedExecEngine::KiB // trusted region size
+													64 * IsolatedExecEngine::KiB // trusted region size
 													) );	  	
 }

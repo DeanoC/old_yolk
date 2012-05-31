@@ -8,6 +8,9 @@
 #include "ieethreadcontext.h"
 #include "isolatedexecengine.h"
 
+extern "C" void _ovly_debug_event() {
+}
+
 extern void InstallVmApiFuncs( TrustedRegion* trustedRegion );
 
 IsolatedExecEngine::IsolatedExecEngine( uint32_t sandboxSize, 
@@ -79,11 +82,12 @@ void* IsolatedExecEngine::sandboxAllocate( size_t size) {
 void IsolatedExecEngine::sandboxFree( void* ptr ) {
 	// TODO
 }
+
 void no_func( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
 	LOG(INFO) << "No func: " << threadCtx->untrusted_rip << "\n"; 
 };
 
-void func0( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
+void _DgStringOut( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
 	const char* text = (const char*)( threadCtx->membase + sbTextptr);
 	LOG(INFO) << "DgStringOut: " << text << "\n"; 
 };
@@ -100,7 +104,7 @@ uintptr_t func1( const IEEThreadContext* threadCtx, const uintptr_t sbDst, const
 void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
 
 	trustedRegion->addFunctionTrampoline( "_no_func_", (void*) no_func );
-	trustedRegion->addFunctionTrampoline( "DgStringOut", (void*) func0 );
+	trustedRegion->addFunctionTrampoline( "DgStringOut", (void*) _DgStringOut );
 }
 
 // TODO thread safe thread allocation
@@ -137,6 +141,8 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	// no code writting can occur once the protect are set
 	mmgr->protect();
 	trustedRegion->protect();
+
+	_ovly_debug_event();
 	
 	threadCtx->untrusted_stack = (uint64_t)mmgr->getStackStart() - 8;
 	unsigned int tmp = 0;
@@ -145,21 +151,21 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 #endif
 	threadCtx->fcw =  (uint16_t) tmp;
 
-	threadCtx->membase = (uint64_t) sandboxMem;
-	threadCtx->untrusted_rip = (uint64_t)dyld->getSymbolAddress( llvm::StringRef("main") );
+	threadCtx->membase = (uint64_t) 0;// DEBUG sandboxMem;
+	threadCtx->untrusted_rip = (uint64_t)dyld->getSymbolAddress( llvm::StringRef("__libc_init") );
+//	threadCtx->untrusted_rip = (uint64_t)dyld->getSymbolAddress( llvm::StringRef("main") );
+	assert( threadCtx->untrusted_rip != 0 );
 
-	// this function never leaves once we enter untrusted code, this thread is commited to untrusted exec
-	// and so we use its stack for the trusted calls from untrusted code
-	// TODO make sure automatic C++ clean up code is on the stack, post this (including all code getting here)
-	// easiest way is to create a new main thread that calls here leaving all the construction to its parent thread.
-#if PLATFORM_OS == MS_WINDOWS
-	threadCtx->trusted_stack = (uint64_t) _AddressOfReturnAddress(); 
-#endif
+	LOG(INFO) << "__preinit_array_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__preinit_array_start") ) << "\n";
+	LOG(INFO) << "__init_array_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__init_array_start") ) << "\n";
+	LOG(INFO) << "__fini_array_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__fini_array_start") ) << "\n";
+	LOG(INFO) << "__ctors_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__ctors_start") ) << "\n";
+
 	threadCtx->owner = this;
 
-	typedef void (*main_ptr)( const IEEThreadContext* ctx );
-	main_ptr mainp = (main_ptr) dyld->getSymbolAddress( llvm::StringRef("SwitchToUntrustedSSELinux") );
-	assert( mainp != nullptr );
-	mainp( threadCtx );
+	typedef void (*switch_ptr)( const IEEThreadContext* ctx );
+	switch_ptr switchp = (switch_ptr) dyld->getSymbolAddress( llvm::StringRef("SwitchToUntrustedSSELinux") );
+	assert( switchp != nullptr );
+	switchp( threadCtx );
 	// never ever ever gets here!
 }
