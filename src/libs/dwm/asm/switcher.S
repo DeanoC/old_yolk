@@ -134,7 +134,8 @@ SwitchToTrustedWinEnd:
 .globl SwitchToTrustedLinux
 .type SwitchToTrustedLinux, @function
 SwitchToTrustedLinux:
-        /* synthesise instructions here (movq threadCtx, %rcx; movq funcptr, %rax)                                      */
+        /* synthesise instructions here (movq threadCtx, %rcx; movq funcptr, %rax) */
+        pushq   %r12                                     
         movq    %rsp,                           32(%rcx)        /* save the untrusted stack                             */
         movq    64(%rcx),                       %rsp            /* restore the trusted stack                            */
         pushq                                   %r15            /* save r15                                             */
@@ -150,6 +151,7 @@ SwitchToTrustedLinux:
 
         popq                                    %r15            /* restore r15                                          */
         movq    32(%r12),                       %rsp            /* restore the untrusted stack                          */
+        popq    %r12
         ret                                                     /* return to the untrusted code                         */
 .globl SwitchToTrustedLinuxEnd
 .type SwitchToTrustedLinuxEnd, @function

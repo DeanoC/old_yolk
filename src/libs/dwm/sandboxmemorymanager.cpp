@@ -202,6 +202,7 @@ uint8_t *SandboxMemoryManager::allocateCodeSection(	uintptr_t size,
 													unsigned sectionID ) {
 	LOG(INFO) << "allocateCodeSection " << size << "/" << alignment << "\n";
 	uintptr_t r = (uintptr_t)codeAllocator.Allocate( size, alignment );
+	assert( r < stackEnd );
 	codeSectionTable[ sectionID ] = std::pair<uintptr_t,size_t>(r,(size_t)size);
 	return (uint8_t*)r;
 }
@@ -211,6 +212,7 @@ uint8_t *SandboxMemoryManager::allocateDataSection(	uintptr_t size,
 													unsigned sectionID ) {
 	LOG(INFO) << "allocateDataSection " << size << "/" << alignment << "\n";
 	uintptr_t r = (uintptr_t)dataAllocator.Allocate( size, alignment );
+	assert( r < stackEnd );
 	dataSectionTable[ sectionID ] = std::pair<uintptr_t,size_t>(r,(size_t)size);
 	return (uint8_t*)r;
 }
@@ -226,16 +228,22 @@ uint8_t *SandboxMemoryManager::allocateSpace(intptr_t size,
 	// todo REWRITE data allocators, not fit for purpose and can be used
 	// to crash the trusted side post running untrusted code :O
 	if( size < 4096 ) {
-		return (uint8_t*)dataAllocator.Allocate( size, alignment );
+		uintptr_t r = (uintptr_t) dataAllocator.Allocate( size, alignment );
+		assert( r < stackEnd );
+		return (uint8_t*)r;
 	} else {
-		return ( (uint8_t*) slabAllocator.AllocateRaw( size ) );
+		uintptr_t r = (uintptr_t) slabAllocator.AllocateRaw( size );
+		assert( r < stackEnd );
+		return (uint8_t*) r;
 	}
 }
 
 uint8_t *SandboxMemoryManager::allocateGlobal(uintptr_t size,
 												unsigned alignment) {
 	LOG(INFO) << "allocateGlobal " << size << "/" << alignment << "\n";
-	return (uint8_t*)dataAllocator.Allocate( size, alignment );
+	uintptr_t r = (uintptr_t) dataAllocator.Allocate( size, alignment );
+	assert( r < stackEnd );
+	return (uint8_t*) r;
 }
 
 uint8_t* SandboxMemoryManager::startExceptionTable(const llvm::Function* f,

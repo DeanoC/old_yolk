@@ -83,30 +83,6 @@ void IsolatedExecEngine::sandboxFree( void* ptr ) {
 	// TODO
 }
 
-void no_func( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
-	LOG(INFO) << "No func: " << threadCtx->untrusted_rip << "\n"; 
-};
-
-void _DgStringOut( const IEEThreadContext* threadCtx, const uintptr_t sbTextptr ) { 
-	const char* text = (const char*)( threadCtx->membase + sbTextptr);
-	LOG(INFO) << "DgStringOut: " << text << "\n"; 
-};
-
-uintptr_t func1( const IEEThreadContext* threadCtx, const uintptr_t sbDst, const int32_t val, const uint32_t size ) {
-	void* dst = (void*)( threadCtx->membase + sbDst);
-	void* ret = memset( dst, val, size );
-	return (uintptr_t)ret - threadCtx->membase;
-};
-// trusted functions can currently have 3 user params (besides the threadCtx) any must be integers or sandbox pointers
-// if pointer must adjust, and beware of other sandbox threads altering (copy before use in most cases!)
-// float support is minimal, not mixing is likely to work for the 4 four float/float vector parameters on 64 bit at least
-// TODO improve support for floats + varargs (which won't work) + handle stack parameters
-void InstallTrustedFuncs( TrustedRegion* trustedRegion ) {
-
-	trustedRegion->addFunctionTrampoline( "_no_func_", (void*) no_func );
-	trustedRegion->addFunctionTrampoline( "DgStringOut", (void*) _DgStringOut );
-}
-
 // TODO thread safe thread allocation
 #define MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCESS 1024
 static IEEThreadContext g_ThreadCtxs[ MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCESS ];
@@ -130,7 +106,6 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	// wipe out (HLT) the untrusted thunk code now its been copied into trusted space
 	memset( sttStart, 0xFE, (uintptr_t)sttEnd - (uintptr_t)sttStart ); 
 
-	InstallTrustedFuncs( trustedRegion );
 	InstallVmApiFuncs( trustedRegion );
 
 	// transfer the elf into the loader and get its ready to go

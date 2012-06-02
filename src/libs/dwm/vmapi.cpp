@@ -13,6 +13,17 @@
 #define UNTRUSTED_PTR_TO_TRUSTED(x) ((uintptr_t)x + threadCtx->membase)
 //namespace {
 
+
+void DbgStringOut( const IEEThreadContext* threadCtx, UNTRUSTED_UINTPTR_T unText ) { 
+	const char* text = (const char*)UNTRUSTED_PTR_TO_TRUSTED( unText );
+	LOG(INFO) << text; 
+};
+
+void DbgIntOut( const IEEThreadContext* threadCtx, int32_t num ) { 
+	LOG(INFO) << num; 
+};
+
+
 UNTRUSTED_UINTPTR_T VmAlloc( const IEEThreadContext* threadCtx, uint32_t size ) {
 	uintptr_t tAddr = (uintptr_t) threadCtx->owner->sandboxAllocate( size );
 	return TRUSTED_PTR_TO_UNTRUSTED( tAddr );
@@ -87,10 +98,11 @@ struct VmStat {
 int VmFStat( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBuf ) {
 	VmStat* stat = (VmStat*) UNTRUSTED_PTR_TO_TRUSTED( unBuf );
 	memset( stat, 0, sizeof( VmStat ) );
+
 	// stdout
-	if( fd == STDOUT_FILENO ) {
+	if( fd == STDOUT_FILENO || fd == STDIN_FILENO || fd == STDERR_FILENO ) {
 		struct stat sds;
-		fstat( STDOUT_FILENO, &sds );
+		fstat( fd, &sds );
 		stat->dev = sds.st_dev;
 		stat->ino = sds.st_ino;
 		stat->mode = sds.st_mode;
@@ -111,7 +123,7 @@ int VmFStat( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBu
 uint32_t VmWrite( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBuf, uint32_t num ) {
 	char* buf = (char*) UNTRUSTED_PTR_TO_TRUSTED( unBuf );
 
-	if( fd == STDOUT_FILENO ) {
+	if( fd == STDOUT_FILENO || fd == STDERR_FILENO ) {
 		write( fd, buf, num );
 	} else {
 		LOG(INFO) << "TODO: VmWrite : ";
@@ -123,12 +135,29 @@ uint32_t VmWrite( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T
 	return num;
 }
 
+struct VmTimeVal {
+	int64_t      	tv_sec;
+	uint64_t 		tv_usec;
+};
 
+int VmGetTimeOfDay( const IEEThreadContext* threadCtx, UNTRUSTED_UINTPTR_T unTv ) {
+	struct timeval tv;
+	struct timezone tz;
+	struct VmTimeVal *rtv = (VmTimeVal*) UNTRUSTED_PTR_TO_TRUSTED(unTv);
 
+	int r = gettimeofday( &tv, nullptr );
+	rtv->tv_sec = tv.tv_sec;
+	rtv->tv_usec = tv.tv_usec;
+
+	return r;
+}
 
 //} // end anon namespace
 
 void InstallVmApiFuncs( TrustedRegion* trustedRegion ) {
+	trustedRegion->addFunctionTrampoline( "DbgStringOut", (void*) DbgStringOut );
+	trustedRegion->addFunctionTrampoline( "DbgIntOut", (void*) DbgIntOut );
+
 	trustedRegion->addFunctionTrampoline( "VmAlloc", (void*) VmAlloc );
 	trustedRegion->addFunctionTrampoline( "VmFree", (void*) VmFree );
 	trustedRegion->addFunctionTrampoline( "__get_sp", (void*) VmGetSp );
@@ -138,6 +167,7 @@ void InstallVmApiFuncs( TrustedRegion* trustedRegion ) {
 
 	trustedRegion->addFunctionTrampoline( "write", (void*) VmWrite );
 	trustedRegion->addFunctionTrampoline( "fstat", (void*) VmFStat );
+	trustedRegion->addFunctionTrampoline( "gettimeofday", (void*) VmGetTimeOfDay );
 
 	trustedRegion->addFunctionTrampoline( "__set_tls", (void*) VmSetTls );
 	trustedRegion->addFunctionTrampoline( "__get_tls", (void*) VmGetTls );
