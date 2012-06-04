@@ -4,4 +4,8 @@ add_subdirectory( binify )
 add_subdirectory( core )
 add_subdirectory( protocols )
 add_subdirectory( glog )
+add_subdirectory( render )
+add_subdirectory( gl )
+add_subdirectory( cl )
+
 add_subdirectory( dwm )

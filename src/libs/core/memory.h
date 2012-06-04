@@ -80,7 +80,7 @@ namespace Core
 #if PLATFORM == WINDOWS 
 #	define CORE_STACK_ALLOC(x)	alloca(x)
 #else
-#	define CORE_STACK_ALLOC(x)	_alloca(x)
+#	define CORE_STACK_ALLOC(x)	alloca(x)
 #endif
 
 // performa a new onto a stack alloc (rarely useful as type* x = CORE_STACK_NEW(type)(a,b,c); is normally just type x(a,b,c); ) but

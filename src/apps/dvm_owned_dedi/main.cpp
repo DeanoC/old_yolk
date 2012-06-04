@@ -1,4 +1,8 @@
 #include "core/core.h"
+#include "gl/gl.h"
+#include "cl/cl.h"
+#include "gl/gfx.h"
+#include "cl/platform.h"
 #include "dwm/dwm.h"
 #include "dwm/bitcoder.h"
 #include "dwm/mmu.h"
@@ -6,6 +10,12 @@
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
 #include "handshake.h"
+
+#define START_FULLSCREEN	false
+#define START_WIDTH			512
+#define START_HEIGHT		512 
+#define START_AA			AA_NONE
+void MainLoop();
 
 std::string 								hostname( "127.0.0.1" );
 int 										port( 2045 );
@@ -83,14 +93,28 @@ int Main() {
 				) 
 			);
 		}
-		Dwm test;
+
+		Gl::Gfx::init();
+		if( !Cl::Platform::exists() )
+			Cl::Platform::init();
+
+		Core::InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
+		bool glOk = Gl::Gfx::get()->createScreen( START_WIDTH, START_HEIGHT, START_FULLSCREEN, Gl::Gfx::START_AA );
+		if( glOk == false ) {
+			LOG(ERROR) << "GL unable to find adequate GPU";
+			return 1;
+		}
+		
+		MainLoop();
+
+/*		Dwm test;
 		test.bootstrapLocal();
 
 		if( Handshake( *io, hostname, port ) == true ) {
 			// Wait for all threads in the pool to exit.
 			for (std::size_t i = 0; i < threads.size(); ++i)
 				threads[i]->join();
-		}
+		}*/
 	} 
 	CoreCatchAllOurExceptions {
 		LogException( err );
@@ -122,4 +146,20 @@ void DWMMain( std::shared_ptr<Core::thread> leash ) {
 	while( true ) {
 		Core::this_thread::sleep( boost::posix_time::millisec(50) );
 	}
+}
+
+#include "render/renderworld.h"
+
+void MainLoop() {
+	Render::RenderWorld rworld;
+
+	Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext(0);
+	// Main loop
+	while( true ) { //!g_bQuitFlag ) {
+		rworld.render( ctx );
+		rworld.debugDraw( ctx );
+
+		Gl::Gfx::get()->present();
+		Core::HouseKeep();
+	}	
 }
