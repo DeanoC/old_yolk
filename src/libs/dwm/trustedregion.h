@@ -78,6 +78,12 @@ public:
 		MMU::get()->protectPages( thunker, thunkSegSize, MMU::PAGE_READ | MMU::PAGE_EXEC );
 	}
 
+	// pair of function to avoid passing trusted address to the untrused side, any trusted address should
+	// be send through here. Also a clean up functions
+	uint32_t trustedAddressToHandle( uintptr_t addr );
+	uintptr_t handleToTrustedAddress( uint32_t handle );
+	void removeTrustedAddress( uintptr_t addr );
+
 private:
 
 	uint8_t* encodeFunc( void* ptr );
@@ -86,16 +92,18 @@ private:
 
 	uint8_t* encodeFuncWithStart( void* ptr, uint8_t* startThunkPtr );
 
-	const uint8_t* 		region;
-	const size_t 		size;
-	uint8_t*			curPtr;
+	const uint8_t* 								region;
+	const size_t 								size;
+	uint8_t*									curPtr;
+					
+	void*										thunker;
+	size_t										thunkSegSize;
+	std::vector<uint8_t*>						thunkCode;
+	uint8_t*									curThunkPtr;
 
-	void*				thunker;
-	size_t				thunkSegSize;
-	std::vector<uint8_t*>	thunkCode;
-	uint8_t*			curThunkPtr;
-
-	void*				threadCtx;
-	std::map< std::string, uint8_t*> nameMap;
+	void*										threadCtx;
+	std::unordered_map< std::string, uint8_t*> 	nameMap;
+	std::unordered_map< uint32_t, uintptr_t> 	trustedAddrToHandle;
+	uint32_t									curTrustedAddrHandle;
 };
 #endif

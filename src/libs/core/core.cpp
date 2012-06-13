@@ -14,25 +14,22 @@
 #include "development_context.h"
 #include "clock.h"
 #include "sysmsg.h"
-#include "core.h"
+#include "keyboard.h"
 
 #if PLATFORM == WINDOWS
 #include "platform_windows/mouse_win.h"
-#include "platform_windows/keyboard_win.h"
 
 extern void WinGetMessages( void );
 extern bool WinInitWindow( int width, int height, bool bFullscreen );
 bool InWinCrtReportLog = false;
-int __cdecl WinCrtReportHook(int type, char * msg, int * ret )
-{
+int __cdecl WinCrtReportHook(int type, char * msg, int * ret ) {
    if(InWinCrtReportLog)
       return FALSE;
 
-	switch( type )
-	{
+	switch( type ) {
 	case _CRT_WARN:		LOG(INFO) << msg; break;
 	case _CRT_ERROR:	LOG(ERROR) << msg; break;
-	case _CRT_ASSERT:	LOG(ERROR) << msg; break;
+	case _CRT_ASSERT:	LOG(FATAL) << msg; break;
 	}
 	return FALSE;
 }
@@ -61,8 +58,7 @@ char* g_argv[ MAX_CMDLINE_ARGS ];	//!< The argv cmdline parameter
 /// \brief	Initialisation of the core library. 
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Init( void ) 
-{
+void Init( void ) {
 	Clock::init();
 	SystemMessage::init();
 	ResourceMan::init();
@@ -91,8 +87,7 @@ void Init( void )
 /// \brief	Shutdowns the core library. 
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Shutdown( void ) 
-{
+void Shutdown( void ) {
 	DevelopmentContext::shutdown();
 #if !defined( USE_GLOG )
 	Logger::shutdown();
@@ -112,22 +107,21 @@ void Shutdown( void )
 /// \brief	Performs some background house keeping. 
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void HouseKeep( void ) 
-{
+void HouseKeep( void ) {
 #if defined(USE_GC)
 	GC_gcollect();
 #endif
 
 #if PLATFORM == WINDOWS
-	if( KeyboardWin::exists() ) {
-		KeyboardWin::get()->update();
-	}
-
 	if( MouseWin::exists() ) {
 		Core::MouseWin::get()->update();
 	}
 
 	WinGetMessages();
+#elif PLATFORM == POSIX
+	extern void X11PumpEvents();
+
+	X11PumpEvents();
 #endif
 }
 
@@ -146,12 +140,13 @@ bool InitWindow( int width, int height, bool bFullscreen ) {
 #if PLATFORM == WINDOWS
 	bool ret = WinInitWindow( width, height, bFullscreen );
 	if( ret ) {
-		KeyboardWin::init();
+		Keyboard::init();
 //		MouseWin::init();
 	}
 
 	return ret;
 #else
+	Keyboard::init();
 	return true;
 #endif
 }

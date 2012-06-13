@@ -26,7 +26,13 @@ public:
 	void* sandboxAllocate( size_t size );
 	void sandboxFree( void* ptr );
 
+	TrustedRegion* getTrustedRegion() { return trustedRegion; }
+
+	void terminate();
+
 private:
+	Core::thread*			untrustedThread;
+
 	void* sandboxMem;
 	void* reservedMem;
 	SandboxMemoryManager*	mmgr;

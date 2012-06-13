@@ -16,8 +16,6 @@
 
 #include "input_listener.h"
 
-
-
 namespace Core {
 
 //! interface class that each context fills in
@@ -59,19 +57,17 @@ public:
 	void activateContext( const char* pName );
 
 	//! returns a named context
-	std::shared_ptr<DevelopmentContextInterface> getContext( const char* pName );
+	std::shared_ptr<DevelopmentContextInterface> getContext( const char* pName ) const;
 
 	//! return the current context
-	std::shared_ptr<DevelopmentContextInterface> getContext();
+	std::shared_ptr<DevelopmentContextInterface> getContext() const;
 
 private:
 	static const int MAX_CONTEXTS = 10;
+	struct Context* contexts;
 
-private:
-	struct Context* m_Contexts;
-
-	unsigned int m_iCurrentContext;
-	bool		m_bContextChanged;
+	unsigned int 	currentContext;
+	bool			contextChanged;
 
 };
 

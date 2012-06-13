@@ -25,6 +25,8 @@ namespace Core
 //!-----------------------------------
 class ResourceMan : public Singleton<ResourceMan> {
 public:
+	friend class ResourceHandleBase;
+	
 	ResourceMan();
 	~ResourceMan();
 
@@ -61,14 +63,15 @@ public:
 	template<uint32_t type>
 	void flushResource( const char* pName, uint32_t flags );
 
-	//! Internal AcquireResource used by ResourceHandle
-	template<uint32_t type>
-	std::shared_ptr<Resource<type> > internalAcquireResource( const ResourceHandle<type>* pHandle );
 
 	void internalProcessManifest( uint16_t numEntries, struct ManifestEntry* entries );
 	void internalCloseManifest( uint16_t numEntries, struct ManifestEntry* entries );
 
 private:
+	//! Internal AcquireResource used by ResourceHandle
+	template<uint32_t type>
+		std::shared_ptr<Resource<type> > internalAcquireResource( const ResourceHandleBase* const pHandle );
+
 	const ResourceHandleBase* implOpenResource(  const char* pName, const void* pData, const size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags );
 	void implCloseResource( ResourceHandleBase* pHandle );
 	void implFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags );
@@ -86,7 +89,7 @@ const ResourceHandle<type>* ResourceMan::loadCreateResource( const char* pName, 
 	if( flags & RMRF_PRELOAD ) {
 		if( pRH->m_wpResourceBase.expired() ) {
 			// note is allowed to return NULL for the shared pointer as its likely the object isn't ready
-			internalAcquireResource( pRH );
+			internalAcquireResource<type>( pRHB );
 		}
 	}
 	return pRH;
@@ -106,9 +109,9 @@ void ResourceMan::flushResource( const char* pName, uint32_t flags ) {
 
 
 template<uint32_t type>
-std::shared_ptr<Resource<type> > ResourceMan::internalAcquireResource( const ResourceHandle<type>* pHandle ) {
+std::shared_ptr<Resource<type> > ResourceMan::internalAcquireResource( const ResourceHandleBase* const pHandle ) {
 	return std::static_pointer_cast<Resource<type> >( 
-		implAcquireResource( const_cast<ResourceHandleBase*>(static_cast<const ResourceHandleBase*>(pHandle)) ) );
+		implAcquireResource( const_cast<ResourceHandleBase*>(pHandle) ) );
 }
 
 
@@ -117,10 +120,10 @@ std::shared_ptr<Resource<type> > ResourceMan::internalAcquireResource( const Res
 //! a resource is already in existence this is a very quick operation.
 //! else it takes an indefinite amount of time, to get the resource
 template< uint32_t type >
-inline std::shared_ptr<Resource<type> > ResourceHandle<type>::baseAcquire() const {
+inline std::shared_ptr<Resource<type> > ResourceHandleBase::baseAcquire() const {
 	while( m_wpResourceBase.expired() ) {
 		std::shared_ptr<Resource<type> > acquired( 
-				ResourceMan::get()->internalAcquireResource( this ) );
+				ResourceMan::get()->internalAcquireResource<type>( this ) );
 		if(acquired != NULL)
 			return acquired;
 	}

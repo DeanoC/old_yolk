@@ -10,7 +10,6 @@
 
 namespace Core
 {
-
 const float Clock::FRAME_PERIOD = 1.0f / 30.0f;
 int64_t Clock::s_TickFrequency;
 
@@ -18,19 +17,23 @@ Clock::Clock( float TimeScale )
 {
 #if PLATFORM == WINDOWS
 	LARGE_INTEGER tmp;
-
-	if ( QueryPerformanceFrequency( &tmp ) != TRUE )
-	{
+	if ( QueryPerformanceFrequency( &tmp ) != TRUE ) {
 		throw std::exception( "QueryPerformanceFrequency unsupported." );
 	}
 	s_TickFrequency = tmp.QuadPart;
-
-	QueryPerformanceCounter( &tmp );
-	m_nRealTicks = tmp.QuadPart;
+#elif PLATFORM == POSIX
+	s_TickFrequency = 1000000; // micro seconds
 #endif
+
+	m_nRealTicks = getInstantTicks();
+
 	m_nTimeTicks = m_nRealTicks;
 
 	m_TimeScale = TimeScale;
+
+	// ensure all times / states are in the normal stable state
+	update();
+	update();
 }
 
 
@@ -42,8 +45,8 @@ float Clock::update()
 	const int64_t dTicks = updateTicks();
 
 	// Time Ticks
-	const float dTime = Clock::get()->time( dTicks ) * m_TimeScale;
-	m_nTimeTicks += Clock::get()->ticks( dTime );
+	const float dTime = time( dTicks ) * m_TimeScale;
+	m_nTimeTicks += ticks( dTime );
 
 	return dTime;
 }
@@ -55,7 +58,7 @@ float Clock::step()
 	updateTicks();
 
 	// Time Ticks
-	m_nTimeTicks += Clock::get()->ticks( FRAME_PERIOD );
+	m_nTimeTicks += ticks( FRAME_PERIOD );
 
 	return FRAME_PERIOD;
 }
@@ -68,11 +71,8 @@ int64_t Clock::updateTicks()
 {
 	// Real Ticks
 	const int64_t nOldRealTick = m_nRealTicks;
-#if PLATFORM == WINDOWS
-	LARGE_INTEGER tmp;
-	QueryPerformanceCounter( &tmp );
-	m_nRealTicks = tmp.QuadPart;
-#endif
+
+	m_nRealTicks = getInstantTicks();
 
 	return (m_nRealTicks - nOldRealTick);
 }

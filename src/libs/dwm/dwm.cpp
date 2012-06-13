@@ -13,6 +13,8 @@
 #include "bitcoder.h"
 #include "mmu.h"
 
+#include <sys/stat.h>
+
 #include "vmthread.h"
 
 DECLARE_EXCEPTION( DBBackEndHard, "Failure to contact backend DB" );
@@ -30,7 +32,9 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 
 Dwm::Dwm() {
 //   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libcommon.a" ) );
+//   libcbc->setModuleIdentifier( "libcommon" );
 //   BitCoder::get()->addLibrary( libcbc );
+   switcherElf = BitCoder::get()->assemble( BitCoder::TRUSTED, Core::FilePath("./switcher.S") );
 }
 
 Dwm::~Dwm() {
@@ -119,12 +123,64 @@ void Dwm::checkSysInfoVersion( const std::string& str ) {
                                        version_rev << "\n"; 
 }
 
+bool checkFileTimestamps( const Core::FilePath& a, const Core::FilePath& b) {
+   struct stat     aStatbuf;
+   struct stat     bStatbuf;
+   int aRet = stat( a.value().c_str(), &aStatbuf );
+   int bRet = stat( b.value().c_str(), &bStatbuf );
+   if( aRet != 0 || bRet != 0 ) {
+      return false;
+   }
+   if( aStatbuf.st_mtime >= bStatbuf.st_mtime ) {
+      return false;
+   } else {
+      return true;
+   }
+}
+
+std::string cacheElf( const Core::FilePath& a, const Core::FilePath& b ) {
+   Core::File aFile;
+   Core::File bFile;
+
+   bool cacheOk = true;
+
+   // if either doesn't exist then not upto date obviously...
+   if( aFile.open( a.value().c_str() ) == false ) {
+      cacheOk = false;
+   }
+   if( bFile.open( b.value().c_str() ) == false ) {
+      cacheOk = false;
+   }
+
+   if( (cacheOk == true) && 
+       checkFileTimestamps( a, b ) ) {
+      std::string ret;
+      uint64_t bcLen = bFile.bytesLeft();
+      ret.resize( bcLen );
+      bFile.read( (uint8_t*) &ret[0], (size_t) bcLen );
+      return ret;
+   } else {
+      // cache is not okay
+      aFile.close();
+      bFile.close();
+
+      auto initbc = BitCoder::get()->loadBitCode( a );
+      initbc->setModuleIdentifier( "bootstrap" );
+      auto prg = BitCoder::get()->make( BitCoder::UNTRUSTED, initbc );
+      bFile.createNew( b.value().c_str() );
+      bFile.write( (uint8_t*) &prg[0], prg.size() );
+      return prg;
+   }
+
+
+}
+
 void Dwm::bootstrapLocal() {
    using namespace Core;
    using namespace llvm;
 
    auto hwThreads = Core::thread::hardware_concurrency();
-   /* ust testing 
+   /* whilst testing 
    auto store = riak::make_client(riakConn, &no_sibling_resolution, *io);
    store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
       if(!err) {
@@ -136,25 +192,19 @@ void Dwm::bootstrapLocal() {
       CoreThrowException( DBBackEndHard, "" );
    });
    */
-   // load initial bitcode modules
-//   auto initbc = loadBitCode( MEMFILE_INEXEBITCODE( bootstrap ) );
-   auto assprg = BitCoder::get()->assemble( BitCoder::TRUSTED, Core::FilePath("./switcher.S") );
-   auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world") );
-   initbc->setModuleIdentifier( "bootstrap" );
-   auto prg = BitCoder::get()->make( BitCoder::UNTRUSTED, initbc );
+
+//   auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world") );
+//   initbc->setModuleIdentifier( "bootstrap" );
+//   auto prg = BitCoder::get()->make( BitCoder::UNTRUSTED, initbc );
+
+   auto prg = cacheElf( Core::FilePath("./hello_world"), Core::FilePath("./cache/hello_world.elf") );
 
    // init thread0 into llvm execution environment
    auto thread0 = std::shared_ptr<VMThread>( new VMThread( *this ) );
    vmThreads.push_back( thread0 );
 
-   thread0->getEngine()->addLibrary( assprg );
+   thread0->getEngine()->addLibrary( switcherElf );
    thread0->getEngine()->process( prg );
 
-//   std::vector<GenericValue> args;
-   //   args.push_back( debugFnGV );
-   //   thread0->getEngine()->exec->addGlobalMapping( debugFnGV, &DebugOutFn );
-
-   // lets start booting
- //  thread0->getEngine()->run( "bootstrap0", args );
-
 }
+

@@ -4,6 +4,86 @@
 		"selected_items":
 		[
 			[
+				"Mes",
+				"MeshCreateParams"
+			],
+			[
+				"ResourceHandle",
+				"ResourceHandleBase"
+			],
+			[
+				"Tex",
+				"TextResourceHandlePtr"
+			],
+			[
+				"trus",
+				"trustedAddrToHandle"
+			],
+			[
+				"cur",
+				"curTrustedAddrHandle"
+			],
+			[
+				"uint",
+				"uintptr_t"
+			],
+			[
+				"unt",
+				"untrustedThread"
+			],
+			[
+				"un",
+				"untrustedThread"
+			],
+			[
+				"Render",
+				"RenderContext"
+			],
+			[
+				"render",
+				"rendercontext"
+			],
+			[
+				"x11",
+				"x11Window"
+			],
+			[
+				"tv_",
+				"tv_sec"
+			],
+			[
+				"stackS",
+				"stackStart"
+			],
+			[
+				"Tag",
+				"TargetName"
+			],
+			[
+				"VM",
+				"VmAlloc"
+			],
+			[
+				"Target",
+				"TargetName"
+			],
+			[
+				"thu",
+				"thunkSegSize"
+			],
+			[
+				"uin",
+				"uint32_t"
+			],
+			[
+				"encodeFuncWith",
+				"encodeFuncWithParam"
+			],
+			[
+				"enc",
+				"encodeFuncWithStart"
+			],
+			[
 				"th",
 				"threadCtx"
 			],
@@ -16,10 +96,6 @@
 				"thunkCodeSize"
 			],
 			[
-				"uint",
-				"uintptr_t"
-			],
-			[
 				"cu",
 				"curThunkPtr"
 			],
@@ -30,10 +106,6 @@
 			[
 				"sta",
 				"stackStart"
-			],
-			[
-				"stackS",
-				"stackSize"
 			],
 			[
 				"bot",
@@ -82,10 +154,6 @@
 			[
 				"sl",
 				"slabAllocator"
-			],
-			[
-				"uin",
-				"uintptr_t"
 			],
 			[
 				"Memo",
@@ -180,68 +248,10 @@
 	"buffers":
 	[
 		{
-			"file": "src/libs/dwm/bitcoder.cpp",
+			"file": "/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
 			"settings":
 			{
-				"buffer_size": 11365,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/deano/projects/nacl-newlib/newlib/libc/sys/linux/brk.c",
-			"settings":
-			{
-				"buffer_size": 851,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/deano/projects/nacl-newlib/newlib/libc/syscalls/sysclose.c",
-			"settings":
-			{
-				"buffer_size": 141,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/dwm/dwm.cpp",
-			"settings":
-			{
-				"buffer_size": 5118,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/dwm/bitcoder.h",
-			"settings":
-			{
-				"buffer_size": 1636,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/dwm/isolatedexecengine.cpp",
-			"settings":
-			{
-				"buffer_size": 6357,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "Searching 10059 files for \"JIT_REGISTER_FN\"\n\n/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/GDBRegistrar.cpp:\n   22    typedef enum {\n   23      JIT_NOACTION = 0,\n   24:     JIT_REGISTER_FN,\n   25      JIT_UNREGISTER_FN\n   26    } jit_actions_t;\n   ..\n  100  void NotifyDebugger(jit_code_entry* JITCodeEntry) {\n  101    llvm::MutexGuard locked(JITDebugLock);\n  102:   __jit_debug_descriptor.action_flag = JIT_REGISTER_FN;\n  103  \n  104    // Insert this entry at the head of the list.\n\n2 matches in 1 file\n",
-			"settings":
-			{
-				"buffer_size": 543,
-				"line_ending": "Unix",
-				"name": "Find Results",
-				"scratch": true
-			}
-		},
-		{
-			"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/GDBRegistrar.cpp",
-			"settings":
-			{
-				"buffer_size": 6819,
+				"buffer_size": 12102,
 				"line_ending": "Unix"
 			}
 		}
@@ -249,7 +259,7 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 272.0,
+		"height": 392.0,
 		"selected_items":
 		[
 			[
@@ -278,134 +288,134 @@
 	},
 	"file_history":
 	[
-		"/home/deano/projects/nacl-newlib/newlib/libc/sys/linux/crt1.c",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/DwarfDebug.cpp",
-		"/home/deano/.cache/.fr-lGG1G5/nacl-gdb/gdb/solib-nacl.c",
-		"/home/deano/.cache/.fr-EiJeIn/nacl-gdb/README",
-		"/home/deano/.cache/.fr-kujDwC/nacl-gdb/gdb/nacl-tdep.c",
-		"/home/deano/.cache/.fr-6QBmnS/nacl-gdb/gdb/nacl-multiarch.c",
-		"/home/deano/.cache/.fr-2gf1RI/nacl-gdb/gdb/nacl-manifest.c",
-		"/home/deano/.cache/.fr-0U1Prt/nacl-gdb/gdb/gnu-nat.c",
-		"/home/deano/.cache/.fr-1VAVzy/nacl-gdb/gdb/amd64-linux-nat.c",
-		"/home/deano/.cache/.fr-fQ6WYS/nacl-gdb/gdb/amd64-nat.c",
-		"/home/deano/.cache/.fr-2TJuCy/nacl-gdb/bfd/elf64-x86-64.c",
-		"/home/deano/.cache/.fr-8JN0nE/nacl-gdb/bfd/cpu-i386.c",
-		"/home/deano/.cache/.fr-PP4lnQ/nacl-gdb/opcodes/i386-gen.c",
-		"/home/deano/builds/yolk/src/apps/dvm_owned_dedi/hello_world.ll",
-		"/home/deano/builds/vt/src/apps/hello_world/hello_world_opt.ll",
-		"/home/deano/builds/vt/src/apps/hello_world/hello_world_opt",
-		"/home/deano/projects/yolk/src/libs/dwm/asm/switcher.S",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Bitcode/Reader/BitcodeReader.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Target/X86/X86ISelLowering.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/MC/MCELFStreamer.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/cmake/modules/LLVMProcessSources.cmake",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Target/X86/X86Subtarget.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCTargetDesc.cpp",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/Support/Host.cpp",
-		"/home/deano/projects/yolk/submodules/clang/lib/Headers/cpuid.h",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/TableGen/CMakeLists.txt",
-		"/home/deano/projects/yolk/CMakeLists.txt",
-		"/home/deano/dvm_owned_dedi.WARNING",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/tools/CMakeLists.txt",
-		"/home/deano/builds/yolk/CMakeCache.txt",
-		"/home/deano/projects/yolk/.gitmodules",
-		"/home/deano/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
-		"/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
-		"/home/deano/projects/yolk/src/libs/dwm/cpufeatures.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/mmu.h",
-		"/home/deano/.xinitrc",
-		"/usr/share/xfce4/helpers/aterm.desktop",
-		"/home/deano/projects/yolk/src/libs/glog/src/utilities.cc",
-		"/home/deano/projects/yolk/src/libs/dwm/bitcoder.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/bitcoder.h",
-		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.cpp",
+		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/main.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/dwm.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/apis/resources.cpp",
+		"/home/deano/tc/Projects/wierd/source/tools/convertmesh/main.cpp",
+		"/home/deano/projects/yolk/src/apps/convertmesh/main.cpp",
+		"/home/deano/projects/yolk/src/apps/convertmesh/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/meshops/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/meshexport/CMakeLists.txt",
+		"/home/deano/.cxoffice/desktopdata/com.codeweavers.unknown.20464.log",
+		"/home/deano/projects/yolk/src/apps/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/dwm/apis/apis.h",
+		"/home/deano/projects/yolk/src/libs/core/resourceman.h",
+		"/home/deano/projects/yolk/src/libs/core/resources.h",
 		"/home/deano/projects/yolk/src/libs/dwm/trustedregion.h",
+		"/home/deano/projects/yolk/src/libs/dwm/trustedregion.cpp",
+		"/home/deano/projects/yolk/src/libs/core/resourceman.cpp",
+		"/home/deano/projects/yolk/src/libs/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/meshexport/meshexport.cpp",
+		"/home/deano/projects/yolk/src/libs/meshexport/wobexp.cpp",
+		"/home/deano/projects/yolk/src/libs/meshimport/meshimport.cpp",
+		"/home/deano/projects/yolk/src/libs/meshimport/LWObject2GO.cpp",
+		"/home/deano/projects/yolk/src/libs/meshimport/LWScene2GO.cpp",
+		"/home/deano/projects/yolk/src/libs/meshimport/assimp.cpp",
+		"/home/deano/projects/yolk/src/libs/meshimport/collada.cpp",
+		"/home/deano/projects/yolk/src/libs/meshimport/obj.cpp",
+		"/home/deano/projects/yolk/src/libs/core/file_path.h",
+		"/home/deano/projects/yolk/src/libs/meshexport/wobexp.h",
+		"/home/deano/projects/yolk/src/libs/meshimport/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/meshimport/assimp.h",
+		"/home/deano/tc/Projects/wierd/source/tools/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/core/coreresources.cpp",
+		"/home/deano/projects/yolk/src/libs/core/coreresources.h",
 		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.h",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/llvm-lit/llvm-lit.in",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/lit/lit/ProgressBar.py",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/lit/lit.py",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/llvm-build/llvm-build",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/DSAextract.py",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/DSAclean.py",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/LLVMBuild.txt",
-		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/utils/LLVMBuild.txt",
-		"/home/deano/projects/yolk/yolk.sublime-project",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/asm/switcher.S",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/sandboxmemorymanager.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/mmu.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/MC/MCObjectStreamer.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86BaseInfo.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/MCTargetDesc/X86MCCodeEmitter.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86InstrSystem.td",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/X86NaClRewritePass.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/Target/X86/AsmParser/X86AsmParser.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/tramp_64.S",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_tls_64.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/arm/nacl_tls.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/arm/sel_rt.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_ldr_standard.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_syscall_64.S",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_stack_safety.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_app_thread.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_switch_to_app_64.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_handlers.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_common.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_copy.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/nacl_syscall_hook.c",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/vmthread.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/vmthread.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/dwm.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/dwm.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_64/nacl_switch_64.S",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/tools/llvm-mc/llvm-mc.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Target/TargetMachine.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/MC/MCAsmInfo.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/mmu.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/src/apps/dvm_owned_dedi/main.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/win/nacl_ldt.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/win/sel_memory.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86/nacl_ldt_x86.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/linux/x86/nacl_ldt.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/linux/sel_memory.c",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/bitcoder.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/core/platform.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86/nacl_ldt_x86.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/sel_addrspace_x86_32.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/sel_ldr_x86_32.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/sel_rt_32.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/nacl_app_32.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86/sel_ldr_x86.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/libs/dwm/isolatedexecengine.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/RuntimeDyld.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldELF.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyldImpl.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/MC/MCExpr.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/MC/MCParser/AsmParser.cpp",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/elf_util.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/shared/platform/posix/nacl_host_desc.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/posix/sel_addrspace_posix.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_addrspace.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/sel_addrspace.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/x86_32/nacl_switch_to_app_32.c",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/Errno.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/Support/ErrorHandling.h",
-		"/Z/Projects/Cyberspace/yolk_repo/yolk.sublime-project",
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Default/Preferences.sublime-settings",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/native_client/src/native_client/src/trusted/service_runtime/arch/arm/sel_addrspace_arm.c",
-		"/Z/Projects/Cyberspace/llvm/include/llvm/Support/MemoryBuffer.h",
-		"/Z/Projects/Cyberspace/yolk_repo/src/apps/dvm_owned_dedi/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/include/llvm/ExecutionEngine/NaClJITMemoryManager.h",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/JIT/NaClJITMemoryManager.cpp",
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/SublimeClang/SublimeClang.sublime-settings",
-		"/Z/Projects/Cyberspace/yolk_repo/submodules/nacl-llvm/llvm/lib/ExecutionEngine/MCJIT/MCJITMemoryManager.cpp"
+		"/home/deano/projects/yolk/src/libs/dwm/apis/debug.cpp",
+		"/home/deano/projects/yolk/src/libs/core/resourcebase.h",
+		"/home/deano/projects/yolk/submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/RuntimeDyld.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/dwm.h",
+		"/home/deano/projects/yolk/src/libs/core/fileio.h",
+		"/home/deano/projects/yolk/src/libs/core/fileio.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/asm/switcher.S",
+		"/home/deano/projects/yolk/src/libs/dwm/vmapi.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/apis/vm.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/CMakeLists.txt",
+		"/home/deano/.config/sublime-text-2/Packages/SublimeClang/SublimeClang.sublime-settings",
+		"/home/deano/projects/yolk/src/libs/gl/vao.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/posix/gfx.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/rendercontext.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/texture.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/gl.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/meshmod.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/meshmod.h",
+		"/home/deano/projects/yolk/.gitmodules",
+		"/home/deano/projects/yolk/submodules/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/meshops/meshops.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/meshops.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/vertex.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/varicontainer.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/mesh.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/edge.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/basicmeshops.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/floattexture.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/meshsorter.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/raycaster.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/textureunit.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/mesh.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/varicontainer.h",
+		"/home/deano/projects/yolk/src/libs/meshops/floattexture.h",
+		"/home/deano/projects/yolk/src/libs/meshops/textureunit.h",
+		"/home/deano/projects/yolk/src/libs/meshops/raycaster.h",
+		"/home/deano/projects/yolk/src/libs/meshimport/meshimport.h",
+		"/home/deano/projects/yolk/src/libs/meshexport/meshexport.h",
+		"/home/deano/projects/pbrt-v2/src/accelerators/bvh.cpp",
+		"/home/deano/projects/pbrt-v2/src/shapes/loopsubdiv.cpp",
+		"/home/deano/projects/pbrt-v2/src/shapes/trianglemesh.cpp",
+		"/home/deano/projects/pbrt-v2/src/shapes/trianglemesh..cpp",
+		"/home/deano/projects/pbrt-v2/src/shapes/sphere.cpp",
+		"/home/deano/projects/pbrt-v2/src/core/shape.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/gfx.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/rendercontext.h",
+		"/home/deano/projects/yolk/src/libs/gl/memory.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/programs/kernels/scenecapture_testlighting.cl",
+		"/home/deano/projects/yolk/src/libs/gl/shaderman.cpp",
+		"/home/deano/projects/yolk/src/libs/render/mesh.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/indextypes.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/face.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/facedata.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/halfedge.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/halfedgevertex.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/materialdata.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/materialface.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/materialparameter.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/materialvertexbindings.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/meshmod_pch.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/normalvertex.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/pointrepvertex.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/positionvertex.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/rgbmaterialparameter.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/scalarmaterialparameter.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/scene.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/sceneobject.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/texturematerialparameter.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/uvvertex.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/vertex.h",
+		"/home/deano/projects/yolk/src/libs/meshmod/vertexdata.h",
+		"/home/deano/projects/yolk/src/libs/gl/wobbackend.h",
+		"/home/deano/projects/yolk/src/libs/render/wobfile.h",
+		"/home/deano/projects/yolk/src/libs/core/core.h",
+		"/home/deano/tc/Projects/gltest/source/main.cpp",
+		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/gl/CMakeLists.txt",
+		"/usr/include/GL/glext.h",
+		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/glx_exts.h",
+		"/usr/include/GL/gl.h",
+		"/home/deano/projects/yolk/src/libs/gl/programs/programs/debuglines.glsl",
+		"/home/deano/projects/yolk/src/libs/cl/platform.cpp",
+		"/home/deano/projects/yolk/src/libs/render/hieskeleton.h",
+		"/home/deano/projects/yolk/src/libs/render/hieskeleton.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/programs/fragments/vs_dbg_linedraw.glsl",
+		"/home/deano/projects/yolk/src/libs/gl/programs/clforgl.glsl",
+		"/home/deano/gDEBugger6.2.438-x86_64/Readme.txt",
+		"/tmp/midori-deano/glext.h",
+		"/home/deano/projects/yolk/src/libs/gl/gfx.h",
+		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.cpp",
+		"/home/deano/projects/yolk/src/libs/cl/programman.cpp",
+		"/home/deano/projects/yolk/src/libs/render/rendercontext.h",
+		"/home/deano/projects/yolk/src/libs/render/renderable.h",
+		"/home/deano/projects/yolk/src/libs/render/renderworld.cpp"
 	],
 	"find":
 	{
@@ -430,6 +440,46 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"MakeBaseFilename",
+			"loadCreateResource",
+			"addRelocationForSymbol",
+			"Expected External Symbol",
+			"SceneCapturePipeline",
+			"GL_NO_ERROR",
+			"0x88f0",
+			"OffsetEXT\nOffsetEXT",
+			"OffsetEXT",
+			"#",
+			"VertexArrayVertexAttribOffset",
+			"VertexAttribOffset",
+			"VertexArrayVertexAttribOffset",
+			"VertexAttribOffset",
+			"VertexArrayVertexAttribOffset",
+			"VertexArrayVertexAttribOffsetEXT",
+			"glVertexArrayVertexAttribOffsetEXT",
+			"REGISTER_SHARED_WITH_CL",
+			"WobBack",
+			"DT_NULL",
+			"setMemoryWritable",
+			"SectionRef",
+			"reassignSectionAddress",
+			"resolveExternalSymbols",
+			"resolveRelocation",
+			"createTargetMachine",
+			"ST_Debug",
+			"ST_Debug\"",
+			"ymbolRef::ST_Debug",
+			"main",
+			"PLT",
+			"R_X86_64_64",
+			"ELF::R_X86_64_64",
+			"createTargetMachine",
+			"RelocModel",
+			"CMModel",
+			"setCodeModel",
+			"setOutputFormat",
+			"Relocation",
+			"_libc",
 			"JIT_REGISTER_FN",
 			"main",
 			"_start",
@@ -517,47 +567,7 @@
 			"NaClWaitForMainThreadToExit",
 			"RTDyldMemoryManager",
 			"Dyld",
-			"NaClJITMemoryManager",
-			"InitializeAllTargetMCs",
-			"addPassesToEmitFile",
-			"createX86NaClRewritePass",
-			"X86NaClRewritePass",
-			"createPassConfig",
-			"addPassesToEmitFile",
-			"InitializeAllTargetInfos",
-			"LLVMTargetMachine",
-			"MCStreamer",
-			"createTargetMachine",
-			"RegisterTarget",
-			"lookupTarget",
-			"TargetMachineCtorFn",
-			"addPassesToEmitMC",
-			"RegisterMCCodeGenInfoFn",
-			"LLVMInitializeX86Target",
-			"RegisterTarget",
-			"MCContext",
-			"getDefaultTargetTriple",
-			"getClosestTargetForJIT",
-			"createTargetMachine",
-			"NativeClient",
-			"Triple",
-			"selectTarget",
-			"TargetMachine",
-			"MCContext",
-			"raw_svector_ostream",
-			"RTDyldMemoryManager",
-			"TargetData",
-			"TargetMachine",
-			"RTDyldMemoryManager",
-			"PassManager",
-			"TargetRegistry",
-			"createX86_32AsmBackend",
-			"MCAssembler",
-			"WriteObject",
-			"src/native_client/src",
-			"ELF",
-			"libelf",
-			"raw_ostream"
+			"NaClJITMemoryManager"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -581,243 +591,33 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/dwm/bitcoder.cpp",
+					"file": "/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
 					"settings":
 					{
-						"buffer_size": 11365,
+						"buffer_size": 12102,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5430,
-								5430
+								733,
+								733
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3322.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/home/deano/projects/nacl-newlib/newlib/libc/sys/linux/brk.c",
-					"settings":
-					{
-						"buffer_size": 851,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								242,
-								242
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage",
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/home/deano/projects/nacl-newlib/newlib/libc/syscalls/sysclose.c",
-					"settings":
-					{
-						"buffer_size": 141,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/libs/dwm/dwm.cpp",
-					"settings":
-					{
-						"buffer_size": 5118,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3738,
-								3738
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 3,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2684.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/libs/dwm/bitcoder.h",
-					"settings":
-					{
-						"buffer_size": 1636,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								965,
-								965
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 728.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/libs/dwm/isolatedexecengine.cpp",
-					"settings":
-					{
-						"buffer_size": 6357,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2147,
-								2147
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1276.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"settings":
-					{
-						"buffer_size": 543,
-						"regions":
-						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										211,
-										226
-									],
-									[
-										442,
-										457
-									]
-								],
-								"scope": ""
-							}
-						},
-						"selection":
-						[
-							[
-								429,
-								429
-							]
-						],
-						"settings":
-						{
-							"detect_indentation": false,
-							"output_tag": 1,
-							"result_base_dir": "",
-							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
-							"result_line_regex": "^ +([0-9]+):",
-							"scroll_past_end": true,
-							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "submodules/nacl-llvm/llvm/lib/ExecutionEngine/RuntimeDyld/GDBRegistrar.cpp",
-					"settings":
-					{
-						"buffer_size": 6819,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1809,
-								1809
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1012.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -866,6 +666,10 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"elf.h",
+				"submodules/nacl-llvm/llvm/include/llvm/Support/ELF.h"
+			],
 			[
 				"dwarf",
 				"submodules/nacl-llvm/llvm/lib/CodeGen/AsmPrinter/DwarfDebug.cpp"
@@ -941,6 +745,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 263.0,
+	"side_bar_width": 261.0,
 	"status_bar_visible": true
 }

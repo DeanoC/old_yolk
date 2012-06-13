@@ -26,17 +26,17 @@ std::shared_ptr<Core::ResourceBase> TextCreateResource( const Core::ResourceHand
 		long end = ftell(fh);
 		fseek( fh, 0, SEEK_SET);
 		long start = ftell(fh);
-		pResource->m_saText.reset( CORE_NEW_ARRAY char[ (end - start)+1] );
-		char* pText = pResource->m_saText.get();
+		pResource->text.reset( CORE_NEW_ARRAY char[ (end - start)+1] );
+		char* pText = pResource->text.get();
 		size_t count = fread( pText, 1, end-start, fh );
 		pText[ count ] = 0;
 
 		fclose( fh );
 	} else {
 		// allocate enough room for the string passed in and copy it
-		pResource->m_saText.reset( CORE_NEW_ARRAY char[ strlen( (char*)pData)+1 ] );
-		strcpy( pResource->m_saText.get(), (char*)pData );
-		pResource->m_saText.get()[ strlen((char*)pData) ] = 0;
+		pResource->text.reset( CORE_NEW_ARRAY char[ strlen( (char*)pData)+1 ] );
+		strcpy( pResource->text.get(), (char*)pData );
+		pResource->text.get()[ strlen((char*)pData) ] = 0;
 	}
 
 	return std::shared_ptr<ResourceBase>(pResource);
@@ -96,7 +96,9 @@ void ManifestResourceDestroyer( std::shared_ptr<Core::ResourceBase>& spBase ) {
 namespace Core
 {
 	void InstallResourceTypes() {
-		ResourceMan::get()->registerResourceType( TextType, TextCreateResource, &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
-		ResourceMan::get()->registerResourceType( ManifestType, ManifestCreateResource, &ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
+		ResourceMan::get()->registerResourceType( TextType, TextCreateResource, 
+		                                &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
+		ResourceMan::get()->registerResourceType( ManifestType, ManifestCreateResource, 
+		                               	&ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
 	}
 }

@@ -10,10 +10,17 @@
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
 #include "handshake.h"
+#include "core/coreresources.h"
+#include "render/hieskeleton.h"
+#include "render/camera.h"
+#include "core/clock.h"
+#include "core/sysmsg.h"
+#include "core/development_context.h"
+#include "debugcamcontext.h"
 
 #define START_FULLSCREEN	false
-#define START_WIDTH			512
-#define START_HEIGHT		512 
+#define START_WIDTH			1024
+#define START_HEIGHT		1024
 #define START_AA			AA_NONE
 void MainLoop();
 
@@ -41,6 +48,15 @@ void readConfig( std::string& hostname, int& port ) {
          port = val->value_.get_int();
       }
    }
+}
+
+bool g_bQuitFlag = false;
+void QuitCallback() {
+	g_bQuitFlag = true;
+}
+int g_iDebugMode = 0;
+void DebugModeCallback( int debugMode ) {
+	g_iDebugMode = debugMode;
 }
 
 
@@ -104,7 +120,14 @@ int Main() {
 			LOG(ERROR) << "GL unable to find adequate GPU";
 			return 1;
 		}
-		
+		Core::SystemMessage::get()->registerQuitCallback( QuitCallback );
+		Core::SystemMessage::get()->registerDebugModeChangeCallback( DebugModeCallback );
+
+		Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext(0);
+		Core::DevelopmentContext::get()->addContext( "DebugCam", 
+				std::shared_ptr<DebugCamContext>( CORE_NEW DebugCamContext( ctx ) ) );
+		Core::DevelopmentContext::get()->activateContext( "DebugCam" );
+
 		MainLoop();
 
 /*		Dwm test;
@@ -127,6 +150,12 @@ int Main() {
 	CoreCatchAll {
 		return 1;
 	}
+
+//	Graphics::ScrConsole::Shutdown();
+//	Cl::Platform::Get()->destroyDevices();
+	Gl::Gfx::get()->shutdownScreen();
+//	Cl::Platform::Shutdown();
+	Gl::Gfx::shutdown();
 
 	MMU::shutdown();
 	BitCoder::shutdown();
@@ -151,15 +180,35 @@ void DWMMain( std::shared_ptr<Core::thread> leash ) {
 #include "render/renderworld.h"
 
 void MainLoop() {
+	using namespace Core;
 	Render::RenderWorld rworld;
 
+	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "sphere_1" ) );
+	auto sphere = CORE_NEW Render::HieSkeleton( "sphere_1" );
+	rworld.addRenderable( sphere );
+
 	Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext(0);
+
+	// flush 'load' time from first time update
+	Clock::get()->update();
+
+	float x = 0.0f;
 	// Main loop
-	while( true ) { //!g_bQuitFlag ) {
+	while( !g_bQuitFlag ) {
+
+		float deltaT = Clock::get()->update();
+
+		DevelopmentContext::get()->update( deltaT );
+
+//		x += deltaT * 10;
+		sphere->getTransformNode()->setLocalPosition( Math::Vector3(x, 0, 0) );
+
 		rworld.render( ctx );
 		rworld.debugDraw( ctx );
 
+		DevelopmentContext::get()->display();
 		Gl::Gfx::get()->present();
 		Core::HouseKeep();
 	}	
+	CORE_DELETE sphere;
 }

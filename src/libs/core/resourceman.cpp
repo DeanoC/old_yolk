@@ -273,17 +273,17 @@ void ResourceMan::internalProcessManifest( uint16_t numEntries, ManifestEntry* e
 	for( uint16_t i=0; i < numEntries; ++i ) {
 		uint32_t type = entries[i].type;
 		// fixup header
-		entries[i].name = fixupPointer<const char>( entries, entries[i].name );
+		entries[i].name.p = fixupPointer<const char>( entries, entries[i].name.o.l );
 
-		const char* pFileName = entries[i].name;
-		entries[i].handle = implOpenResource( pFileName, NULL, 0, type, (RESOURCE_FLAGS)(RMRF_LOADOFFDISK | RMRF_PRELOAD) );
+		const char* pFileName = entries[i].name.p;
+		entries[i].handle.p = implOpenResource( pFileName, NULL, 0, type, (RESOURCE_FLAGS)(RMRF_LOADOFFDISK | RMRF_PRELOAD) );
 	}
 }
 
 void ResourceMan::internalCloseManifest( uint16_t numEntries, ManifestEntry* entries ) {
 	for( uint16_t i=0; i < numEntries; ++i ) {
-		implCloseResource( (Core::ResourceHandleBase*) entries[i].handle );
-		entries[i].handle = NULL;
+		implCloseResource( (Core::ResourceHandleBase*) entries[i].handle.p );
+		entries[i].handle.p = NULL;
 	}
 }
 

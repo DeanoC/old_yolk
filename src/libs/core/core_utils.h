@@ -205,8 +205,9 @@ struct GenerateTemplateHash
 };
 
 //! useful for binary loaders
+//! currently all file offsets are 32 bit so maximum file size = 4GiB
 template<typename T>
-T* fixupPointer( void* pBase, const void* offset )
+T* fixupPointer( void* pBase, const uint32_t offset )
 {
 	return (T*)(((char*)pBase) + (intptr_t)offset);
 }

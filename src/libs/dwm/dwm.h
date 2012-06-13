@@ -44,6 +44,9 @@ private:
 	std::shared_ptr<boost::asio::ip::tcp::socket>			dwmChanSock;
 	std::shared_ptr<boost::asio::io_service>				io;
 	std::vector<std::shared_ptr<VMThread>>					vmThreads;
+
+	std::string												switcherElf;
+	std::string												libcElf;
 };
 
 

@@ -28,6 +28,11 @@ CORE_INLINE int64_t Clock::getInstantTicks()
 	LARGE_INTEGER tmp;
 	QueryPerformanceCounter( &tmp );
 	nTicks = tmp.QuadPart;
+#elif PLATFORM == POSIX
+    struct timeval time;
+    /* Grab the current time. */
+    gettimeofday(&time, NULL);
+    nTicks = time.tv_usec + time.tv_sec * 1000000;   
 #endif
 	return nTicks;
 }

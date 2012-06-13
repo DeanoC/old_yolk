@@ -14,6 +14,8 @@
 #include "resources.h"
 #include "resource_dir.h"
 
+#define FOP( x, y ) union { x p; struct { uint32_t h; uint32_t l; } o; } y
+
 namespace Core {
 
 
@@ -26,7 +28,7 @@ struct TextResource : public Core::Resource<TextType> {
 	struct CreationStruct {};
 	struct LoadStruct {};
 
-	boost::scoped_array<char>		m_saText;
+	boost::scoped_array<char>		text;
 };
 
 //! text Type
@@ -43,8 +45,8 @@ static const uint32_t ManifestType					=	RESOURCE_NAME('M','A','N','I');
 // a single entry
 struct ManifestEntry {
 	uint32_t							type;
-	const char*							name;
-	const Core::ResourceHandleBase*		handle;
+	FOP( const char*,							name );
+	FOP( const Core::ResourceHandleBase*,		handle );
 };
 
 struct ManifestResource : public Core::Resource<ManifestType> {
@@ -61,5 +63,7 @@ typedef std::shared_ptr<ManifestResource>									ManifestResourcePtr;
 
 
 }
+
+#undef FOP
 
 #endif // WIERD_CORE_CORERESOURCES_H

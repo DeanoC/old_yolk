@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <boost/weak_ptr.hpp>
-
 namespace Core {
 
 enum RESOURCE_FLAGS
@@ -52,6 +50,10 @@ public:
 	~ResourceHandleBase() {};
 
 protected:
+	//! acquire a typed resource 
+	template< uint32_t type >
+		std::shared_ptr<Resource<type> > baseAcquire() const;
+
 	ResourceHandleBase( uint32_t type_ ) : m_Type( type_ ) {};
 
 	//! a weak ptr to the actual resource
@@ -71,11 +73,8 @@ public:
 	// helper to acquire an class that inherits off Resource<type>
 	template<class T>
 	std::shared_ptr<T> acquire() const {
-		return boost::shared_static_cast<T>( baseAcquire() );
+		return std::static_pointer_cast<T>( baseAcquire() );
 	}
-
-	//! acquire a typed resource 
-	std::shared_ptr<Resource<type> > baseAcquire() const;
 
 protected:
 	ResourceHandle() {};

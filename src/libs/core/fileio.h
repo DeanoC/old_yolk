@@ -46,17 +46,23 @@ public:
 	}
 		
 	bool open( const char* _path );
+	bool createNew( const char* _path );
+
 	virtual void close();
 	virtual bool isValid() const {
 		return (fh != NULL);
 	}
 		
 	virtual uint64_t read(uint8_t* _buffer, uint64_t _len);
+	virtual uint64_t write(uint8_t* _buffer, uint64_t _len);
 
 	virtual uint64_t tell();
 	virtual void seekFromStart( uint64_t _seek );		
 	virtual uint64_t bytesLeft();
 	virtual uint8_t getByte();
+
+	// for when you need to things like fstat etc. not supported via the usual interface
+	FILE* getFH() const { return fh; }
 protected:
 	FILE* fh;
 };

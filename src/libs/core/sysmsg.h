@@ -24,22 +24,22 @@ public:
 	typedef void (*IntCallback)( int );
 
 	//! install a callback to receive Quit message
-	void RegisterQuitCallback( VoidCallback pCallback ) {
+	void registerQuitCallback( VoidCallback pCallback ) {
 		m_pQuitCallback = pCallback;
 	}
 	//! install a callback to receive DebugMode message
-	void RegisterDebugModeChangeCallback( IntCallback pCallback ) {
+	void registerDebugModeChangeCallback( IntCallback pCallback ) {
 		m_pDebugModeChangeCallback = pCallback;
 	}
 
 	//! Call a registered callback for Quit
-	void Quit( void ) {
+	void quit( void ) {
 		if(m_pQuitCallback) {
 			m_pQuitCallback();
 		}
 	}
 	//! Call a registered callback for debug mode change
-	void DebugModeChange( int mode ) {
+	void debugModeChange( int mode ) {
 		if(m_pDebugModeChangeCallback) {
 			m_pDebugModeChangeCallback( mode );
 		}

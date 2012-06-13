@@ -27,11 +27,11 @@ class AsyncResourceHandle : public Core::ResourceHandle<type> {
 public:
 	static const uint32_t Type = type;
 	typedef rclass								ResourceClass;
-	typedef std::shared_ptr<ResourceClass>	ResourcePtr;
+	typedef std::shared_ptr<ResourceClass>		ResourcePtr;
 
 	// helper to acquire an class that inherits off Resource<type>
 	ResourcePtr acquire() const {
-	  return std::static_pointer_cast<ResourceClass>( Core::ResourceHandle<type>::baseAcquire() );
+	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseAcquire<type>() );
 	}
 	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
 	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );

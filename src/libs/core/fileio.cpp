@@ -15,6 +15,11 @@ namespace Core
 		fh = fopen( _path, "rb" );
 		return  ( fh != NULL) ? true : false;
 	}
+	bool File::createNew( const char* _path ) {
+		fh = fopen( _path, "wb" );
+		return  ( fh != NULL) ? true : false;		
+	}
+
 	void File::close(){
 		if( fh ) {
 			fclose(fh);
@@ -24,6 +29,11 @@ namespace Core
 	uint64_t File::read(uint8_t* _buffer, uint64_t _len){
 		return fread(_buffer, 1, (size_t)_len, fh);
 	}
+
+	uint64_t File::write(uint8_t* _buffer, uint64_t _len){
+		return fwrite(_buffer, 1, (size_t)_len, fh);
+	}
+
 	
 	uint64_t File::tell(){
 		return ftell(fh);

@@ -11,7 +11,7 @@
 extern "C" void _ovly_debug_event() {
 }
 
-extern void InstallVmApiFuncs( TrustedRegion* trustedRegion );
+extern void InstallDWMApiFuncs( TrustedRegion* trustedRegion );
 
 IsolatedExecEngine::IsolatedExecEngine( uint32_t sandboxSize, 
 										uint32_t sandboxStackSize,
@@ -83,6 +83,17 @@ void IsolatedExecEngine::sandboxFree( void* ptr ) {
 	// TODO
 }
 
+void IsolatedExecEngine::terminate() {
+	untrustedThread->interrupt();
+	try {
+		boost::this_thread::interruption_point();
+	} catch( ... ) {
+	};
+
+	CORE_DELETE untrustedThread;
+	untrustedThread = nullptr;
+}
+
 // TODO thread safe thread allocation
 #define MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCESS 1024
 static IEEThreadContext g_ThreadCtxs[ MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCESS ];
@@ -106,7 +117,7 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	// wipe out (HLT) the untrusted thunk code now its been copied into trusted space
 	memset( sttStart, 0xFE, (uintptr_t)sttEnd - (uintptr_t)sttStart ); 
 
-	InstallVmApiFuncs( trustedRegion );
+	InstallDWMApiFuncs( trustedRegion );
 
 	// transfer the elf into the loader and get its ready to go
 	MemoryBuffer* mb = MemoryBuffer::getMemBuffer( elfstr );
@@ -131,16 +142,14 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 //	threadCtx->untrusted_rip = (uint64_t)dyld->getSymbolAddress( llvm::StringRef("main") );
 	assert( threadCtx->untrusted_rip != 0 );
 
-	LOG(INFO) << "__preinit_array_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__preinit_array_start") ) << "\n";
-	LOG(INFO) << "__init_array_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__init_array_start") ) << "\n";
-	LOG(INFO) << "__fini_array_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__fini_array_start") ) << "\n";
-	LOG(INFO) << "__ctors_start: " << (void*) dyld->getSymbolAddress( llvm::StringRef("__ctors_start") ) << "\n";
-
 	threadCtx->owner = this;
-
 	typedef void (*switch_ptr)( const IEEThreadContext* ctx );
 	switch_ptr switchp = (switch_ptr) dyld->getSymbolAddress( llvm::StringRef("SwitchToUntrustedSSELinux") );
 	assert( switchp != nullptr );
-	switchp( threadCtx );
-	// never ever ever gets here!
+
+	untrustedThread = CORE_NEW Core::thread( [&]() {
+		switchp( threadCtx );
+	});
+
+	untrustedThread->join();
 }

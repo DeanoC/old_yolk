@@ -3,11 +3,10 @@ cmake_minimum_required( VERSION 2.8 )
 include_directories( ${CMAKE_SOURCE_DIR}/submodules/nacl-llvm/llvm/include/ )
 include_directories( ${CMAKE_BINARY_DIR}/submodules/nacl-llvm/llvm/include/ )
 link_directories( ${CMAKE_BINARY_DIR}/submodules/nacl-llvm/llvm/lib )
-include_directories( ${CMAKE_SOURCE_DIR}/submodules/native_client/src/ ) # slightly odd but same as the actual project uses...
 
-file( GLOB cpp_src_files *.cpp *.cxx)
+file( GLOB cpp_src_files *.cpp *.cxx apis/*.cpp )
 file( GLOB c_src_files *.c )
-file( GLOB header_files *.h *.inl *.hpp *.hxx)
+file( GLOB header_files *.h *.inl *.hpp *.hxx apis/*.h )
 list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
 ADD_MSVC_PRECOMPILED_HEADER( "dwm.h" "${cpp_src_files}" )
