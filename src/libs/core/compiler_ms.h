@@ -6,8 +6,8 @@
 /// \details	
 ///		compiler_ms description goes here
 ///
-/// \remark	Copyright (c) 2010 Zombie House Studios. All rights reserved.
-/// \remark	mailto://deano@zombiehousestudios.com
+/// \remark	Copyright (c) 2010 Cloud Pixies Ltd. All rights reserved.
+/// \remark	mailto://deano@cloudpixies.com
 ///
 /// \todo	Fill in detailed file description. 
 /// \todo	support iterator debugging in debug

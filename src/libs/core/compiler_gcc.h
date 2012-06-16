@@ -6,7 +6,7 @@
 /// \details	
 /// 	Contains the various defines to support GCC as a compiler for wierd
 ///
-/// \remark	Copyright (c) 2010 Zombie House Studios. All rights reserved.
+/// \remark	Copyright (c) 2012 Cloud Pixies Ltd. All rights reserved.
 /// \remark	mailto://deano@zombiehousestudios.com
 /// 
 /// \todo GCC force inline needs properly defining

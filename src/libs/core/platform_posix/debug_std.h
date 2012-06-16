@@ -3,7 +3,7 @@
 //  Wierd Core
 //  
 //  Created by Deano on 2008-09-27.
-//  Copyright 2008 Zombie House Studios. All rights reserved.
+//  Copyright 2008 Cloud Pixies Ltd. All rights reserved.
 //
 
 #pragma once

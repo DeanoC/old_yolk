@@ -18,7 +18,7 @@
 ///
 /// \brief	Returns the number of elements in a staic array. 
 ///
-/// \remarks	Deano, 03/10/2010. 
+/// \remarks	Deano, 03/10/2012. 
 ///
 /// \param	array	The array must be static.
 /// \todo	Google has a version that detects it is a static array, this just bugs out if not... 
@@ -30,7 +30,7 @@
 ///
 /// \brief	return the bit of the number. 
 ///
-/// \remarks	Deano, 03/10/2010. 
+/// \remarks	Deano, 03/10/2012. 
 ///
 /// \param	num	returns the bit representing this index. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@
 ///
 /// \brief	marks the variable unused. 
 ///
-/// \remarks	Deano, 03/10/2010. 
+/// \remarks	Deano, 03/10/2012. 
 ///
 /// \param	i	The variable to mark as unused. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

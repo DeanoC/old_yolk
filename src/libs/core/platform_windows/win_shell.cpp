@@ -2,8 +2,8 @@
 //  win_shell.cpp
 //  deano
 //  
-//  Created by Deano on 2010.
-//  Copyright 2010 Zombie House Studios. All rights reserved.
+//  Created by Deano on 2012.
+//  Copyright 2012 Cloud Pixies Ltd. All rights reserved.
 // 
 
 #include "core/core.h"

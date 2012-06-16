@@ -8,11 +8,10 @@
 
 #include "core/core.h"
 #include "resourceman.h"
-#if PLATFORM == WINDOWS
-#	include "platform_windows/dirwatch.h"
-#endif
 #include <sstream>
 #include "coreresources.h"
+#include "tbb/concurrent_hash_map.h"
+#include "tbb/concurrent_vector.h"
 
 namespace
 {
@@ -41,34 +40,33 @@ namespace Core
 
 struct ResourceData 
 {
-
-	boost::scoped_array<const char>				m_ResourceName;
-	boost::scoped_array<const char>				m_ResourceData;
-	ResourceHandleBase*							m_spHandle;
-	std::shared_ptr<ResourceBase>				m_spResource;
-	uint32_t									m_iRefCount;
-	RESOURCE_FLAGS								m_Flags;
-	std::string								cacheName;
+	boost::scoped_array<const char>				resourceName;
+	boost::scoped_array<const char>				resourceData;
+	ResourceHandleBase*							handle;
+	std::shared_ptr<ResourceBase>				resource;
+	uint32_t									refCount;
+	RESOURCE_FLAGS								flags;
+	std::string									cacheName;
 
 	ResourceData(	const char* pName, 
 					const char* pData, 
-					RESOURCE_FLAGS flags, 
+					RESOURCE_FLAGS flags_, 
 					ResourceHandleBase* pBase ) {
-		m_ResourceName.reset( pName );
-		m_ResourceData.reset( pData );
-		m_spHandle = pBase ;
-		m_iRefCount = 1;
-		m_Flags = flags;
+		resourceName.reset( pName );
+		resourceData.reset( pData );
+		handle = pBase ;
+		refCount = 1;
+		flags = flags_;
 	}
 };
 
 struct ResourceTypeData {
-	ResourceMan::CreateResourceCallback				m_CreateCallback;
-	ResourceMan::DestroyResourceCallback			m_DestroyCallback;
-	ResourceMan::ChangeResourceCallback				m_ChangeResourceCallback;
-	ResourceMan::DestroyResourceHandleCallback		m_DestroyResourceHandleCallback;
-	std::string										m_ResourceDirectory;
-	size_t											m_ResourceHandleSize;	
+	ResourceMan::CreateResourceCallback				createCallback;
+	ResourceMan::DestroyResourceCallback			destroyCallback;
+	ResourceMan::ChangeResourceCallback				changeResourceCallback;
+	ResourceMan::DestroyResourceHandleCallback		destroyResourceHandleCallback;
+	std::string										resourceDirectory;
+	size_t											resourceHandleSize;	
 
 	ResourceTypeData(){}
 	ResourceTypeData(	ResourceMan::CreateResourceCallback& create, 
@@ -77,12 +75,12 @@ struct ResourceTypeData {
 						ResourceMan::DestroyResourceHandleCallback destroyHandle,
 						const std::string& dir,
 						const size_t _rhSize ) :
-		m_CreateCallback( create ), 
-		m_DestroyCallback( destroy ), 
-		m_ChangeResourceCallback( change ),
-		m_DestroyResourceHandleCallback( destroyHandle ),
-		m_ResourceDirectory( dir ),
-		m_ResourceHandleSize( _rhSize )
+		createCallback( create ), 
+		destroyCallback( destroy ), 
+		changeResourceCallback( change ),
+		destroyResourceHandleCallback( destroyHandle ),
+		resourceDirectory( dir ),
+		resourceHandleSize( _rhSize )
 	{
 	}
 };
@@ -90,47 +88,51 @@ struct ResourceTypeData {
 class ResourceManImpl {
 public:
 
-	typedef std::list<ResourceData*>									ListResourceData;
-	typedef std::unordered_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
-	typedef std::unordered_map<std::string, ResourceData*>			CacheIndex;
-	typedef std::unordered_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
+	typedef tbb::concurrent_vector<ResourceData*>								ListResourceData;
+	typedef tbb::concurrent_hash_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
+	typedef tbb::concurrent_hash_map<std::string, ResourceData*>				CacheIndex;
+	typedef tbb::concurrent_hash_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
 
-	ListResourceData	m_ListResourceHandlePtrs;
-	PtrIndex			m_ResourceHandleBaseMap;
-	CacheIndex			m_CacheMap;
-	ResourceTypeMap		m_ResourceTypeMap;
+	ListResourceData	listResourceHandlePtrs;
+	PtrIndex			resourceHandleBaseMap;
+	CacheIndex			cacheMap;
+	ResourceTypeMap		resourceTypeMap;
 
 	~ResourceManImpl() {
-		if(m_ListResourceHandlePtrs.size() > 0) {
+		if(listResourceHandlePtrs.size() > 0) {
 			LOG(INFO) << "Unreleased Resources, these will cause memory leaks :\n";
 		}
-		ListResourceData::iterator rdIt = m_ListResourceHandlePtrs.begin();
-		while( rdIt != m_ListResourceHandlePtrs.end() ) {
-			uint32_t type = (*rdIt)->m_spHandle->getType();
+		ListResourceData::iterator rdIt = listResourceHandlePtrs.begin();
+		while( rdIt != listResourceHandlePtrs.end() ) {
+			uint32_t type = (*rdIt)->handle->getType();
 			std::string typeName = getResourceTypeAsString( type );
 			LOG(INFO) << "Type : " << typeName.c_str() << "(" << type << ")" << 
-						" - Name : " << (*rdIt)->m_ResourceName.get() << "\n";
+						" - Name : " << (*rdIt)->resourceName.get() << "\n";
 			++rdIt;
 		}
 	}
 };
 
 ResourceMan::ResourceMan() :
-	m_impl( *(CORE_NEW ResourceManImpl()) ) {
+	impl( *(CORE_NEW ResourceManImpl()) ) {
 }
 
 ResourceMan::~ResourceMan() {
-	CORE_DELETE &m_impl;
+	CORE_DELETE &impl;
 }
 
 const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, const void* pData, size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags ) {
-	CORE_ASSERT( (m_impl.m_ResourceTypeMap.find( type ) != m_impl.m_ResourceTypeMap.end() ) &&
-			"Resource type not registered" );
-	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ type ];
+	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
+	if( impl.resourceTypeMap.find( roRTM, type ) == false ) {
+		CORE_ASSERT( false && "Resource type not registered" );
+		return nullptr;
+	}
+
+	const ResourceTypeData& rtd = roRTM->second;
 
 	std::string actualName;
 	if( flags & RMRF_LOADOFFDISK ) {
-		actualName = rtd.m_ResourceDirectory + pName;
+		actualName = rtd.resourceDirectory + pName;
 	} else {
 		actualName = pName;
 	}
@@ -140,62 +142,77 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
 	cacheName = actualName + flagString.str();
 
-	ResourceManImpl::CacheIndex::const_iterator cacheIt = m_impl.m_CacheMap.find( cacheName );
+	ResourceManImpl::CacheIndex::accessor cacheIt;
+	if( impl.cacheMap.find( cacheIt, cacheName ) ) {
+		ResourceData* pRD = cacheIt->second;
+		CORE_ASSERT( pRD->handle->type == type );
+		pRD->refCount++;
+		return pRD->handle;
+	}
 
-	if( cacheIt == m_impl.m_CacheMap.end() ) {
-		char *pSafeData = NULL;
-		if( pData != NULL ) {
-			pSafeData = CORE_NEW_ARRAY char[ sizeofData ]; // will be owned ResourceData
-			memcpy(pSafeData, pData, sizeofData);
-		}
+	char *pSafeData = NULL;
+	if( pData != NULL ) {
+		pSafeData = CORE_NEW_ARRAY char[ sizeofData ]; // will be owned ResourceData
+		memcpy(pSafeData, pData, sizeofData);
+	}
+	uint8_t* baseMem = CORE_NEW_ARRAY uint8_t[ rtd.resourceHandleSize ];
+	memset( baseMem, 0, rtd.resourceHandleSize );
+	ResourceHandleBase* pBase = CORE_PLACEMENT_NEW(baseMem) ResourceHandleBase( type );
+
+	ResourceManImpl::PtrIndex::accessor acc;
+	if( impl.resourceHandleBaseMap.insert( acc, pBase ) ) {	
 		char *pSafeName = CORE_NEW_ARRAY char[ actualName.size()+ 1 ]; // will be owned ResourceData
 		strcpy(pSafeName, actualName.c_str() );
-
-		uint8_t* baseMem = CORE_NEW_ARRAY uint8_t[ rtd.m_ResourceHandleSize ];
-		memset( baseMem, 0, rtd.m_ResourceHandleSize );
-		ResourceHandleBase* pBase = CORE_PLACEMENT_NEW(baseMem) ResourceHandleBase( type );
-		m_impl.m_ListResourceHandlePtrs.push_back( CORE_NEW ResourceData( pSafeName, pSafeData, flags, pBase ) );
-		m_impl.m_ResourceHandleBaseMap[ pBase ] = m_impl.m_ListResourceHandlePtrs.back();
-
+		auto lb = impl.listResourceHandlePtrs.push_back( CORE_NEW ResourceData( pSafeName, pSafeData, flags, pBase ) );
+		acc->second = *lb;
 		if( !(flags & RMRF_DONTCACHE) ) {
-			m_impl.m_CacheMap[ cacheName ] = m_impl.m_ListResourceHandlePtrs.back();
-			m_impl.m_CacheMap[ cacheName ]->cacheName = cacheName;
+			if( impl.cacheMap.insert( cacheIt, cacheName ) ) {
+				cacheIt->second = *lb;
+				cacheIt->second->cacheName = cacheName;
+			}
 		}
 
-		return pBase;
 	} else {
-		ResourceData* pRD = (*cacheIt).second;
-		CORE_ASSERT( pRD->m_spHandle->m_Type == type );
-		pRD->m_iRefCount++;
-		return pRD->m_spHandle;
+		CORE_DELETE_ARRAY( pSafeData );
+		CORE_DELETE_ARRAY( baseMem );
+		CORE_ASSERT( false && "resourceHandleBaseMap.insert failed" )
 	}
+
+	return pBase;
 }
 
 void ResourceMan::implCloseResource( ResourceHandleBase* pHandle ) {
-	if( m_impl.m_ResourceHandleBaseMap.find( pHandle ) != m_impl.m_ResourceHandleBaseMap.end() ) {
-		ResourceData* pRD = m_impl.m_ResourceHandleBaseMap[ pHandle ];
-		CORE_ASSERT( pHandle == pRD->m_spHandle );
-		--pRD->m_iRefCount;
-		if( pRD->m_iRefCount == 0 ) {
-			ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ pRD->m_spHandle->m_Type ];
-			if( pRD->m_spResource ) {
+	ResourceManImpl::PtrIndex::accessor acc;
+	if( impl.resourceHandleBaseMap.find( acc, pHandle )  ) {
+		ResourceData* pRD = acc->second;
+		CORE_ASSERT( pHandle == pRD->handle );
+		--pRD->refCount;
+		if( pRD->refCount == 0 ) {
+			ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
+			if( impl.resourceTypeMap.find( roRTM, pHandle->type ) == false ) {
+				CORE_ASSERT( false && "Resource type not registered" );
+			}
+
+			const ResourceTypeData& rtd = roRTM->second;
+			if( auto res = pHandle->resourceBase.lock() ) {
 				// the callback does the reset DO NOT do it yourself
-				rtd.m_DestroyCallback( pRD->m_spResource );
+				rtd.destroyCallback( res );
 			}
 
 			// cache entry are actually optional so check for valitity before erasing
-			ResourceManImpl::CacheIndex::iterator cacheIt = m_impl.m_CacheMap.find( pRD->cacheName );
-			if( cacheIt != m_impl.m_CacheMap.end() ) {
-				m_impl.m_CacheMap.erase( cacheIt );
+			ResourceManImpl::CacheIndex::accessor cacheIt;
+			if( impl.cacheMap.find( cacheIt, pRD->cacheName ) ) {
+				impl.cacheMap.erase( cacheIt );
 			}
 
-			ResourceManImpl::PtrIndex::iterator rhbIt = m_impl.m_ResourceHandleBaseMap.find( pRD->m_spHandle );
-			ResourceManImpl::ListResourceData::iterator lrdIt = std::find( m_impl.m_ListResourceHandlePtrs.begin(),m_impl.m_ListResourceHandlePtrs.end(), pRD );
-			m_impl.m_ResourceHandleBaseMap.erase( rhbIt );
-			m_impl.m_ListResourceHandlePtrs.erase( lrdIt );
+			// currently the vector just grows, null entries and releasing memory but not actually
+			// shriking the vector. This could be done by a stop the world mutex by for now probably okay as only 4/8 byte per resource
+			ResourceManImpl::ListResourceData::iterator lrdIt = std::find( impl.listResourceHandlePtrs.begin(),impl.listResourceHandlePtrs.end(), pRD );
+			*lrdIt = nullptr;
 
+			impl.resourceHandleBaseMap.erase( acc );
 			
-			rtd.m_DestroyResourceHandleCallback( pRD->m_spHandle );
+			rtd.destroyResourceHandleCallback( pRD->handle );
 			CORE_DELETE pRD;
 
 		}
@@ -204,14 +221,16 @@ void ResourceMan::implCloseResource( ResourceHandleBase* pHandle ) {
 	}
 }
 void ResourceMan::implFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags ) {
-	CORE_ASSERT( (m_impl.m_ResourceTypeMap.find( type ) != m_impl.m_ResourceTypeMap.end() ) &&
-			"Resource type not registered" );
-	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ type ];
+	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
+	if( impl.resourceTypeMap.find( roRTM, type ) == false ) {
+		CORE_ASSERT( false && "Resource type not registered" );
+	}
 
+	const ResourceTypeData& rtd = roRTM->second;
 
 	std::string actualName;
 	if( flags & RMRF_LOADOFFDISK ) {
-		actualName = rtd.m_ResourceDirectory + pName;
+		actualName = rtd.resourceDirectory + pName;
 	} else {
 		actualName = pName;
 	}
@@ -221,10 +240,10 @@ void ResourceMan::implFlushResource( const char* pName, uint32_t type, RESOURCE_
 	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
 	cacheName = actualName + flagString.str();
 
-	ResourceManImpl::CacheIndex::iterator cacheIt = m_impl.m_CacheMap.find( cacheName );
-
-	if( cacheIt != m_impl.m_CacheMap.end() ) {
-		m_impl.m_CacheMap.erase( cacheIt );
+	// cache entry are actually optional so check for valitity before erasing
+	ResourceManImpl::CacheIndex::accessor cacheIt;
+	if( impl.cacheMap.find( cacheIt, cacheName ) ) {
+		impl.cacheMap.erase( cacheIt );
 	}
 }
 
@@ -239,34 +258,77 @@ void ResourceMan::registerResourceType (	uint32_t type,
 											DestroyResourceHandleCallback pDestroyHandle,							
 											ChangeResourceCallback pChange,
 											const std::string dir ) {
-	CORE_ASSERT( m_impl.m_ResourceTypeMap.find(type) == m_impl.m_ResourceTypeMap.end() );
+	ResourceManImpl::ResourceTypeMap::accessor rtmIt;
+	if( impl.resourceTypeMap.find( rtmIt, type ) == true ) {
+		CORE_ASSERT( false && "Resource type already registered" );
+	}
+
 	if( pDestroyHandle == NULL ) {
 		pDestroyHandle = &DefaultDestroyResourceHandleCallback;
 	}
 
-//	Log << "Registering Resource Type : " << GetResourceTypeAsString(type) << " (" << type << ")" << "\n";
-	m_impl.m_ResourceTypeMap[ type ] = ResourceTypeData( pCreate, pDestroy, pChange, pDestroyHandle, dir, resourceHandleSize );
+	if( impl.resourceTypeMap.insert( rtmIt, type ) == true ) {
+//	LOG(INFO) << "Registering Resource Type : " << GetResourceTypeAsString(type) << " (" << type << ")" << "\n";
+		rtmIt->second = ResourceTypeData( pCreate, pDestroy, pChange, pDestroyHandle, dir, resourceHandleSize );
+	}
 }
 
 std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBase* pHandle ) {
-	ResourceData* pRD = m_impl.m_ResourceHandleBaseMap[ pHandle ];
-	ResourceTypeData& rtd = m_impl.m_ResourceTypeMap[ pHandle->m_Type ];
-#if defined( LOG_RESOURCE_ACQUIRE )
-	if( pRD->m_Flags & RMRF_LOADOFFDISK ) {
-		Log <<	((pRD->m_Flags & RMRF_PRELOAD)? "Preloading " : "Acquiring ") << GetResourceTypeAsString( pHandle->m_type ) << 
-				" resource off disk: " << pRD->m_ResourceName.get() <<"\n";
-	} else {
-		Log << "Acquiring in memory resource: " << pRD->m_ResourceName.get() <<"\n";
+	bool alreadyAcquiring;
+	pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, true );
+	if( alreadyAcquiring ) {
+		return std::shared_ptr<ResourceBase>();
 	}
-#endif
-	pRD->m_spResource = rtd.m_CreateCallback( pHandle, pRD->m_Flags, pRD->m_ResourceName.get(), pRD->m_ResourceData.get() );
-	if( pRD->m_spResource != NULL ) {
-		std::weak_ptr<ResourceBase> tmp( pRD->m_spResource );
-		pHandle->m_wpResourceBase.swap( tmp );
-	}
-	pRD->m_Flags = (RESOURCE_FLAGS) (pRD->m_Flags & ~(RMRF_PRELOAD ));
 
-	return pRD->m_spResource;
+	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
+	if( impl.resourceTypeMap.find( roRTM, pHandle->type ) == false ) {
+		CORE_ASSERT( false && "Resource type not registered" );
+	}
+	const ResourceTypeData& rtd = roRTM->second;
+
+	ResourceManImpl::PtrIndex::accessor rdIt;
+	if( impl.resourceHandleBaseMap.find( rdIt, pHandle ) == false ) {
+		CORE_ASSERT( false && "Invalid Resource require" );		
+	}
+	ResourceData* pRD = rdIt->second;
+
+	auto res = rtd.createCallback( pHandle, pRD->flags, pRD->resourceName.get(), pRD->resourceData.get() );
+	if( res ) {
+		pRD->resource = res;
+		pRD->flags = (RESOURCE_FLAGS) (pRD->flags & ~(RMRF_PRELOAD ));
+
+		pHandle->resourceBase = res;
+
+		bool alreadyAcquiring;
+		pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, false );
+	}
+
+	return res;
+}
+
+void ResourceMan::internalAsyncAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& res ) {
+	ResourceHandleBase* pHandle = const_cast<ResourceHandleBase*>(_handle);
+
+	if( !res ) {
+		bool alreadyAcquiring;
+		pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, false );
+		return;
+	}
+
+	ResourceManImpl::PtrIndex::accessor rdIt;
+	if( impl.resourceHandleBaseMap.find( rdIt, pHandle ) == false ) {
+		CORE_ASSERT( false && "Invalid Resource require" );		
+	}
+
+	ResourceData* pRD = rdIt->second;
+	pRD->resource = res;
+	pRD->flags = (RESOURCE_FLAGS) (pRD->flags & ~(RMRF_PRELOAD ));
+
+	pHandle->resourceBase = res;
+
+	bool alreadyAcquiring;
+	pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, false );
+	
 }
 
 void ResourceMan::internalProcessManifest( uint16_t numEntries, ManifestEntry* entries ) {

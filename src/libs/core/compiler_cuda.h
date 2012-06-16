@@ -6,8 +6,8 @@
 /// \details	
 /// 	Contains the various defines to support CUDA as a compiler for wierd
 ///
-/// \remark	Copyright (c) 2010 Zombie House Studios. All rights reserved.
-/// \remark	mailto://deano@zombiehousestudios.com
+/// \remark	Copyright (c) 2012 Cloud Pixies Ltd. All rights reserved.
+/// \remark	mailto://deano@cloudpixies.com
 /// 		
 /// \todo does CUDA support alignment attributes for members?
 /// \todo can CUDA support CORE_STATIC_ASSERT?

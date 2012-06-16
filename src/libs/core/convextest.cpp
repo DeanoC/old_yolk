@@ -3,7 +3,7 @@
 //  deano
 //  
 //  Created by Deano on 2008-10-12.
-//  Copyright 2008 Zombie House Studios. All rights reserved.
+//  Copyright 2008 Cloud Pixies Ltd. All rights reserved.
 // 
 
 #include "core/core.h"

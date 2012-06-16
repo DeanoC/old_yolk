@@ -6,8 +6,8 @@
 /// \details	
 ///		Use as a ray casting acceleration and other uses
 ///
-/// \remark	Copyright (c) 2010 Zombie House Studios. All rights reserved.
-/// \remark	mailto://deano@zombiehousestudios.com
+/// \remark	Copyright (c) 2012 Cloud Pixies Ltd. All rights reserved.
+/// \remark	mailto://deano@cloudpixies.com
 ///
 /// \todo	Fill in detailed file description. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

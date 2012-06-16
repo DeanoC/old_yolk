@@ -90,6 +90,7 @@ include_directories( ${CMAKE_BINARY_DIR}/submodules/zlib/ )
 include_directories( ${CMAKE_SOURCE_DIR}/submodules/zlib/ )
 include_directories( ${CMAKE_SOURCE_DIR}/submodules/riak-cpp/ )
 include_directories( ${CMAKE_BINARY_DIR}/submodules/riak-cpp/ )
+include_directories( ${CMAKE_SOURCE_DIR}/submodules/tbb/include )
 
 if( WIN32 )
 	set( LLVM_PREPROCESSOR ${CMAKE_SOURCE_DIR}/../vt_repo/bin/clang.exe -S )

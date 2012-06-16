@@ -8,8 +8,8 @@
 /// of our basic thread system.
 /// we can so far choose between boost::threads and tbb::thread and maybe the systems tr2
 /// 
-/// \remark	Copyright (c) 2010 Zombie House Studios. All rights reserved.
-/// \remark	mailto://deano@zombiehousestudios.com
+/// \remark	Copyright (c) 2012 Cloud Pixies Ltd. All rights reserved.
+/// \remark	mailto://deano@cloudpixies.com
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

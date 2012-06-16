@@ -100,7 +100,7 @@ int Main() {
 
 		// Create a pool of threads to run all of the io_services.
 		std::vector<std::shared_ptr<Core::thread> > threads;
-		for (std::size_t i = 0; i < Core::thread::hardware_concurrency(); ++i) {
+		for (std::size_t i = 0; i < Core::thread::hardware_concurrency() - 2; ++i) {
 			threads.push_back( 
 				std::make_shared<Core::thread>( 
 					boost::bind( &boost::asio::io_service::run, 
@@ -110,34 +110,31 @@ int Main() {
 			);
 		}
 
-		Gl::Gfx::init();
-		if( !Cl::Platform::exists() )
-			Cl::Platform::init();
+		threads.push_back( 
+			std::make_shared<Core::thread>( 
+				boost::bind( &MainLoop ) 
+			) 
+		); 
+		size_t mainLoopThreadIndex = threads.size() - 1;
 
-		Core::InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
-		bool glOk = Gl::Gfx::get()->createScreen( START_WIDTH, START_HEIGHT, START_FULLSCREEN, Gl::Gfx::START_AA );
-		if( glOk == false ) {
-			LOG(ERROR) << "GL unable to find adequate GPU";
-			return 1;
-		}
-		Core::SystemMessage::get()->registerQuitCallback( QuitCallback );
-		Core::SystemMessage::get()->registerDebugModeChangeCallback( DebugModeCallback );
+		threads.push_back( 
+			std::make_shared<Core::thread>( 
+				[] { 
+					Dwm test;
+					test.bootstrapLocal();				
+				}
+			)
+		);
 
-		Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext(0);
-		Core::DevelopmentContext::get()->addContext( "DebugCam", 
-				std::shared_ptr<DebugCamContext>( CORE_NEW DebugCamContext( ctx ) ) );
-		Core::DevelopmentContext::get()->activateContext( "DebugCam" );
-
-		MainLoop();
-
-/*		Dwm test;
-		test.bootstrapLocal();
-
-		if( Handshake( *io, hostname, port ) == true ) {
+/*		if( Handshake( *io, hostname, port ) == true ) 
+		{
 			// Wait for all threads in the pool to exit.
 			for (std::size_t i = 0; i < threads.size(); ++i)
 				threads[i]->join();
 		}*/
+		threads[ mainLoopThreadIndex ]->join();
+
+		// TODO terminate nicely other thread, rather than yank them..
 	} 
 	CoreCatchAllOurExceptions {
 		LogException( err );
@@ -153,9 +150,6 @@ int Main() {
 
 //	Graphics::ScrConsole::Shutdown();
 //	Cl::Platform::Get()->destroyDevices();
-	Gl::Gfx::get()->shutdownScreen();
-//	Cl::Platform::Shutdown();
-	Gl::Gfx::shutdown();
 
 	MMU::shutdown();
 	BitCoder::shutdown();
@@ -183,11 +177,30 @@ void MainLoop() {
 	using namespace Core;
 	Render::RenderWorld rworld;
 
+
+	Gl::Gfx::init();
+	if( !Cl::Platform::exists() )
+		Cl::Platform::init();
+
+	Core::InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
+	bool glOk = Gl::Gfx::get()->createScreen( START_WIDTH, START_HEIGHT, START_FULLSCREEN, Gl::Gfx::START_AA );
+	if( glOk == false ) {
+		LOG(ERROR) << "GL unable to find adequate GPU";
+		return;
+	}
+	Core::SystemMessage::get()->registerQuitCallback( QuitCallback );
+	Core::SystemMessage::get()->registerDebugModeChangeCallback( DebugModeCallback );
+
+	Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT );
+	ctx->threadActivate();
+	ctx->prepToRender();
+
+	Core::DevelopmentContext::get()->addContext( "DebugCam",  std::shared_ptr<DebugCamContext>( CORE_NEW DebugCamContext( ctx ) ) );
+	Core::DevelopmentContext::get()->activateContext( "DebugCam" );
+
 	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "sphere_1" ) );
 	auto sphere = CORE_NEW Render::HieSkeleton( "sphere_1" );
 	rworld.addRenderable( sphere );
-
-	Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext(0);
 
 	// flush 'load' time from first time update
 	Clock::get()->update();
@@ -211,4 +224,8 @@ void MainLoop() {
 		Core::HouseKeep();
 	}	
 	CORE_DELETE sphere;
+
+	Gl::Gfx::get()->shutdownScreen();
+//	Cl::Platform::Shutdown();
+	Gl::Gfx::shutdown();	
 }

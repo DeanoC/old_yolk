@@ -1,4 +1,5 @@
 
+add_subdirectory( tbb )
 add_subdirectory( nacl-llvm/llvm )
 add_subdirectory( zlib )
 add_subdirectory( json-spirit )

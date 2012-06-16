@@ -29,13 +29,20 @@ public:
 	typedef rclass								ResourceClass;
 	typedef std::shared_ptr<ResourceClass>		ResourcePtr;
 
-	// helper to acquire an class that inherits off Resource<type>
+	// helper to acquire a class that inherits off Resource<type>
 	ResourcePtr acquire() const {
 	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseAcquire<type>() );
 	}
+
+	// helper to try and acquire a class that inherits off Resource<type>
+	ResourcePtr tryAcquire() const {
+	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseTryAcquire<type>() );
+	}
+
 	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
 	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
 	}
+
 	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
 	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
 	}
@@ -74,6 +81,8 @@ public:
 	void reset( const arh* _handle ){ handle = _handle; }
 
 	ResourcePtr acquire() const { return handle->acquire(); }
+
+	ResourcePtr tryAcquire() const { return handle->tryAcquire(); }
 
 	const arh* get() { return handle; }
 private:

@@ -67,10 +67,13 @@ public:
 	void internalProcessManifest( uint16_t numEntries, struct ManifestEntry* entries );
 	void internalCloseManifest( uint16_t numEntries, struct ManifestEntry* entries );
 
+	void internalAsyncAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& _resource );
+
 private:
 	//! Internal AcquireResource used by ResourceHandle
 	template<uint32_t type>
 		std::shared_ptr<Resource<type> > internalAcquireResource( const ResourceHandleBase* const pHandle );
+
 
 	const ResourceHandleBase* implOpenResource(  const char* pName, const void* pData, const size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags );
 	void implCloseResource( ResourceHandleBase* pHandle );
@@ -78,7 +81,7 @@ private:
 
 	std::shared_ptr<ResourceBase> implAcquireResource( ResourceHandleBase* pHandle );
 
-	class ResourceManImpl&	m_impl;
+	class ResourceManImpl&	impl;
 };
 
 
@@ -87,7 +90,7 @@ const ResourceHandle<type>* ResourceMan::loadCreateResource( const char* pName, 
 	const ResourceHandleBase* pRHB = implOpenResource( pName, pData, sizeofData, type, (RESOURCE_FLAGS)flags );
 	const ResourceHandle<type>* pRH = (const ResourceHandle<type>*) pRHB;
 	if( flags & RMRF_PRELOAD ) {
-		if( pRH->m_wpResourceBase.expired() ) {
+		if( pRH->resourceBase.expired() ) {
 			// note is allowed to return NULL for the shared pointer as its likely the object isn't ready
 			internalAcquireResource<type>( pRHB );
 		}
@@ -119,18 +122,33 @@ std::shared_ptr<Resource<type> > ResourceMan::internalAcquireResource( const Res
 //! the internal unsafe versions that actual do the work. If
 //! a resource is already in existence this is a very quick operation.
 //! else it takes an indefinite amount of time, to get the resource
-template< uint32_t type >
-inline std::shared_ptr<Resource<type> > ResourceHandleBase::baseAcquire() const {
-	while( m_wpResourceBase.expired() ) {
-		std::shared_ptr<Resource<type> > acquired( 
-				ResourceMan::get()->internalAcquireResource<type>( this ) );
-		if(acquired != NULL)
-			return acquired;
+template< uint32_t type_ >
+inline std::shared_ptr<Resource<type_> > ResourceHandleBase::baseAcquire() const {
+	while( resourceBase.expired() ) {
+		std::shared_ptr<Resource<type_> > acquiredp( 
+				ResourceMan::get()->internalAcquireResource<type_>( this ) );
+		if( acquiredp )
+			return acquiredp;
 	}
 
-	return std::static_pointer_cast<Resource<type> >( m_wpResourceBase.lock() );
+	return std::static_pointer_cast<Resource<type_> >( resourceBase.lock() );
 }
-
+//! like baseAcquire but doesn't stall, if its not ready it will return a empty
+//! shared pointer
+template< uint32_t type_ >
+inline std::shared_ptr<Resource<type_> > ResourceHandleBase::baseTryAcquire() const {
+	if( resourceBase.expired() ) {
+		std::shared_ptr<Resource<type_> > acquiredp( 
+				ResourceMan::get()->internalAcquireResource<type_>( this ) );
+		if( acquiredp ) {
+			return acquiredp;
+		} else {
+			return std::shared_ptr<Resource<type_> >();
+		}
+	} else {
+		return std::static_pointer_cast<Resource<type_> >( resourceBase.lock() );
+	}
+}
 
 }	//namespace Core
 

@@ -1,7 +1,7 @@
 //!-----------------------------------------------------
 //!
 //! \file resourcebase.h
-//!   Copyright (C) 2010 by Dean Calver                                     
+//!   Copyright (C) 2012 by Dean Calver                                     
 //!   deano@rattie.demon.co.uk                                              
 //!
 //!-----------------------------------------------------
@@ -42,23 +42,25 @@ public:
 	friend class ResourceMan;	
 
 	//! returns the type of this resource
-	uint32_t getType() const {
-		return m_Type;
-	}
+	uint32_t getType() const { return type; }
 
 	//! should only be done by the resource manager
 	~ResourceHandleBase() {};
 
+
 protected:
 	//! acquire a typed resource 
-	template< uint32_t type >
-		std::shared_ptr<Resource<type> > baseAcquire() const;
+	template< uint32_t type_ >
+		std::shared_ptr<Resource<type_> > baseAcquire() const;
+	//! try and acquire a typed resource 
+	template< uint32_t type_ >
+		std::shared_ptr<Resource<type_> > baseTryAcquire() const;
 
-	ResourceHandleBase( uint32_t type_ ) : m_Type( type_ ) {};
+	ResourceHandleBase( uint32_t type_ ) : type( type_ ) {};
 
-	//! a weak ptr to the actual resource
-	mutable std::weak_ptr<ResourceBase>	m_wpResourceBase;
-	uint32_t m_Type;	//!< type this resource handle points to
+	mutable std::weak_ptr<ResourceBase>	resourceBase;
+	mutable std::atomic<bool> acquiring; // as acquiring can be async, this simply flags that onces been kicked off
+	uint32_t type;	//!< type this resource handle points to
 };
 
 //! gets returned, every time you want to use the resource
@@ -70,10 +72,16 @@ protected:
 template< uint32_t type >
 class ResourceHandle : public ResourceHandleBase {
 public:
-	// helper to acquire an class that inherits off Resource<type>
+	// helper to acquire a class that inherits off Resource<type>
 	template<class T>
 	std::shared_ptr<T> acquire() const {
 		return std::static_pointer_cast<T>( baseAcquire() );
+	}
+
+	// helper to try and acquire a class that inherits off Resource<type>
+	template< class T >
+	std::shared_ptr<T> tryAcquire() const {
+		return std::static_pointer_cast<T>( baseTryAcquire() );		
 	}
 
 protected:
