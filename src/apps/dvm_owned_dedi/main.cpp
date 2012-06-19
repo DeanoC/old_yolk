@@ -72,82 +72,69 @@ int Main() {
 	desc.add_options()
 		("help", "produce help message")
 	;
-	CoreTry {
-		po::variables_map vm;
-		po::store(po::parse_command_line(Core::g_argc, Core::g_argv, desc), vm);
-		po::notify(vm);    
+	po::variables_map vm;
+	po::store(po::parse_command_line(Core::g_argc, Core::g_argv, desc), vm);
+	po::notify(vm);    
 
-		if (vm.count("help")) {
-			LOG(INFO) << desc << "\n";
-			return 1;
-		}
+	if (vm.count("help")) {
+		LOG(INFO) << desc << "\n";
+		return 1;
+	}
 
-		readConfig( hostname, port );
+	readConfig( hostname, port );
 
-		io = std::make_shared<boost::asio::io_service>();
-		g_heart = std::make_shared<Heart>( *io );
+	io = std::make_shared<boost::asio::io_service>();
+	g_heart = std::make_shared<Heart>( *io );
 
 
-		// Wait for signals indicating time to shut down.
-		boost::asio::signal_set signals( *io );
-		signals.add(SIGINT);
-		signals.add(SIGTERM);
+	// Wait for signals indicating time to shut down.
+	boost::asio::signal_set signals( *io );
+	signals.add(SIGINT);
+	signals.add(SIGTERM);
 #if defined(SIGQUIT)
-		signals.add(SIGQUIT);
+	signals.add(SIGQUIT);
 #endif // defined(SIGQUIT)
-		signals.async_wait( boost::bind( 
-					&boost::asio::io_service::stop, &(*io) ) );
+	signals.async_wait( boost::bind( 
+				&boost::asio::io_service::stop, &(*io) ) );
 
-		// Create a pool of threads to run all of the io_services.
-		std::vector<std::shared_ptr<Core::thread> > threads;
-		for (std::size_t i = 0; i < Core::thread::hardware_concurrency() - 2; ++i) {
-			threads.push_back( 
-				std::make_shared<Core::thread>( 
-					boost::bind( &boost::asio::io_service::run, 
-						&(*io) 
-					) 
+	// Create a pool of threads to run all of the io_services.
+	std::vector<std::shared_ptr<Core::thread> > threads;
+	for (std::size_t i = 0; i < Core::thread::hardware_concurrency() - 2; ++i) {
+		threads.push_back( 
+			std::make_shared<Core::thread>( 
+				boost::bind( &boost::asio::io_service::run, 
+					&(*io) 
 				) 
-			);
-		}
-
-		threads.push_back( 
-			std::make_shared<Core::thread>( 
-				boost::bind( &MainLoop ) 
 			) 
-		); 
-		size_t mainLoopThreadIndex = threads.size() - 1;
-
-		threads.push_back( 
-			std::make_shared<Core::thread>( 
-				[] { 
-					Dwm test;
-					test.bootstrapLocal();				
-				}
-			)
 		);
+	}
+
+	threads.push_back( 
+		std::make_shared<Core::thread>( 
+			boost::bind( &MainLoop ) 
+		) 
+	); 
+	size_t mainLoopThreadIndex = threads.size() - 1;
+
+/*
+	threads.push_back( 
+		std::make_shared<Core::thread>( 
+			[] { 
+				Dwm test;
+				test.bootstrapLocal();				
+			}
+		)
+	);*/
 
 /*		if( Handshake( *io, hostname, port ) == true ) 
-		{
-			// Wait for all threads in the pool to exit.
-			for (std::size_t i = 0; i < threads.size(); ++i)
-				threads[i]->join();
-		}*/
-		threads[ mainLoopThreadIndex ]->join();
+	{
+		// Wait for all threads in the pool to exit.
+		for (std::size_t i = 0; i < threads.size(); ++i)
+			threads[i]->join();
+	}*/
+	threads[ mainLoopThreadIndex ]->join();
 
-		// TODO terminate nicely other thread, rather than yank them..
-	} 
-	CoreCatchAllOurExceptions {
-		LogException( err );
-		return 1;
-	}
-	CoreCatchAllStdExceptions {
-		LOG(ERROR) << err.what();
-		return 1;
-	}
-	CoreCatchAll {
-		return 1;
-	}
-
+	// TODO terminate nicely other thread, rather than yank them.
 //	Graphics::ScrConsole::Shutdown();
 //	Cl::Platform::Get()->destroyDevices();
 
@@ -198,8 +185,10 @@ void MainLoop() {
 	Core::DevelopmentContext::get()->addContext( "DebugCam",  std::shared_ptr<DebugCamContext>( CORE_NEW DebugCamContext( ctx ) ) );
 	Core::DevelopmentContext::get()->activateContext( "DebugCam" );
 
-	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "sphere_1" ) );
-	auto sphere = CORE_NEW Render::HieSkeleton( "sphere_1" );
+//	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "sphere_1" ) );
+//	auto sphere = CORE_NEW Render::HieSkeleton( "sphere_1" );
+	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "starfire" ) );
+	auto sphere = CORE_NEW Render::HieSkeleton( "starfire" );
 	rworld.addRenderable( sphere );
 
 	// flush 'load' time from first time update

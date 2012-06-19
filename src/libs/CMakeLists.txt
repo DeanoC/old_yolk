@@ -11,5 +11,6 @@ add_subdirectory( meshmod )
 add_subdirectory( meshops )
 add_subdirectory( meshimport )
 add_subdirectory( meshexport )
+add_subdirectory( lightwaveloader )
 
 add_subdirectory( dwm )

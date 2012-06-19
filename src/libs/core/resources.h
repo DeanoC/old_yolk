@@ -22,7 +22,7 @@
 namespace Core {
 
 //! passed to resource create call backs
-template< uint32_t type, class rclass, typename resultType = void*, uint32_t forcedCreateFlags = 0 >
+template< uint32_t type, class rclass, uint32_t forcedCreateFlags = 0 >
 class AsyncResourceHandle : public Core::ResourceHandle<type> {
 public:
 	static const uint32_t Type = type;
@@ -39,12 +39,12 @@ public:
 	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseTryAcquire<type>() );
 	}
 
-	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
+	static const AsyncResourceHandle<type, rclass, forcedCreateFlags>* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  return static_cast<const AsyncResourceHandle<type, rclass, forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
 	}
 
-	static const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  return static_cast<const AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
+	static const AsyncResourceHandle<type, rclass, forcedCreateFlags>* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  return static_cast<const AsyncResourceHandle<type, rclass, forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
 	}
 
 	static void flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
@@ -52,20 +52,8 @@ public:
 	}
 
 	void close() const {
-	  Core::ResourceMan::get()->closeResource<Type>( const_cast<AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>(this) );
+	  Core::ResourceMan::get()->closeResource<Type>( const_cast<AsyncResourceHandle<type, rclass, forcedCreateFlags>*>(this) );
 	}
-
-	static void destroyHandle( Core::ResourceHandleBase* rhb ) {
-	  AsyncResourceHandle<type, rclass, resultType>* handle = static_cast<AsyncResourceHandle<type, rclass, resultType,forcedCreateFlags>*>(rhb);
-	  CORE_DELETE handle;
-	}
-  
-	mutable resultType				asyncResultPtr;
-#if PLATFORM == WINDOWS
-	mutable HRESULT					asyncResult;
-#else 
-	mutable void*					asyncResult;
-#endif
 };
 
 template< typename arh >

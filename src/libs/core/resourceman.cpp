@@ -99,16 +99,33 @@ public:
 	ResourceTypeMap		resourceTypeMap;
 
 	~ResourceManImpl() {
+		bool anyValidLeft = false;
+
 		if(listResourceHandlePtrs.size() > 0) {
-			LOG(INFO) << "Unreleased Resources, these will cause memory leaks :\n";
+			auto rdIt = listResourceHandlePtrs.cbegin();
+			while( rdIt != listResourceHandlePtrs.cend() ) {
+				if( (*rdIt) != nullptr && (*rdIt)->handle != nullptr ) {
+					anyValidLeft = true;
+					break;
+				}
+				++rdIt;
+			}
 		}
-		ListResourceData::iterator rdIt = listResourceHandlePtrs.begin();
-		while( rdIt != listResourceHandlePtrs.end() ) {
-			uint32_t type = (*rdIt)->handle->getType();
-			std::string typeName = getResourceTypeAsString( type );
-			LOG(INFO) << "Type : " << typeName.c_str() << "(" << type << ")" << 
-						" - Name : " << (*rdIt)->resourceName.get() << "\n";
-			++rdIt;
+		if( anyValidLeft ) {
+			LOG(INFO) << "Unreleased Resources, these will cause memory leaks :\n";
+			auto rdIt = listResourceHandlePtrs.begin();
+			while( rdIt != listResourceHandlePtrs.end() ) {
+				if( (*rdIt) == nullptr || (*rdIt)->handle == nullptr ) {
+					++rdIt;
+					continue;
+				}
+
+				uint32_t type = (*rdIt)->handle->getType();
+				std::string typeName = getResourceTypeAsString( type );
+				LOG(INFO) << "Type : " << typeName.c_str() << "(" << type << ")" << 
+							" - Name : " << (*rdIt)->resourceName.get() << "\n";
+				++rdIt;
+			}
 		}
 	}
 };
@@ -279,6 +296,9 @@ std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBa
 	if( alreadyAcquiring ) {
 		return std::shared_ptr<ResourceBase>();
 	}
+	if( auto res = pHandle->resourceBase.lock() ) {
+		return res;
+	}
 
 	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
 	if( impl.resourceTypeMap.find( roRTM, pHandle->type ) == false ) {
@@ -317,7 +337,7 @@ void ResourceMan::internalAsyncAcquireComplete( const ResourceHandleBase* _handl
 
 	ResourceManImpl::PtrIndex::accessor rdIt;
 	if( impl.resourceHandleBaseMap.find( rdIt, pHandle ) == false ) {
-		CORE_ASSERT( false && "Invalid Resource require" );		
+		CORE_ASSERT( false && "Invalid Resource require" );
 	}
 
 	ResourceData* pRD = rdIt->second;

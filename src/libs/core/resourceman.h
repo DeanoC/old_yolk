@@ -124,20 +124,24 @@ std::shared_ptr<Resource<type> > ResourceMan::internalAcquireResource( const Res
 //! else it takes an indefinite amount of time, to get the resource
 template< uint32_t type_ >
 inline std::shared_ptr<Resource<type_> > ResourceHandleBase::baseAcquire() const {
-	while( resourceBase.expired() ) {
-		std::shared_ptr<Resource<type_> > acquiredp( 
-				ResourceMan::get()->internalAcquireResource<type_>( this ) );
-		if( acquiredp )
-			return acquiredp;
-	}
-
-	return std::static_pointer_cast<Resource<type_> >( resourceBase.lock() );
+	do {
+		if( auto res = resourceBase.lock() ) {
+			return std::static_pointer_cast<Resource<type_> >( res );
+		} else {
+			std::shared_ptr<Resource<type_> > acquiredp( 
+					ResourceMan::get()->internalAcquireResource<type_>( this ) );
+			if( acquiredp )
+				return acquiredp;
+		}
+	} while( true );
 }
 //! like baseAcquire but doesn't stall, if its not ready it will return a empty
 //! shared pointer
 template< uint32_t type_ >
 inline std::shared_ptr<Resource<type_> > ResourceHandleBase::baseTryAcquire() const {
-	if( resourceBase.expired() ) {
+	if( auto res = resourceBase.lock() ) {
+		return std::static_pointer_cast<Resource<type_> >( res );
+	} else {
 		std::shared_ptr<Resource<type_> > acquiredp( 
 				ResourceMan::get()->internalAcquireResource<type_>( this ) );
 		if( acquiredp ) {
@@ -145,8 +149,6 @@ inline std::shared_ptr<Resource<type_> > ResourceHandleBase::baseTryAcquire() co
 		} else {
 			return std::shared_ptr<Resource<type_> >();
 		}
-	} else {
-		return std::static_pointer_cast<Resource<type_> >( resourceBase.lock() );
 	}
 }
 
