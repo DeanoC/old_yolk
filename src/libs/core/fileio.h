@@ -46,6 +46,7 @@ public:
 	}
 		
 	bool open( const char* _path );
+	bool openText( const char* _path );
 	bool createNew( const char* _path );
 
 	virtual void close();
@@ -70,54 +71,60 @@ protected:
 
 class MemFile : public InOutInterface {
 public:
-	MemFile(){}
+	MemFile( uint64_t _size ) {
+		buffer = CORE_NEW_ARRAY uint8_t[_size];
+		size = _size;
+		offset = 0;		
+	}
 	MemFile( uint8_t* _mem, uint64_t _size ){
-		m_Buffer = _mem;
-		m_Size = _size;
-		m_Offset = 0;
+		buffer = _mem;
+		size = _size;
+		offset = 0;
 	}
+	uint8_t* getBuffer() { return buffer; }
+
 	virtual void close(){
-		CORE_DELETE_ARRAY m_Buffer;
-		m_Buffer = 0;
+		CORE_DELETE_ARRAY buffer;
+		buffer = 0;
 	}
+
 	virtual bool isValid() const {
-		return (m_Buffer != NULL);
-	}
-		
+		return (buffer != NULL);
+	}	
 
 	virtual uint64_t read( uint8_t* _buffer, uint64_t _len ){
-		if ( m_Offset + _len > m_Size ) {
-			_len = m_Size - m_Offset;
+		if ( offset + _len > size ) {
+			_len = size - offset;
 		}
 			
-		memcpy( _buffer, m_Buffer+m_Offset, size_t(_len) );
-		m_Offset += _len;
+		memcpy( _buffer, buffer+offset, size_t(_len) );
+		offset += _len;
 		return _len;
 	}
 
 	virtual uint64_t tell() {
-		return m_Offset;
+		return offset;
 	}
 	virtual void seekFromStart( uint64_t _seek ) {
-		m_Offset = _seek;
+		offset = _seek;
 	}
 	virtual uint8_t getByte() {
-		if( m_Offset > m_Size)
+		if( offset > size)
 			return 0;
-		if( m_Offset < 0 )
+		if( offset < 0 )
 			return 0;
 				
-		return m_Buffer[ m_Offset++ ];
+		return buffer[ offset++ ];
 	}
 	virtual uint64_t bytesLeft() {
-		return m_Size - m_Offset;
+		return size - offset;
 	}
 	InOutInterface& inOut() { return (InOutInterface&)(*this); }
 				 
 protected:
-	uint8_t*	m_Buffer;
-	uint64_t	m_Offset;
-	uint64_t	m_Size;
+	uint8_t*	buffer;
+	uint64_t	offset;
+	uint64_t	size;
 };
 
 

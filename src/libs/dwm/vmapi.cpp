@@ -6,4 +6,5 @@ void InstallDWMApiFuncs( TrustedRegion* trustedRegion ) {
 	InstallDebugApiFuncs( trustedRegion );
 	InstallVmApiFuncs( trustedRegion );
 	InstallResourcesApiFuncs( trustedRegion );	
+	InstallHierApiFuncs( trustedRegion );	
 }

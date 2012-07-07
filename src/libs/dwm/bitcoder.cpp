@@ -171,6 +171,14 @@ BitCoder::BitCoder() :
 	// Package up features to be passed to target/subtarget
 	std::string featuresStr;
 	SubtargetFeatures Features;
+	TargetOptions toptions;
+
+	// debug options
+	toptions.NoFramePointerElim = true;
+	toptions.NoFramePointerElimNonLeaf = true;
+	toptions.JITEmitDebugInfo = true;
+	toptions.JITExceptionHandling = true;
+	CodeGenOpt::Level optLevel = CodeGenOpt::Less;
 
 	// TODO de memory leak
 	std::string Error;
@@ -181,23 +189,23 @@ BitCoder::BitCoder() :
 
 	Features.getDefaultSubtargetFeatures( untrustedTriple );
 	featuresStr = Features.getString();
-  	tm[UNTRUSTED].reset( tUNTRUSTED->createTargetMachine( untrustedTriple.getTriple(), cpu, featuresStr, TargetOptions(), Reloc::Static, CodeModel::Large ) );
-	mcii[UNTRUSTED].reset( tUNTRUSTED->createMCInstrInfo() );	
-	mcsti[UNTRUSTED].reset( tUNTRUSTED->createMCSubtargetInfo( untrustedTriple.getTriple(), cpu, featuresStr ) );	
+  	tm[UNTRUSTED].reset( tUNTRUSTED->createTargetMachine( untrustedTriple.getTriple(), cpu, featuresStr, toptions, Reloc::Static, CodeModel::Large, optLevel ) );
+	mcii[UNTRUSTED].reset( tUNTRUSTED->createMCInstrInfo() );
+	mcsti[UNTRUSTED].reset( tUNTRUSTED->createMCSubtargetInfo( untrustedTriple.getTriple(), cpu, featuresStr ) );
   	mcai[UNTRUSTED].reset( tUNTRUSTED->createMCAsmInfo( untrustedTriple.getTriple() ) );
   	mcri[UNTRUSTED].reset( tUNTRUSTED->createMCRegInfo( untrustedTriple.getTriple() ) );
-	mcab[UNTRUSTED].reset( tUNTRUSTED->createMCAsmBackend( untrustedTriple.getTriple() ) );
+	mcab[UNTRUSTED] = tUNTRUSTED->createMCAsmBackend( untrustedTriple.getTriple() ) ;
 	Features.getDefaultSubtargetFeatures( trustedTriple );
 	featuresStr = Features.getString();
-  	tm[TRUSTED].reset( tTRUSTED->createTargetMachine( trustedTriple.getTriple(), cpu, featuresStr, TargetOptions() ) );
-	mcii[TRUSTED].reset( tTRUSTED->createMCInstrInfo() );	
-	mcsti[TRUSTED].reset( tTRUSTED->createMCSubtargetInfo( trustedTriple.getTriple(), cpu, featuresStr ) );	
+  	tm[TRUSTED].reset( tTRUSTED->createTargetMachine( trustedTriple.getTriple(), cpu, featuresStr, toptions, Reloc::Static, CodeModel::Large, optLevel ) );
+	mcii[TRUSTED].reset( tTRUSTED->createMCInstrInfo() );
+	mcsti[TRUSTED].reset( tTRUSTED->createMCSubtargetInfo( trustedTriple.getTriple(), cpu, featuresStr ) );
   	mcai[TRUSTED].reset( tTRUSTED->createMCAsmInfo( trustedTriple.getTriple() ) );
   	mcri[TRUSTED].reset( tTRUSTED->createMCRegInfo( trustedTriple.getTriple() ) );
-	mcab[TRUSTED].reset( tTRUSTED->createMCAsmBackend( trustedTriple.getTriple() ) );
+	mcab[TRUSTED] = tTRUSTED->createMCAsmBackend( trustedTriple.getTriple() );
 
 }
-
+/*
 void BitCoder::addLibrary( llvm::Module* lib ) {	
 	libraries.push_back( lib );
 }
@@ -205,6 +213,7 @@ void BitCoder::removeLibrary( llvm::Module* lib ) {
 	libraries.remove( lib );
 	CORE_DELETE lib;
 }
+*/
 
 std::string BitCoder::make( const int type, llvm::Module* prg ) {
 	using namespace llvm;
@@ -215,13 +224,15 @@ std::string BitCoder::make( const int type, llvm::Module* prg ) {
     prg->setOutputFormat( Module::ExecutableOutputFormat );
 
 	// link together everything
-	Linker linker( StringRef("bitcoder"), prg, Linker::Verbose);
+/*	Linker linker( StringRef("bitcoder"), prg, Linker::Verbose);
 	auto lkIt = libraries.begin();
 	while( lkIt != libraries.end() ) {
 		linker.LinkInModule( *lkIt, Linker::PreserveSource );
 		++lkIt;
 	}
 	Module* bc = linker.getModule(); // link result in bc owned by Linker
+	*/
+	Module* bc = prg;
     bc->setOutputFormat(  Module::ExecutableOutputFormat );
 
 	std::vector<std::string> mustKeep;

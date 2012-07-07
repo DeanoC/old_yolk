@@ -9,6 +9,7 @@
 
 class SandboxMemoryManager;
 class TrustedRegion;
+class World;
 namespace llvm { class RuntimeDyld; }
 
 class IsolatedExecEngine {
@@ -17,11 +18,11 @@ public:
 	static const unsigned int MiB = 1024 * KiB;
 	static const unsigned int GiB = 1024 * MiB;
 
-	IsolatedExecEngine( uint32_t sandboxSize, uint32_t sandboxStackSize, uint32_t sandboxTrustedRegionSize );
+	IsolatedExecEngine( uint32_t sandboxSize, uint32_t sandboxStackSize, uint32_t sandboxTrustedRegionSize, World* _world );
 	~IsolatedExecEngine();
 
 	void addLibrary( const std::string& elfstr );
-	void process( const std::string& elfstr );
+	void process( const std::string& elfstr, void (*apiInstall)( TrustedRegion* ) );
 
 	void* sandboxAllocate( size_t size );
 	void sandboxFree( void* ptr );
@@ -30,6 +31,7 @@ public:
 
 	void terminate();
 
+	World*					world;
 private:
 	Core::thread*			untrustedThread;
 

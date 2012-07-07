@@ -8,9 +8,10 @@
 #include "parser.tab.hpp"
 
 extern int yyparse (void *YYPARSE_PARAM);
+extern void ResetSymbolTable();
 
 int g_LineNum;
-int g_Debug = 1;
+int g_Debug = 0;
 int g_ShowHelp;
 char g_InFile[512];
 char g_OutFile[512];
@@ -31,7 +32,8 @@ void Binify( const std::string& txt, std::ostream& out ) {
 	g_Offset = 0;
 	g_LineNum = 0;
 	g_Pass = 0;
-
+	ResetSymbolTable();
+	
 	bindy parser0( &inp, &out );
 	yyparse( &parser0 );
 

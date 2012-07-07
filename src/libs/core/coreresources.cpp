@@ -10,10 +10,10 @@
 #include "coreresources.h"
 #include "file_path.h"
 
-namespace 
-{
+//namespace 
+//{
 //! Callback from the resource manager to create a text resource
-std::shared_ptr<Core::ResourceBase> TextCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData )
+void TextCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData )
 {
 	using namespace Core;
 
@@ -39,11 +39,12 @@ std::shared_ptr<Core::ResourceBase> TextCreateResource( const Core::ResourceHand
 		pResource->text.get()[ strlen((char*)pData) ] = 0;
 	}
 
-	return std::shared_ptr<ResourceBase>(pResource);
+	auto res = std::shared_ptr<ResourceBase>(pResource);
+	Core::ResourceMan::get()->internalAcquireComplete( handle, res );
 }
 
 //! Callback from the resource manager to create a text resource
-std::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData ) {
+void ManifestCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData ) {
 	using namespace Core;
 	std::shared_ptr<ManifestResource> pResource( CORE_NEW ManifestResource );
 
@@ -78,7 +79,8 @@ std::shared_ptr<Core::ResourceBase> ManifestCreateResource( const Core::Resource
 		CORE_ASSERT( false );
 	}
 
-	return std::shared_ptr<ResourceBase>(pResource);
+	auto res = std::shared_ptr<ResourceBase>(pResource);
+	Core::ResourceMan::get()->internalAcquireComplete( handle, res );
 }
 
 void ManifestResourceDestroyer( std::shared_ptr<Core::ResourceBase>& spBase ) {
@@ -91,7 +93,64 @@ void ManifestResourceDestroyer( std::shared_ptr<Core::ResourceBase>& spBase ) {
 	spActual.reset(); // destruction
 }
 
-} // end anon namespace
+//! Header of a property file	
+struct BinPropertyFileHeader {
+	uint32_t uiMagic;				//!< Should be PROP
+
+	uint16_t uiVersion;				//!< an incrementing version number
+	uint16_t uiNumProperties;		//!< number of different properties
+	uint32_t size;					//!< total size
+	// padding so that properties start on a 64 bit alignment 
+};
+
+//! Callback from the resource manager to create a binary property resource
+void BinPropertyCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData ) {
+	using namespace Core;
+	std::shared_ptr<BinPropertyResource> pResource( CORE_NEW BinPropertyResource );
+
+	if( flags & RMRF_LOADOFFDISK ) {
+		uint32_t magic = 0;
+		uint16_t version = 0;
+
+		Core::FilePath path( pName );
+		path = path.ReplaceExtension( ".prp" );
+		const char* pManPath = path.value().c_str();
+
+		std::ifstream inStream( pManPath, std::ifstream::binary );
+		inStream.read( (char*)&magic, sizeof(magic) );
+		if( !inStream.good() ) {
+			LOG(FATAL) << "Binary Propertys - " << path.value() << " not found\n";
+		}
+		inStream.read( (char*)&version, sizeof(version) );
+		if( magic == Core::BinPropertyType && version == 2 ) {
+			inStream.read( (char*)&pResource->numEntries, sizeof(pResource->numEntries) );
+			uint32_t size;
+			inStream.read( (char*)&size, sizeof(size) );
+			uint32_t dummy;
+			inStream.read( (char*)&dummy, sizeof(dummy) );
+
+			char* rawArray = CORE_NEW_ARRAY char[ size ];
+			inStream.read( rawArray, size );
+			pResource->totalSize =  size;
+			pResource->entries.reset( (BinProperty*) rawArray );
+			BinProperty* props = pResource->entries.get();
+			
+			for( int i = 0;i < pResource->numEntries; ++i ) {
+				props[i].name.p = fixupPointer<const char>( props, props[i].name.o.l );
+				props[i].data.p = fixupPointer<void>( props, props[i].data.o.l );
+			}
+		} else {
+			LOG(FATAL) << "Binary Propertys " << pData << " Invalid\n";
+		}
+	} else {
+		CORE_ASSERT( false );
+	}
+
+	auto res = std::shared_ptr<ResourceBase>(pResource);
+	Core::ResourceMan::get()->internalAcquireComplete( handle, res );
+}
+
+//} // end anon namespace
 
 namespace Core
 {
@@ -100,5 +159,8 @@ namespace Core
 		                                &SimpleResourceDestroyer<TextResource>, sizeof(TextResourceHandle) );
 		ResourceMan::get()->registerResourceType( ManifestType, ManifestCreateResource, 
 		                               	&ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
+		ResourceMan::get()->registerResourceType( BinPropertyType, BinPropertyCreateResource, 
+		                               	&SimpleResourceDestroyer<TextResource>, sizeof(BinPropertyResourceHandle), 0, 0, "Properties/" );
+
 	}
 }

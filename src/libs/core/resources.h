@@ -23,11 +23,12 @@ namespace Core {
 
 //! passed to resource create call backs
 template< uint32_t type, class rclass, uint32_t forcedCreateFlags = 0 >
-class AsyncResourceHandle : public Core::ResourceHandle<type> {
+class ResourceHandle : public Core::TypedResourceHandle<type> {
 public:
 	static const uint32_t Type = type;
-	typedef rclass								ResourceClass;
-	typedef std::shared_ptr<ResourceClass>		ResourcePtr;
+	typedef rclass														ResourceClass;
+	typedef std::shared_ptr<ResourceClass>								ResourcePtr;
+	typedef const ResourceHandle<type, rclass, forcedCreateFlags> 	ThisConstType;
 
 	// helper to acquire a class that inherits off Resource<type>
 	ResourcePtr acquire() const {
@@ -39,12 +40,12 @@ public:
 	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseTryAcquire<type>() );
 	}
 
-	static const AsyncResourceHandle<type, rclass, forcedCreateFlags>* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  return static_cast<const AsyncResourceHandle<type, rclass, forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
+	static ThisConstType* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
 	}
 
-	static const AsyncResourceHandle<type, rclass, forcedCreateFlags>* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
-	  return static_cast<const AsyncResourceHandle<type, rclass, forcedCreateFlags>*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
+	static ThisConstType* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
 	}
 
 	static void flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
@@ -52,29 +53,47 @@ public:
 	}
 
 	void close() const {
-	  Core::ResourceMan::get()->closeResource<Type>( const_cast<AsyncResourceHandle<type, rclass, forcedCreateFlags>*>(this) );
+	  Core::ResourceMan::get()->closeResource<Type>( const_cast<ThisConstType*>(this) );
+	}
+
+	ThisConstType* clone() const {
+	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->cloneResource<Type>( const_cast<ThisConstType*>(this) ) );
 	}
 };
 
 template< typename arh >
-class ScopedAsyncResourceHandle {
+class ScopedResourceHandle {
 public:
 	typedef typename arh::ResourcePtr ResourcePtr;
 
-	explicit ScopedAsyncResourceHandle() : handle(NULL) {}
+	explicit ScopedResourceHandle() : handle(NULL) {}
 
-	explicit ScopedAsyncResourceHandle( const arh* _handle ) : handle(_handle) {}
-	~ScopedAsyncResourceHandle() { if( handle ) handle->close(); }
+	// pass ownership to this, caller should not close this instance!
+	explicit ScopedResourceHandle( const arh* _handle ) : handle(_handle) {}
 
-	void reset( const arh* _handle ){ handle = _handle; }
+	~ScopedResourceHandle() { if( handle ) handle->close(); }
+
+	// pass ownership to this, any previous handle will be closed
+	void reset( const arh* _handle ) { 
+		if( handle ) handle->close();
+		handle = _handle; 
+	}
 
 	ResourcePtr acquire() const { return handle->acquire(); }
 
 	ResourcePtr tryAcquire() const { return handle->tryAcquire(); }
 
-	const arh* get() { return handle; }
+	ScopedResourceHandle& operator= ( const ScopedResourceHandle& rhs ) {
+		if( rhs.handle ) {
+			this->reset( rhs.handle->clone() );
+		} else {
+			this->reset( NULL );
+		}
+		return *this;
+	}
+
+	const arh* get() const { return handle; }
 private:
-	ScopedAsyncResourceHandle& operator= (const ScopedAsyncResourceHandle&);
 
 	const arh*	 handle;	
 };

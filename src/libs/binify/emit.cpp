@@ -27,6 +27,9 @@ static unsigned int g_debugMax = 0x9c0;
 // Symbol table
 typedef std::map< std::string, int > SymTab;
 static SymTab s_SymTab;
+void ResetSymbolTable() {
+	s_SymTab.clear();
+}
 
 void SetSymbol( const char* name, int val )
 {

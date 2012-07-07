@@ -6,8 +6,8 @@
 //!-----------------------------------------------------
 #pragma once
 
-#ifndef WIERD_CORE_VECTOR_MATHS_H
-#define WIERD_CORE_VECTOR_MATHS_H
+#ifndef CORE_VECTOR_MATHS_H_
+#define CORE_VECTOR_MATHS_H_
 
 
 #include "core/core.h"

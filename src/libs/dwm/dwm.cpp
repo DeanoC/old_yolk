@@ -4,18 +4,19 @@
  *  Created on: 15 Apr 2012
  *      Author: deanoc
  */
-#include "dwm.h"
+
+#include <sys/stat.h>
 #include "core/fileio.h"
 #include "riak/client.hxx"
 #include "riak/transport.hxx"
 #include "riak/transports/single-serial-socket.hxx"
 #include "json_spirit/json_spirit_reader.h"
 #include "bitcoder.h"
+
 #include "mmu.h"
-
-#include <sys/stat.h>
-
-#include "vmthread.h"
+#include "world.h"
+#include "vmthreads.h"
+#include "dwm.h"
 
 DECLARE_EXCEPTION( DBBackEndHard, "Failure to contact backend DB" );
 
@@ -31,10 +32,13 @@ std::shared_ptr<riak::object> no_sibling_resolution (const ::riak::siblings&)
 }
 
 Dwm::Dwm() {
-//   auto libcbc = BitCoder::get()->loadBitCode( Core::FilePath( "./libcommon.a" ) );
-//   libcbc->setModuleIdentifier( "libcommon" );
-//   BitCoder::get()->addLibrary( libcbc );
    switcherElf = BitCoder::get()->assemble( BitCoder::TRUSTED, Core::FilePath("./switcher.S") );
+   world = std::make_shared<World>();
+}
+
+Dwm::Dwm( WorldPtr _world ) {
+   switcherElf = BitCoder::get()->assemble( BitCoder::TRUSTED, Core::FilePath("./switcher.S") );
+   world = _world;
 }
 
 Dwm::~Dwm() {
@@ -179,7 +183,6 @@ void Dwm::bootstrapLocal() {
    using namespace Core;
    using namespace llvm;
 
-   auto hwThreads = Core::thread::hardware_concurrency();
    /* whilst testing 
    auto store = riak::make_client(riakConn, &no_sibling_resolution, *io);
    store->get_object( "sys", "info", [&](const std::error_code& err, RiakObjPtr obj, riak::value_updater&) {
@@ -193,18 +196,13 @@ void Dwm::bootstrapLocal() {
    });
    */
 
-//   auto initbc = BitCoder::get()->loadBitCode( Core::FilePath("./hello_world") );
-//   initbc->setModuleIdentifier( "bootstrap" );
-//   auto prg = BitCoder::get()->make( BitCoder::UNTRUSTED, initbc );
-
    auto prg = cacheElf( Core::FilePath("./hello_world"), Core::FilePath("./cache/hello_world.elf") );
 
-   // init thread0 into llvm execution environment
-   auto thread0 = std::shared_ptr<VMThread>( new VMThread( *this ) );
-   vmThreads.push_back( thread0 );
+   // init thread into llvm execution environment
+   auto thread = std::make_shared<VMThreads>( *this );
+   vmThreads.push_back( thread );
 
-   thread0->getEngine()->addLibrary( switcherElf );
-   thread0->getEngine()->process( prg );
+   thread->run( prg );
 
 }
 

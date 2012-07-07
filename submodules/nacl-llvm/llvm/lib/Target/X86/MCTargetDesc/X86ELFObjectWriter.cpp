@@ -14,6 +14,7 @@
 #include "llvm/MC/MCValue.h"
 #include "llvm/Support/ELF.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/Debug.h"
 
 using namespace llvm;
 
@@ -106,7 +107,9 @@ unsigned X86ELFObjectWriter::GetRelocType(const MCValue &Target,
         default:
           llvm_unreachable("Unimplemented");
         case MCSymbolRefExpr::VK_None:
+      dbgs() << "ELF::R_X86_64_32S generated\n";
           Type = ELF::R_X86_64_32S;
+//          Type = ELF::R_X86_64_64;
           break;
         case MCSymbolRefExpr::VK_GOT:
           Type = ELF::R_X86_64_GOT32;

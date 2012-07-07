@@ -139,6 +139,10 @@
 #include "core/aligned_vector.h"
 #include "core/thread.h"
 
+// tbb concurrent containers
+#include "tbb/concurrent_hash_map.h"
+#include "tbb/concurrent_vector.h"
+
 namespace Core
 {
 

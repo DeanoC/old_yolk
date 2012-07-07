@@ -19,8 +19,9 @@ enum RESOURCE_FLAGS
 	RMRF_INMEMORYCREATE		= BIT(2),	//! this is an in memory resource
 	RMRF_DONTCACHE			= BIT(3),	//! never re-use/cache this resource
 	RMRF_PRELOAD			= BIT(4),	//! start loading the resource before acquire is called in the background
-
-	RMRF_FORCE32BIT			= 0xFFFFFFFF	//! make sure resource flags is always 32 bit (its relied upon in the naming system)
+	RMRF_DONTFLUSH			= BIT(5),	//! once acquired don't flush until all resource handles are also flushed 
+										// NOTE currently DONTFLUSH is ignored as this behavriour is always true 
+										// but for forward compat this should be set when this behavior is required
 };
 
 //! all resource derive off this
@@ -59,7 +60,7 @@ protected:
 	ResourceHandleBase( uint32_t type_ ) : type( type_ ) {};
 
 	mutable std::weak_ptr<ResourceBase>	resourceBase;
-	mutable std::atomic<bool> acquiring; // as acquiring can be async, this simply flags that onces been kicked off
+	mutable std::atomic<int> acquiring; // as acquiring can be async, this simply flags that onces been kicked off
 	uint32_t type;	//!< type this resource handle points to
 };
 
@@ -70,7 +71,7 @@ protected:
 //! don't point to things inside an acquired resource) when you
 //! actually use things, live loading will occur automatically
 template< uint32_t type >
-class ResourceHandle : public ResourceHandleBase {
+class TypedResourceHandle : public ResourceHandleBase {
 public:
 	// helper to acquire a class that inherits off Resource<type>
 	template<class T>
@@ -85,8 +86,8 @@ public:
 	}
 
 protected:
-	ResourceHandle() {};
-	~ResourceHandle() {};
+	TypedResourceHandle() {};
+	~TypedResourceHandle() {};
 };
 
 } // end Core namespace

@@ -15,6 +15,11 @@ namespace Core
 		fh = fopen( _path, "rb" );
 		return  ( fh != NULL) ? true : false;
 	}
+	bool File::openText( const char* _path ){
+		fh = fopen( _path, "rt" );
+		return  ( fh != NULL) ? true : false;
+	}
+
 	bool File::createNew( const char* _path ) {
 		fh = fopen( _path, "wb" );
 		return  ( fh != NULL) ? true : false;		

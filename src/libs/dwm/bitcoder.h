@@ -22,8 +22,8 @@ namespace Core { class InOutInterface; class FilePath; }
 class BitCoder : public Core::Singleton<BitCoder> {
 public:
 	friend class Core::Singleton<BitCoder>;
-	void addLibrary( llvm::Module* lib );
-	void removeLibrary( llvm::Module* lib );
+//	void addLibrary( llvm::Module* lib );
+//	void removeLibrary( llvm::Module* lib );
 
 	static const int UNTRUSTED = 0;
 	static const int TRUSTED = 1;
@@ -46,14 +46,14 @@ private:
 
 	// code generator for trusted and untrusted code generation
 	std::shared_ptr<llvm::TargetMachine>		tm[2];
-	std::shared_ptr<llvm::MCAsmBackend>			mcab[2];
+	llvm::MCAsmBackend*							mcab[2];
 	std::shared_ptr<llvm::MCAsmInfo>		 	mcai[2];
 	std::shared_ptr<llvm::MCInstrInfo> 			mcii[2];
 	std::shared_ptr<llvm::MCSubtargetInfo> 		mcsti[2];
 	std::shared_ptr<llvm::MCRegisterInfo>		mcri[2];
 
 
-	std::list< llvm::Module* > 	libraries;
+//	std::list< llvm::Module* > 	libraries;
 };
 
 

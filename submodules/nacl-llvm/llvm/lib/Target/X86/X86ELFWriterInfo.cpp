@@ -18,6 +18,7 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Target/TargetData.h"
 #include "llvm/Target/TargetMachine.h"
+#include "llvm/Support/Debug.h"
 
 using namespace llvm;
 
@@ -40,6 +41,7 @@ unsigned X86ELFWriterInfo::getRelocationType(unsigned MachineRelTy) const {
     case X86::reloc_absolute_word:
       return ELF::R_X86_64_32;
     case X86::reloc_absolute_word_sext:
+      dbgs() << "X86::reloc_absolute_word_sext generated\n";
       return ELF::R_X86_64_32S;
     case X86::reloc_absolute_dword:
       return ELF::R_X86_64_64;

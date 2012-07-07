@@ -27,12 +27,16 @@ extern "C" int main( int argc, char** argv ) {
 		LogException( err );
 		LOG(FATAL) << "Fatal Exception: \n";
 	}
-	CoreCatchAllStdExceptions {
-		LOG(FATAL) << err.what();
+/*	CoreCatchAllStdExceptions {
+		if( err.what() ) {
+			LOG(FATAL) << err.what();
+		} else {
+			LOG(FATAL) << "std exception caught, but has no what\n";
+		}
 	}
 	CoreCatchAll {
 		LOG(FATAL) << "Fatal Unknown exception: \n";
-	}
+	}*/
 
 	Core::Shutdown();
 #if defined( USE_GLOG )

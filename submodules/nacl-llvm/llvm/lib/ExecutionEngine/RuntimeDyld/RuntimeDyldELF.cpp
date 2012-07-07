@@ -196,12 +196,12 @@ void RuntimeDyldELF::resolveX86_64Relocation(uint8_t *LocalAddress,
                                              uint64_t Value,
                                              uint32_t Type,
                                              int64_t Addend) {
-  DEBUG(dbgs() << "resolveX86_64Relocation, LocalAddress: " << LocalAddress
-               << " FinalAddress: " << format("%p",FinalAddress)
-               << " Value: " << format("%x",Value)
-               << " Type: " << format("%x",Type)
-               << " Addend: " << format("%x",Addend)
-               << "\n");
+    DEBUG( dbgs() << "resolveX86_64Relocation, LocalAddress: " << LocalAddress
+                 << " FinalAddress: " << format("%p",FinalAddress)
+                 << " Value: " << format("%x",Value)
+                 << " Type: " << format("%x",Type)
+                 << " Addend: " << format("%x",Addend)
+                 << "\n" );
 
   switch (Type) {
   default:
@@ -216,10 +216,16 @@ void RuntimeDyldELF::resolveX86_64Relocation(uint8_t *LocalAddress,
   case ELF::R_X86_64_32S: {
     Value += Addend;
     // FIXME: Handle the possibility of this assertion failing
+
+//    if( Type == ELF::R_X86_64_32 ) {
+//      assert( (Value & 0xFFFFFFFF00000000ULL) == 0x0 );
+//    } 
+//    if( Type == ELF::R_X86_64_32S ) {
+//      assert( (Value & 0xFFFFFFFF00000000ULL) == 0xFFFFFFFF00000000ULL );
+//    }
     assert((Type == ELF::R_X86_64_32 && !(Value & 0xFFFFFFFF00000000ULL)) ||
            (Type == ELF::R_X86_64_32S &&
             (Value & 0xFFFFFFFF00000000ULL) == 0xFFFFFFFF00000000ULL));
-	// under nacl sandbox this is fine i think...
     uint32_t TruncatedAddr = (Value & 0xFFFFFFFF);
     uint32_t *Target = reinterpret_cast<uint32_t*>(LocalAddress);
     *Target = TruncatedAddr;

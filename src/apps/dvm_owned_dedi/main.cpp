@@ -1,28 +1,13 @@
 #include "core/core.h"
-#include "gl/gl.h"
-#include "cl/cl.h"
-#include "gl/gfx.h"
-#include "cl/platform.h"
 #include "dwm/dwm.h"
 #include "dwm/bitcoder.h"
 #include "dwm/mmu.h"
+#include "dwm_client/client.h"
+
 #include "heart.h"
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
 #include "handshake.h"
-#include "core/coreresources.h"
-#include "render/hieskeleton.h"
-#include "render/camera.h"
-#include "core/clock.h"
-#include "core/sysmsg.h"
-#include "core/development_context.h"
-#include "debugcamcontext.h"
-
-#define START_FULLSCREEN	false
-#define START_WIDTH			1024
-#define START_HEIGHT		1024
-#define START_AA			AA_NONE
-void MainLoop();
 
 std::string 								hostname( "127.0.0.1" );
 int 										port( 2045 );
@@ -49,16 +34,6 @@ void readConfig( std::string& hostname, int& port ) {
       }
    }
 }
-
-bool g_bQuitFlag = false;
-void QuitCallback() {
-	g_bQuitFlag = true;
-}
-int g_iDebugMode = 0;
-void DebugModeCallback( int debugMode ) {
-	g_iDebugMode = debugMode;
-}
-
 
 int Main() {
 	using namespace Core;
@@ -109,22 +84,21 @@ int Main() {
 		);
 	}
 
+	DwmClient client;
 	threads.push_back( 
 		std::make_shared<Core::thread>( 
-			boost::bind( &MainLoop ) 
+			boost::bind( &DwmClient::run, &client ) 
 		) 
-	); 
+	);
+
 	size_t mainLoopThreadIndex = threads.size() - 1;
 
-/*
+	Dwm server( client.getClientWorld() );
 	threads.push_back( 
 		std::make_shared<Core::thread>( 
-			[] { 
-				Dwm test;
-				test.bootstrapLocal();				
-			}
+			boost::bind( &Dwm::bootstrapLocal, &server )
 		)
-	);*/
+	);
 
 /*		if( Handshake( *io, hostname, port ) == true ) 
 	{
@@ -133,10 +107,6 @@ int Main() {
 			threads[i]->join();
 	}*/
 	threads[ mainLoopThreadIndex ]->join();
-
-	// TODO terminate nicely other thread, rather than yank them.
-//	Graphics::ScrConsole::Shutdown();
-//	Cl::Platform::Get()->destroyDevices();
 
 	MMU::shutdown();
 	BitCoder::shutdown();
@@ -158,63 +128,3 @@ void DWMMain( std::shared_ptr<Core::thread> leash ) {
 	}
 }
 
-#include "render/renderworld.h"
-
-void MainLoop() {
-	using namespace Core;
-	Render::RenderWorld rworld;
-
-
-	Gl::Gfx::init();
-	if( !Cl::Platform::exists() )
-		Cl::Platform::init();
-
-	Core::InitWindow( START_WIDTH, START_HEIGHT, START_FULLSCREEN );
-	bool glOk = Gl::Gfx::get()->createScreen( START_WIDTH, START_HEIGHT, START_FULLSCREEN, Gl::Gfx::START_AA );
-	if( glOk == false ) {
-		LOG(ERROR) << "GL unable to find adequate GPU";
-		return;
-	}
-	Core::SystemMessage::get()->registerQuitCallback( QuitCallback );
-	Core::SystemMessage::get()->registerDebugModeChangeCallback( DebugModeCallback );
-
-	Render::RenderContext* ctx = (Render::RenderContext*) Gl::Gfx::get()->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT );
-	ctx->threadActivate();
-	ctx->prepToRender();
-
-	Core::DevelopmentContext::get()->addContext( "DebugCam",  std::shared_ptr<DebugCamContext>( CORE_NEW DebugCamContext( ctx ) ) );
-	Core::DevelopmentContext::get()->activateContext( "DebugCam" );
-
-//	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "sphere_1" ) );
-//	auto sphere = CORE_NEW Render::HieSkeleton( "sphere_1" );
-	ScopedAsyncResourceHandle<ManifestResourceHandle> sphMan( ManifestResourceHandle::load( "starfire" ) );
-	auto sphere = CORE_NEW Render::HieSkeleton( "starfire" );
-	rworld.addRenderable( sphere );
-
-	// flush 'load' time from first time update
-	Clock::get()->update();
-
-	float x = 0.0f;
-	// Main loop
-	while( !g_bQuitFlag ) {
-
-		float deltaT = Clock::get()->update();
-
-		DevelopmentContext::get()->update( deltaT );
-
-//		x += deltaT * 10;
-		sphere->getTransformNode()->setLocalPosition( Math::Vector3(x, 0, 0) );
-
-		rworld.render( ctx );
-		rworld.debugDraw( ctx );
-
-		DevelopmentContext::get()->display();
-		Gl::Gfx::get()->present();
-		Core::HouseKeep();
-	}	
-	CORE_DELETE sphere;
-
-	Gl::Gfx::get()->shutdownScreen();
-//	Cl::Platform::Shutdown();
-	Gl::Gfx::shutdown();	
-}

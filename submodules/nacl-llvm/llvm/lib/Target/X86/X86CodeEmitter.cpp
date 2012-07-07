@@ -425,7 +425,7 @@ void Emitter<CodeEmitter>::emitDisplacementField(const MachineOperand *RelocOp,
   // Otherwise, this is something that requires a relocation.  Emit it as such
   // now.
   unsigned RelocType = Is64BitMode ?
-    (IsPCRel ? X86::reloc_pcrel_word : X86::reloc_absolute_word_sext)
+    (IsPCRel ? X86::reloc_pcrel_word : X86::reloc_absolute_dword)
     : (IsPIC ? X86::reloc_picrel_word : X86::reloc_absolute_word);
   if (RelocOp->isGlobal()) {
     // In 64-bit static small code model, we could potentially emit absolute.

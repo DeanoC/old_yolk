@@ -2,11 +2,17 @@
 	"folders":
 	[
 		{
-			"path": "~/projects/yolk"
+			"pathX": "C:/Users/Artminer/Documents/projects/yolk",
+            "path": "~/projects/yolk"
 		}
 	],
     "settings":
     {
+        "sublimegdb_sourcedir": "/home/deano/projects/yolk",
+        "sublimegdb_workingdir": "/home/deano/rpg.sh/live",
+        // NOTE: You MUST provide --interpreter=mi for the plugin to work
+        "sublimegdb_commandline": "gdb --interpreter=mi ./go",
+     
         "sublimeclang_options":
         [
             "-D_WIN32",

@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_CORE_H
-#define WIERD_CORE_CORE_H
+#ifndef CORE_CORE_H_
+#define CORE_CORE_H_
 
 #if !defined( __STDC_LIMIT_MACROS )
 #	define __STDC_LIMIT_MACROS
@@ -73,15 +73,6 @@
 
 // standard parts of the engine
 #include "core_utils.h"
-#if USE_OPENGL
-	#if RENDER_BACKEND == Gl 
-	#	include "glload\gll.h"
-	#	include "glload\gl_4_2.h"
-	#	if PLATFORM == WINDOWS
-	#	include "glload\wgl_exts.h"
-	#	endif
-	#endif
-#endif
 
 #if PLATFORM != GPU
 

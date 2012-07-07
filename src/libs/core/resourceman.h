@@ -31,7 +31,7 @@ public:
 	~ResourceMan();
 
 	//! called to create a resource with the provided data
-	typedef std::shared_ptr<ResourceBase> (*CreateResourceCallback)( const ResourceHandleBase* handle, RESOURCE_FLAGS flags, const char* pName, const void* pData );
+	typedef void (*CreateResourceCallback)( const ResourceHandleBase* handle, RESOURCE_FLAGS flags, const char* pName, const void* pData );
 	//! called to destory the provided resource
 	typedef void (*DestroyResourceCallback)( std::shared_ptr<ResourceBase>& );
 	//! called the resource has change, return true to flush
@@ -53,30 +53,35 @@ public:
 	// Load or Create a resource, for load name is filename, data is the resource specific load structure, 
 	// for create name is internal name to allow caching or not, data is the resource specific create structure
 	template< uint32_t type >
-	const ResourceHandle<type>* loadCreateResource( const char* pName, const void* pData, const size_t sizeofData, uint32_t flags );
+	const TypedResourceHandle<type>* loadCreateResource( const char* pName, const void* pData, const size_t sizeofData, uint32_t flags );
 
 	//! used when the resource is finished
 	template<uint32_t type>
-	void closeResource( const ResourceHandle<type>* handle );
+	void closeResource( const TypedResourceHandle<type>* handle );
 
 	//! flushes a resource fromt he caches
 	template<uint32_t type>
 	void flushResource( const char* pName, uint32_t flags );
 
+	void baseCloseResource( ResourceHandleBase* pHandle );
+
+	template<uint32_t type>
+	TypedResourceHandle<type>* cloneResource( const TypedResourceHandle<type>* handle );
+
+	ResourceHandleBase* baseCloneResource( ResourceHandleBase* pHandle );
 
 	void internalProcessManifest( uint16_t numEntries, struct ManifestEntry* entries );
 	void internalCloseManifest( uint16_t numEntries, struct ManifestEntry* entries );
 
-	void internalAsyncAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& _resource );
+	void internalAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& _resource );
 
 private:
-	//! Internal AcquireResource used by ResourceHandle
+	//! Internal AcquireResource used by TypedResourceHandle
 	template<uint32_t type>
 		std::shared_ptr<Resource<type> > internalAcquireResource( const ResourceHandleBase* const pHandle );
 
 
 	const ResourceHandleBase* implOpenResource(  const char* pName, const void* pData, const size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags );
-	void implCloseResource( ResourceHandleBase* pHandle );
 	void implFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags );
 
 	std::shared_ptr<ResourceBase> implAcquireResource( ResourceHandleBase* pHandle );
@@ -86,9 +91,9 @@ private:
 
 
 template<uint32_t type>
-const ResourceHandle<type>* ResourceMan::loadCreateResource( const char* pName, const void* pData, const size_t sizeofData, uint32_t flags ) {
+const TypedResourceHandle<type>* ResourceMan::loadCreateResource( const char* pName, const void* pData, const size_t sizeofData, uint32_t flags ) {
 	const ResourceHandleBase* pRHB = implOpenResource( pName, pData, sizeofData, type, (RESOURCE_FLAGS)flags );
-	const ResourceHandle<type>* pRH = (const ResourceHandle<type>*) pRHB;
+	const TypedResourceHandle<type>* pRH = (const TypedResourceHandle<type>*) pRHB;
 	if( flags & RMRF_PRELOAD ) {
 		if( pRH->resourceBase.expired() ) {
 			// note is allowed to return NULL for the shared pointer as its likely the object isn't ready
@@ -100,10 +105,14 @@ const ResourceHandle<type>* ResourceMan::loadCreateResource( const char* pName, 
 
 
 template<uint32_t type>
-void ResourceMan::closeResource( const ResourceHandle<type>* pHandle ) {
-	implCloseResource( const_cast<ResourceHandleBase*>(static_cast<const ResourceHandleBase*>(pHandle)) );
+void ResourceMan::closeResource( const TypedResourceHandle<type>* pHandle ) {
+	baseCloseResource( const_cast<ResourceHandleBase*>(static_cast<const ResourceHandleBase*>(pHandle)) );
 }
 
+template<uint32_t type>
+TypedResourceHandle<type>* ResourceMan::cloneResource( const TypedResourceHandle<type>* pHandle ) {
+	return (TypedResourceHandle<type>*) baseCloneResource( const_cast<ResourceHandleBase*>(static_cast<const ResourceHandleBase*>(pHandle)) );
+}
 
 template<uint32_t type>
 void ResourceMan::flushResource( const char* pName, uint32_t flags ) {

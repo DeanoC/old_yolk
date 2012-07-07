@@ -40,10 +40,10 @@ public:
 
 	//! the meat returns the typed resource handle
 	template<uint32_t type>	
-	const ResourceHandle<type>* get() const
+	const TypedResourceHandle<type>* get() const
 	{
 		CORE_ASSERT( type == m_iType && type == m_pResourceHandle->getType() )
-		return (const ResourceHandle<type>*) m_pResourceHandle;
+		return (const TypedResourceHandle<type>*) m_pResourceHandle;
 	}
 
 	//! return the original filename, mainly a debug aid as almost never needed

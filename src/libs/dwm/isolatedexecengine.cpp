@@ -7,17 +7,18 @@
 #include "trustedregion.h"
 #include "ieethreadcontext.h"
 #include "isolatedexecengine.h"
+#include "world.h"
 
 extern "C" void _ovly_debug_event() {
 }
 
-extern void InstallDWMApiFuncs( TrustedRegion* trustedRegion );
-
 IsolatedExecEngine::IsolatedExecEngine( uint32_t sandboxSize, 
 										uint32_t sandboxStackSize,
-										uint32_t sandboxTrustedRegionSize ) :
+										uint32_t sandboxTrustedRegionSize,
+										World* _world ) :
 	sandboxMem( 0 ),
-	reservedMem( 0 )	
+	reservedMem( 0 ),
+	world( _world )
 {
 	// allocate the sandbox memory space and make it all 
 	// read/write for use to prepare it
@@ -98,10 +99,10 @@ void IsolatedExecEngine::terminate() {
 #define MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCESS 1024
 static IEEThreadContext g_ThreadCtxs[ MAX_UNTRUSTED_THREADS_PER_UNTRUSTED_PROCESS ];
 static int g_ThreadIdx = 0;
-void IsolatedExecEngine::process( const std::string& elfstr ) {
+void IsolatedExecEngine::process( const std::string& elfstr, void (*apiInstall)( TrustedRegion* ) ) {
 	using namespace llvm;
 #if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
-//	static_assert( sizeof(IEEThreadContext)== 80, "IEEThreadContext size has changed" );
+	static_assert( sizeof(IEEThreadContext)== 80, "IEEThreadContext size has changed" );
 #elif CPU_FAMILY == CPU_X64
 	static_assert( sizeof(IEEThreadContext)== 80, "IEEThreadContext size has changed" );
 #endif
@@ -117,7 +118,7 @@ void IsolatedExecEngine::process( const std::string& elfstr ) {
 	// wipe out (HLT) the untrusted thunk code now its been copied into trusted space
 	memset( sttStart, 0xFE, (uintptr_t)sttEnd - (uintptr_t)sttStart ); 
 
-	InstallDWMApiFuncs( trustedRegion );
+	apiInstall( trustedRegion );
 
 	// transfer the elf into the loader and get its ready to go
 	MemoryBuffer* mb = MemoryBuffer::getMemBuffer( elfstr );

@@ -4,6 +4,82 @@
 		"selected_items":
 		[
 			[
+				"cu",
+				"curWinHeight"
+			],
+			[
+				"sc",
+				"scrHeight"
+			],
+			[
+				"scr",
+				"scrWidth"
+			],
+			[
+				"debug",
+				"debugCam"
+			],
+			[
+				"De",
+				"DebugCamContext"
+			],
+			[
+				"back",
+				"backHeight"
+			],
+			[
+				"s_new",
+				"s_newWidth"
+			],
+			[
+				"cur",
+				"curWinWidth"
+			],
+			[
+				"s_",
+				"s_winHeight"
+			],
+			[
+				"alr",
+				"alreadyAcquiring"
+			],
+			[
+				"uint",
+				"uint32_t"
+			],
+			[
+				"qui",
+				"quitFlag"
+			],
+			[
+				"ex",
+				"execEngine"
+			],
+			[
+				"COR_",
+				"CORE_ASSERT"
+			],
+			[
+				"an",
+				"anyValidLeft"
+			],
+			[
+				"Vertex",
+				"VertexIndex"
+			],
+			[
+				"m_p",
+				"m_pointRep"
+			],
+			[
+				"lightWave",
+				"lightWaveScene2MeshMod"
+			],
+			[
+				"res",
+				"resourceLoaderIo"
+			],
+			[
 				"Res",
 				"ResourceLoader"
 			],
@@ -36,7 +112,7 @@
 				"MeshCreateParams"
 			],
 			[
-				"ResourceHandle",
+				"TypedResourceHandle",
 				"ResourceHandleBase"
 			],
 			[
@@ -46,14 +122,6 @@
 			[
 				"trus",
 				"trustedAddrToHandle"
-			],
-			[
-				"cur",
-				"curTrustedAddrHandle"
-			],
-			[
-				"uint",
-				"uintptr_t"
 			],
 			[
 				"unt",
@@ -118,10 +186,6 @@
 			[
 				"thunk",
 				"thunkCodeSize"
-			],
-			[
-				"cu",
-				"curThunkPtr"
 			],
 			[
 				"trustedS",
@@ -272,60 +336,74 @@
 	"buffers":
 	[
 		{
-			"file": "src/apps/dvm_owned_dedi/main.cpp",
+			"file": "src/libs/dwm_client/client.cpp",
 			"settings":
 			{
-				"buffer_size": 5684,
+				"buffer_size": 2519,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/libs/gl/gfx.cpp",
+			"file": "src/libs/dwm/apis/resources.cpp",
 			"settings":
 			{
-				"buffer_size": 2815,
+				"buffer_size": 3943,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/dwm/vmthreads.cpp",
+			"settings":
+			{
+				"buffer_size": 746,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/dwm/apis/vm.cpp",
+			"settings":
+			{
+				"buffer_size": 4752,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/gl/posix/gfx.cpp",
+			"settings":
+			{
+				"buffer_size": 4657,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/gl/glew.c",
+			"settings":
+			{
+				"buffer_size": 807901,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/gl/gl.h",
+			"settings":
+			{
+				"buffer_size": 2773,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gl/resourceloader.h",
+			"file": "src/libs/gl/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 316,
-				"line_ending": "Unix",
-				"name": "resourceloader.h"
+				"buffer_size": 1913,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gl/resourceloader.cpp",
+			"file": "src/libs/gl/rendercontext.cpp",
 			"settings":
 			{
-				"buffer_size": 8857,
-				"line_ending": "Unix",
-				"name": "resourceloader.cpp"
-			}
-		},
-		{
-			"file": "src/libs/core/resourceman.cpp",
-			"settings":
-			{
-				"buffer_size": 10988,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/core/resourceman.h",
-			"settings":
-			{
-				"buffer_size": 5872,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/gl/gfx.h",
-			"settings":
-			{
-				"buffer_size": 4404,
+				"buffer_size": 9457,
 				"line_ending": "Windows"
 			}
 		}
@@ -362,134 +440,134 @@
 	},
 	"file_history":
 	[
-		"/tmp/midori-deano/prioritised_handlers.cpp",
+		"/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/deano/projects/yolk/src/libs/gl/glload/source/glxl_ext.c",
+		"/home/deano/projects/yolk/src/libs/gl/glew.c",
+		"/home/deano/projects/yolk/src/libs/gl/glew.h",
+		"/home/deano/projects/yolk/src/libs/gl/glxew.h",
+		"/home/deano/projects/yolk/src/libs/gl/wglew.h",
+		"/home/deano/projects/glew-1.7.0/src/glewinfo.c",
+		"/home/deano/projects/glew-1.7.0/src/visualinfo.c",
+		"/home/deano/projects/yolk/src/libs/dwm/vmapi.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/gl.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/posix/gfx.cpp",
+		"/home/deano/projects/yolk/src/libs/core/sysmsg.h",
+		"/home/deano/projects/yolk/src/libs/core/platform_posix/events_x11.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/gfx.h",
+		"/home/deano/projects/yolk/src/libs/gl/gfx.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm_client/debugcamcontext.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm_client/debugcamcontext.h",
+		"/home/deano/projects/yolk/src/libs/render/camera.h",
+		"/home/deano/projects/yolk/src/libs/gl/forwardpipeline.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/_int_gl_1_1.h",
+		"/home/deano/projects/yolk/src/libs/gl/forwardpipeline.h",
+		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.h",
+		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.cpp",
+		"/home/deano/projects/yolk/src/libs/render/pipeline.h",
+		"/home/deano/projects/yolk/src/libs/dwm_client/client.h",
+		"/home/deano/projects/yolk/src/libs/dwm_client/clientworld.h",
+		"/home/deano/projects/yolk/src/libs/core/resource_dir.cpp",
+		"/home/deano/projects/yolk/src/CMakeLists.txt",
 		"/home/deano/projects/yolk/src/libs/gl/debugprims.h",
-		"/home/deano/projects/yolk/src/libs/render/mesh.cpp",
-		"/home/deano/projects/yolk/src/libs/core/resources.h",
+		"/home/deano/projects/yolk/src/libs/gl/debugprims.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/rendercontext.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/resourceloader.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/resourceloader.h",
+		"/home/deano/projects/yolk/src/libs/gl/vao.cpp",
+		"/home/deano/projects/yolk/src/libs/core/resourceman.h",
+		"/home/deano/projects/yolk/src/libs/core/resourceman.cpp",
 		"/home/deano/projects/yolk/src/libs/core/resourcebase.h",
+		"/home/deano/projects/yolk/src/libs/core/coreresources.cpp",
+		"/home/deano/projects/yolk/src/libs/cl/platform.cpp",
+		"/home/deano/projects/yolk/src/libs/core/resources.h",
+		"/home/deano/projects/yolk/src/libs/dwm/dwm.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.h",
+		"/home/deano/projects/yolk/src/libs/dwm/vmthreads.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/vmthreads.h",
+		"/home/deano/projects/yolk/src/libs/dwm/dwm.h",
+		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/world.h",
+		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/main.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm/trustedregion.h",
+		"/home/deano/projects/yolk/src/libs/dwm/apis/resources.cpp",
+		"/home/deano/projects/yolk/src/libs/render/hie.h",
+		"/home/deano/projects/yolk/src/libs/render/hie.cpp",
+		"/home/deano/projects/yolk/src/libs/render/renderable.h",
+		"/home/deano/projects/yolk/src/libs/dwm/vmthread.cpp",
+		"/home/deano/projects/yolk/src/libs/dwm_client/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/CMakeLists.txt",
+		"/home/deano/projects/yolk/src/libs/dvm_client/client.h",
+		"/home/deano/projects/yolk/src/libs/dvm_client/client.cpp",
+		"/home/deano/projects/yolk/src/libs/render/renderworld.h",
+		"/home/deano/projects/yolk/src/libs/render/renderworld.cpp",
+		"/home/deano/.spectrwm.conf",
+		"/home/deano/projects/yolk/src/libs/render/wobfile.cpp",
+		"/home/deano/projects/yolk/src/libs/render/wobfile.h",
+		"/home/deano/projects/yolk/src/libs/render/mesh.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/databuffer.cpp",
+		"/home/deano/projects/yolk/src/libs/core/cmdline_shell.cpp",
+		"/home/deano/.conkyrc",
+		"/home/deano/.cache/.fr-4IOxYX/conky-dlab/conkyrc-1600/conkyrc-nopanel-0",
+		"/home/deano/.cache/.fr-pzQgk5/conky-dlab/conkyrc-1600/conkyrc-panel-2",
+		"/etc/X11/xorg.conf",
+		"/home/deano/projects/yolk/src/libs/gl/databuffer.h",
+		"/home/deano/projects/yolk/src/libs/gl/memory.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/constantcache.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/rendercontext.h",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWOLoader.cpp",
+		"/home/deano/projects/yolk/src/apps/convertmesh/main.cpp",
+		"/home/deano/rpg.sh/live/Hie/starfire.hietxt",
+		"/home/deano/projects/yolk/src/libs/meshimport/LWObject2GO.cpp",
+		"/home/deano/rpg.sh/live/Meshes/starfire_LW Mesh.wobtxt",
+		"/home/deano/projects/yolk/src/libs/meshexport/wobexp.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/vertex.cpp",
+		"/home/deano/projects/yolk/src/libs/meshops/basicmeshops.cpp",
+		"/home/deano/projects/yolk/src/libs/meshmod/edge.cpp",
+		"/home/deano/rpg.sh/live/Manifests/starfire.mantxt",
+		"/home/deano/projects/yolk/src/libs/meshimport/assimp.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWSceneLoader.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWSceneLoader.h",
+		"/home/deano/projects/yolk/src/libs/meshimport/LWScene2GO.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWTypes.h",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWLayer.h",
+		"/home/deano/projects/yolk/submodules/assimp/code/LWOFileData.h",
+		"/home/deano/projects/yolk/src/libs/meshimport/meshimport.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWChannelGroup.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWEnvelope.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWLayer.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWNode.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/StungActorPlugin.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/lightwaveloader.cpp",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/lightwaveloader.h",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWFace.h",
+		"/home/deano/projects/yolk/src/libs/lightwaveloader/CMakeLists.txt",
+		"/home/deano/rpg.sh/live/Manifests/sstudioStarFire_91900.mantxt",
+		"/home/deano/projects/yolk/src/libs/meshimport/LWScene2GO.h",
+		"/home/deano/projects/yolk/src/libs/meshimport/CMakeLists.txt",
+		"/home/deano/rpg.sh/live/Hie/sstudioStarFire_91900.hietxt",
+		"/home/deano/projects/yolk/src/libs/meshimport/LWObject2GO.h",
+		"/home/deano/projects/yolk/src/libs/meshimport/assimp.h",
+		"/home/deano/rpg.sh/live/Meshes/sstudioStarFire_91900.Shape_sstudioStarFire_91900.wobtxt",
+		"/home/deano/projects/yolk/src/libs/gl/vao.h",
+		"/home/deano/projects/yolk/src/libs/gl/databufferman.h",
+		"/home/deano/projects/yolk/src/libs/gl/databufferman.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/fbo.cpp",
+		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/glx_exts.h",
+		"/home/deano/projects/yolk/src/libs/render/rendercontext.h",
+		"/tmp/midori-deano/prioritised_handlers.cpp",
 		"/home/deano/projects/yolk/src/libs/gl/CMakeLists.txt",
 		"/home/deano/projects/yolk/submodules/assimp/CMakeLists.txt",
 		"/home/deano/projects/yolk/src/libs/meshops/meshsorter.h",
 		"/home/deano/projects/yolk/src/libs/meshops/meshsorter.cpp",
 		"/home/deano/projects/yolk/src/libs/meshops/basicmeshops.h",
-		"/home/deano/projects/yolk/src/libs/meshops/basicmeshops.cpp",
 		"/home/deano/projects/yolk/src/libs/meshimport/obj.h",
-		"/home/deano/projects/yolk/src/libs/meshimport/assimp.h",
 		"/home/deano/projects/yolk/src/libs/core/core_utils.h",
 		"/home/deano/projects/yolk/src/libs/core/aligned_vector.h",
 		"/home/deano/projects/yolk/src/libs/core/bvh.cpp",
 		"/home/deano/projects/yolk/src/libs/core/bvh.h",
 		"/home/deano/projects/yolk/src/libs/core/compiler_cuda.h",
-		"/home/deano/projects/yolk/src/libs/core/compiler_gcc.h",
-		"/home/deano/projects/yolk/src/libs/core/compiler_llvm.h",
-		"/home/deano/projects/yolk/src/libs/core/compiler_ms.h",
-		"/home/deano/projects/yolk/src/libs/core/convextest.cpp",
-		"/home/deano/projects/yolk/src/libs/core/convextest.h",
-		"/home/deano/projects/yolk/src/libs/core/fileio.h",
-		"/home/deano/projects/yolk/src/libs/core/thread.h",
-		"/home/deano/projects/yolk/src/libs/core/platform_posix/debug_std.h",
-		"/home/deano/projects/yolk/src/libs/core/platform_windows/win_shell.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/windows/gfx.cpp",
-		"/home/deano/projects/yolk/submodules/zlib/CMakeLists.txt",
-		"/home/deano/projects/yolk/submodules/protobuf/CMakeLists.txt",
-		"/home/deano/projects/yolk/submodules/tbb/CMakeLists.txt",
-		"/home/deano/projects/yolk/submodules/tbb/src/tbb/CMakeLists.txt",
-		"/home/deano/projects/yolk/submodules/tbb/src/tbb/governor.cpp",
-		"/home/deano/projects/yolk/submodules/tbb/src/rml/CMakeLists.txt",
-		"/home/deano/projects/yolk/yolk_setup.cmake",
-		"/home/deano/projects/yolk/submodules/tbb/src/tbb/tbb_version.h",
-		"/home/deano/projects/yolk/src/libs/core/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/libs/core/resourceman.h",
-		"/home/deano/projects/yolk/submodules/tbb/src/rml/server/rml_server.cpp",
-		"/home/deano/projects/yolk/submodules/tbb/src/tbb/private_server.cpp",
-		"/home/deano/projects/yolk/submodules/tbb/src/tbb/cache_aligned_allocator.cpp",
-		"/home/deano/projects/yolk/submodules/tbb/src/tbb/dynamic_link.h",
-		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/CMakeLists.txt",
-		"/home/deano/projects/yolk/submodules/CMakeLists.txt",
-		"/home/deano/.cache/.fr-2e6Hge/tbb40_20111109oss/src/tbb/dynamic_link.cpp",
-		"/home/deano/.cache/.fr-4Oa4Ax/tbb40_20111109oss/include/tbb/concurrent_queue.h",
-		"/home/deano/.cache/.fr-z3QUEC/tbb40_20111109oss/include/tbb/compat/thread",
-		"/home/deano/.cache/.fr-i513QW/tbb40_20111109oss/include/tbb/machine/linux_intel64.h",
-		"/home/deano/.cache/.fr-XQyTPA/tbb40_20111109oss/src/tbb/tbb_thread.cpp",
-		"/home/deano/.cache/.fr-4HGJ7L/tbb40_20111109oss/src/tbbproxy/tbbproxy.cpp",
-		"/home/deano/.cache/.fr-3ptBYK/tbb40_20111109oss/include/tbb/concurrent_queue.h",
-		"/home/deano/.cache/.fr-4dzwHS/tbb40_20111109oss/include/tbb/internal/_concurrent_queue_impl.h",
-		"/home/deano/.cache/.fr-LDkUji/tbb40_20111109oss/examples/concurrent_priority_queue/shortpath/shortpath.cpp",
-		"/home/deano/.cache/.fr-yB1rND/tbb40_20111109oss/include/tbb/tbb_config.h",
-		"/home/deano/.cache/.fr-DWoH5y/tbb40_20111109oss/src/tbb/arena.h",
-		"/home/deano/.cache/.fr-TCw7TO/tbb40_20111109oss/README",
-		"/home/deano/projects/yolk/src/libs/render/rendercontext.h",
-		"/home/deano/projects/yolk/src/libs/gl/rendercontext.h",
-		"/home/deano/projects/yolk/src/libs/gl/posix/gfx.cpp",
-		"/home/deano/projects/yolk/src/libs/core/platform_posix/keyboard_x11.cpp",
-		"/home/deano/projects/yolk/src/libs/core/core.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/forwardpipeline.cpp",
-		"/home/deano/projects/yolk/src/libs/render/wobfile.h",
-		"/home/deano/projects/yolk/src/libs/gl/rendercontext.cpp",
-		"/home/deano/projects/yolk/src/libs/render/wobfile.cpp",
-		"/home/deano/projects/yolk/src/libs/meshexport/wobexp.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/apis/resources.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/gfx.h",
-		"/home/deano/projects/yolk/src/libs/gl/gl.h",
-		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/gl_core.h",
-		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/glx_exts.h",
-		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/gll.h",
-		"/home/deano/projects/yolk/src/libs/render/render.h",
-		"/home/deano/projects/yolk/src/libs/gl/gfx.cpp",
-		"/home/deano/projects/yolk/src/libs/cl/platform.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/debugprims.cpp",
-		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/debugcamcontext.cpp",
-		"/home/deano/rpg.sh/live/Hie/sphere_1.hietxt",
-		"/home/deano/projects/yolk/src/libs/render/renderworld.cpp",
-		"/home/deano/projects/yolk/src/libs/core/platform_posix/keyboard_x11.h",
-		"/home/deano/projects/yolk/src/libs/core/clock.cpp",
-		"/home/deano/projects/yolk/src/libs/core/clock.inl",
-		"/home/deano/projects/yolk/src/libs/core/platform_posix/events_x11.cpp",
-		"/media/truecrypt1/Projects/gltest/source/main.cpp",
-		"/home/deano/projects/yolk/src/libs/core/development_context.h",
-		"/home/deano/projects/yolk/src/libs/core/development_context.cpp",
-		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/debugcamcontext.h",
-		"/home/deano/projects/yolk/src/libs/core/sysmsg.h",
-		"/media/truecrypt1/Projects/gltest/source/debugcamcontext.h",
-		"/media/truecrypt1/Projects/gltest/source/debugcamcontext.cpp",
-		"/media/truecrypt1/Projects/wierd/source/gui/ttf_font.cpp",
-		"/media/truecrypt1/Projects/wierd/source/gui/gui_flash.cpp",
-		"/home/deano/.cache/.fr-eXDhRH/Framework3/Renderer.h",
-		"/home/deano/.cache/.fr-Apvsyi/Framework3/Renderer.cpp",
-		"/home/deano/.cache/.fr-LaQUxn/Framework3/GUI/Dialog.cpp",
-		"/home/deano/.cache/.fr-477YHQ/Framework3/GUI/Button.cpp",
-		"/home/deano/projects/yolk/src/libs/core/keyboard.h",
-		"/home/deano/projects/yolk/src/libs/core/platform_windows/keyboard_win.h",
-		"/home/deano/projects/yolk/src/libs/core/platform_windows/keyboard_win.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/constantcache.cpp",
-		"/home/deano/projects/yolk/src/libs/render/camera.h",
-		"/home/deano/projects/yolk/src/libs/render/camera.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/constantcache.h",
-		"/home/deano/projects/yolk/src/libs/core/vector_math_c.h",
-		"/home/deano/projects/yolk/src/libs/gl/camera.h",
-		"/home/deano/projects/yolk/src/libs/gl/camera.cpp",
-		"/home/deano/rpg.sh/live/Meshes/sphere_1_Layer_0.wobtxt",
-		"/home/deano/projects/yolk/src/libs/render/hieskeleton.cpp",
-		"/home/deano/.cache/.fr-hIHr4R/readme.txt",
-		"/home/deano/rpg.sh/live/Manifests/sphere_1.mantxt",
-		"/home/deano/projects/yolk/src/libs/gl/memory.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/shaderman.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/fbo.cpp",
-		"/home/deano/projects/yolk/src/libs/render/pipeline.h",
-		"/home/deano/projects/yolk/src/libs/gl/forwardpipeline.h",
-		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.h",
-		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/_int_gl_exts.h",
-		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/main.cpp",
-		"/home/deano/projects/yolk/src/libs/render/hieskeleton.h",
-		"/home/deano/projects/yolk/src/libs/core/resourceman.cpp",
-		"/home/deano/projects/yolk/src/libs/meshexport/wobexp.h",
-		"/home/deano/projects/yolk/src/libs/core/file_path.h",
-		"/home/deano/projects/yolk/src/libs/core/file_path.cpp",
-		"/home/deano/projects/yolk/src/apps/convertmesh/main.cpp",
-		"/home/deano/projects/yolk/src/libs/core/coreresources.cpp",
-		"/home/deano/projects/yolk/src/libs/core/coreresources.h",
-		"/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings"
+		"/home/deano/projects/yolk/src/libs/core/compiler_gcc.h"
 	],
 	"find":
 	{
@@ -497,7 +575,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 102.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"",
@@ -514,6 +592,24 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"glxew",
+			"glXGetProcAddressARB",
+			"GL_LINEAR",
+			"GL_UNIFORM_BUFFER",
+			"expired",
+			"LWSurfPolyTag",
+			"getS",
+			"LoadObjectLayer",
+			"fmatrix44",
+			"modelFactory",
+			"Log",
+			"glBindVertexArray",
+			"DataBuffer",
+			"DataBufferMan",
+			"glBind",
+			"Vao",
+			"GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB",
+			"pRD->resource",
 			"deano@zombiehousestudios.com",
 			"2010",
 			"Zombie House Studios",
@@ -623,25 +719,7 @@
 			"NaClLdtAllocateSelector",
 			"NaCl_page_alloc",
 			"NaClJITMemoryManagerX",
-			"NACL_ABI_PROT_READ",
-			"PROT_READ",
-			"SimpleSlab",
-			"NaClAddrSpaceBeforeAlloc",
-			"NaClAllocateSpace",
-			"NaClAllocAddrSpace",
-			"NaClElfImageLoad",
-			"mem_start",
-			"NaClJITMemoryManager",
-			"isBaseAddressKnownZero",
-			"OutputFormat",
-			"NaClApp ",
-			"NaClApp",
-			"NaClAppLoadFile",
-			"NaClElfImageNew",
-			"NaClAppLoadFileDynamically",
-			"NaClCreateMainThread",
-			"createInternalizePass",
-			"populateLTOPassManager"
+			"NACL_ABI_PROT_READ"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -649,6 +727,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Math::Matrix4x4",
+			"LOG(INFO)",
 			"Cloud Pixies Ltd",
 			"impl",
 			"dcinterface",
@@ -668,23 +748,23 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/apps/dvm_owned_dedi/main.cpp",
+					"file": "src/libs/dwm_client/client.cpp",
 					"settings":
 					{
-						"buffer_size": 5684,
+						"buffer_size": 2519,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2285,
-								2285
+								2078,
+								2078
 							]
 						],
 						"settings":
@@ -693,25 +773,25 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1621.0,
+						"translation.y": 1372.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/gl/gfx.cpp",
+					"file": "src/libs/dwm/apis/resources.cpp",
 					"settings":
 					{
-						"buffer_size": 2815,
+						"buffer_size": 3943,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1829,
-								1829
+								3196,
+								3196
 							]
 						],
 						"settings":
@@ -720,30 +800,29 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1100.0,
+						"translation.y": 997.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/gl/resourceloader.h",
+					"file": "src/libs/dwm/vmthreads.cpp",
 					"settings":
 					{
-						"buffer_size": 316,
+						"buffer_size": 746,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								264,
-								264
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "resourceloader.h",
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -754,45 +833,45 @@
 				},
 				{
 					"buffer": 3,
-					"file": "src/libs/gl/resourceloader.cpp",
+					"file": "src/libs/dwm/apis/vm.cpp",
 					"settings":
 					{
-						"buffer_size": 8857,
+						"buffer_size": 4752,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8622,
-								8622
+								2513,
+								2513
 							]
 						],
 						"settings":
 						{
-							"auto_name": "resourceloader.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3925.0,
+						"translation.y": 1892.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "src/libs/core/resourceman.cpp",
+					"file": "src/libs/gl/posix/gfx.cpp",
 					"settings":
 					{
-						"buffer_size": 10988,
+						"buffer_size": 4657,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9590,
-								9590
+								858,
+								858
 							]
 						],
 						"settings":
@@ -801,25 +880,53 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 5311.0,
+						"translation.y": 578.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "src/libs/core/resourceman.h",
+					"file": "src/libs/gl/glew.c",
 					"settings":
 					{
-						"buffer_size": 5872,
+						"buffer_size": 807901,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5690,
-								5690
+								695391,
+								695391
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 262897.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/libs/gl/gl.h",
+					"settings":
+					{
+						"buffer_size": 2773,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								142,
+								142
 							]
 						],
 						"settings":
@@ -828,31 +935,57 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2385.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "src/libs/gl/gfx.h",
+					"buffer": 7,
+					"file": "src/libs/gl/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 4404,
+						"buffer_size": 1913,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								433,
-								433
+								466,
+								466
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/libs/gl/rendercontext.cpp",
+					"settings":
+					{
+						"buffer_size": 9457,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								394,
+								394
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -991,6 +1124,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 276.0,
+	"side_bar_width": 242.0,
 	"status_bar_visible": true
 }

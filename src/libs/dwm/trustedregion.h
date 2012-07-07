@@ -27,6 +27,7 @@ public:
 		thunkCode.resize( thunkCodeSize );
 		memcpy( &thunkCode[0], thunkCodeStart, thunkCodeSize );
 	}
+
 	void setThreadContext( void* ctx ) {
 		threadCtx = ctx;
 	}
@@ -70,7 +71,7 @@ public:
 		}
 	}
 
-	void unprotect() {		
+	void unprotect() {
 		MMU::get()->protectPages( thunker, thunkSegSize, MMU::PAGE_READ | MMU::PAGE_WRITE );
 	}
 
@@ -87,9 +88,7 @@ public:
 private:
 
 	uint8_t* encodeFunc( void* ptr );
-
 	uint8_t* encodeFuncWithParam( void* ptr, void* param );
-
 	uint8_t* encodeFuncWithStart( void* ptr, uint8_t* startThunkPtr );
 
 	const uint8_t* 								region;

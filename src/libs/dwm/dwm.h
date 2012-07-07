@@ -12,8 +12,9 @@
 #include "core/file_path.h"
 #include "riak/core_types.hxx"
 #include "riak/transport.hxx"
+#include "dwm/world.h"
 
-class VMThread;
+class VMThreads;
 
 // todo create the two seperate libs, for now trust everyone
 #define DWM_TRUSTED
@@ -24,12 +25,17 @@ typedef std::shared_ptr<riak::object> RiakObjPtr;
 
 class Dwm {
 public:
+	friend class VMThreads;
+	
 	Dwm();
+	Dwm( WorldPtr _world );
 	~Dwm();
 
 	bool openCommChans( std::shared_ptr<boost::asio::io_service> _io, const std::string& hostname );
 
 	void bootstrapLocal();
+
+	WorldPtr getWorld() const { return world; }
 
 private:
 	void checkSysInfoVersion( const std::string& str );
@@ -43,10 +49,11 @@ private:
 	int														dwmChanPort;
 	std::shared_ptr<boost::asio::ip::tcp::socket>			dwmChanSock;
 	std::shared_ptr<boost::asio::io_service>				io;
-	std::vector<std::shared_ptr<VMThread>>					vmThreads;
+	std::vector<std::shared_ptr<VMThreads>>					vmThreads;
 
 	std::string												switcherElf;
 	std::string												libcElf;
+	WorldPtr												world;
 };
 
 

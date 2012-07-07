@@ -154,14 +154,13 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 		actualName = pName;
 	}
 
-	std::string cacheName;
 	std::stringstream flagString;
 	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
-	cacheName = actualName + flagString.str();
+	const std::string cacheName( actualName + flagString.str() );
 
-	ResourceManImpl::CacheIndex::accessor cacheIt;
-	if( impl.cacheMap.find( cacheIt, cacheName ) ) {
-		ResourceData* pRD = cacheIt->second;
+	ResourceManImpl::CacheIndex::const_accessor rcacheIt;
+	if( impl.cacheMap.find( rcacheIt, cacheName ) ) {
+		ResourceData* pRD = rcacheIt->second;
 		CORE_ASSERT( pRD->handle->type == type );
 		pRD->refCount++;
 		return pRD->handle;
@@ -183,6 +182,7 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 		auto lb = impl.listResourceHandlePtrs.push_back( CORE_NEW ResourceData( pSafeName, pSafeData, flags, pBase ) );
 		acc->second = *lb;
 		if( !(flags & RMRF_DONTCACHE) ) {
+			ResourceManImpl::CacheIndex::accessor cacheIt;
 			if( impl.cacheMap.insert( cacheIt, cacheName ) ) {
 				cacheIt->second = *lb;
 				cacheIt->second->cacheName = cacheName;
@@ -198,7 +198,7 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 	return pBase;
 }
 
-void ResourceMan::implCloseResource( ResourceHandleBase* pHandle ) {
+void ResourceMan::baseCloseResource( ResourceHandleBase* pHandle ) {
 	ResourceManImpl::PtrIndex::accessor acc;
 	if( impl.resourceHandleBaseMap.find( acc, pHandle )  ) {
 		ResourceData* pRD = acc->second;
@@ -234,9 +234,21 @@ void ResourceMan::implCloseResource( ResourceHandleBase* pHandle ) {
 
 		}
 	} else {
-		CORE_ASSERT( false && "ResourceHandle does not exist\n" );
+		CORE_ASSERT( false && "TypedResourceHandle does not exist\n" );
 	}
 }
+ResourceHandleBase* ResourceMan::baseCloneResource( ResourceHandleBase* pHandle ) {
+	ResourceManImpl::PtrIndex::accessor acc;
+	if( impl.resourceHandleBaseMap.find( acc, pHandle )  ) {
+		ResourceData* pRD = acc->second;
+		CORE_ASSERT( pHandle == pRD->handle );
+		++pRD->refCount;
+	} else {
+		CORE_ASSERT( false && "TypedResourceHandle does not exist\n" );		
+	}
+	return pHandle;
+}
+
 void ResourceMan::implFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags ) {
 	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
 	if( impl.resourceTypeMap.find( roRTM, type ) == false ) {
@@ -291,9 +303,10 @@ void ResourceMan::registerResourceType (	uint32_t type,
 }
 
 std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBase* pHandle ) {
-	bool alreadyAcquiring;
-	pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, true );
+	int alreadyAcquiring = std::atomic_fetch_add( &pHandle->acquiring, 1 );	
+
 	if( alreadyAcquiring ) {
+		pHandle->acquiring += -1;	
 		return std::shared_ptr<ResourceBase>();
 	}
 	if( auto res = pHandle->resourceBase.lock() ) {
@@ -306,32 +319,27 @@ std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBa
 	}
 	const ResourceTypeData& rtd = roRTM->second;
 
-	ResourceManImpl::PtrIndex::accessor rdIt;
+	ResourceManImpl::PtrIndex::const_accessor rdIt;
 	if( impl.resourceHandleBaseMap.find( rdIt, pHandle ) == false ) {
 		CORE_ASSERT( false && "Invalid Resource require" );		
 	}
-	ResourceData* pRD = rdIt->second;
+	const ResourceData* pRD = rdIt->second;
+	rdIt.release();
 
-	auto res = rtd.createCallback( pHandle, pRD->flags, pRD->resourceName.get(), pRD->resourceData.get() );
-	if( res ) {
-		pRD->resource = res;
-		pRD->flags = (RESOURCE_FLAGS) (pRD->flags & ~(RMRF_PRELOAD ));
+	rtd.createCallback( pHandle, pRD->flags, pRD->resourceName.get(), pRD->resourceData.get() );
 
-		pHandle->resourceBase = res;
-
-		bool alreadyAcquiring;
-		pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, false );
+	if( auto res = pHandle->resourceBase.lock() ) {
+		return res;
+	} else {
+		return std::shared_ptr<ResourceBase>();
 	}
-
-	return res;
 }
 
-void ResourceMan::internalAsyncAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& res ) {
+void ResourceMan::internalAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& res ) {
 	ResourceHandleBase* pHandle = const_cast<ResourceHandleBase*>(_handle);
 
 	if( !res ) {
-		bool alreadyAcquiring;
-		pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, false );
+		pHandle->acquiring += -1;
 		return;
 	}
 
@@ -346,9 +354,7 @@ void ResourceMan::internalAsyncAcquireComplete( const ResourceHandleBase* _handl
 
 	pHandle->resourceBase = res;
 
-	bool alreadyAcquiring;
-	pHandle->acquiring.compare_exchange_strong( alreadyAcquiring, false );
-	
+	pHandle->acquiring += -1;	
 }
 
 void ResourceMan::internalProcessManifest( uint16_t numEntries, ManifestEntry* entries ) {
@@ -364,7 +370,7 @@ void ResourceMan::internalProcessManifest( uint16_t numEntries, ManifestEntry* e
 
 void ResourceMan::internalCloseManifest( uint16_t numEntries, ManifestEntry* entries ) {
 	for( uint16_t i=0; i < numEntries; ++i ) {
-		implCloseResource( (Core::ResourceHandleBase*) entries[i].handle.p );
+		baseCloseResource( (Core::ResourceHandleBase*) entries[i].handle.p );
 		entries[i].handle.p = NULL;
 	}
 }
