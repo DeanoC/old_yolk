@@ -1,0 +1,44 @@
+#pragma once
+
+//!-----------------------------------------------------
+//!
+//! \file shaderman.h
+//! handles the shader system / compiler etc.
+//!
+//!-----------------------------------------------------
+#if !defined(WIERD_GL_SHADERMAN_H)
+#define WIERD_GL_SHADERMAN_H
+
+#include "program.h"
+
+namespace Core {
+	class ResourceHandleBase;
+};
+
+namespace Gl {
+
+	class ShaderMan {
+	public:
+		ShaderMan();
+
+		void registerProgramSource( const char* name, const char* source );
+
+		Program* internalCreate( const Core::ResourceHandleBase* baseHandle, const char* pName, const Program::CreationStruct* creation );
+
+		void initDefaultPrograms();
+	private:
+		const char* getProgramSource( const std::string& prgName ) const;
+		Program* internalCreateWholeProgram( const Core::ResourceHandleBase* baseHandle, const char* pName, const Program::CreationStruct* creation );
+
+		void preprocess( std::string& src, int& count, std::string* glsrc );
+		void preprocessIncludes( std::string& src, std::list<std::string>& fragments );
+		void preprocessPatchSource( std::string& src );
+		void buildUniformTables( Program* prg );
+
+		typedef std::unordered_map< std::string, const char*> NameSourceMap;
+		NameSourceMap programSrc;
+
+	};
+}
+
+#endif

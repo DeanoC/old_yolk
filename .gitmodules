@@ -7,6 +7,6 @@
 [submodule "submodules/protobuf"]
 	path = submodules/protobuf
 	url = git@bitbucket.org:DeanoC/protobuf.git
-[submodule "assimp"]
+[submodule "submodules/assimp"]
 	path = submodules/assimp
 	url = git://github.com/assimp/assimp.git
