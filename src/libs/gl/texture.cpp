@@ -5,18 +5,57 @@
  */
 #include "gl.h"
 #include "core/resourceman.h"
+#include "core/fileio.h"
+#include "core/file_path.h"
 #include "gfx.h"
 #include "dds.h"
 #include "texture.h"
 
 namespace {
+#include "scene/generictextureformat.h"
+
+#define GL_COMPRESSED_RGBA_S3TC_DXT1 			GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT3 			GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT5 			GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1 		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3 		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5 		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT
+#define GL_COMPRESSED_RGBA_BPTC_UNORM 			GL_COMPRESSED_RGBA_BPTC_UNORM_ARB
+#define GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM 	GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB
+
+#define GL_COMPRESSED_RGB_S3TC_DXT1 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT 
+#define GL_COMPRESSED_SRGB_S3TC_DXT1 			GL_COMPRESSED_SRGB_S3TC_DXT1_EXT 
+#define GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT 	GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB
+#define GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT 	GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB
+
+#define GTF_START_MACRO static uint32_t GtfToGlFormat[] = {
+#define GTF_MOD_MACRO(x) GL_##x,
+#define GTF_END_MACRO };
+#include "scene/generictextureformat.h"
+
+#undef GL_COMPRESSED_RGBA_S3TC_DXT1 		
+#undef GL_COMPRESSED_RGBA_S3TC_DXT3 		
+#undef GL_COMPRESSED_RGBA_S3TC_DXT5 		
+#undef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1 	
+#undef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3 	
+#undef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5 	
+#undef GL_COMPRESSED_RGBA_BPTC_UNORM 		
+#undef GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM 
+#undef GL_COMPRESSED_RGB_S3TC_DXT1 		
+#undef GL_COMPRESSED_SRGB_S3TC_DXT1 		
+#undef GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT 
+#undef GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT
+
+
 #define TEX_IMAGE			0
 #define TEX_STORAGE			1
 #define TEX_STORAGE_DSA		2
-#define TEX_STORE			TEX_IMAGE
+// note currently TEX_IMAGE doesn't get the prefilled image data corractly
+#define TEX_STORE			TEX_STORAGE_DSA
 
 // work around for Storage bugs + not accepted by debuggers and profilers yet
 void TexStorage1D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width ) {
+	CORE_ASSERT( levels > 0 );
 #if TEX_STORE == TEX_IMAGE
 	auto pixFormat = GlFormat::getPixelFormat( fmt );
 	auto pixType = GlFormat::getPixelType( fmt ); 
@@ -35,9 +74,11 @@ void TexStorage1D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum f
 #elif TEX_STORE == TEX_STORAGE_DSA
 	glTextureStorage1DEXT( name, texType, levels, fmt, width );
 #endif
+	GL_CHECK
 }
 
 void TexStorage2D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width, GLint height ) {
+	CORE_ASSERT( levels > 0 );
 #if TEX_STORE == TEX_IMAGE
 	auto pixFormat = GlFormat::getPixelFormat( fmt );
 	auto pixType = GlFormat::getPixelType( fmt ); 
@@ -57,9 +98,11 @@ void TexStorage2D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum f
 #elif TEX_STORE == TEX_STORAGE_DSA
 	glTextureStorage2DEXT( name, texType, levels, fmt, width, height );
 #endif
+	GL_CHECK
 }
 
 void TexStorage3D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width, GLint height, GLint depth ) {
+	CORE_ASSERT( levels > 0 );
 #if TEX_STORE == TEX_IMAGE
 	auto pixFormat = GlFormat::getPixelFormat( fmt );
 	auto pixType = GlFormat::getPixelType( fmt ); 
@@ -79,14 +122,92 @@ void TexStorage3D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum f
 #elif TEX_STORE == TEX_STORAGE_DSA
 	glTextureStorage3DEXT( name, texType, levels, fmt, width, height, depth );
 #endif
+	GL_CHECK
 }
 
 void TexStorageBuffer( Gl::Memory::Name name, GLenum fmt,  Gl::Memory::Name bufferName ) {
 	glBindTexture( GL_TEXTURE_BUFFER, name );
 	glTexBuffer( GL_TEXTURE_BUFFER, fmt, bufferName );
 	glBindTexture( GL_TEXTURE_BUFFER, 0 );
+
+	GL_CHECK
 }
 
+// These Image functions must use SubImage as Storage allocated can't
+// call glImageXXX as they could potentially try to resize which isn't allowed
+
+void TexImage1D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width, uint8_t* memPtr ) {
+	auto pixFmt = GlFormat::getPixelFormat( fmt );
+	auto pixType = GlFormat::getPixelType( fmt ); 
+	for( unsigned int i = 0; i < levels; ++i ) {
+#if TEX_STORE == TEX_IMAGE ||  TEX_STORE == TEX_STORAGE
+		if( i == 0 ) glBindTexture( texType, name );
+		glTexSubImage1D( 	texType, i, 
+							0, width, 
+							pixFmt, pixType, memPtr );
+		if( i == levels-1 )	glBindTexture( texType, 0 );
+#elif TEX_STORE == TEX_STORAGE_DSA
+		glTextureSubImage1DEXT( name, texType, i, 
+								0, width, 
+								pixFmt, pixType, memPtr );
+#endif
+		memPtr += (width * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
+		width = std::max<unsigned int>(1, width / 2);
+	}
+	GL_CHECK
+}
+
+void TexImage2D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width, GLint height, uint8_t* memPtr ) {
+	auto pixFmt = GlFormat::getPixelFormat( fmt );
+	auto pixType = GlFormat::getPixelType( fmt ); 
+	for( unsigned int i = 0; i < levels; ++i ) {
+#if TEX_STORE == TEX_IMAGE ||  TEX_STORE == TEX_STORAGE
+		if( i == 0 ) glBindTexture( texType, name );
+		glTexSubImage2D( 	texType, i, 
+							0, 0, width, height, 						pixFmt, pixType, memPtr );
+		if( i == levels-1 )	glBindTexture( texType, 0 );
+#elif TEX_STORE == TEX_STORAGE_DSA
+		glTextureSubImage2DEXT( name, texType, i, 
+								0, 0, width, height,
+								pixFmt, pixType, memPtr );
+#endif
+		memPtr += (width * height * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
+		width = std::max<unsigned int>(1, width / 2);
+
+		// 1D Array don't mipmap slices
+		if( texType != GL_TEXTURE_1D_ARRAY ) {
+			height = std::max<unsigned int>(1, height / 2);
+		}
+	}
+	GL_CHECK
+}
+
+void TexImage3D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width, GLint height, GLint depth, uint8_t* memPtr ) {
+	auto pixFmt = GlFormat::getPixelFormat( fmt );
+	auto pixType = GlFormat::getPixelType( fmt ); 
+	for( unsigned int i = 0; i < levels; ++i ) {
+#if TEX_STORE == TEX_IMAGE ||  TEX_STORE == TEX_STORAGE
+		if( i == 0 ) glBindTexture( texType, name );
+		glTexSubImage3D( 	texType, i,
+							0, 0, 0, width, height, depth,
+							pixFmt, pixType, memPtr );
+		if( i == levels-1 )	glBindTexture( texType, 0 );
+#elif TEX_STORE == TEX_STORAGE_DSA
+		glTextureSubImage3DEXT( name, texType, i, 
+								0, 0, 0, width, height, depth,
+								pixFmt, pixType, memPtr );
+#endif
+		memPtr += (width * height * depth * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
+		width = std::max<unsigned int>(1, width / 2);
+		height = std::max<unsigned int>(1, height / 2);
+
+		// only 3D texture mipmap depth as well
+		if( texType == GL_TEXTURE_3D ) {
+			depth = std::max<unsigned int>(1, depth / 2);
+		}
+	}
+	GL_CHECK
+}
 
 #undef TEX_IMAGE
 #undef TEX_STORAGE
@@ -111,43 +232,99 @@ Texture::Texture() :
 Texture::~Texture() {
 }
 
-Texture* Texture::internalLoadTexture( const Core::ResourceHandleBase* baseHandle, 
+//! Header of a Texture file	
+struct TextureFileHeader {
+	uint32_t magic;					//!< Should be TXTR
+	uint32_t version;				//!< an incrementing version number
+	uint32_t format;				//!< GENERIC_TEXTURE_FORMAT
+	uint32_t flags;					//!< BIT(0) == CUBEMAP
+	uint32_t width;
+	uint32_t height;
+	uint32_t depth;
+	uint32_t slices;
+	uint32_t mipLevels;
+	uint32_t size;					//!< total size
+	// padding so that properties start on a 64 bit alignment 
+};
+
+Texture* Texture::internalLoad( const Core::ResourceHandleBase* baseHandle, 
 								const char* pTextureFileName, 
 								bool preload ) {
-	uint8_t* pData;
-	DDS_HEADER* pHeader;
-	uint8_t* pTexData;
-	size_t texSize;
-
-	bool loaded = LoadDDSFromFile( pTextureFileName, &pData, &pHeader, &pTexData, &texSize );
-	if( loaded == false ) {
-		CORE_DELETE_ARRAY( pData);
-		return NULL;
+	Core::FilePath path( pTextureFileName );
+	path = path.ReplaceExtension( ".txr" );
+	Core::MemFile fio( path.value().c_str() );
+	if( !fio.isValid() ) {
+		LOG(INFO) << path.value() << " cannot be loaded\n";
+		return nullptr;
+	}
+	
+	TextureFileHeader header;
+	fio.read( (uint8_t*) &header, sizeof(TextureFileHeader) );
+	if( header.magic != TextureType ) {
+		LOG(INFO) << path.value() << " is not a TXTR file\n";
+		return nullptr;
+	}
+	if( header.version != 1 ) {
+		LOG(INFO) << path.value() << " is a TXTR file of the wrong version\n";
+		return nullptr;		
 	}
 
-	Texture* pTexture = CORE_NEW Texture();
+	CreationStruct cs;
+	cs.format = GtfToGlFormat[ header.format ];
+	cs.width = header.width;
+	cs.height = header.height;
+	cs.depth = header.depth;
+	cs.slices = header.slices;
+	cs.mipLevels = header.mipLevels;
+	cs.flags = TCF_PRE_FILL;
+	cs.prefillPitch = (header.width * GlFormat::getBitWidth(cs.format)) / 8;
+	if( cs.depth <= 1 ) {
+		if( cs.height <= 1 ) {
+			cs.flags |= TCF_1D;
+		} else {
+			cs.flags |= TCF_2D;
+		}
+	} else {
+		cs.flags |= TCF_3D;
+	}
+	if( cs.slices > 1 ) {
+		cs.flags |= TCF_ARRAY;
+	}
+	// BIT(0) == cubemap
+	if( header.flags & BIT(0) ) {
+		cs.flags |= TCF_CUBE_MAP;
+	}
 
-	CORE_DELETE_ARRAY( pData);
-	return pTexture;
+	uint8_t* texMem = fio.takeBufferOwnership();
+	cs.prefillData = (void*) Core::alignTo( (uintptr_t)texMem + sizeof( TextureFileHeader ), 8 );
+//	for( int i = 0;i < header.size/4; ++i ) {
+//		((uint32_t*)cs.prefillData)[i] = 0xFF00FF00; // ABGR
+//	}
+
+	Texture* tex =  internalCreate( &cs );
+	CORE_DELETE_ARRAY texMem;
+
+	return tex;
 }
 
-Texture* Texture::internalCreateTexture( const CreationStruct* pStruct ) {
+Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 	Texture* pTexture = CORE_NEW Texture();
-	pTexture->width = pStruct->iWidth;
-	pTexture->height = pStruct->iHeight;
-	pTexture->depth = pStruct->iDepth;
-	pTexture->mipLevels = pStruct->iMipLevels;
-	pTexture->format = pStruct->texFormat;
+	pTexture->width = pStruct->width;
+	pTexture->height = pStruct->height;
+	pTexture->depth = pStruct->depth;
+	pTexture->slices = pStruct->slices;
+	pTexture->mipLevels = pStruct->mipLevels;
+	pTexture->format = pStruct->format;
 	Name name;
 	
 	GL_CHECK
 
 	// GL create write only render target as renderbuffers
-	if( (pStruct->iFlags & (TCF_RENDER_TARGET|TCF_GPU_WRITE_ONLY)) == (TCF_RENDER_TARGET|TCF_GPU_WRITE_ONLY) ) {
+	if( (pStruct->flags & (TCF_RENDER_TARGET|TCF_GPU_WRITE_ONLY)) == (TCF_RENDER_TARGET|TCF_GPU_WRITE_ONLY) ) {
 		name = pTexture->generateName( MNT_RENDER_BUFFER );
 		pTexture->renderBuffer = true;
 
-		if( pStruct->iFlags & TCF_MULTISAMPLE ) {
+		if( pStruct->flags & TCF_MULTISAMPLE ) {
 			pTexture->sampleCount = pStruct->sampleCount;
 			glNamedRenderbufferStorageMultisampleEXT( name, pTexture->format, pTexture->sampleCount, pTexture->width, pTexture->height );
 		} else {
@@ -156,12 +333,11 @@ Texture* Texture::internalCreateTexture( const CreationStruct* pStruct ) {
 		return pTexture;
 	}
 
-	CORE_ASSERT( (pStruct->iFlags & TCF_GPU_WRITE_ONLY) == 0 );
-	CORE_ASSERT( (pStruct->iFlags & TCF_MULTISAMPLE) == 0 );
+	CORE_ASSERT( (pStruct->flags & TCF_GPU_WRITE_ONLY) == 0 );
 
 	name = pTexture->generateName( MNT_TEXTURE_OBJECT ); 
 
-	if(pStruct->iFlags & TCF_COMPRESS_ON_LOAD) {
+	if(pStruct->flags & TCF_COMPRESS_ON_LOAD) {
 		if( pStruct->compressToFormat != 0xFFFFFFFF ) {
 			pTexture->format = pStruct->compressToFormat;
 		} else {
@@ -174,113 +350,91 @@ Texture* Texture::internalCreateTexture( const CreationStruct* pStruct ) {
 		}
 	}
 
-	if( pStruct->iFlags & TCF_1D ) {
-		if( pStruct->iFlags & TCF_ARRAY ) {
-			TexStorage2D( GL_TEXTURE_1D_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->depth );
-		} else {
-			TexStorage1D( GL_TEXTURE_1D, pTexture->mipLevels, name, pTexture->format, pTexture->width );
-		}
-	} else if( pStruct->iFlags & (TCF_2D | TCF_CUBE_MAP) ) {
-		if( pStruct->iFlags & TCF_CUBE_MAP ) {
-			if( pStruct->iFlags & TCF_ARRAY ) {
-				TexStorage3D( GL_TEXTURE_CUBE_MAP_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->depth );
+	if( pStruct->flags & TCF_MULTISAMPLE ) {
+		TODO_ASSERT( false && "Multisample texture TODO" );
+	} else {
+		if( pStruct->flags & TCF_1D ) {
+			if( pStruct->flags & TCF_ARRAY ) {
+				TexStorage2D( GL_TEXTURE_1D_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->slices );
 			} else {
-				TexStorage2D( GL_TEXTURE_CUBE_MAP, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height );
+				TexStorage1D( GL_TEXTURE_1D, pTexture->mipLevels, name, pTexture->format, pTexture->width );
 			}
-		} else {
-			if( pStruct->iFlags & TCF_ARRAY ) {
-				TexStorage3D( GL_TEXTURE_2D_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->depth );
+		} else if( pStruct->flags & (TCF_2D | TCF_CUBE_MAP) ) {
+			if( pStruct->flags & TCF_CUBE_MAP ) {
+				if( pStruct->flags & TCF_ARRAY ) {
+					TexStorage3D( GL_TEXTURE_CUBE_MAP_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->slices );
+				} else {
+					TexStorage2D( GL_TEXTURE_CUBE_MAP, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height );
+				}
 			} else {
-				TexStorage2D( GL_TEXTURE_2D, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height );
+				if( pStruct->flags & TCF_ARRAY ) {
+					TexStorage3D( GL_TEXTURE_2D_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->slices );
+				} else {
+					TexStorage2D( GL_TEXTURE_2D, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height );
+				}
 			}
+		} else if( pStruct->flags & TCF_3D ) {
+			CORE_ASSERT( (pStruct->flags & TCF_ARRAY) == 0 );
+			TexStorage3D( GL_TEXTURE_3D, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->depth );
+		} else if( pStruct->flags & TCF_BUFFER ) {
+			TexStorageBuffer( name, pTexture->format, pStruct->bufferName );
 		}
-	} else if( pStruct->iFlags & TCF_3D ) {
-		CORE_ASSERT( (pStruct->iFlags & TCF_ARRAY) == 0 );
-		TexStorage3D( GL_TEXTURE_3D, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->depth );
-	} else if( pStruct->iFlags & TCF_BUFFER ) {
-		TexStorageBuffer( name, pTexture->format, pStruct->bufferName );
 	}
-
 	GL_CHECK;
 
-	if( pStruct->iFlags & TCF_PRE_FILL ) {
+	if( pStruct->flags & TCF_PRE_FILL ) {
 		uint8_t* memPtr = (uint8_t*) pStruct->prefillData;
-		uint32_t width = pStruct->iWidth;
-		uint32_t height = pStruct->iHeight;
-		uint32_t depth = pStruct->iDepth;
+		uint32_t width = pStruct->width;
+		uint32_t height = pStruct->height;
+		uint32_t depth = pStruct->depth;
+		uint32_t slices = pStruct->slices;
 
 		// GL handles compressed format differently
-		if( GlFormat::isCompressed( pStruct->texFormat ) && 
-			(pStruct->iFlags & TCF_COMPRESS_ON_LOAD) == false) {
+		if( GlFormat::isCompressed( pStruct->format ) && 
+			(pStruct->flags & TCF_COMPRESS_ON_LOAD) == false) {
 				TODO_ASSERT( false && "Compress on load TODO" );
 		} else {
-			GLuint pixFmt = GlFormat::getPixelFormat( pStruct->texFormat );
-			GLuint pixType = GlFormat::getPixelType( pStruct->texFormat );
-			if( pStruct->iFlags & TCF_1D ) {
-				if( pStruct->iFlags & TCF_ARRAY ) {
-					for( unsigned int i = 0; i < pStruct->iMipLevels; ++i ) {
-						glTextureSubImage2DEXT( name, GL_TEXTURE_1D_ARRAY, i, 
-												0, 0,  width, depth,
-												pixFmt, pixType, memPtr );
-						memPtr += (width * depth * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
-						width = std::max<unsigned int>(1, width / 2);
-					}
+			if( pStruct->flags & TCF_1D ) {
+				if( pStruct->flags & TCF_ARRAY ) {
+					TexImage2D( GL_TEXTURE_1D_ARRAY, pTexture->mipLevels, 
+							name, pTexture->format, 
+							width, slices, memPtr );
 				} else {
-					for( unsigned int i = 0; i < pStruct->iMipLevels; ++i ) {
-						glTextureSubImage1DEXT( name, GL_TEXTURE_1D, i, 
-												0, width, 
-												pixFmt, pixType, memPtr );
-						memPtr += (width * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
-						width = std::max<unsigned int>(1, width / 2);
-					}
+					TexImage1D( GL_TEXTURE_1D, pTexture->mipLevels, 
+							name, pTexture->format, 
+							width, memPtr );
 				}
-			} else if( pStruct->iFlags & TCF_2D ) {
-				if( pStruct->iFlags & TCF_ARRAY ) {
-					if( pStruct->iFlags & TCF_CUBE_MAP ) {
-						depth = depth * 6;
-					}
-					for( unsigned int i = 0; i < pStruct->iMipLevels; ++i ) {
-						glTextureSubImage3DEXT( name, GL_TEXTURE_2D_ARRAY, i, 
-												0, 0, 0, width, height, depth,
-												pixFmt, pixType, memPtr );
-						memPtr += (width * height * depth * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
-						width = std::max<unsigned int>(1, width / 2);
-						height = std::max<unsigned int>(1, height / 2);
-						depth = std::max<unsigned int>(1, depth / 2);
-					}
-				} else {
-					if( (pStruct->iFlags & TCF_CUBE_MAP) == false ) {
-						for( unsigned int i = 0; i < pStruct->iMipLevels; ++i ) {
-							glTextureSubImage2DEXT( name, GL_TEXTURE_2D, i, 
-													0, 0, width, height,
-													pixFmt, pixType, memPtr );
-							memPtr += (width * height * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
-							width = std::max<unsigned int>(1, width / 2);
-							height = std::max<unsigned int>(1, height / 2);
-						}
+			} else if( pStruct->flags & TCF_2D ) {
+				if( pStruct->flags & TCF_ARRAY ) {
+					if( (pStruct->flags & TCF_CUBE_MAP) == false ) {
+						TexImage3D( GL_TEXTURE_2D_ARRAY, pTexture->mipLevels, 
+								name, pTexture->format, 
+								width, height, slices,
+								memPtr );
 					} else {
-						for( GLenum j = GL_TEXTURE_CUBE_MAP_POSITIVE_X; j < GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; ++ j ) {
-							for( unsigned int i = 0; i < pStruct->iMipLevels; ++i ) {
-								glTextureSubImage2DEXT( name, j, i, 
-														0, 0, width, height,
-														pixFmt, pixType, memPtr );
-								memPtr += (width * height * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
-								width = std::max<unsigned int>(1, width / 2);
-								height = std::max<unsigned int>(1, height / 2);
-							}
+						TexImage3D( GL_TEXTURE_CUBE_MAP_ARRAY, pTexture->mipLevels, 
+								name, pTexture->format, 
+								width, height, slices,
+								memPtr );
+					}
+				} else {
+					if( (pStruct->flags & TCF_CUBE_MAP) == false ) {
+						TexImage2D( GL_TEXTURE_2D, pTexture->mipLevels, 
+								name, pTexture->format, 
+								width, height, memPtr );
+					} else {
+						for( GLenum j = GL_TEXTURE_CUBE_MAP_POSITIVE_X; j < GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; ++j ) {
+							TexImage2D( j, pTexture->mipLevels, 
+									name, pTexture->format, 
+									width, height, memPtr );
 						}
 					}
 				}
-			} else if( pStruct->iFlags & TCF_3D ) {
-				for( unsigned int i = 0; i < pStruct->iMipLevels; ++i ) {
-					glTextureSubImage3DEXT( name, GL_TEXTURE_3D, i, 
-											0, 0, 0, width, height, depth,
-											pixFmt, pixType, memPtr );
-					memPtr += (width * height * depth * GlFormat::getPixelTypeWidth(pixFmt)) / 8;
-					width = std::max<unsigned int>(1, width / 2);
-					height = std::max<unsigned int>(1, height / 2);
-					depth = std::max<unsigned int>(1, depth / 2);
-				}
+			} else if( pStruct->flags & TCF_3D ) {
+				TexImage3D( GL_TEXTURE_3D, pTexture->mipLevels, 
+						name, pTexture->format, 
+						width, height, depth,
+						memPtr );
 			}
 		}
 	}
@@ -289,3 +443,102 @@ Texture* Texture::internalCreateTexture( const CreationStruct* pStruct ) {
 }
 
 }
+
+
+/*
+	stbi_io_callbacks ioCallbacks;
+	ioCallbacks.read = &Core::InOutInterface::C_read;
+	ioCallbacks.skip = &Core::InOutInterface::C_skip;
+	ioCallbacks.eof = &Core::InOutInterface::C_eof;
+
+	int width = 0, height = 0, components = 0;
+	CreationStruct cs;
+	memset( &cs, 0, sizeof(CreationStruct) );
+	Texture* texture;
+
+	uint8_t* pData = stbi_load_from_callbacks( &ioCallbacks, (void*)&fio.inOut(), &width, &height, &components, 0 );
+	if( pData == NULL ) {
+		DDS_HEADER* pHeader;
+		uint8_t* pTexData;
+		size_t texSize;
+
+		bool loaded = LoadDDSFromFile( pTextureFileName, &pData, &pHeader, &pTexData, &texSize );
+		if( loaded == false ) {
+			CORE_DELETE_ARRAY( pData);
+			return NULL;
+		}
+
+		cs.flags = TCF_PRE_FILL;
+		cs.iHeight = pHeader->dwHeight;
+		cs.iWidth = pHeader->dwWidth;
+		cs.iDepth = pHeader->dwDepth;
+		cs.iMipLevels = pHeader->dwMipMapCount ? pHeader->dwMipMapCount : 1;
+
+		DXGI_FORMAT dxgiFmt;
+
+		if (( pHeader->ddspf.dwFlags & DDS_FOURCC )
+			&& (DDS_MAKEFOURCC( 'D', 'X', '1', '0' ) == pHeader->ddspf.dwFourCC ) ) {
+			DDS_HEADER_DXT10* d3d10ext = (DDS_HEADER_DXT10*)( (char*)pHeader + sizeof(DDS_HEADER) );
+
+			dxgiFmt = d3d10ext->dxgiFormat;
+
+			switch( d3d10ext->resourceDimension ) {
+				case DDS_RESOURCE_DIMENSION_TEXTURE1D: cs.flags |= TCF_1D; break;
+				case DDS_RESOURCE_DIMENSION_TEXTURE2D: cs.flags |= TCF_2D; break;
+				case DDS_RESOURCE_DIMENSION_TEXTURE3D: cs.flags |= TCF_3D; break;
+			}
+			if( d3d10ext->arraySize > 1 ) {
+				// don't support 3d arrays yet
+				CORE_ASSERT( d3d10ext->resourceDimension != DDS_RESOURCE_DIMENSION_TEXTURE3D );
+				cs.flags |= TCF_ARRAY;
+				cs.iDepth = d3d10ext->arraySize;
+			}
+			if( d3d10ext->miscFlag & DDS_RESOURCE_MISC_TEXTURECUBE ) {
+				cs.flags |= TCF_CUBE_MAP;			
+			}
+		} else {
+			dxgiFmt = GetDXGIFormat( pHeader->ddspf );
+			if (pHeader->dwCubemapFlags != 0
+				|| (pHeader->dwHeaderFlags & DDS_HEADER_FLAGS_VOLUME) ) {
+				cs.flags |= TCF_CUBE_MAP;
+			}
+			if( pHeader->dwHeaderFlags & DDS_HEADER_FLAGS_VOLUME ) {
+				cs.flags |= TCF_3D;
+			} else {
+				// no legacy 1D textures
+				cs.flags |= TCF_2D;
+			}
+
+		}
+		cs.texFormat = GlFormat::getGlFormat( dxgiFmt );
+		if( cs.texFormat == 0 ) {
+			CORE_DELETE_ARRAY( pData);
+			return NULL;		
+		}
+
+		cs.prefillData = pTexData;
+		cs.prefillPitch = (GlFormat::getBitWidth( cs.texFormat ) * cs.iWidth) / 8;
+		cs.flags |= TCF_PRE_FILL;
+		texture = internalCreateTexture( &cs );
+		CORE_DELETE_ARRAY( pData);
+
+	} else {
+		cs.flags = TCF_PRE_FILL | TCF_2D;
+		cs.iHeight = width;
+		cs.iWidth = height;
+		cs.iDepth = 0;
+		cs.iMipLevels = 1;
+		switch( components ) {
+			case STBI_grey: cs.texFormat = GL_R8; break;
+			case STBI_grey_alpha: cs.texFormat = GL_RG8; break;
+			case STBI_rgb: cs.texFormat = GL_RGB8; break;
+			case STBI_rgb_alpha: cs.texFormat = GL_RGBA8; break;
+		}
+		cs.prefillData = pData;
+		cs.prefillPitch = width * components;
+
+		texture = internalCreateTexture( &cs );
+
+		stbi_image_free( pData);
+	}
+*/

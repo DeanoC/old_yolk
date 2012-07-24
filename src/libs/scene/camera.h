@@ -23,6 +23,10 @@ namespace Scene {
 		//! sets the projection of the camera, fov is total not half
 		void setProjection( float fov, float aspect, float znear, float zfar );
 
+		void setFOV( float fov, float aspect = 1.0f );
+		void setDepthRange( float znear, float zfar );
+
+
 		//! sets the view of the matrix
 		void setView( const Math::Matrix4x4& viewMatrix );
 
@@ -37,6 +41,8 @@ namespace Scene {
 		const Math::Vector3 getPosition() const;
 
 	protected:
+		void setProjection(); // uses already stored values
+
 		Math::Matrix4x4 viewMatrix;
 		Math::Matrix4x4 projectionMatrix;
 		float			zNear;

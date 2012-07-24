@@ -9,7 +9,7 @@
 #include "core/coreresources.h"
 
 #include "apis.h"
-#include "../../../vt/src/libs/area/resources_api.h"
+#include "../../../vt/src/libs/area/apis/resources_api.h"
 
 ResHandle ResOpenText( _VT_PARAMS1( _VT_PTR( const char*, name ) ) ) {
 	using namespace Core;

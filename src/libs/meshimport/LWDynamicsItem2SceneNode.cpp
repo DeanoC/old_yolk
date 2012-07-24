@@ -77,7 +77,7 @@ bool ExtractCollisionMesh( MeshMod::SceneNodePtr node, std::vector<float>& verts
 
 			mesh->removeAllSimilarPositions( 1e-5f );
 			MeshOps::BasicMeshOps ops( mesh );
-			ops.quadOrTriangulate();
+			ops.triangulate();
 
 			VertexElementsContainer& vertCon = mesh->getVertexContainer();
 			FaceElementsContainer& faceCon = mesh->getFaceContainer();
@@ -86,39 +86,22 @@ bool ExtractCollisionMesh( MeshMod::SceneNodePtr node, std::vector<float>& verts
 			assert( posEle != 0 );
 			assert( faceEle != 0 );
 
-			std::vector<unsigned int> origIndicies;
-			std::vector<unsigned int> indexRemapper;
-			indexRemapper.resize( vertCon.size() );
-			std::fill( indexRemapper.begin(), indexRemapper.end(), MM_INVALID_INDEX );
-			unsigned int vertexNum = 0;
-
+			verts.resize( (*posEle).size() * 3 );
 			for( auto fIt = faceEle->cbegin(); fIt != faceEle->cend(); ++fIt ) {
 				std::vector<VertexIndex> faceVertexIndices;
 				mesh->getFaceVertices( faceEle->distance<FaceIndex>(fIt), faceVertexIndices );
-				// ignore points and lines as have no collision position
-				if( faceVertexIndices.size() == 3 || faceVertexIndices.size() == 4 ) {
+				// ignore points and lines as have no collision position but are valid after triangulation
+				assert( faceVertexIndices.size() <= 3 ); 
+				if( faceVertexIndices.size() == 3 ) {
 					for( auto fvIt = faceVertexIndices.cbegin(); fvIt != faceVertexIndices.cend(); ++fvIt ) {
-						if( indexRemapper[ *fvIt ] == MM_INVALID_INDEX ) {
-							indexRemapper[ *fvIt ] = vertexNum++;
-						}
-						origIndicies.push_back( *fvIt );
+						verts[ ((*fvIt) * 3) + 0 ] = (*posEle)[ *fvIt ].x;
+						verts[ ((*fvIt) * 3) + 1 ] = (*posEle)[ *fvIt ].y;
+						verts[ ((*fvIt) * 3) + 2 ] = (*posEle)[ *fvIt ].z;
+						indices.push_back( *fvIt );
 					}
 				}				
 			}
-
-			indexRemapper.erase( std::remove( indexRemapper.begin(), indexRemapper.end(), MM_INVALID_INDEX ), indexRemapper.end() );
-
-			verts.resize( indexRemapper.size() * 3 );
-
-			for( auto iIt = indexRemapper.cbegin(); iIt != indexRemapper.cend(); ++iIt ) {
-				verts[ (std::distance(indexRemapper.cbegin(), iIt) * 3) + 0 ] = (*posEle)[ *iIt ].x;
-				verts[ (std::distance(indexRemapper.cbegin(), iIt) * 3) + 1 ] = (*posEle)[ *iIt ].y;
-				verts[ (std::distance(indexRemapper.cbegin(), iIt) * 3) + 2 ] = (*posEle)[ *iIt ].z;
-			}
-
-			for( auto iIt = origIndicies.cbegin(); iIt != origIndicies.cend(); ++iIt ) {
-				indices.push_back( indexRemapper[*iIt] );
-			}
+			// TODO remove any unused vertices
 
 			return true;
 		}

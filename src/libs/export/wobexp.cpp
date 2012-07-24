@@ -574,10 +574,14 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath pOutFilena
 					m_faceListArray[matNum].reserve( 1024 );
 				}
 				const FaceIndex faceNum = surfEle->distance<FaceIndex>( surfIt );
-				m_faceListArray[matNum].push_back( faceNum );
 				facevList.clear();
 				m_goMesh->getFaceVertices( faceNum, facevList );
-				m_vertListArray[matNum].insert( facevList.cbegin(), facevList.cend() );
+				// TODO points and lines
+				if( facevList.size() > 2 ) {
+					m_vertListArray[matNum].insert( facevList.cbegin(), facevList.cend() );
+					m_faceListArray[matNum].push_back( faceNum );
+				}
+
 			}
 			++surfIt;
 		}

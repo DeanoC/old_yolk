@@ -92,7 +92,8 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 											const DataBuffer::CreationStruct* creation ) {
 	DataBuffer* dbuffer = CORE_NEW DataBuffer();
 	dbuffer->generateName( MNT_DATA_BUFFER );
-	dbuffer->size = (size_t)Core::alignTo( creation->size, DataBuffer::MIN_BUFFER_SIZE);
+//	dbuffer->size = (size_t)Core::alignTo( creation->size, DataBuffer::MIN_BUFFER_SIZE);
+	dbuffer->size = creation->size;
 	CORE_ASSERT( dbuffer->size >= creation->size );
 	dbuffer->type = creation->type;
 
@@ -106,7 +107,6 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 		glBindBuffer( dbuffer->type, 0 );
 		GL_CHECK
 #else
-
 		glNamedBufferDataEXT( dbuffer->getName(), dbuffer->size, creation->data,  GL_STATIC_DRAW );
 		GL_CHECK
 #endif

@@ -5,14 +5,14 @@
 //! the engine graphics mesh class
 //!
 //!-----------------------------------------------------
-#if !defined(WIERD_SCENE_MESH_H)
-#define WIERD_SCENE_MESH_H
+#if !defined(YOLK_SCENE_MESH_H)
+#define YOLK_SCENE_MESH_H
 
 #if !defined( YOLK_SCENE_RENDERABLE_H_ )
 #include "renderable.h"
 #endif
 
-#if !defined( WIERD_SCENE_WOBFILE_H )
+#if !defined( YOLK_SCENE_WOBFILE_H )
 #include "wobfile.h"
 #endif
 

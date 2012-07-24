@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef WEIRD_CORE_COLOUR_H
-#define WEIRD_CORE_COLOUR_H
+#ifndef YOLK_CORE_COLOUR_H_
+#define YOLK_CORE_COLOUR_H_
 
 
 #include "vector_math.h"
@@ -31,6 +31,9 @@ public:
 	//! intended to convert from internal colour space to RGBA
 	virtual const RGBAColour& getRGBAColour() const = 0;
 	virtual void setRGBAColour( const RGBAColour& colour ) = 0;
+
+	// common short cut same as RGBAColour::packARGV( getRGBAColour() )
+	uint32_t packARGB() const;
 };
 
 
@@ -75,6 +78,9 @@ public:
 
 };
 
+inline uint32_t Colour::packARGB() const {
+	return RGBAColour::packARGB( this->getRGBAColour() );
+}
 
 }	//namespace Core
 

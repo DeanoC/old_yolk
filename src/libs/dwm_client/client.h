@@ -11,9 +11,8 @@ public:
 	void run();
 
 	ClientWorldPtr getClientWorld() const { return world; }
-
 protected:
-	ClientWorldPtr	world;
+	ClientWorldPtr						world;
 };
 
 

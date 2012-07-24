@@ -25,15 +25,15 @@ ForwardPipeline::ForwardPipeline( size_t index ) :
 
 	Texture::CreationStruct fpcrt = {
 		TCF_2D | TCF_RENDER_TARGET,
-		TF_RGBA8888,
-		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(), 1, 1
+		TF_RGBA8888, 1,
+		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(),
 	};
 	colourRtHandle.reset( TextureHandle::create( "_forwardpipe_colrt", &fpcrt ) );
 
 	Texture::CreationStruct fpdrt = {
 		TCF_2D | TCF_RENDER_TARGET,
-		GL_DEPTH24_STENCIL8,
-		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(), 1, 1
+		GL_DEPTH24_STENCIL8, 1,
+		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(),
 	};
 	depthRtHandle.reset( TextureHandle::create( "_forwardpipe_depthrt", &fpdrt ) );
 
@@ -65,7 +65,9 @@ void ForwardPipeline::bind( Scene::RenderContext* rc, bool clear ) {
 	}
 
 	glEnable( GL_DEPTH_TEST );
-
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
 }
 
 void ForwardPipeline::unbind( Scene::RenderContext* rc ) {

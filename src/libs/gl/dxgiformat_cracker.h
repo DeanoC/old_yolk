@@ -18,7 +18,7 @@
 class DXGIFormat {
 public:
 	//! is this texture format a depth stencil format?
-	static bool IsDepthStencilFormat( DXGI_FORMAT fmt ) {
+	static bool isDepthStencilFormat( DXGI_FORMAT fmt ) {
 		switch ( fmt ) {
 		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 		case DXGI_FORMAT_D32_FLOAT:
@@ -31,7 +31,7 @@ public:
 	}
 
 	//! return the TYPELESS version of each DXGI_FORMAT we really support
-	static DXGI_FORMAT GetTypelessTextureFormat( DXGI_FORMAT fmt ) {
+	static DXGI_FORMAT getTypelessTextureFormat( DXGI_FORMAT fmt ) {
 		switch ( fmt ) {
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
 		case DXGI_FORMAT_R32G32B32A32_UINT:
@@ -160,7 +160,7 @@ public:
 	}
 
 	//! return the shader version of the stencil each depth/stencil format
-	static DXGI_FORMAT GetShaderStencilTextureFormat( DXGI_FORMAT fmt ) {
+	static DXGI_FORMAT getShaderStencilTextureFormat( DXGI_FORMAT fmt ) {
 		switch ( fmt ) {
 		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 			return DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
@@ -172,7 +172,7 @@ public:
 	}
 
 	//! returns the number of channels per dxgi format
-	static unsigned int GetChannelCount( DXGI_FORMAT fmt ) {
+	static unsigned int getChannelCount( DXGI_FORMAT fmt ) {
 		switch( fmt ) {
 		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
@@ -229,7 +229,7 @@ public:
 	}
 
 	//! Returns the number of color channel bits in the specified DXGI_FORMAT
-	static unsigned int GetColorChannelBits( DXGI_FORMAT fmt ) {
+	static unsigned int getColorChannelBits( DXGI_FORMAT fmt ) {
 		switch( fmt ) {
 		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
@@ -310,7 +310,7 @@ public:
 	///
 	/// \return	The bit width of the format.
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	static unsigned int GetBitWidth( DXGI_FORMAT fmt ) {
+	static unsigned int getBitWidth( DXGI_FORMAT fmt ) {
 		switch( fmt ){
 		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:

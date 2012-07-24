@@ -1,11 +1,11 @@
 #pragma once
 ///-------------------------------------------------------------------------------------------------++
-/// \file	gl\giformat_cracker.h
+/// \file	gl\g;format_cracker.h
 ///
-/// \brief	Declares the dxgiformat cracker class.
+/// \brief	Declares the glformat cracker class.
 ///
 /// \details	
-///		dxgiformat_cracker description goes here
+///		gl_cracker description goes here
 ///
 /// \remark	Copyright (c) 2011 Dean Calver. All rights reserved.
 /// \remark	mailto://deano@rattie.demon.co.uk
@@ -15,6 +15,8 @@
 
 #if !defined( YOLK_GL_CRACKER_H__ )
 #define YOLK_GL_CRACKER_H__
+
+#include "dxgiformat.h"
 
 class GlFormat {
 public:
@@ -33,7 +35,7 @@ public:
 		}
 	}
 
-	//! returns the number of channels per dxgi format
+	//! returns the number of channels per gl format
 	static unsigned int getChannelCount( GLuint fmt ) {
 		switch( fmt ) {
 		case GL_RGBA2:
@@ -136,8 +138,8 @@ public:
 		}
 	}
 
-	//! Returns the number of color channel bits in the specified DXGI_FORMAT
-	static unsigned int getColorChannelBits( GLuint fmt ) {
+	//! Returns the number of channel bits
+	static unsigned int getChannelBits( GLuint fmt, int channel = 0) {
 		switch( fmt ) {
 		case GL_RGBA32F:
 		case GL_RGBA32I:
@@ -151,15 +153,18 @@ public:
 		case GL_R32F:
 		case GL_R32I:
 		case GL_R32UI:
-		case GL_DEPTH32F_STENCIL8:
 		case GL_DEPTH_COMPONENT32F:
 		case GL_DEPTH_COMPONENT32:
 			return 32;
+		case GL_DEPTH32F_STENCIL8:
+			if( channel == 0) return 32;
+			else return 8;
 
-		case GL_DEPTH24_STENCIL8:
 		case GL_DEPTH_COMPONENT24:
 			return 24;
-
+		case GL_DEPTH24_STENCIL8:
+			if( channel == 0) return 24;
+			else return 8;
 		case GL_RGBA16:
 		case GL_RGBA16F:
 		case GL_RGBA16I:
@@ -187,13 +192,15 @@ public:
 		case GL_RGBA12:
 			return 12;
 		case GL_R11F_G11F_B10F:
-			return 11;		
+			if( channel == 3) return 10;
+			else return 11;
 		case GL_RGB10_A2:
 		case GL_RGB10_A2UI:
-			return 10;
+			if( channel == 4 ) return 2;
+			else return 10;
 		case GL_RGB9_E5:
-			return 9;
-
+			if( channel == 4) return 5;
+			else return 9;
 		case GL_RGBA8:
 		case GL_RGBA8I:
 		case GL_RGBA8UI:
@@ -221,8 +228,10 @@ public:
 		case GL_COMPRESSED_RGBA_BPTC_UNORM_ARB:
 		case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:
 			return 6;
-		case GL_RGB5:	
 		case GL_RGB5_A1:
+			if( channel == 4) return 1;
+			else return 5;
+		case GL_RGB5:	
 		case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
 		case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
 		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
@@ -236,7 +245,8 @@ public:
 		case GL_RGB4:
 			return 4;
 		case GL_R3_G3_B2:
-			return 3;		
+			if( channel == 3) return 2;
+			else return 3;
 		case GL_RGBA2:
 			return 2;
 
@@ -638,6 +648,192 @@ public:
 		case GL_RGB4: return 32;
 		case GL_RGB5: return 16;
 		default: return getBitWidth( fmt );
+		}
+	}
+
+	static GLuint getGlFormat( DXGI_FORMAT fmt ) {
+		switch( fmt ) {
+		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:
+			return GL_RGBA32F;
+		case DXGI_FORMAT_R32G32B32A32_SINT:
+			return GL_RGBA32I;
+		case DXGI_FORMAT_R32G32B32A32_UINT:
+			return GL_RGBA32UI;
+
+		case DXGI_FORMAT_R32G32B32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32_FLOAT:
+			return GL_RGB32F;
+		case DXGI_FORMAT_R32G32B32_SINT:
+			return GL_RGB32I;
+		case DXGI_FORMAT_R32G32B32_UINT:
+			return GL_RGB32UI;
+
+		case DXGI_FORMAT_R32G32_TYPELESS:
+		case DXGI_FORMAT_R32G32_FLOAT:
+			return GL_RG32F;
+		case DXGI_FORMAT_R32G32_SINT:
+			return GL_RG32I;
+		case DXGI_FORMAT_R32G32_UINT:
+			return GL_RG32UI;
+
+		case DXGI_FORMAT_R16G16B16A16_TYPELESS:
+		case DXGI_FORMAT_R16G16B16A16_UNORM:
+			return GL_RGBA16;
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:
+			return GL_RGBA16F;
+		case DXGI_FORMAT_R16G16B16A16_SINT:
+			return GL_RGBA16I;
+		case DXGI_FORMAT_R16G16B16A16_UINT:
+			return GL_RGBA16UI;
+		case DXGI_FORMAT_R16G16B16A16_SNORM:
+			return GL_RGBA16_SNORM;
+
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+		case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
+		case DXGI_FORMAT_X32_TYPELESS_G8X24_UINT:
+			return GL_DEPTH32F_STENCIL8;
+
+		case DXGI_FORMAT_R8G8B8A8_TYPELESS:
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			return GL_RGBA8;
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+			return GL_SRGB8_ALPHA8;
+		case DXGI_FORMAT_R8G8B8A8_SINT:
+			return GL_RGBA8I;
+		case DXGI_FORMAT_R8G8B8A8_UINT:
+			return GL_RGBA8UI;
+		case DXGI_FORMAT_R8G8B8A8_SNORM:
+			return GL_RGBA8_SNORM;
+
+		case DXGI_FORMAT_R16G16_TYPELESS:
+		case DXGI_FORMAT_R16G16_UNORM:
+			return GL_RG16;
+		case DXGI_FORMAT_R16G16_FLOAT:
+			return GL_RG16F;
+		case DXGI_FORMAT_R16G16_SINT:
+			return GL_RG16I;
+		case DXGI_FORMAT_R16G16_UINT:
+			return GL_RG16UI;
+		case DXGI_FORMAT_R16G16_SNORM:
+			return GL_RG16_SNORM;
+
+		case DXGI_FORMAT_R32_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT:
+			return GL_DEPTH_COMPONENT32F;
+		case DXGI_FORMAT_R32_FLOAT:
+			return GL_R32F;
+		case DXGI_FORMAT_R32_SINT:
+			return GL_R32I;
+		case DXGI_FORMAT_R32_UINT:
+			return GL_R32UI;
+
+		case DXGI_FORMAT_R24G8_TYPELESS:
+		case DXGI_FORMAT_D24_UNORM_S8_UINT:
+		case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:
+		case DXGI_FORMAT_X24_TYPELESS_G8_UINT:
+			return GL_DEPTH24_STENCIL8;
+
+		case DXGI_FORMAT_R10G10B10A2_TYPELESS:
+		case DXGI_FORMAT_R10G10B10A2_UNORM:
+			return GL_RGB10_A2;
+		case DXGI_FORMAT_R10G10B10A2_UINT:
+			return GL_RGB10_A2UI;
+		case DXGI_FORMAT_R11G11B10_FLOAT:
+			return GL_R11F_G11F_B10F;
+		case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:
+			return GL_RGB9_E5;
+
+		case DXGI_FORMAT_R8G8_TYPELESS:
+		case DXGI_FORMAT_R8G8_UNORM:
+			return GL_RG8;
+		case DXGI_FORMAT_R8G8_SINT:
+			return GL_RG8I;
+		case DXGI_FORMAT_R8G8_UINT:
+			return GL_RG8UI;
+		case DXGI_FORMAT_R8G8_SNORM:
+			return GL_RG8_SNORM;
+		case DXGI_FORMAT_R16_TYPELESS:
+		case DXGI_FORMAT_R16_FLOAT:
+			return GL_R16F;
+		case DXGI_FORMAT_D16_UNORM:
+			return GL_DEPTH_COMPONENT16;
+		case DXGI_FORMAT_R16_UNORM:
+			return GL_R16;
+		case DXGI_FORMAT_R16_SINT:
+			return GL_R16I;
+		case DXGI_FORMAT_R16_UINT:
+			return GL_R16UI;
+		case DXGI_FORMAT_R16_SNORM:
+			return GL_R16_SNORM;
+
+		case DXGI_FORMAT_B5G6R5_UNORM:
+			return GL_RGB5; // erm wrong but fix up if every used
+		case DXGI_FORMAT_B5G5R5A1_UNORM:
+			return GL_RGB5_A1;
+
+		case DXGI_FORMAT_BC6H_TYPELESS:
+		case DXGI_FORMAT_BC6H_UF16:
+			return GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB;
+		case DXGI_FORMAT_BC6H_SF16:
+			return GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB;
+
+		case DXGI_FORMAT_R8_TYPELESS:
+		case DXGI_FORMAT_A8_UNORM:
+		case DXGI_FORMAT_R8_UNORM:
+			return GL_R8;
+		case DXGI_FORMAT_R8_SINT:
+			return GL_R8I;
+		case DXGI_FORMAT_R8_UINT:
+			return GL_R8UI;
+		case DXGI_FORMAT_R8_SNORM:
+			return GL_R8_SNORM;
+		case DXGI_FORMAT_BC2_TYPELESS:
+		case DXGI_FORMAT_BC2_UNORM:
+			return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		case DXGI_FORMAT_BC2_UNORM_SRGB:
+			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+		case DXGI_FORMAT_BC3_TYPELESS:
+		case DXGI_FORMAT_BC3_UNORM:
+			return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		case DXGI_FORMAT_BC3_UNORM_SRGB:
+			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+		case DXGI_FORMAT_BC5_TYPELESS:
+		case DXGI_FORMAT_BC5_UNORM:
+			return GL_COMPRESSED_RG_RGTC2;
+		case DXGI_FORMAT_BC5_SNORM:
+			return GL_COMPRESSED_SIGNED_RG_RGTC2;
+		case DXGI_FORMAT_BC7_TYPELESS:
+		case DXGI_FORMAT_BC7_UNORM:
+			return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;	
+		case DXGI_FORMAT_BC7_UNORM_SRGB:
+			return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
+
+		case DXGI_FORMAT_BC1_TYPELESS:
+		case DXGI_FORMAT_BC1_UNORM:
+			return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		case DXGI_FORMAT_BC1_UNORM_SRGB:
+			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+		case DXGI_FORMAT_BC4_TYPELESS:
+		case DXGI_FORMAT_BC4_UNORM:
+			return GL_COMPRESSED_RED_RGTC1;
+		case DXGI_FORMAT_BC4_SNORM:
+			return GL_COMPRESSED_SIGNED_RED_RGTC1;
+
+		// unknown
+		default:
+		case DXGI_FORMAT_R1_UNORM:
+		case DXGI_FORMAT_R8G8_B8G8_UNORM:
+		case DXGI_FORMAT_G8R8_G8B8_UNORM:
+		case DXGI_FORMAT_B8G8R8A8_UNORM:
+		case DXGI_FORMAT_B8G8R8X8_UNORM:
+		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
+		case DXGI_FORMAT_B8G8R8A8_TYPELESS:
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+		case DXGI_FORMAT_B8G8R8X8_TYPELESS:
+		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
+			return 0;
 		}
 	}
 

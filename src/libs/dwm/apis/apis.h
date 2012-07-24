@@ -14,6 +14,7 @@ class TrustedRegion;
 #define _VT_PARAMS2( x, y ) const IEEThreadContext* threadCtx, x, y
 #define _VT_PARAMS3( x, y, z ) const IEEThreadContext* threadCtx, x, y, z
 #define _VT_PTR( x, y ) UNTRUSTED_UINTPTR_T y
+#define _VT_YOLK_PTR( x, y, z ) x z = (x) UNTRUSTED_PTR_TO_TRUSTED(y)
 
 void InstallDebugApiFuncs( TrustedRegion* trustedRegion );
 void InstallVmApiFuncs( TrustedRegion* trustedRegion );

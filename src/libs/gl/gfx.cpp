@@ -13,6 +13,7 @@
 #include "rendercontext.h"
 #include "forwardpipeline.h"
 #include "resourceloader.h"
+#include "imagecomposer.h"
 
 
 // compute renderer needs CL
@@ -63,6 +64,7 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 	shaderMan->initDefaultPrograms();
 
 	debugPrims.reset( CORE_NEW DebugPrims() );
+	finalComposer.reset( CORE_NEW ImageComposer() );
 
 	// install pipelines
 	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW ForwardPipeline(pipelines.size()) ) );
@@ -93,8 +95,11 @@ void Gfx::shutdownScreen() {
 }
 
 void Gfx::present( int backWidth, int backHeight ) {
+	resourceLoader->showLoadingIfNeeded( finalComposer.get() );
+
 	pipelines[0]->bind( &renderContexts[RENDER_CONTEXT], false );
 	debugPrims->flush();
+	finalComposer->render();
 	pipelines[0]->unbind( &renderContexts[0] );
 
 	pipelines[0]->display( &renderContexts[RENDER_CONTEXT], backWidth, backHeight );

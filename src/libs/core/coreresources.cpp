@@ -9,6 +9,7 @@
 #include "resourceman.h"
 #include "coreresources.h"
 #include "file_path.h"
+#include "fileio.h"
 
 //namespace 
 //{
@@ -20,18 +21,10 @@ void TextCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_
 	std::shared_ptr<TextResource> pResource( CORE_NEW TextResource );
 
 	if( flags & RMRF_LOADOFFDISK ) {
-		FILE* fh = fopen( pName, "rt" );
-		CORE_ASSERT( fh != 0 );
-		fseek( fh, 0, SEEK_END);
-		long end = ftell(fh);
-		fseek( fh, 0, SEEK_SET);
-		long start = ftell(fh);
-		pResource->text.reset( CORE_NEW_ARRAY char[ (end - start)+1] );
-		char* pText = pResource->text.get();
-		size_t count = fread( pText, 1, end-start, fh );
-		pText[ count ] = 0;
+		MemFile file;
+		file.loadTextFile( pName );
+		pResource->text.reset( (char*)file.takeBufferOwnership() );
 
-		fclose( fh );
 	} else {
 		// allocate enough room for the string passed in and copy it
 		pResource->text.reset( CORE_NEW_ARRAY char[ strlen( (char*)pData)+1 ] );

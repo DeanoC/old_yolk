@@ -5,6 +5,7 @@
 namespace Gl {
 // forward decl
 class ResourceLoaderImpl;
+class ImageComposer;
 
 class ResourceLoader {
 public:
@@ -12,7 +13,7 @@ public:
 	ResourceLoader();
 	~ResourceLoader();
 
-
+	void showLoadingIfNeeded( ImageComposer* composer );
 protected:
 	void installResourceTypes();
 	ResourceLoaderImpl& impl;

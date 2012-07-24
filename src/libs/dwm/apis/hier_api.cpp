@@ -11,8 +11,8 @@
 
 #include "apis.h"
 
-#include "../../../vt/src/libs/area/resources_api.h"
-#include "../../../vt/src/libs/area/hier_api.h"
+#include "../../../vt/src/libs/area/apis/resources_api.h"
+#include "../../../vt/src/libs/area/apis/hier_api.h"
 
 //--------------
 // creation 

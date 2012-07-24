@@ -403,7 +403,7 @@ namespace LWObject2Go_Local
 					++layIt0;
 				}
 			}
-//			pivot += (*layItCur).m_pivot;
+			pivot += (*layItCur).pivot;
 
 			const unsigned int baseVertex = out->getVertexContainer().size();
 			const unsigned int baseFace = out->getFaceContainer().size();
@@ -426,11 +426,9 @@ namespace LWObject2Go_Local
 
 	void AddLWLayerVertices( const LightWave::Layer& in, MeshMod::MeshPtr out, const Math::Matrix4x4& transform, const Math::Vector3& pivot )
 	{
-//		fvector3 pivot = in.m_pivot;
 		std::vector<LightWave::VEC12>::const_iterator ptIt = in.points.begin();
 		while( ptIt != in.points.end() )
 		{
-//			Math::Vector3 pt = Math::Vector3( pivot[0] + (*ptIt)[0], pivot[1] + (*ptIt)[1], pivot[2] + (*ptIt)[2] );
 			Math::Vector3 pt = Math::Vector3( (*ptIt)[0] - pivot[0], (*ptIt)[1] - pivot[1], (*ptIt)[2] - pivot[2]);
 			pt = Math::TransformAndProject( pt, transform );
 

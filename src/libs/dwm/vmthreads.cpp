@@ -22,6 +22,6 @@ VMThreads::VMThreads( Dwm& _dwm ) :
 
 void VMThreads::run( const std::string& prg ) {
 
-   execEngine->process( prg, &InstallDWMApiFuncs );
+   execEngine->process( prg, getWorld()->getApiSetupFunction() );
 
 }

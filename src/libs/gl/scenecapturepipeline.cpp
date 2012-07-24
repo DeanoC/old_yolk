@@ -64,9 +64,9 @@ SceneCapturePipeline::SceneCapturePipeline( size_t index ) :
 		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(), 1, 1
 	};
 	colourRtHandle.reset( TextureHandle::create( "_scenecapturepipe_colrt", &sccrt ) );
-	sccrt.texFormat = TF_RGBA8888; // no SRGB
+	sccrt.format = TF_RGBA8888; // no SRGB
 	counterRtHandle.reset( TextureHandle::create( "_scenecapturepipe_counterrt", &sccrt ) );
-	sccrt.texFormat = GL_RGBA32F; // note we pretend its float so the blender works BUT actual 24 bit integer
+	sccrt.format = GL_RGBA32F; // note we pretend its float so the blender works BUT actual 24 bit integer
 	minMaxRtHandle.reset( TextureHandle::create( "_scenecapturepipe_minmaxrt", &sccrt ) );
 	Cl::Image::CreationStruct clihcs = {
 		contextCl,
@@ -94,7 +94,7 @@ SceneCapturePipeline::SceneCapturePipeline( size_t index ) :
 	};
 	fragmentsTexHandle.reset( TextureHandle::create( "_scenecapturepipe_fragments_tex", &fragcs ) );
 	fragcs.bufferName = headsBuffer->getName();
-	fragcs.texFormat = GL_R32UI,
+	fragcs.format = GL_R32UI,
 	headsTexHandle.reset( TextureHandle::create( "_scenecapturepipe_heads_tex", &fragcs ) );
 	Cl::Buffer::CreationStruct clfbcs = {
 		contextCl,

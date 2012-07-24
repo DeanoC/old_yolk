@@ -6,17 +6,20 @@
 #include <core/core.h>
 #include <core/debug_render.h>
 #include <core/sysmsg.h>
+#include "scene/camera.h"
+#include "scene/rendercontext.h"
+#include "clientworld.h"
 #include "debugcamcontext.h"
 //#include <core/platform_windows/mouse_win.h>
 
-DebugCamContext::DebugCamContext( Scene::RenderContext* _controlContext, int scrWidth, int scrHeight, float degFov, float znear, float zfar ) :
-	pCamera(  CORE_NEW Scene::Camera() ) 
+DebugCamContext::DebugCamContext( ClientWorld* _owner, Scene::RenderContext* _controlContext, int scrWidth, int scrHeight, float degFov, float znear, float zfar ) :
+	camera( CORE_NEW Scene::Camera() ),
+	owner( _owner ),
+	controlContext( _controlContext )
 {
-	controlContext = _controlContext;
-
 	float aspect = (float)scrWidth / (float)scrHeight;
 	fovRads = Math::degree_to_radian<float>() * degFov;
-	pCamera->setProjection( fovRads, aspect, znear, zfar );
+	camera->setProjection( fovRads, aspect, znear, zfar );
 
 	// default
 	xRot = yRot = zRot = 0;
@@ -24,11 +27,12 @@ DebugCamContext::DebugCamContext( Scene::RenderContext* _controlContext, int scr
 	speed = 50.0f;
 	angularSpeed = 90.f; // degrees per second
 	position = Math::Vector3(0,0,10);
-	pCamera->setView( Math::IdentityMatrix() );
-	controlContext->setCamera( pCamera );
+	camera->setView( Math::IdentityMatrix() );
 
 	lockedFrustum = false;
 	debugLevel = 0;
+}
+DebugCamContext::~DebugCamContext() {	
 }
 
 void DebugCamContext::padXAxisMovement( unsigned int padNum, float x ) {
@@ -96,22 +100,7 @@ void DebugCamContext::mouseRightButton() {
 
 void DebugCamContext::enable( bool on  ) {
 	if( on ) {
-		controlContext->setCamera( pCamera );
-//		controlContext->viewFrustum = &m_pCamera->getFrustum();
-//		Graphics::ScrConsole::Get()->Print( "Debug Cam Context Active" );
-#if PLATFORM == WINDOWS 
-		if( Core::MouseWin::Exists() ) {
-			Core::MouseWin::Get()->lockToWindow();
-			Core::MouseWin::Get()->hideCursor();
-		}
-#endif
-	} else {
-#if PLATFORM == WINDOWS 
-		if( Core::MouseWin::Exists() ) {
-			Core::MouseWin::Get()->unlockFromWindow();
-			Core::MouseWin::Get()->showCursor();
-		}
-#endif
+		controlContext->setCamera( camera );
 	}
 }
 
@@ -121,7 +110,7 @@ void DebugCamContext::update( float fTimeInSecs ) {
 	Matrix4x4 mat,xrot,yrot,zrot;
 	xrot = CreateXRotationMatrix( degree_to_radian<float>() * xRot );
 	yrot = CreateYRotationMatrix( degree_to_radian<float>() * yRot );
-	zrot = CreateYRotationMatrix( degree_to_radian<float>() * zRot );
+	zrot = CreateZRotationMatrix( degree_to_radian<float>() * zRot );
 	mat = MultiplyMatrix( xrot, yrot );
 	mat = MultiplyMatrix( mat, zrot );
 
@@ -134,7 +123,7 @@ void DebugCamContext::update( float fTimeInSecs ) {
 	position += (zvec * curForwardMotion * fTimeInSecs );
 
 	// make view matrix
-	pCamera->setView( CreateLookAtMatrix( position, position + zvec, yvec ) );
+	camera->setView( CreateLookAtMatrix( position, position + zvec, yvec ) );
 
 //	if( lockedFrustum == false ) {
 //		m_pCamera->UpdateFrustum();
@@ -147,10 +136,14 @@ void DebugCamContext::update( float fTimeInSecs ) {
 void DebugCamContext::display() {
 	using namespace Core;
 	using namespace Math;
+
+	g_pDebugRender->ndcLine( RGBAColour(1,0,0,1), Vector2(0,0), Vector2(1,1) );
 	
 	g_pDebugRender->worldLine( RGBAColour(1,0,0,1), Vector3(0,0,0), Vector3(100,0,0) );
 	g_pDebugRender->worldLine( RGBAColour(0,1,0,1), Vector3(0,0,0), Vector3(0,100,0) );
 	g_pDebugRender->worldLine( RGBAColour(0,0,1,1), Vector3(0,0,0), Vector3(0,0,100) );
+
+	owner->debugDraw( controlContext );
 
 	//	m_pCamera->getFrustum().debugDraw( RGBAColour(1,1,1,1) );
 }
@@ -161,6 +154,6 @@ void DebugCamContext::setAspectRatio( int scrWidth, int scrHeight, int winWidth,
 	float scrAspect = (float) scrWidth / (float) scrHeight;
 	float aspect = scrAspect / winAspect;
 
-	pCamera->setProjection( fovRads, aspect, pCamera->getZNear(), pCamera->getZFar() );
+	camera->setProjection( fovRads, aspect, camera->getZNear(), camera->getZFar() );
 
 }

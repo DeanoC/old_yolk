@@ -18,10 +18,13 @@ DECLARE_SHARED_WITH_CL( clforgl );
 DECLARE_SHARED_WITH_CL( constant_blocks );
 DECLARE_FRAGMENT( vs_basic );
 DECLARE_FRAGMENT( fs_basic );
-DECLARE_FRAGMENT( vs_dbg_linedraw );
+DECLARE_FRAGMENT( vs_ndcpos_col );
 DECLARE_FRAGMENT( fs_vertcol );
+DECLARE_FRAGMENT( vs_ndcpos_col_uv );
+DECLARE_FRAGMENT( fs_tex_vertcol );
 DECLARE_PROGRAM( basic );
-DECLARE_PROGRAM( debuglines );
+DECLARE_PROGRAM( 2dcolour );
+DECLARE_PROGRAM( basicsprite );
 
 namespace {
 const int MAX_GLSL_INCLUDES = 128;
@@ -46,11 +49,14 @@ void ShaderMan::initDefaultPrograms() {
 	REGISTER_SHARED_WITH_CL( constant_blocks );
 	REGISTER_FRAGMENT( vs_basic );
 	REGISTER_FRAGMENT( fs_basic );
-	REGISTER_FRAGMENT( vs_dbg_linedraw );
+	REGISTER_FRAGMENT( vs_ndcpos_col );
 	REGISTER_FRAGMENT( fs_vertcol );
+	REGISTER_FRAGMENT( vs_ndcpos_col_uv );
+	REGISTER_FRAGMENT( fs_tex_vertcol );
 
 	REGISTER_PROGRAM( basic );
-	REGISTER_PROGRAM( debuglines );
+	REGISTER_PROGRAM( 2dcolour );
+	REGISTER_PROGRAM( basicsprite );
 }
 
 const char* ShaderMan::getProgramSource( const std::string& prgName ) const {
@@ -199,11 +205,11 @@ Program* ShaderMan::internalCreateWholeProgram( const Core::ResourceHandleBase* 
 				int logLength = 0;
 				glGetShaderiv(shaderName, GL_INFO_LOG_LENGTH, &logLength);
 				if( logLength > 0 ) {
-					char* log = CORE_STACK_NEW_ARRAY( char, logLength );
+					char* log = CORE_STACK_NEW_ARRAY( char, logLength  + 1);
 					glGetShaderInfoLog(shaderName, logLength, &logLength, log);
-					LOG(ERROR) << "Compile shader :  " << programName << " ( " << wholeProgramShaders[i] << " ) :\n" << log;
+					LOG(FATAL) << "Compile shader :  " << programName << " ( " << wholeProgramShaders[i] << " ) :\n" << log;
 				} else {
-					LOG(ERROR) << "Compile shader :  " << programName << " ( " << wholeProgramShaders[i] << " ) :\n No Log from GL\n";
+					LOG(FATAL) << "Compile shader :  " << programName << " ( " << wholeProgramShaders[i] << " ) :\n No Log from GL\n";
 				}
 				return NULL;
 			}
@@ -223,22 +229,22 @@ Program* ShaderMan::internalCreateWholeProgram( const Core::ResourceHandleBase* 
 	}
 
 	glLinkProgram( prg->getName() );
-	GL_CHECK
-
-	glValidateProgram( prg->getName() );
-	GL_CHECK
-
 	GLint validStatus = GL_FALSE;
 	glGetProgramiv( prg->getName(), GL_LINK_STATUS, &validStatus);
 	if(validStatus == GL_FALSE) {
         int logLength = 0;
         glGetProgramiv(prg->name, GL_INFO_LOG_LENGTH, &logLength);
-        char* log = CORE_STACK_NEW_ARRAY( char, logLength );
-        glGetProgramInfoLog(prg->name, logLength, &logLength, log);
-        LOG(ERROR) << "Link program :  " << programName << " :\n" << log;
-//		DebugBreak();
+		if( logLength > 0 ) {
+	        char* log = CORE_STACK_NEW_ARRAY( char, logLength + 1 );
+	        glGetProgramInfoLog(prg->name, logLength, NULL, log);
+	        LOG(FATAL) << "Link program :  " << programName << " :\n" << log << "\n";
+	    } else {
+			LOG(FATAL) << "Link program :  " << programName << " :\n No Log from GL\n";
+		}
 		return NULL;
 	}
+//	glValidateProgram( prg->getName() );
+//	GL_CHECK
 
 	buildUniformTables( prg );
 

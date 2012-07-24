@@ -4,8 +4,8 @@
  @brief	Declares the databuffer class.
  */
 #pragma once
-#if !defined( WIERD_GL_VAO_H__ )
-#define WIERD_GL_VAO_H__
+#if !defined( YOLK_GL_VAO_H_ )
+#define YOLK_GL_VAO_H_
 
 #include "core/resources.h"
 #include "memory.h"

@@ -32,13 +32,31 @@ public:
 	virtual void seekFromStart( uint64_t _seek ) = 0;
 	virtual uint64_t bytesLeft() = 0;
 	virtual uint8_t getByte() = 0;
+
+	virtual InOutInterface& inOut() { return (InOutInterface&)(*this); }
+
+	// these help hook the stb_image functions to the these interfaces
+	static int C_read( void* user, char* data, int size ) {
+		InOutInterface* io = (InOutInterface*) user;
+		return (int) io->read( (uint8_t*) data, (uint64_t) size );
+	}
+	static void C_skip( void* user, unsigned int n ) {
+		InOutInterface* io = (InOutInterface*) user;
+		uint64_t c = io->tell();
+		io->seekFromStart( c + n );
+	}
+	static int C_eof( void* user ) {
+		InOutInterface* io = (InOutInterface*) user;
+		return io->bytesLeft() == 0;
+	}
+
 };
 
 
 class File : public InOutInterface {
 public:
-	File() : fh(NULL) {}
-	File( const char* _path ) : fh(NULL) {
+	explicit File() : fh(NULL) {}
+	explicit File( const char* _path ) : fh(NULL) {
 		open(_path);
 	}
 	~File() {
@@ -71,16 +89,23 @@ protected:
 
 class MemFile : public InOutInterface {
 public:
-	MemFile( uint64_t _size ) {
+	explicit MemFile() : buffer(NULL), size(0), offset(0) {}
+	explicit MemFile( const char* _path );
+	explicit MemFile( File& file );
+
+	explicit MemFile( uint64_t _size ) {
 		buffer = CORE_NEW_ARRAY uint8_t[_size];
 		size = _size;
 		offset = 0;		
 	}
-	MemFile( uint8_t* _mem, uint64_t _size ){
+	explicit MemFile( uint8_t* _mem, uint64_t _size ){
 		buffer = _mem;
 		size = _size;
 		offset = 0;
 	}
+	bool loadFile( const char* _path );
+	bool loadTextFile( const char* _path );
+
 	uint8_t* getBuffer() { return buffer; }
 
 	virtual void close(){
@@ -119,7 +144,14 @@ public:
 	virtual uint64_t bytesLeft() {
 		return size - offset;
 	}
+
 	InOutInterface& inOut() { return (InOutInterface&)(*this); }
+
+	uint8_t* takeBufferOwnership() { 
+		uint8_t* tmp = buffer;
+		buffer = NULL; size = 0; offset = 0;
+		return tmp;
+	}
 				 
 protected:
 	uint8_t*	buffer;

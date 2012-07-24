@@ -4,12 +4,17 @@
 
 #include <core/development_context.h>
 
-#include <scene/camera.h>
-#include <scene/rendercontext.h>
+
+namespace Scene {
+	class Camera;
+	class RenderContext;
+}
+class ClientWorld;
 
 class DebugCamContext : public Core::DevelopmentContextInterface {
 public:
-	DebugCamContext( Scene::RenderContext* _controlContext, int scrWidth, int scrHeight, float degFov, float znear, float zfar );
+	DebugCamContext( ClientWorld* _owner, Scene::RenderContext* _controlContext, int scrWidth, int scrHeight, float degFov, float znear, float zfar );
+	~DebugCamContext();
 
 	/// called every frame that the context is active for x movement
 	virtual void padXAxisMovement( unsigned int padNum, float x );
@@ -52,7 +57,7 @@ public:
 
 protected:
 	//! Render camera 
-	std::shared_ptr<Scene::Camera> pCamera;
+	std::shared_ptr<Scene::Camera> camera;
 	float fovRads; 
 
 	float xRot;
@@ -65,9 +70,10 @@ protected:
 	float curForwardMotion;
 	float curSideMotion;
 
-	Scene::RenderContext* controlContext;
-
 	bool	lockedFrustum;
+
+	ClientWorld* 			owner;
+	Scene::RenderContext* 	controlContext;
 
 };
 

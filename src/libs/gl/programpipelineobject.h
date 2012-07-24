@@ -4,8 +4,8 @@
  @brief	Declares the programpipelineobject class.
  */
 #pragma once
-#if !defined( WIERD_GL_PROGRAMPIPELINEOBJECT_H__ )
-#define WIERD_GL_PROGRAMPIPELINEOBJECT_H__ 
+#if !defined( YOLK_GL_PROGRAMPIPELINEOBJECT_H_ )
+#define YOLK_GL_PROGRAMPIPELINEOBJECT_H_
 
 #include "memory.h"
 #include "program.h"

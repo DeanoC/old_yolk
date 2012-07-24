@@ -132,7 +132,7 @@ void GetSurfaceInfo(	unsigned int width, unsigned int height, DXGI_FORMAT fmt,
 		rowBytes = numBlocksWide * bcnumBytesPerBlock;
 		numRows = numBlocksHigh;
 	} else {
-		unsigned int bpp = DXGIFormat::GetBitWidth( fmt );
+		unsigned int bpp = DXGIFormat::getBitWidth( fmt );
 		rowBytes = ( width * bpp + 7 ) / 8; // round up to nearest byte
 		numRows = height;
 	}

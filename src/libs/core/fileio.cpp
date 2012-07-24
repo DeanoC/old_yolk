@@ -58,4 +58,42 @@ namespace Core
 		seekFromStart(pos);
 		return left;
 	}
+
+	MemFile::MemFile( File& file ) {
+		size = file.bytesLeft();
+		buffer = CORE_NEW_ARRAY uint8_t[ size ];
+		file.read( buffer, size );
+		offset = 0;
+	}
+	MemFile::MemFile( const char* _path ) :
+		size( 0 ), buffer( nullptr ), offset( 0 ) {
+		loadFile( _path );
+	}
+	bool MemFile::loadFile( const char* _path ) {
+		File file( _path );
+		if( file.isValid() ) {
+			size = file.bytesLeft();
+			buffer = CORE_NEW_ARRAY uint8_t[ size ];
+			file.read( buffer, size );
+			offset = 0;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	bool MemFile::loadTextFile( const char* _path ) {
+		File file;
+		file.openText( _path );
+		if( file.isValid() ) {
+			size = file.bytesLeft() + 1;
+			buffer = CORE_NEW_ARRAY uint8_t[ size ];
+			file.read( buffer, size - 1 );
+			buffer[ size - 1 ] = 0; // add end null
+			offset = 0;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 } /* Core */ 

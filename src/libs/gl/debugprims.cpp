@@ -47,13 +47,13 @@ DebugPrims::DebugPrims() {
 		}
 	};
 
-	const std::string vaoName = "_depthPrimVao_" + Vao::genEleString(vocs.elementCount, vocs.elements );
+	const std::string vaoName = "_debugPrimVao_" + Vao::genEleString(vocs.elementCount, vocs.elements );
 	vaoHandle = VaoHandle::create( vaoName.c_str(), &vocs );
 
 	vertexBuffer = vertexBufferHandle->acquire();
 	pVertices = (Vertex*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY );
 
-	debugProgramHandle = ProgramHandle::create( "debuglines" );
+	debugProgramHandle = ProgramHandle::create( "2dcolour" );
 }
 
 DebugPrims::~DebugPrims() {
@@ -66,8 +66,13 @@ DebugPrims::~DebugPrims() {
 
 void DebugPrims::ndcLine( const Core::Colour& colour, const Math::Vector2& a, const Math::Vector2& b ) {
 	int nlv = std::atomic_fetch_add( &numLineVertices, 2 );
-	if( nlv+2 > MAX_DEBUG_VERTICES)
-		flush();
+	if( nlv+2 > MAX_DEBUG_VERTICES) {
+		// TODO as drawing can occur on any thread, we can't flush like we used to (as uses GL context)
+		// so for now drop it, TODO queue up flushes
+//		flush();
+		std::atomic_fetch_add( &numLineVertices, -2 );
+		return;
+	}
 
 	const uint32_t packCol = Core::RGBAColour::packARGB( colour.getRGBAColour() );
 
@@ -83,8 +88,13 @@ void DebugPrims::worldLine( const Core::Colour& colour,
 	using namespace Math;
 
 	int nwv = std::atomic_fetch_add( &numLineWorldVertices, 2 );
-	if( nwv+2 > MAX_DEBUG_VERTICES)
-		flush();
+	if( nwv+2 > MAX_DEBUG_VERTICES) {
+		// TODO as drawing can occur on any thread, we can't flush like we used to (as uses GL context)
+		// so for now drop it, TODO queue up flushes
+//		flush();
+		std::atomic_fetch_add( &numLineWorldVertices, -2 );
+		return;
+	}
 
 	const uint32_t packCol = Core::RGBAColour::packARGB( colour.getRGBAColour() );
 

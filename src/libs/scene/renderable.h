@@ -31,6 +31,7 @@ namespace Scene {
 	public:
 		enum R_TYPE {
 			R_MESH,
+			R_HEIGHTFIELD,
 		};
 
 		Renderable( Core::TransformNode* transNode ) :
@@ -80,4 +81,4 @@ namespace Scene {
 
 }; // end namespace Scene
 
-#endif //WIERD_GRAPHICS_RENDERABLE_H
+#endif //YOLK_GRAPHICS_RENDERABLE_H

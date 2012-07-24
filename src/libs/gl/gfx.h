@@ -16,6 +16,7 @@ namespace Gl {
 	class ShaderMan;
 	class DebugPrims;
 	class ResourceLoader;
+	class ImageComposer;
 
 	//! The main singleton for the gfx subject
 	class Gfx : public Core::Singleton<Gfx> {
@@ -96,6 +97,8 @@ namespace Gl {
 
 		ShaderMan* getShaderMan() { return shaderMan.get(); }
 
+		ImageComposer* getFinalImageComposer() { return finalComposer.get(); }
+
 		RenderContext* getThreadRenderContext( THREAD_CONTEXT index ) const;
 
 		void incPrimitiveCount( const uint32_t count ) {
@@ -130,6 +133,7 @@ namespace Gl {
 		boost::scoped_ptr<ShaderMan>						shaderMan;
 		boost::scoped_ptr<DebugPrims>						debugPrims;
 		boost::scoped_ptr<ResourceLoader>					resourceLoader;
+		boost::scoped_ptr<ImageComposer>					finalComposer;
 
 		typedef std::unordered_map<std::string, size_t>		HashPipeline;
 		HashPipeline										hashPipeline;

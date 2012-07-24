@@ -12,6 +12,7 @@
 #include "scene/wobfile.h"
 #include "scene/hierfile.h"
 #include "texture.h"
+#include "textureatlas.h"
 #include "program.h"
 #include "databuffer.h"
 #include "vao.h"
@@ -19,6 +20,7 @@
 #include "wobbackend.h"
 #include "gfx.h"
 #include "shaderman.h"
+#include "imagecomposer.h"
 #include "rendercontext.h"
 
 #include "resourceloader.h"
@@ -32,15 +34,20 @@ public:
 	ResourceLoaderImpl();
 	~ResourceLoaderImpl();
 
+	void showLoadingIfNeeded( ImageComposer* composer );
+
 	void installResourceTypes();
 	static void PushOntoLoaderContext( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  );
 	static std::shared_ptr<boost::asio::io_service>	io;
 	static std::shared_ptr<boost::asio::io_service::strand>	ioStrand;
 
 	std::shared_ptr<Core::thread>						loaderThread;
+	TextureAtlasHandlePtr 								loadTextureAtlas;
+	static std::atomic<int>								workCounter;
 };
 std::shared_ptr<boost::asio::io_service> ResourceLoaderImpl::io;
 std::shared_ptr<boost::asio::io_service::strand>	ResourceLoaderImpl::ioStrand;
+std::atomic<int> ResourceLoaderImpl::workCounter(0);
 
 //! Callback from the resource manager to create a texture resource
 std::shared_ptr<Core::ResourceBase> TextureCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
@@ -51,12 +58,32 @@ std::shared_ptr<Core::ResourceBase> TextureCreateResource( const Core::ResourceH
 		if( flags & RMRF_PRELOAD ) {
 			bPreLoad = true;
 		}
-		TexturePtr pResource( Texture::internalLoadTexture( handle, pName, bPreLoad ) );
+		TexturePtr pResource( Texture::internalLoad( handle, pName, bPreLoad ) );
 		return std::shared_ptr<ResourceBase>( pResource );
 	} else if( flags & RMRF_INMEMORYCREATE ) {
 		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;
-		TexturePtr pResource( Texture::internalCreateTexture( pStruct ) );
+		TexturePtr pResource( Texture::internalCreate( pStruct ) );
 		return std::shared_ptr<ResourceBase>( pResource );
+	} else {
+		assert( false && "Unknown Resource Type" );
+		return std::shared_ptr<ResourceBase>();
+	}
+}
+
+std::shared_ptr<Core::ResourceBase> TextureAtlasCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
+	using namespace Core;
+
+	if( flags & RMRF_LOADOFFDISK ) {
+		bool bPreLoad = false;
+		if( flags & RMRF_PRELOAD ) {
+			bPreLoad = true;
+		}
+		TextureAtlasPtr pResource( TextureAtlas::internalLoad( handle, pName, bPreLoad ) );
+		return std::shared_ptr<ResourceBase>( pResource );
+	} else if( flags & RMRF_INMEMORYCREATE ) {
+//		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;
+//		TexturePtr pResource( Texture::internalCreateTexture( pStruct ) );
+		return std::shared_ptr<ResourceBase>();
 	} else {
 		assert( false && "Unknown Resource Type" );
 		return std::shared_ptr<ResourceBase>();
@@ -155,6 +182,24 @@ std::shared_ptr<Core::ResourceBase> HierCreateResource( const Core::ResourceHand
 	}
 }
 
+//! Callback from the resource manager to create a height field resource
+/*std::shared_ptr<Core::ResourceBase> HeightfieldCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
+	using namespace Core;
+	using namespace Scene;
+
+	if( flags & RMRF_LOADOFFDISK ) {
+		bool bPreLoad = false;
+		if( flags & RMRF_PRELOAD ) {
+			bPreLoad = true;
+		}
+		HeightfieldPtr pResource( Heightfield::internalLoad( handle, pName, bPreLoad ) );
+		return std::shared_ptr<ResourceBase>( pResource );
+	} else {
+		CORE_ASSERT( false && "Can only load off disk" );
+		return std::shared_ptr<ResourceBase>();
+	}
+}
+*/
 void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
 	using namespace Scene;
 
@@ -163,7 +208,8 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	switch( handle->getType() ) {
 	case WobType: res = WobCreateResource( handle, flags, pName, pData ); break;
 	case HierType: res = HierCreateResource( handle, flags, pName, pData ); break;
-	case TextureType: res = TextureCreateResource( handle, flags, pName, pData );break;
+	case TextureType: res = TextureCreateResource( handle, flags, pName, pData ); break;
+	case TextureAtlasType: res = TextureAtlasCreateResource( handle, flags, pName, pData ); break;
 	case ProgramRType: res = ProgramCreateResource( handle, flags, pName, pData ); break;
 	case DataBufferRType: res = DataBufferCreateResource( handle, flags, pName, pData ); break;
 	case XboRType: res = XboCreateResource( handle, flags, pName, pData ); break;
@@ -172,6 +218,7 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 		LOG(FATAL) << "ProcessLoader being passed a resource it cannot handle\n";
 	}
 
+	--ResourceLoaderImpl::workCounter;
 	Core::ResourceMan::get()->internalAcquireComplete( handle, res );
 }
 
@@ -185,13 +232,15 @@ void ResourceLoaderImpl::PushOntoLoaderContext( const Core::ResourceHandleBase* 
 	std::shared_ptr<Core::ResourceBase> res;
 	switch( handle->getType() ) {
 //	case WobType: res = WobCreateResource( handle, flags, pName, pData ); break;
-//	case WobHierType: res = HieCreateResource( handle, flags, pName, pData ); break;
+//	case HierType: res = HierCreateResource( handle, flags, pName, pData ); break;
 //	case TextureType: res = TextureCreateResource( handle, flags, pName, pData );break;
+//	case TextureAtlasType: res = TextureAtlasCreateResource( handle, flags, pName, pData );break;
 //	case ProgramRType: res = ProgramCreateResource( handle, flags, pName, pData ); break;
-//	case DataBufferRType: res = DataBufferCreateResource( handle, flags, pName, pData ); break;
+	case DataBufferRType: res = DataBufferCreateResource( handle, flags, pName, pData ); break;
 //	case XboRType: res = XboCreateResource( handle, flags, pName, pData ); break;
 	case VaoRType: res = VaoCreateResource( handle, flags, pName, pData ); break; 
 	default: {
+			ResourceLoaderImpl::workCounter++;
 			ioStrand->post( boost::bind<void>( ProcessLoader, handle, flags, pName, pData ) ); 
 			return;
 		}
@@ -205,18 +254,34 @@ void ResourceLoaderImpl::installResourceTypes() {
 	using namespace Scene;
 	using namespace Gl;
 
+	#define SRD(x) SimpleResourceDestroyer< x >
+	#define SO(x) sizeof( x )
+	#define REG ResourceMan::get()->registerResourceType
+
 	auto cb = &ResourceLoaderImpl::PushOntoLoaderContext;
 
-	ResourceMan::get()->registerResourceType( WobType, cb, 
-	            &SimpleResourceDestroyer<WobResource>, sizeof(WobResourceHandle), NULL, 0 , "Meshes/" );
-	ResourceMan::get()->registerResourceType( HierType, cb, 
-	            &SimpleResourceDestroyer<HierResource>, sizeof(HierResourceHandle), NULL, 0 , "Hier/" );
-	ResourceMan::get()->registerResourceType( TextureType, cb, 
-				&SimpleResourceDestroyer<Texture>, sizeof(TextureHandle), NULL, 0, "Textures/" );
-	ResourceMan::get()->registerResourceType( ProgramRType, cb, &SimpleResourceDestroyer<Program>, sizeof(ProgramHandle), NULL, 0, "" );
-	ResourceMan::get()->registerResourceType( DataBufferRType, cb, &SimpleResourceDestroyer<DataBuffer>, sizeof(DataBufferHandle), NULL, 0, "" );
-	ResourceMan::get()->registerResourceType( VaoRType, cb, &SimpleResourceDestroyer<Vao>, sizeof(VaoHandle), NULL, 0, "" );
-	ResourceMan::get()->registerResourceType( XboRType, cb, &SimpleResourceDestroyer<Xbo>, sizeof(XboHandle), NULL, 0, "" );
+	REG ( WobType, cb, &SRD(WobResource), SO(WobResourceHandle), 
+							NULL, 0 , "Meshes/" );
+	REG ( HierType, cb, &SRD(HierResource), SO(HierResourceHandle), 
+							NULL, 0 , "Hier/" );
+	REG ( TextureType, cb, &SRD(Texture), SO(TextureHandle), 
+							NULL, 0, "Textures/" );
+	REG ( TextureAtlasType, cb, &SRD(TextureAtlas), SO(TextureAtlasHandle), 
+							NULL, 0, "Textures/" );
+	REG ( ProgramRType, cb, &SRD(Program), SO(ProgramHandle), 
+							NULL, 0, "" );
+	REG( DataBufferRType, cb, &SRD(DataBuffer), SO(DataBufferHandle), 
+							NULL, 0, "" );
+	REG( VaoRType, cb, &SRD(Vao), SO(VaoHandle), 
+							NULL, 0, "" );
+	REG( XboRType, cb, &SRD(Xbo), SO(XboHandle), 
+							NULL, 0, "" );
+
+	#undef SRD
+	#undef SO
+	#undef REG
+
+	loadTextureAtlas = TextureAtlasHandle::load( "base-ui.tat" );
 
 }
 
@@ -225,6 +290,7 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 	ioStrand = std::make_shared<boost::asio::io_service::strand>( *io );
 
 	std::atomic<bool> sig( false );
+
 	loaderThread = std::make_shared<Core::thread>( 
 		[&] {
 			auto ctx = Gl::Gfx::get()->getThreadRenderContext( Gl::Gfx::LOAD_CONTEXT );
@@ -238,8 +304,26 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 	while( sig == false ) {
 		// wait for load thread context to activate;
 	};
+}
+
+void ResourceLoaderImpl::showLoadingIfNeeded( ImageComposer* composer ) {
+	if( ResourceLoaderImpl::workCounter > 0) {
+		composer->putSprite( loadTextureAtlas, 0, 
+						ImageComposer::ALPHA_BLEND, 
+						Math::Vector2( 0.85f, 0.95f ),
+						Math::Vector2( 0.15f, 0.05f ),
+						Core::RGBAColour::unpackARGB(0xFFFFFFFF),
+						0 );
+	}
+	composer->putSprite( loadTextureAtlas, 1, 
+					ImageComposer::ALPHA_BLEND, 
+					Math::Vector2( 0.85f, 0.95f ),
+					Math::Vector2( 0.15f, 0.05f ),
+					Core::RGBAColour::unpackARGB(0x80FFFFFF),
+					1 );
 
 }
+
 ResourceLoaderImpl::~ResourceLoaderImpl() {
 	io.reset();
 }
@@ -255,4 +339,9 @@ ResourceLoader::~ResourceLoader() {
 void ResourceLoader::installResourceTypes() {
 	impl.installResourceTypes();
 }
+
+void ResourceLoader::showLoadingIfNeeded( ImageComposer* composer ) {
+	impl.showLoadingIfNeeded( composer );	
+}
+
 }

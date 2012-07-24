@@ -24,19 +24,46 @@ RenderWorld::RenderWorld() {
 RenderWorld::~RenderWorld() {
 }
 
-void RenderWorld::addRenderable( RenderablePtr renderable ) {
-	renderables.push_back( renderable );
+uint32_t RenderWorld::addRenderable( RenderablePtr renderable ) {
+	auto it = renderables.push_back( renderable );
+	return (uint32_t) std::distance( renderables.begin(), it );
 }
 
 void RenderWorld::removeRenderable( RenderablePtr renderable ) {
-			// currently the vector just grows, null entries and releasing memory but not actually
-			// shriking the vector. This could be done by a stop the world mutex by for now probably okay as only 4/8 byte per renderab le
-
+	// currently the vector just grows, null entries and releasing memory but not actually
+	// shriking the vector. This could be done by a stop the world mutex by for now probably okay as only 4/8 byte per renderab le
 	RenderableContainer::iterator enIt = std::find(renderables.begin(), renderables.end(), renderable );
 	assert( (enIt != renderables.end()) && "Renderable is not in this RenderWorld");
 	*enIt = nullptr;
 //	renderables.erase( enIt );
 }
+void RenderWorld::removeRenderable( uint32_t index ) {
+	RenderableContainer::iterator enIt = renderables.begin();
+	std::advance( enIt, index );
+	assert( (enIt != renderables.end()) && "Renderable is not in this RenderWorld");
+	*enIt = nullptr;
+}
+
+uint32_t RenderWorld::addCamera( CameraPtr camera ) {
+	auto it = cameras.push_back( camera );
+	return (uint32_t) std::distance( cameras.begin(), it );
+}
+
+void RenderWorld::removeCamera( CameraPtr camera ) {
+	// currently the vector just grows, null entries and releasing memory but not actually
+	// shriking the vector. This could be done by a stop the world mutex by for now probably okay as only 4/8 byte per renderab le
+	CameraContainer::iterator enIt = std::find(cameras.begin(), cameras.end(), camera );
+	assert( (enIt != cameras.end()) && "Camera is not in this RenderWorld");
+	*enIt = nullptr;
+//	renderables.erase( enIt );
+}
+void RenderWorld::removeCamera( uint32_t index ) {
+	CameraContainer::iterator enIt = cameras.begin();
+	std::advance( enIt, index );
+	assert( (enIt != cameras.end()) && "Camera is not in this RenderWorld");
+	*enIt = nullptr;
+}
+
 
 void RenderWorld::renderRenderables( RenderContext* context, const size_t pipelineIndex ) {
 	using namespace RENDER_BACKEND;

@@ -26,29 +26,29 @@
 
 #define GDEBBUGGER_FRIENDLY_STARTUP
 
-inline void GlLogERROR( GLenum _cherr ) {
-	switch( _cherr ) {
-	case GL_INVALID_ENUM: LOG(INFO) << "GL_INVALID_ENUM: An unacceptable value is specified for an enumerated argument."; break;
-	case GL_INVALID_VALUE: LOG(INFO) << "GL_INVALID_VALUE: A numeric argument is out of range.."; break;
-	case GL_INVALID_OPERATION: LOG(INFO) << "GL_INVALID_OPERATION: The specified operation is not allowed in the current state."; break;
-	case GL_OUT_OF_MEMORY: LOG(INFO) << "GL_OUT_OF_MEMORY: There is not enough memory left to execute the command."; break;
-	case GL_TABLE_TOO_LARGE: LOG(INFO) << "GL_TABLE_TOO_LARGE: The specified table exceeds the implementation's maximum supported table size."; break;
-	default: LOG(INFO) << "Unknown GL Error (" << _cherr << ")"; break;
-	}
-}
 
 #define DO_GL_CHECKS
 
 #if defined( DO_GL_CHECKS )
+#define GL_LOGERROR( _cherr ) \
+	switch( _cherr ) { \
+	case GL_INVALID_ENUM: LOG(INFO) << "GL_INVALID_ENUM: An unacceptable value is specified for an enumerated argument."; break; \
+	case GL_INVALID_VALUE: LOG(INFO) << "GL_INVALID_VALUE: A numeric argument is out of range.."; break; \
+	case GL_INVALID_OPERATION: LOG(INFO) << "GL_INVALID_OPERATION: The specified operation is not allowed in the current state."; break; \
+	case GL_OUT_OF_MEMORY: LOG(INFO) << "GL_OUT_OF_MEMORY: There is not enough memory left to execute the command."; break; \
+	case GL_TABLE_TOO_LARGE: LOG(INFO) << "GL_TABLE_TOO_LARGE: The specified table exceeds the implementation's maximum supported table size."; break; \
+	default: LOG(INFO) << "Unknown GL Error (" << _cherr << ")"; break; \
+	}
+
 #define GL_CHECK {															\
 			GLenum _cherr = GL_NO_ERROR;									\
 			bool   _cheer = true;											\
 			while( (_cherr = glGetError()) != GL_NO_ERROR ) {				\
-				GlLogERROR(_cherr);											\
+				GL_LOGERROR( _cherr );											\
 				_cheer = false;												\
 			}																\
 			if( _cheer == false ) {											\
-				CORE_ASSERT( false && "\nGL_CHECK failed\n" );				\
+				LOG(FATAL) << "\nGL_CHECK failed\n";				\
 			}																\
 		}
 

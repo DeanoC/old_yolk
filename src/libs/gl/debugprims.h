@@ -41,7 +41,7 @@ namespace Gl {
 
 	private:
 
-		static const int MAX_DEBUG_VERTICES			= 4096;
+		static const int MAX_DEBUG_VERTICES			= 1*1024*1024;
 		static const int NUM_TYPES_OF_DEBUG_PRIM	= 2; // NDC Line, World Line
 		static const int NDC_LINE_START_INDEX		= MAX_DEBUG_VERTICES * 0;
 		static const int WORLD_LINE_START_INDEX		= MAX_DEBUG_VERTICES * 1;

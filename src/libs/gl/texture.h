@@ -4,8 +4,8 @@
  @brief	Declares the texture class.
  */
 #pragma once
-#if !defined( WIERD_GL_TEXTURE_H__ )
-#define WIERD_GL_TEXTURE_H__
+#if !defined( YOLK_GL_TEXTURE_H_ )
+#define YOLK_GL_TEXTURE_H_
 
 #include "memory.h"
 #include "core/resources.h"
@@ -55,13 +55,14 @@ namespace Gl {
 		// there are platform specific versions which can be used to get closer to the metal
 		struct CreationStruct {
 
-			uint32_t	iFlags;					//!< various flags (including platform specific ones go here)
-			TEXTURE_FORMAT	texFormat;			//!< TEXTURE_FORMAT of the wanted texture
+			uint32_t	flags;					//!< various flags (including platform specific ones go here)
+			TEXTURE_FORMAT	format;			//!< TEXTURE_FORMAT of the wanted texture
 
-			uint32_t	iWidth;					//!< create a texture of this width
-			uint32_t	iHeight;				//!< create a texture of this height
-			uint32_t	iDepth;					//!< 3D depth or array slice count
-			uint32_t	iMipLevels;				//!< how many mip levels (0=all)
+			uint32_t	mipLevels;				//!< how many mip levels (0=all)
+			uint32_t	width;					//!< create a texture of this width
+			uint32_t	height;				//!< create a texture of this height
+			uint32_t	depth;					//!< 3D depth
+			uint32_t 	slices;				//!< slice count
 
 			// these properties must be entered after the constructor
 			// only used with the relevant flag set
@@ -80,10 +81,10 @@ namespace Gl {
 
 		struct LoadStruct {};
 
-		static Texture* internalLoadTexture( const Core::ResourceHandleBase* baseHandle, 
+		static Texture* internalLoad( const Core::ResourceHandleBase* baseHandle, 
 												const char* pTextureFileName, 
 												bool preload );
-		static Texture* internalCreateTexture( const CreationStruct* pStruct );
+		static Texture* internalCreate( const CreationStruct* pStruct );
 
 		Texture();
 		//! dtor
@@ -92,6 +93,7 @@ namespace Gl {
 		uint32_t getWidth() const { return width; }
 		uint32_t getHeight() const { return height; }
 		uint32_t getDepth() const { return depth; }
+		uint32_t getSlices() const { return slices; }
 		TEXTURE_FORMAT getFormat() const { return format; }
 		uint32_t getMipLevelCount() const { return mipLevels; }
 		uint32_t getSampleCount() const { return sampleCount; }
@@ -100,7 +102,8 @@ namespace Gl {
 	protected:
 		uint32_t width;					//!< width of this texture
 		uint32_t height;				//!< height of this texture
-		uint32_t depth;					//!< depth or slice count of this texture
+		uint32_t depth;					//!< depth
+		uint32_t slices;				//!<  slice count of this texture
 		TEXTURE_FORMAT format;			//!< format of this texture
 		uint32_t mipLevels;				//!< number of mip levels
 		uint32_t sampleCount;			//!< sample count (usually 1)

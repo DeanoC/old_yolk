@@ -6,10 +6,12 @@
 #include "core/coreresources.h"
 #include "scene/hie.h"
 #include "scene/camera.h"
+#include "scene/rendercontext.h"
 #include "core/clock.h"
 #include "core/sysmsg.h"
 #include "core/development_context.h"
 #include "debugcamcontext.h"
+#include "inputhandlercontext.h"
 #include "clientworld.h"
 #include "client.h"
 
@@ -73,9 +75,12 @@ void DwmClient::run() {
 	ctx->threadActivate();
 	ctx->prepToRender();
 
-	auto debugCam = std::make_shared<DebugCamContext>( ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
+	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
+	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
 
+	auto debugCam = std::make_shared<DebugCamContext>( world.get(), ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
+
 	DevelopmentContext::get()->activateContext( "DebugCam" );
 
 	// flush 'load' time from first time update
@@ -87,12 +92,11 @@ void DwmClient::run() {
 		float deltaT = Clock::get()->update();
 
 		DevelopmentContext::get()->update( deltaT );
-		debugCam->setAspectRatio( s_screenWidth, s_screenWidth, curWinWidth, curWinHeight );
 
 		world->render( ctx );
-		world->debugDraw( ctx );
 
 		DevelopmentContext::get()->display();
+
 		Gl::Gfx::get()->present( curWinWidth, curWinHeight );
 		Core::HouseKeep();
 	}	

@@ -10,20 +10,41 @@
 
 namespace Scene {
 
-Camera::Camera(){
+Camera::Camera() : 
+	yScale( 1.0f ),
+	xScale( 1.0f ),
+	zNear( 0.1 ),
+	zFar( 4000 ) {
 }
 
 void Camera::setProjection( float fov, float aspect, float znear, float zfar ) {
 	yScale = 1.f / tanf(fov/2);
 	xScale = aspect / yScale;
-	projectionMatrix = Math::Matrix4x4(	xScale,		0,		0,								0,
-										0,			yScale,	0,								0,
-										0,			0,		(zfar+znear)/(zfar-znear),		1,
-										0,			0,		-(2*znear*zfar)/(zfar-znear),	0 );
 	zNear = znear;
 	zFar = zfar;
+	setProjection();
+}
 
-	invalidate();
+void Camera::setFOV( float fov, float aspect ) {
+	yScale = 1.f / tanf(fov/2);
+	xScale = aspect / yScale;
+
+	setProjection();
+}
+
+void Camera::setDepthRange( float near, float far ) {
+	zNear = near;
+	zFar = far;
+
+	setProjection();
+}
+
+void Camera::setProjection() {
+	projectionMatrix = Math::Matrix4x4(	xScale,		0,		0,								0,
+										0,			yScale,	0,								0,
+										0,			0,		(zFar+zNear)/(zFar-zNear),		1,
+										0,			0,		-(2*zNear*zFar)/(zFar-zNear),	0 );
+	invalidate();		
 }
 
 void Camera::setView( const Math::Matrix4x4& _viewMatrix ) {
