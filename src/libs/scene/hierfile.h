@@ -18,7 +18,7 @@ namespace Scene {
 	struct HierarchyTree;
 
 	static const uint32_t HierType = RESOURCE_NAME('H','I','E','R');
-	static const uint8_t HierVersion = 1;
+	static const uint8_t HierVersion = 2;
 
 	enum HierarchyNodeType {
 		HNT_NODE		= 0, //!< general unspecified node
@@ -33,14 +33,11 @@ namespace Scene {
 	};
 
 	struct HierarchyFileHeader {
-		uint32_t uiMagic;				//!< Should but HIER
-		uint16_t numNodes;				//!< number of nodes
-		uint8_t version;				//!< hierVersion
-		uint8_t flags;					//!< none currently
-		union {
-			CORE_ALIGN(8) uint32_t 		linkBlockSize;			//!< size of link tree block
-			FOP( uint8_t*, 	pLinkBlock);
-		};
+		uint32_t 	uiMagic;				//!< Should but HIER
+		uint16_t 	numNodes;				//!< number of nodes
+		uint8_t 	version;				//!< hierVersion
+		uint8_t 	flags;					//!< none currently
+		uint32_t 	dataBlockSize;	//!< size of nodes + link tree block
 	};
 
 	enum HierarchyNodeFlags {
@@ -50,14 +47,15 @@ namespace Scene {
 	struct HierarchyNode {
 		uint16_t	type;
 		uint16_t	flags;
-		union {
-			// note union must be of pointer types (its fixed up on load)
-			FOP( const char*, meshName );
-		};
 
 		float		pos[3];
 		float		quat[4];
 		float		scale[3];
+
+		union {
+			// note union must be of pointer types (its fixed up on load)
+			FOP( const char*, meshName );
+		};
 		FOP( HierarchyTree*,	children );
 		FOP( const char*,		nodeName );
 	};

@@ -26,7 +26,6 @@ namespace Scene {
 		void setFOV( float fov, float aspect = 1.0f );
 		void setDepthRange( float znear, float zfar );
 
-
 		//! sets the view of the matrix
 		void setView( const Math::Matrix4x4& viewMatrix );
 

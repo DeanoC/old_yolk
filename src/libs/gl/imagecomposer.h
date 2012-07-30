@@ -218,16 +218,15 @@ private:
 				if( vertexBuffer == nullptr ) {
 					vertexBuffer = vertexBufferHandle->acquire();
 				}
-				mapped = (void*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY );
+				mapped = (void*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY, DataBuffer::MF_DISCARD );
 				numVertices = 0;
 			}
 
 			void unmap() {
-				if( mapped != nullptr ) {
-					CORE_ASSERT( vertexBuffer != nullptr );
-					vertexBuffer->unmap();
-					mapped = nullptr;
-				}
+				CORE_ASSERT( mapped != nullptr );
+				CORE_ASSERT( vertexBuffer != nullptr );
+				vertexBuffer->unmap();
+				mapped = nullptr;
 			}
 
 			DataBufferHandlePtr		vertexBufferHandle;
@@ -241,6 +240,7 @@ private:
 
 		typedef std::map<PageKey, Page>				PageMap;
 		PageMap										pageMap;
+		int 										layerNum;
 	} layers[MAX_LAYERS];
 
 	ProgramHandlePtr	program[MAX_RENDER_TYPE];			//!< programs

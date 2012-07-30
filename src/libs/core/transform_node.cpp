@@ -56,7 +56,7 @@ void TransformNode::setLocalTransform( const Math::Vector3& pos, const Math::Qua
 	dirtyTransforms();
 }
 
-const Math::Matrix4x4 TransformNode::getLocalTransform() const {
+const Math::Matrix4x4 TransformNode::getLocalMatrix() const {
 	Math::Matrix4x4 transMat = Math::CreateTranslationMatrix( position );
 	Math::Matrix4x4 rotMat = Math::CreateRotationMatrix( orientation );
 	Math::Matrix4x4 scaleMat = Math::CreateScaleMatrix( scale );
@@ -64,11 +64,11 @@ const Math::Matrix4x4 TransformNode::getLocalTransform() const {
 	return rotMat * scaleMat * transMat;
 }
 
-const Math::Matrix4x4& TransformNode::getWorldTransform() const {
+const Math::Matrix4x4& TransformNode::getWorldMatrix() const {
 	if( !transformCached ) {
-		*transform = getLocalTransform();
+		*transform = getLocalMatrix();
 		if( parent != 0  ) {
-			*transform = parent->getWorldTransform() * *transform;
+			*transform = parent->getWorldMatrix() * *transform;
 		}
 		transformCached = true;
 	} 
@@ -77,6 +77,7 @@ const Math::Matrix4x4& TransformNode::getWorldTransform() const {
 
 }
 void TransformNode::setParent( TransformNode* _parent ) {
+	CORE_ASSERT( _parent != this );
 	parent = _parent;
 }
 
@@ -89,7 +90,8 @@ unsigned int TransformNode::getChildCount() const {
 }
 
 void TransformNode::addChild( TransformNode* child ) {
-	CORE_ASSERT( (child->parent == 0) && "node already has a parent" );
+	CORE_ASSERT( child->parent == 0 );
+	CORE_ASSERT( child != this );
 	children.push_back( child );
 	child->parent = this;
 }
@@ -122,14 +124,14 @@ void TransformNode::dirtyTransforms() {
 void TransformNode::debugDisplay() const {
 	// draw local axis
 	float axislength = 1.0f;
-	const Math::Matrix4x4& matworld = getWorldTransform();
+	const Math::Matrix4x4& matworld = getWorldMatrix();
 	g_pDebugRender->worldLine( Core::RGBAColour(1,0,0,1), Math::GetTranslation(matworld), Math::GetTranslation(matworld)+Math::GetXAxis(matworld)*axislength );
 	g_pDebugRender->worldLine( Core::RGBAColour(0,1,0,1), Math::GetTranslation(matworld), Math::GetTranslation(matworld)+Math::GetYAxis(matworld)*axislength );
 	g_pDebugRender->worldLine( Core::RGBAColour(0,0,1,1), Math::GetTranslation(matworld), Math::GetTranslation(matworld)+Math::GetZAxis(matworld)*axislength );
 
 	// draw connecting line to parent
 	if( getParent() != NULL ) {
-		const Math::Matrix4x4& matworldparent = getParent()->getWorldTransform();
+		const Math::Matrix4x4& matworldparent = getParent()->getWorldMatrix();
 		g_pDebugRender->worldLine( Core::RGBAColour(1,1,1,1), Math::GetTranslation(matworld), Math::GetTranslation(matworldparent) );
 	}
 

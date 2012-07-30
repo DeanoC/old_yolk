@@ -1,6 +1,8 @@
 #include "meshimport.h"
 #include "core/fileio.h"
 
+#include "boost/tokenizer.hpp"
+#include "boost/lexical_cast.hpp"
 #include "grometxtimp.h"
 
 namespace MeshImport {
@@ -9,7 +11,26 @@ namespace MeshImport {
 GromeTxtImp::ObjectLookup ObjectTable[] = {
 	// Objects
 	{ "TerrainZone",		&GromeTxtImp::terrainZoneObjectKey },
-	{ "name",				&GromeTxtImp::nameVarKey },
+		{ "name",				&GromeTxtImp::nameVarKey },
+		{ "tiles_no_x",			&GromeTxtImp::defaultVariableKey },
+		{ "tiles_no_z",			&GromeTxtImp::defaultVariableKey },
+		{ "tiles_size_x",		&GromeTxtImp::defaultVariableKey },
+		{ "tiles_size_z",		&GromeTxtImp::defaultVariableKey },
+		{ "heightfield",		&GromeTxtImp::heightfieldVariableKey },
+
+	{ "ColorLayer",			&GromeTxtImp::skipKey },
+		{ "material_name",			&GromeTxtImp::defaultVariableKey },
+		{ "color_image_file",		&GromeTxtImp::defaultVariableKey },
+		{ "color_texmap_offset",	&GromeTxtImp::defaultVariableKey },
+		{ "color_texmap_scale",		&GromeTxtImp::defaultVariableKey },
+		{ "color_texmap_horiz_rot",	&GromeTxtImp::defaultVariableKey },
+		{ "color_texmap_vert_rot",	&GromeTxtImp::defaultVariableKey },
+		{ "color_texmap_spin_rot",	&GromeTxtImp::defaultVariableKey },
+		{ "color_texmap_coords",	&GromeTxtImp::defaultVariableKey },
+
+	{ "ObjectContainer",	&GromeTxtImp::skipKey },
+		{ "owner",	&GromeTxtImp::defaultVariableKey },
+
 	{ "", 					&GromeTxtImp::skipKey },
 };
 
@@ -20,7 +41,7 @@ GromeTxtImp::GromeTxtImp( const std::string& filename ) :
 
 	FILE* f;
 
-	f = fopen(filename.c_str(),"rb");
+	f = fopen(filename.c_str(),"rt");
 	if (f == NULL) {
 		loadedOkay = false;
 		return;
@@ -153,5 +174,26 @@ void GromeTxtImp::defaultObjectKey( FILE* f ) {
 void GromeTxtImp::terrainZoneObjectKey( FILE* f ) {
 	objectReader( f, ObjectTable );
 }
+
+void GromeTxtImp::heightfieldVariableKey( FILE* f ) {
+	ungetLastLine = true;
+	readLine(f);
+	char* keyText = strtok(lineBuffer," \t\xA\xD");
+	char* eqText = strtok(0," \t\xA\xD");
+	char* dataText = strtok(0,"\xA\xD");
+
+	std::string str( dataText );
+	boost::tokenizer<> token( str );
+	std::vector<float> heights;
+
+	for( boost::tokenizer<>::iterator tok = token.begin(); 
+			tok != token.end(); 
+			++tok ) {
+		heights.push_back( boost::lexical_cast<float>(*tok) );
+	}
+	objStack.top()->push_back( GromeTxtVariable( keyText, 
+		boost::any( heights ) ) );
+}
+
 
 }

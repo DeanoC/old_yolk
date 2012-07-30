@@ -324,6 +324,7 @@ namespace Math {
 	CALL inline float LengthSquared( const Vector2& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 2D Vector
 	CALL inline float LengthSquared( const Vector3& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 3D Vector
 	CALL inline float LengthSquared( const Vector4& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 4D Vector
+	CALL inline float LengthSquared( const Quaternion& q ){ return Dot(q,q); }  	//!< Length^2 of a 4D Vector
 
 	CALL inline float Length( const Vector2& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 2D Vector
 	CALL inline float Length( const Vector3& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 3D Vector

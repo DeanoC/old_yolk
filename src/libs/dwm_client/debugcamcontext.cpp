@@ -137,8 +137,6 @@ void DebugCamContext::display() {
 	using namespace Core;
 	using namespace Math;
 
-	g_pDebugRender->ndcLine( RGBAColour(1,0,0,1), Vector2(0,0), Vector2(1,1) );
-	
 	g_pDebugRender->worldLine( RGBAColour(1,0,0,1), Vector3(0,0,0), Vector3(100,0,0) );
 	g_pDebugRender->worldLine( RGBAColour(0,1,0,1), Vector3(0,0,0), Vector3(0,100,0) );
 	g_pDebugRender->worldLine( RGBAColour(0,0,1,1), Vector3(0,0,0), Vector3(0,0,100) );

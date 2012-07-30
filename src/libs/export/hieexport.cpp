@@ -7,20 +7,13 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
                               	Core::ResourceManifestEntryVector& manifest, 
                                	const Core::FilePath pOutFilename ) {
 	using namespace Scene;
-	std::ostringstream outStream;
 	std::ostringstream nodeStream;
 	std::ostringstream linkStream;
 	std::map<std::string,std::string> stringTable;
 
-	// produce a wob node header 
-	outStream << "// hierachy file\n";
-	outStream << ".type u32\n";
-	outStream << HierType << "\t// HIER\n";	// magic
-
 	// collect nodes
 	std::vector< MeshMod::SceneNodePtr > nodeArray;
 	std::stack< MeshMod::SceneNodePtr > nodes;
-	int nodeCounter = 0;
 
 	for( auto nodeIt = scene->sceneNodes.begin(); nodeIt != scene->sceneNodes.end(); ++nodeIt ) {
 		nodes.push( *nodeIt );
@@ -28,14 +21,189 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 
 	while( !nodes.empty() ) {
 		MeshMod::SceneNodePtr n = nodes.top();
-		nodes.pop(); ++nodeCounter;
+		nodes.pop(); 
 		nodeArray.push_back( n );
 		for( uint32_t i=0;i < n->getChildCount();++i ) {
 			nodes.push( n->getChild(i) );
 		}
 	}
 
-	assert( nodeArray.size() == nodeCounter );
+	int nodeCounter = 0;
+	for( std::vector< MeshMod::SceneNodePtr >::const_iterator it = nodeArray.begin();
+		it != nodeArray.end();
+		++it ) {
+	
+		nodeStream << "//---------------------------------------------\n";
+		linkStream << "//------------------------------------------\n";
+		MeshMod::SceneNodePtr node = *it;
+		int nodeIndex = (int) std::distance<std::vector< MeshMod::SceneNodePtr >::const_iterator>( nodeArray.begin(), it );
+
+		if( node->type == "Joint" ) {
+			TODO_ASSERT( false && "Bones and joints" );
+		} else { // also covers if( node->m_type == "Mesh" ) {
+			MeshMod::MeshPtr mesh;
+			nodeStream << ".align 8\n";
+			if( node->getObjectCount() > 0 ) {
+				// TODO what to do with multiple nodes?
+				for( unsigned int objNum = 0; objNum < node->getObjectCount();++objNum ) {
+					MeshMod::SceneObjectPtr obj = node->getObject(objNum);
+					if( objNum > 0 ) {
+						nodeStream << "Node_"  << nodeIndex << "_" << objNum << ": \t\t\t\t\t // node Start\n";
+					} else {
+						nodeStream << "Node_"  << nodeIndex << ": \t\t\t\t\t // node Start\n";
+					}
+					if( obj->getType() == "Mesh" ) {
+						mesh = std::dynamic_pointer_cast<MeshMod::Mesh>( obj );
+						nodeStream << "(u16)" << HNT_MESH << "\t\t\t\t\t// type = MESH\n";
+					} else {
+						nodeStream << "(u16)" << HNT_NODE << "\t\t\t\t\t// type = NODE\n";						
+					}
+					if( (*it)->properties.size() > 0 ) {
+						nodeStream << "(u16) " << HNF_PROPERTIES << "\t\t\t\t\t // flags = HNF_PROPERTIES\n";
+					} else {
+						nodeStream << "(u16) " << 0 << "\t\t\t\t\t // flags\n";
+					}
+					nodeStream << ".type float\n";
+					if( objNum > 0 ) {
+						nodeStream	<<  (float) node->transform.position[0] << ", "
+									<<  (float) node->transform.position[1] << ", "
+									<<  (float) node->transform.position[2] << "\t\t\t\t\t// Node Position\n";
+						nodeStream	<<  (float) node->transform.orientation[0] << ", "
+									<<  (float) node->transform.orientation[1] << ", "
+									<<  (float) node->transform.orientation[2] << ", "
+									<<  (float) node->transform.orientation[3] << "\t\t\t\t// Node Rotation (quat)\n";
+						nodeStream	<<  (float) node->transform.scale[0] << ", "
+									<<  (float) node->transform.scale[1] << ", "  
+									<<  (float) node->transform.scale[2] << "\t\t\t\t\t// Node Scale\n";
+					} else {
+						nodeStream	<< "0, 0, 0\t\t\t\t\t// Position same as parent\n";
+						nodeStream	<< "0, 0, 0, 1\t\t\t\t// Rotation same as parent\n";
+						nodeStream	<< "1, 1, 1\t\t\t\t\t// Scale same as parent\n";
+					}
+					nodeStream << ".align 8\n";
+					nodeStream << ".type u32\n";
+					if( obj->getType() == "Mesh" ) {
+						std::ostringstream meshLabName;
+						meshLabName <<  "MeshName_N" << nodeIndex << "_" << objNum  << "Str";
+						nodeStream << "0, " << meshLabName.str() << " - beginLab" << "\t\t\t\t\t// node parameters\n";
+						auto baseName = pOutFilename.RemoveExtension().BaseName().value();
+						auto meshName = Core::FilePath( baseName + "_" + mesh->getName()).RemoveExtension().value();
+						stringTable[ meshLabName.str() + ":" ] = meshName;
+					} else {
+						nodeStream << "0,0" << "\t\t\t\t\t// node parameters \n";
+					}
+
+					if( objNum == 0 ) {
+						int childCount = node->getChildCount() + node->getObjectCount();
+						// any children minus this object link it up
+						if( childCount > 1 ) {
+							nodeStream << "0, NodeTree" << nodeIndex << " - beginLab"<< "\t\t\t\t\t // pointer to children node tree\n";
+							linkStream << "NodeTree" << nodeIndex << ":\n";
+							linkStream << (uint32_t)(childCount-1) << "\t\t\t\t\t // Number of Childen\n";
+							for( unsigned int i=0;i < childCount;++i ) {
+								if( childCount < node->getChildCount() ) {
+									linkStream << "Node_" << std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
+								} else {
+									if( i == node->getChildCount() ) {
+										// skip as this is the node itself
+										continue;
+									} else {
+										// add extra objects attached to this node as children
+										// this takes the offset of the child and divides by the size of that
+										// child node structure, as this is the same for all nodes, this gives
+										// us the out child index
+										linkStream << "Node_" << nodeIndex << "_" << childCount << " / " <<
+											"(Node_" << nodeIndex << "_" << childCount << "_end - " <<
+											"Node_" << nodeIndex << "_" << childCount << ")";
+									}
+								}
+								if( i != childCount-1 ) {
+									linkStream << " , ";
+								} else {
+									linkStream << "\t\t\t\t\t //  32 bit indices to nodes\n";
+								}
+							}
+						} else {
+							nodeStream << "0,0" << "\t\t\t\t\t// no child linkage\n";
+						}
+					} else {
+						nodeStream << "0,0" << "\t\t\t\t\t// no child linkage\n";
+					}
+
+					std::ostringstream emitName;
+					emitName <<  "NodeName" << nodeIndex << "_" << objNum << "Str";
+					nodeStream << "0, " << emitName.str() << " - beginLab\n";
+					stringTable[ emitName.str() + ":" ] = Core::FilePath( node->name ).RemoveExtension().value();
+					if( objNum > 0 ) {
+						nodeStream << "Node_"  << nodeIndex << "_" << objNum << "_end: \t\t\t\t\t // node End\n";
+					} else {
+						nodeStream << "Node_"  << nodeIndex << "_end: \t\t\t\t\t // node End\n";						
+					}
+					nodeCounter++;
+				}	
+			} else {
+				int childCount = node->getChildCount();
+				// skip nodes that have no children. no properties and are identity
+				if( childCount == 0 && (*it)->properties.empty() &&
+					node->transform.isIdentity() ) {
+					continue;
+				}
+				nodeStream << "Node_"  << nodeIndex << ": \t\t\t\t\t // node Start\n";
+				nodeStream << "(u16)" << HNT_NODE << "\t\t\t\t\t// type = NODE\n";
+				if( (*it)->properties.size() > 0 ) {
+					nodeStream << "(u16) " << HNF_PROPERTIES << "\t\t\t\t\t // flags = HNF_PROPERTIES\n";
+				} else {
+					nodeStream << "(u16) " << 0 << "\t\t\t\t\t // flags\n";
+				}
+				nodeStream << ".type float\n";
+				nodeStream	<<  (float) node->transform.position[0] << ", "
+							<<  (float) node->transform.position[1] << ", "
+							<<  (float) node->transform.position[2] << "\t\t\t\t\t// Node Position\n";
+				nodeStream	<<  (float) node->transform.orientation[0] << ", "
+							<<  (float) node->transform.orientation[1] << ", "
+							<<  (float) node->transform.orientation[2] << ", "
+							<<  (float) node->transform.orientation[3] << "\t\t\t\t// Node Rotation (quat)\n";
+				nodeStream	<<  (float) node->transform.scale[0] << ", "
+							<<  (float) node->transform.scale[1] << ", "  
+							<<  (float) node->transform.scale[2] << "\t\t\t\t\t// Node Scale\n";
+				nodeStream << ".type u32\n";
+				nodeStream << ".align 8\n";
+
+				nodeStream << "0,0" << "\t\t\t\t\t// Node parameters ptr\n";
+				if( childCount > 0 ) {
+					nodeStream << "0, NodeTree" << nodeIndex << " - beginLab"<< "\t\t\t\t\t // pointer to children node tree\n";
+					linkStream << "NodeTree" << nodeIndex << ":\n";
+					linkStream << (uint32_t) childCount << "\t\t\t\t\t // Number of Childen\n";
+					for( unsigned int i=0;i < childCount;++i ) {
+						int childNo = std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
+						linkStream << "Node_" << childNo << " / " <<
+									"(Node_" << childNo << "_end - " <<
+									"Node_" << childNo << ")";
+
+						if( i != childCount-1 ) {
+							linkStream << " , ";
+						} else {
+							linkStream << "\t\t\t\t\t //  32 bit indices to nodes\n";
+						}
+					}
+				} else {
+					nodeStream << "0,0" << "\t\t\t\t\t// no linkage\n";
+				}
+
+				std::ostringstream emitName;
+				emitName <<  "NodeName" << nodeIndex << "Str";
+				nodeStream << "0, " << emitName.str() << " - beginLab\n";
+				stringTable[ emitName.str() + ":" ] = Core::FilePath( node->name ).RemoveExtension().value();
+				nodeCounter++;
+			}
+		}	
+	}
+
+	std::ostringstream outStream;
+	// produce a wob node header 
+	outStream << "// hierachy file\n";
+	outStream << ".type u32\n";
+	outStream << HierType << "\t// HIER\n";	// magic
 	outStream << "(u16) " << nodeCounter << "\t\t\t\t\t // num nodes\n";
 	outStream << "(u8) " << (int)HierVersion << "\t\t\t\t\t // version\n";
 	if( scene->properties.size() > 0 ) {
@@ -44,102 +212,11 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 		outStream << "(u8) " << 0 << "\t\t\t\t\t // flags\n";
 	}
 	outStream << "endLab - beginLab \t\t\t\t\t // total size\n";
-
-	for( std::vector< MeshMod::SceneNodePtr >::const_iterator it = nodeArray.begin();
-		it != nodeArray.end();
-		++it ) {
-			nodeStream << "//---------------------------------------------\n";
-			nodeStream << ".align 8\n";
-			linkStream << "//------------------------------------------\n";
-			MeshMod::SceneNodePtr node = *it;
-			int nodeIndex = (int) std::distance<std::vector< MeshMod::SceneNodePtr >::const_iterator>( nodeArray.begin(), it );
-			nodeStream << "Node_"  << nodeIndex << ": \t\t\t\t\t // node Start\n";
-
-			if( node->type == "Joint" ) {
-				nodeStream << "(u16)" << HNT_JOINT << "\t\t\t\t\t// type = JOINT\n";
-				if( (*it)->properties.size() > 0 ) {
-					nodeStream << "(u16) " << HNF_PROPERTIES << "\t\t\t\t\t // flags = HNF_PROPERTIES\n";
-				} else {
-					nodeStream << "(u16) " << 0 << "\t\t\t\t\t // flags\n";
-				}
-				nodeStream << ".align 8\n";
-				nodeStream << "0,0" << "\t\t\t\t\t// Node parameters ptr\n";
-			} else { // also covers if( node->m_type == "Mesh" ) {
-
-				MeshMod::MeshPtr mesh;
-				// TODO what to do with multiple nodes?
-				for( unsigned int objNum = 0; objNum < node->getObjectCount();++objNum ) {
-					MeshMod::SceneObjectPtr obj = node->getObject(objNum);
-					if( obj->getType() == "Mesh" ) {
-						mesh = std::dynamic_pointer_cast<MeshMod::Mesh>( obj );
-						break;
-					}
-				}
-				if(mesh) {
-					nodeStream << "(u16)" << HNT_MESH << "\t\t\t\t\t// type = MESH\n";
-					if( (*it)->properties.size() > 0 ) {
-						nodeStream << "(u16) " << HNF_PROPERTIES << "\t\t\t\t\t // flags = HNF_PROPERTIES\n";
-					} else {
-						nodeStream << "(u16) " << 0 << "\t\t\t\t\t // flags\n";
-					}
-					nodeStream << ".align 8\n";
-	
-					std::ostringstream meshLabName;
-					meshLabName <<  "MeshName_N" << nodeIndex << "Str";
-					nodeStream << "0, " << meshLabName.str() << " - beginLab" << "\t\t\t\t\t// node parameters\n";
-					auto baseName = pOutFilename.RemoveExtension().BaseName().value();
-					auto meshName = Core::FilePath( baseName + "_" + mesh->getName()).RemoveExtension().value();
-
-					stringTable[ meshLabName.str() + ":" ] = meshName;
-
-				} else {
-					// default to node as we have no mesh?
-					nodeStream << "(u16)" << HNT_NODE << "\t\t\t\t\t// type = NODE\n";
-					if( (*it)->properties.size() > 0 ) {
-						nodeStream << "(u16) " << HNF_PROPERTIES << "\t\t\t\t\t // flags = HNF_PROPERTIES\n";
-					} else {
-						nodeStream << "(u16) " << 0 << "\t\t\t\t\t // flags\n";
-					}
-					nodeStream << ".align 8\n";
-					nodeStream << "0,0" << "\t\t\t\t\t// node parameters \n";
-				}
-
-			}
-
-			nodeStream << ".type float\n";
-			nodeStream	<<  (float) node->transform.position[0] << ", "
-						<<  (float) node->transform.position[1] << ", "
-						<<  (float) node->transform.position[2] << "\t\t\t\t\t// Node Position\n";
-			nodeStream	<<  (float) node->transform.orientation[0] << ", "
-						<<  (float) node->transform.orientation[1] << ", "
-						<<  (float) node->transform.orientation[2] << ", "
-						<<  (float) node->transform.orientation[3] << "\t\t\t\t\t// Node Rotation (quat)\n";
-			nodeStream	<<  (float) node->transform.scale[0] << ", "
-						<<  (float) node->transform.scale[1] << ", "  
-						<<  (float) node->transform.scale[2] << "\t\t\t\t\t// Node Scale\n";
-			nodeStream << ".type u32\n";
-			nodeStream << ".align 8\n";
-
-			nodeStream << "0, NodeTree" << nodeIndex << " - beginLab"<< "\t\t\t\t\t // pointer to children node tree\n";
-			linkStream << "NodeTree" << nodeIndex << ":\n";
-			linkStream << (uint32_t)node->getChildCount() << "\t\t\t\t\t // Number of Childen\n";
-			for( unsigned int i=0;i < node->getChildCount();++i ) {
-				linkStream << std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
-				if( i != node->getChildCount()-1 ) {
-					linkStream << " , ";
-				} else {
-					linkStream << "\t\t\t\t\t //  32 bit indices to nodes\n";
-				}
-			}
-			std::ostringstream emitName;
-			emitName <<  "NodeTree" << nodeIndex << "Str";
-			nodeStream << "0, " << emitName.str() << " - beginLab\n";
-
-			stringTable[ emitName.str() + ":" ] = Core::FilePath( node->name ).RemoveExtension().value();
-	}	
-	outStream << ".align 8\n" << nodeStream.str();
 	outStream << "//---------------------------------------------\n";
-	outStream << ".align 8\n" << "beginLab:\n";
+	outStream << "beginLab:\n";
+	outStream << "//---------------------------------------------\n";
+	outStream << nodeStream.str();
+	outStream << "//---------------------------------------------\n";
 	outStream << linkStream.str();
 
 	outStream << "//---------------------------------------------\n";
@@ -152,7 +229,6 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 	}
 
 	outStream << "endLab:\n";
-
 
 	// add a Manifest folder to the path
 	auto filedir = pOutFilename.DirName();

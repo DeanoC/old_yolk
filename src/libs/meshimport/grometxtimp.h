@@ -40,6 +40,7 @@ namespace MeshImport {
 		void nameVarKey( FILE* f );
 
 		void terrainZoneObjectKey( FILE* f );
+		void heightfieldVariableKey( FILE* f );
 
 	private:
 		bool loadedOkay;

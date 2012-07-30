@@ -18,7 +18,8 @@
 
 namespace Scene {
 
-RenderWorld::RenderWorld() {
+RenderWorld::RenderWorld() :
+	activeCamera( nullptr ) {
 }
 
 RenderWorld::~RenderWorld() {
@@ -26,7 +27,10 @@ RenderWorld::~RenderWorld() {
 
 uint32_t RenderWorld::addRenderable( RenderablePtr renderable ) {
 	auto it = renderables.push_back( renderable );
-	return (uint32_t) std::distance( renderables.begin(), it );
+	const uint32_t index = (uint32_t) std::distance( renderables.begin(), it );
+	visibleRenderables.reserve( index + 1 );
+
+	return index;
 }
 
 void RenderWorld::removeRenderable( RenderablePtr renderable ) {
@@ -67,58 +71,82 @@ void RenderWorld::removeCamera( uint32_t index ) {
 
 void RenderWorld::renderRenderables( RenderContext* context, const size_t pipelineIndex ) {
 	using namespace RENDER_BACKEND;
-
-	// TODO frustum cull once not each time RenderRenderables is called
-
 	Gfx* gfx = Gfx::get();
 
 	Pipeline* pipeline = gfx->getPipeline( pipelineIndex );
-	pipeline->bind( context, true );
-	
-	// output to current render targets
-	RenderableContainer::const_iterator it = renderables.begin();
-	while( it != renderables.end() ) {
+	pipeline->bind( context );
+
+	// first go through and cull renderables, also copy matrixes under
+	// a lock to ensure other thread updates of renderables transform
+	// isn't reflected to the renderer mid frame
+
+	visibleRenderables.clear();
+	Core::AABB waabb;
+
+	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
+	RenderableContainer::const_iterator it = renderables.cbegin();
+	while( it != renderables.cend() ) {
 		const RenderablePtr& toRender = (*it);
-//		if( context->viewFrustum->cullAABB( toRender->getWorldAABB() ) != Core::Frustum::OUTSIDE ) 
+		const uint32_t index = (uint32_t) 
+				std::distance( renderables.cbegin(), it );
+
+		toRender->getTransformNode()->setRenderMatrix();
+		toRender->getWorldAABB( waabb );
+//			if( activeCamera &&
+//				activeCamera->getFrustum().cullAABB( waabb ) != 
+//								Core::Frustum::OUTSIDE ) 
 		{
-			toRender->render( context, pipelineIndex );
+			visibleRenderables.push_back( index );
 		}
+
 		++it;
 	}
+	updateLock.unlock();
 
-	pipeline->unbind( context );
+	for( auto i = 0; i < pipeline->getGeomPassCount(); ++i ) {
+		pipeline->startGeomPass( i );
 
+		// output geometry
+		STIndexContainer::const_iterator rmit = visibleRenderables.cbegin();
+		while( rmit != visibleRenderables.cend() ) {
+			const RenderablePtr& toRender = renderables[ (*rmit) ];
+			toRender->render( context, pipelineIndex );
+			++rmit;
+		}
+
+		pipeline->endGeomPass( i );
+	}
+
+	pipeline->unbind();
 }
 void RenderWorld::debugDraw( RenderContext* context ) {
+	return;
+	using namespace RENDER_BACKEND;
+	Gfx* gfx = Gfx::get();
 
-	context->pushDebugMarker( "RenderWorld::DebugDraw" );
+	Pipeline* pipeline = gfx->getPipeline( 0 );
+	pipeline->bind( context );
 
-	// output to geometry buffers
+	Core::AABB waabb;
 	RenderableContainer::const_iterator it = renderables.begin();
 	while( it != renderables.end() ) {
 		const RenderablePtr& toRender = (*it);
-//		if( context->viewFrustum->cullAABB( toRender->getWorldAABB() ) != Core::Frustum::OUTSIDE ) 
+		toRender->getWorldAABB( waabb );
+//		if( activeCamera &&
+//			activeCamera->getFrustum().cullAABB( waabb ) != 
+//							Core::Frustum::OUTSIDE ) 
 		{
 			toRender->debugDraw( context );
 		}
 		++it;
 	}
 
-	context->popDebugMarker(); 
+	pipeline->unbind();
+
 }
 
 void RenderWorld::render( RenderContext* context ) {
-	using namespace RENDER_BACKEND;
-
-	Gfx* gfx = Gfx::get();
-
-	for( size_t i = 0; i < gfx->getNumPipelines(); ++i ) {
-		// TODO how to select pipelines... hmmm
-		if( i == 0 ) {
-			renderRenderables( context, i );
-		}
-	}
-
+	renderRenderables( context, 1 );
 }
 
 }

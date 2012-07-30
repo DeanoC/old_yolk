@@ -16,15 +16,24 @@
 // outside namespace
 DECLARE_SHARED_WITH_CL( clforgl );
 DECLARE_SHARED_WITH_CL( constant_blocks );
+DECLARE_FRAGMENT( vs_passthrough );
 DECLARE_FRAGMENT( vs_basic );
+DECLARE_FRAGMENT( vs_flat_basic );
 DECLARE_FRAGMENT( fs_basic );
 DECLARE_FRAGMENT( vs_ndcpos_col );
 DECLARE_FRAGMENT( fs_vertcol );
 DECLARE_FRAGMENT( vs_ndcpos_col_uv );
 DECLARE_FRAGMENT( fs_tex_vertcol );
+DECLARE_FRAGMENT( vs_transform_only );
+DECLARE_FRAGMENT( gs_makefullscreen );
+DECLARE_FRAGMENT( fs_resolve8msaa );
+
 DECLARE_PROGRAM( basic );
+DECLARE_PROGRAM( flat_basic );
 DECLARE_PROGRAM( 2dcolour );
 DECLARE_PROGRAM( basicsprite );
+DECLARE_PROGRAM( depth_only );
+DECLARE_PROGRAM( resolve8msaa );
 
 namespace {
 const int MAX_GLSL_INCLUDES = 128;
@@ -47,16 +56,24 @@ ShaderMan::ShaderMan() {
 void ShaderMan::initDefaultPrograms() {
 	REGISTER_SHARED_WITH_CL( clforgl );
 	REGISTER_SHARED_WITH_CL( constant_blocks );
+	REGISTER_FRAGMENT( vs_passthrough );
 	REGISTER_FRAGMENT( vs_basic );
+	REGISTER_FRAGMENT( vs_flat_basic );
 	REGISTER_FRAGMENT( fs_basic );
 	REGISTER_FRAGMENT( vs_ndcpos_col );
 	REGISTER_FRAGMENT( fs_vertcol );
 	REGISTER_FRAGMENT( vs_ndcpos_col_uv );
 	REGISTER_FRAGMENT( fs_tex_vertcol );
+	REGISTER_FRAGMENT( vs_transform_only );
+	REGISTER_FRAGMENT( gs_makefullscreen );
+	REGISTER_FRAGMENT( fs_resolve8msaa );
 
+	REGISTER_PROGRAM( flat_basic );
 	REGISTER_PROGRAM( basic );
 	REGISTER_PROGRAM( 2dcolour );
 	REGISTER_PROGRAM( basicsprite );
+	REGISTER_PROGRAM( depth_only );
+	REGISTER_PROGRAM( resolve8msaa );
 }
 
 const char* ShaderMan::getProgramSource( const std::string& prgName ) const {

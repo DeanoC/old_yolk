@@ -14,9 +14,11 @@ list( APPEND header_files ${header_files} ${cl_src_files} )
 list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
 foreach( sc ${cl_src_files} )
-	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp 
+	set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp PROPERTIES GENERATED TRUE )
+	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp
+						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc}
 						COMMAND bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp ${sc}
-						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} )
+						COMMENT "${sc}: if this fails create the directory part of ${sc} in the build folders manually" )
 	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
 endforeach( sc ${cl_src_files} )
 

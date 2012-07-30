@@ -24,8 +24,11 @@ namespace Scene {
 	public:
 		//! Default ctor creates an empty mesh
 		Mesh();
-		//! loads the mesh provided
+		//! loads the mesh provided and gives it an identity transform
 		Mesh( const char* pFilename );
+
+		//! loads the mesh and hooks in the transform provided
+		Mesh( const char* pFilename, Core::TransformNode* node );
 		
 		//! dtor
 		~Mesh();
@@ -59,8 +62,7 @@ namespace Scene {
 
 	protected:
 		WobResourceHandlePtr		meshHandle;
-		Math::Matrix4x4				transformMatrix;
-		Core::TransformNode			simpleTransformNode;
+		Math::Matrix4x4*			ownedMatrix;
 		Math::Matrix4x4				prevWVP;
 	};
 }; // end namespace Graphics

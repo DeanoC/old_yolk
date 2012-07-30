@@ -5,6 +5,8 @@
 //! owns the Gl LOAD_CONTEXT for talking to the GPU
 //!
 //! TODO possible multiple ResourceLoader at the same time
+//! TODO find out why some have to be done sync, if doen async
+//! TODO GL errors abound :(
 //!-----------------------------------------------------
 
 #include "gl.h"
@@ -231,8 +233,8 @@ void ResourceLoaderImpl::PushOntoLoaderContext( const Core::ResourceHandleBase* 
 	// some things have to be done sync due to GL context oddness, this distinguishs the boys from the men
 	std::shared_ptr<Core::ResourceBase> res;
 	switch( handle->getType() ) {
-//	case WobType: res = WobCreateResource( handle, flags, pName, pData ); break;
-//	case HierType: res = HierCreateResource( handle, flags, pName, pData ); break;
+	case WobType: res = WobCreateResource( handle, flags, pName, pData ); break;
+	case HierType: res = HierCreateResource( handle, flags, pName, pData ); break;
 //	case TextureType: res = TextureCreateResource( handle, flags, pName, pData );break;
 //	case TextureAtlasType: res = TextureAtlasCreateResource( handle, flags, pName, pData );break;
 //	case ProgramRType: res = ProgramCreateResource( handle, flags, pName, pData ); break;

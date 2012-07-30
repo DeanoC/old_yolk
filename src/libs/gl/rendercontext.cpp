@@ -47,8 +47,11 @@ void debugOutput (
 
     if(severity == GL_DEBUG_SEVERITY_HIGH_ARB) {
 		LOG(ERROR) << debSource << " : " << debType << " : " << id << " : " << message;
+
 #if PLATFORM == WINDOWS 
 		DebugBreak();
+#else
+		raise(SIGINT);
 #endif
 	} else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB) {
 		LOG(WARNING) << debSource << " : " << debType << " : " << id << " : " << message;
@@ -118,20 +121,21 @@ void RenderContext::threadActivate() {
 		if( glDebugMessageCallbackAMD ) {
 			glDebugMessageCallbackAMD(&debugOutputAMD, NULL);
 			GL_CHECK
+			glDebugMessageEnableAMD(0, 0, 0, NULL, GL_TRUE);
+			GL_CHECK
 			glDebugMessageInsertAMD(GL_DEBUG_CATEGORY_APPLICATION_AMD, 
 				GL_DEBUG_SEVERITY_LOW_AMD, 1, testStr.length(), testStr.c_str() );
-			GL_CHECK
-			glDebugMessageEnableAMD(0, 0, 0, NULL, GL_TRUE);
 			GL_CHECK
 		} else if(glDebugMessageControlARB) {
 			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 			GL_CHECK
 			glDebugMessageCallbackARB(&debugOutput, NULL);
 			GL_CHECK
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+			GL_CHECK
 			glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 
 				1, GL_DEBUG_SEVERITY_LOW_ARB, testStr.length(), testStr.c_str() );
 			GL_CHECK
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 		}
 		debugOutputInstalled = true;
 	}
@@ -180,7 +184,6 @@ void RenderContext::useAsRenderTarget( TexturePtr pTarget ) {
 }
 void RenderContext::useAsDepthOnlyRenderTargets( TexturePtr pDepthTarget ) {
 	useNoRenderTargets();
-	fbo->detach( FAP_COLOUR0 );
 	fbo->attach( FAP_DEPTH, pDepthTarget );
 	boundRenderTargets[FAP_MAX_ATTACHMENT_POINTS-1] = pDepthTarget;
 	fbo->bind();
@@ -216,6 +219,7 @@ void RenderContext::useNoRenderTargets() {
 	}
 	if( boundRenderTargets[FAP_MAX_ATTACHMENT_POINTS-1] != NULL ) {
 		fbo->detach( FAP_DEPTH );
+		boundRenderTargets[FAP_MAX_ATTACHMENT_POINTS-1] = NULL;
 	}
 }
 

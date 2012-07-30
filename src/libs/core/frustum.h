@@ -50,7 +50,7 @@ public:
 	}
 
 	//!Taking an AABB min and max in world space, work out its interaction with the view frustum
-	CALL CULL_RESULT cullAABB( const Core::AABB& oAABB ) {
+	CALL CULL_RESULT cullAABB( const Core::AABB& oAABB ) const {
 		bool Intersect = false;
 		Math::Vector3 Min, Max;
 

@@ -11,7 +11,8 @@
 #include "shaderman.h"
 
 #include "rendercontext.h"
-#include "forwardpipeline.h"
+#include "debugpipeline.h"
+#include "vtpipeline.h"
 #include "resourceloader.h"
 #include "imagecomposer.h"
 
@@ -67,8 +68,9 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 	finalComposer.reset( CORE_NEW ImageComposer() );
 
 	// install pipelines
-	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW ForwardPipeline(pipelines.size()) ) );
+	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW DebugPipeline(pipelines.size()) ) );
 //	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW SceneCapturePipeline(pipelines.size()) ) );
+	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW VtPipeline(pipelines.size()) ) );
 
 	// add pipelines into a fast name lookup system
 	for( size_t i = 0; i < pipelines.size(); ++i ) {
@@ -83,12 +85,14 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 	glGetIntegerv( GL_MAX_FRAGMENT_ATOMIC_COUNTERS, &fsAtomicCounter );
 	LOG(INFO) << "Geometry Shader atomics : " << gsAtomicCounter;
 	LOG(INFO) << "Fragment Shader atomics : " << fsAtomicCounter;
+	int samples;
+	glGetIntegerv( GL_MAX_SAMPLES, &samples);
+	LOG(INFO) << "MSAA samples : " << samples;
 #endif
 
 
 	return true;
 }
-
 
 void Gfx::shutdownScreen() {
 	renderContexts.reset( 0 );
@@ -97,18 +101,33 @@ void Gfx::shutdownScreen() {
 void Gfx::present( int backWidth, int backHeight ) {
 	resourceLoader->showLoadingIfNeeded( finalComposer.get() );
 
-	pipelines[0]->bind( &renderContexts[RENDER_CONTEXT], false );
-	debugPrims->flush();
-	finalComposer->render();
-	pipelines[0]->unbind( &renderContexts[0] );
+	// clear the backbuffer
+//	float colClr[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+//	glClearBufferfv( GL_COLOR, 0, colClr );
+//	glClearBufferfi( GL_DEPTH_STENCIL, 0, 1.0, 0 );
 
-	pipelines[0]->display( &renderContexts[RENDER_CONTEXT], backWidth, backHeight );
-	renderContexts[0].swapBuffers();
+	auto forId = hashPipeline[ "forward" ];
+	auto vtId = hashPipeline[ "vt" ];
+
+	// merge pipelines and display
+	// bind, merge, unbind, this is needed to get debug market correct
+	// and the keep the rule that each bind needs an unbind
+	pipelines[ forId ]->bind( &renderContexts[RENDER_CONTEXT] );
+	pipelines[ vtId ]->merge( &renderContexts[RENDER_CONTEXT] );
+	pipelines[ forId ]->unbind();
+
+	// merge are allowed (and have to for MSAA) to fiddle with things
+	// that binds set, so merge must be followed by unbind, but as we
+	// want to draw stuff we have to call bind again
+	pipelines[ forId ]->bind( &renderContexts[RENDER_CONTEXT] );
+	finalComposer->render();
+	debugPrims->flush();
+	pipelines[ forId ]->unbind();
+	renderContexts[ forId ].swapBuffers();
 
 	frameCount++;
 	totalPrimitiveCount = 0;
 }
-
 
 RenderContext* Gfx::getThreadRenderContext( THREAD_CONTEXT index ) const {
 	return &renderContexts[index];

@@ -51,7 +51,7 @@ DebugPrims::DebugPrims() {
 	vaoHandle = VaoHandle::create( vaoName.c_str(), &vocs );
 
 	vertexBuffer = vertexBufferHandle->acquire();
-	pVertices = (Vertex*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY );
+	pVertices = (Vertex*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY, DataBuffer::MF_DISCARD );
 
 	debugProgramHandle = ProgramHandle::create( "2dcolour" );
 }

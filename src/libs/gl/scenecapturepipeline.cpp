@@ -5,6 +5,7 @@
 //! renderer.
 //!
 //!-----------------------------------------------------
+#if 0
 
 #include "gl.h"
 #include "core/resources.h"
@@ -510,3 +511,4 @@ SceneCapturePipelineDataStore::~SceneCapturePipelineDataStore() {
 }
 
 }
+#endif

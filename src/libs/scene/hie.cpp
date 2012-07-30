@@ -26,6 +26,7 @@ Hie::Hie( const char* pFilename ) :
 	}
 
 	HierarchyNode* nodes = (HierarchyNode*) (header+1);
+	nodes = (HierarchyNode*) Core::alignTo( (uintptr_t) nodes, 8 );
 
 	numNodes = header->numNodes;
 	if( header->numNodes > 0 ) {
@@ -41,9 +42,11 @@ Hie::Hie( const char* pFilename ) :
 		for( uint16_t i=0;i < header->numNodes;++i ) {
 			HierarchyNode* node = &nodes[i];
 			HierarchyTree* tree = node->children.p;
-			uint32_t* indices = (uint32_t*)(tree + 1);
-			for( uint32_t j=0;j < node->children.p->numChildren;++j) {
-				nodeArray[i].addChild( nodeArray + indices[j] );
+			if( tree ) {
+				uint32_t* indices = (uint32_t*)(tree + 1);
+				for( uint32_t j=0;j < node->children.p->numChildren;++j) {
+					nodeArray[i].addChild( nodeArray + indices[j] );
+				}
 			}
 			nodeArray[i].setLocalPosition( Math::Vector3( node->pos ) );
 
@@ -58,8 +61,8 @@ Hie::Hie( const char* pFilename ) :
 			}
 
 			if( node->type == HNT_MESH ) {
-				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( node->meshName.p );
-				nodeArray[i].addChild( mesh->getTransformNode() );
+				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( 
+					node->meshName.p, &nodeArray[i] );
 				ownedMeshes.push_back( mesh );
 				localAabb.expandBy( mesh->getLocalAabb() );
 			}			

@@ -34,10 +34,10 @@ Fbo::~Fbo() {
 	unbind();
 }
 
-void Fbo::bind() {
+void Fbo::bind( FBO_FRAMEBUFFER_SD target ) {
 	glFramebufferDrawBuffersEXT( name, colourCount, drawBufferArray );
 	GL_CHECK
-	auto nchk = glCheckNamedFramebufferStatusEXT( name, GL_FRAMEBUFFER );
+	auto nchk = glCheckNamedFramebufferStatusEXT( name, target );
 	switch( nchk ) {
 		case GL_FRAMEBUFFER_COMPLETE: break;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: LOG(ERROR) << "named GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n"; break;
@@ -48,9 +48,9 @@ void Fbo::bind() {
 		default: LOG(INFO) << "named glCheckFramebufferStatus ERR " << nchk << "\n"; break;
 	}
 
-	glBindFramebuffer( GL_FRAMEBUFFER, name );
+	glBindFramebuffer( target, name );
 	GL_CHECK
-	auto chk = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+	auto chk = glCheckFramebufferStatus( target );
 	switch( chk ) {
 		case GL_FRAMEBUFFER_COMPLETE: break;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: LOG(ERROR) << "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n"; break;
@@ -62,8 +62,8 @@ void Fbo::bind() {
 	}
 }
 
-void Fbo::unbind() {
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+void Fbo::unbind( FBO_FRAMEBUFFER_SD target ) {
+	glBindFramebuffer( target, 0 );
 	GL_CHECK
 }
 
@@ -78,8 +78,19 @@ void Fbo::attach( FBO_ATTACHMENT_POINT pnt, const TexturePtr& target ) {
 		renderBufferType = true;
 	} else {
 		CORE_ASSERT( target->getType() == MNT_TEXTURE_OBJECT );
-		// TODO 1D, 3D, arrays, cubemaps  
-		glNamedFramebufferTexture2DEXT( name, pnt, GL_TEXTURE_2D, target->getName(), 0 );
+		if( target->getHeight() > 1 ) {
+			if( target->getDepth() <= 1 ) {
+				if( target->getSampleCount() > 1 ) {
+					glNamedFramebufferTexture2DEXT( name, pnt, GL_TEXTURE_2D_MULTISAMPLE, target->getName(), 0 );
+				} else {
+					glNamedFramebufferTexture2DEXT( name, pnt, GL_TEXTURE_2D, target->getName(), 0 );
+				}
+			} else {
+				glNamedFramebufferTexture3DEXT( name, pnt, GL_TEXTURE_3D, target->getName(), 0, 0 );
+			}
+		} else {
+			glNamedFramebufferTexture1DEXT( name, pnt, GL_TEXTURE_1D, target->getName(), 0 );
+		}
 		GL_CHECK
 	}
 
@@ -110,9 +121,8 @@ void Fbo::detach( FBO_ATTACHMENT_POINT pnt ) {
 }
 
 void Fbo::detachAll() {
-	for( int i = FAP_COLOUR0; i <= FAP_COLOUR7; ++i ) {
-		detach( (FBO_ATTACHMENT_POINT) i );
-
+	for( int i = 0; i < colourCount; ++i ) {
+		detach( (FBO_ATTACHMENT_POINT) ((int)FAP_COLOUR0 + i) );
 	}
 	detach( FAP_DEPTH );
 }

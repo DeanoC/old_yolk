@@ -23,6 +23,15 @@ public:
 			orientation( 0,0,0,1 ),
 			scale( 1,1,1 ) 
 	{}
+	bool isIdentity() const {
+		if ( (Math::LengthSquared( position ) < 1e-5f) &&
+			 (1 - Math::LengthSquared(orientation) < 1e-5f) &&
+			 (3 - Math::LengthSquared( scale ) < 1e-5f) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	//! position
 	Math::Vector3		position;

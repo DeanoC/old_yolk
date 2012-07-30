@@ -17,14 +17,25 @@ namespace Scene {
 
 Mesh::Mesh() :
 	meshHandle(0),
-	simpleTransformNode( transformMatrix ),
-	Renderable( &simpleTransformNode ) {
+	ownedMatrix( CORE_NEW Math::Matrix4x4() ),
+	Renderable( CORE_NEW Core::TransformNode( *ownedMatrix ) ) {
 }
 
 Mesh::Mesh( const char* pFilename ) :
 	meshHandle( WobResourceHandle::load( pFilename, NULL, Core::RMRF_NONE ) ),
-	simpleTransformNode( transformMatrix ),
-	Renderable( &simpleTransformNode ) {
+	ownedMatrix( CORE_NEW Math::Matrix4x4() ),
+	Renderable( CORE_NEW Core::TransformNode( *ownedMatrix ) ) {
+
+	// for now 
+	WobResourcePtr wob = meshHandle->tryAcquire();
+	if( wob ) {
+		localAabb = Core::AABB( wob->header->minAABB, wob->header->maxAABB );
+	}
+}
+Mesh::Mesh( const char* pFilename, Core::TransformNode* node ) :
+	meshHandle( WobResourceHandle::load( pFilename, NULL, Core::RMRF_NONE ) ),
+	ownedMatrix( nullptr ),
+	Renderable( node ) {
 
 	// for now 
 	WobResourcePtr wob = meshHandle->tryAcquire();
@@ -33,9 +44,14 @@ Mesh::Mesh( const char* pFilename ) :
 	}
 }
 
+
 Mesh::~Mesh() {
 	if( meshHandle ) {
 		Core::ResourceMan::get()->closeResource( meshHandle );
+	}
+	if( ownedMatrix ) {
+		CORE_DELETE ownedMatrix;
+		CORE_DELETE transformNode;
 	}
 }
 
@@ -44,7 +60,8 @@ void Mesh::render( RenderContext* rc, const int pipelineName ) {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
-	context->getConstantCache().changeObject( prevWVP, getTransformNode()->getWorldTransform() );
+	context->getConstantCache().changeObject( prevWVP, 
+							getTransformNode()->getRenderMatrix() );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
 	prevWVP = context->getConstantCache().getMatrix( RENDER_BACKEND::CVN_WORLD_VIEW_PROJ );

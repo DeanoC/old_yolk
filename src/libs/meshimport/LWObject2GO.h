@@ -42,6 +42,19 @@ extern MeshMod::MeshPtr LightWaveObject2GoMesh(	const LightWave::Object& in,
 										MeshMod::MeshPtr out = MeshMod::MeshPtr(),
 										const unsigned int layer = -1,
 										const Math::Matrix4x4& transform =  Math::IdentityMatrix() );
+class LWOImp  : public ImportInterface {
+public:
+	LWOImp( const std::string& filename );
+	virtual ~LWOImp();
+
+	virtual bool loadedOk() const override;
+	virtual MeshMod::ScenePtr toMeshMod() override;
+
+private:
+	MeshMod::MeshPtr 	mesh;
+	MeshMod::ScenePtr 	scene;
+};
+
 } // end namespace
 
 //---------------------------------------------------------------------------

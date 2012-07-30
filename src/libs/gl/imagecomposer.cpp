@@ -46,6 +46,10 @@ ImageComposer::ImageComposer( int _maxSpritesPerLayer ) :
 {
 	program[ SIMPLE_SPRITE ] = ProgramHandle::create( "basicsprite" );
 	program[ SOLID_COLOUR ] = ProgramHandle::create( "2dcolour" );
+
+	for( int i = 0; i < MAX_LAYERS; ++i ) {
+		layers[i].layerNum = i;
+	}
 }
 
 ImageComposer::~ImageComposer() {
@@ -68,7 +72,7 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 			maxSpritesPerLayer * 6 * SizeOfRenderType[ key.type ]
 		};
 		std::stringstream nam;
-		nam << "_imagecompPage" << layer.pageMap.size();
+		nam << "_imagecompPage" << layer.pageMap.size() << "_" << layer.layerNum;
 		const std::string name = nam.str();
 		DataBufferHandlePtr vertexBufferHandle = DataBufferHandle::create( name.c_str(), &vbcs );
 
@@ -402,11 +406,16 @@ void ImageComposer::render() {
 		while( pmIt != layers[i].pageMap.end() ) {
 			const Layer::PageKey& pagekey = pmIt->first;
 			Layer::Page& page = pmIt->second;
+			if( page.mapped == nullptr ) {
+				++pmIt;
+				continue;
+			}
 
 			page.unmap();
 
 			VaoPtr vao = page.vaoHandle->tryAcquire();
 			if( !vao ) {
+				++pmIt;
 				continue;
 			}
 			glBindVertexArray( vao->getName() );

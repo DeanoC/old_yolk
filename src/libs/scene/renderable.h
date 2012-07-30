@@ -46,7 +46,9 @@ namespace Scene {
 		virtual void render( RenderContext* context, const int pipelineIndex ) = 0;
 
 		virtual void debugDraw( RenderContext* context ) const {
-			getWorldAABB().drawDebug( Core::RGBAColour(1,1,1,1), Math::IdentityMatrix() );
+			Core::AABB waabb;
+			getWorldAABB( waabb );
+			waabb.drawDebug( Core::RGBAColour(1,1,1,1), Math::IdentityMatrix() );
 		}
 
 		//! get the transform node directly for attaching
@@ -55,14 +57,20 @@ namespace Scene {
 
 		const Core::AABB& getLocalAabb() const { return localAabb; }
 
-		Core::AABB getWorldAABB() const {
+		void getWorldAABB( Core::AABB& waabb) const {
 			if( transformNode != NULL ) {
-				return localAabb.transform( transformNode->getWorldTransform() );
+				waabb = localAabb.transform( transformNode->getWorldMatrix() );
 			} else{
-				return localAabb;
+				waabb = localAabb;
 			}
 		}
-
+		void getRenderAABB( Core::AABB& waabb) const {
+			if( transformNode != NULL ) {
+				waabb = localAabb.transform( transformNode->getRenderMatrix() );
+			} else{
+				waabb = localAabb;
+			}
+		}
 		// this is a method to get a flat array of renderables for simple
 		// renderable it will 0 or 1 entry, however for compound renderables
 		// it can render a number of renderables. Its also allows easy filtering

@@ -31,19 +31,30 @@ namespace Scene {
 		virtual const CameraPtr getCamera( uint32_t index ) const { return cameras[index]; }
 		virtual CameraPtr getCamera( uint32_t index ) { return cameras[index]; }
 
+		// TODO multiple screens/views etc.
+		void setActiveCamera( std::shared_ptr<Scene::Camera> cam ) { activeCamera = cam; }
+		std::shared_ptr<Scene::Camera> getActiveCamera() { return activeCamera; }
+
 		virtual void render( RenderContext* context );
 
 		virtual void debugDraw( RenderContext* context );
 
+		Core::mutex* getUpdateMutex() { return &updateMutex; }
+
 	protected:
+		typedef tbb::concurrent_vector< RenderablePtr > RenderableContainer;
+		typedef tbb::concurrent_vector< CameraPtr > 	CameraContainer;
+		typedef std::vector< uint32_t > STIndexContainer;
+
 		void renderRenderables(  RenderContext* context, const size_t pipelineIndex );
 
-		typedef tbb::concurrent_vector< RenderablePtr > RenderableContainer;
 		RenderableContainer				renderables;
+		STIndexContainer				visibleRenderables;
 
-		typedef tbb::concurrent_vector< CameraPtr > CameraContainer;
 		CameraContainer					cameras;
 
+		std::shared_ptr<Scene::Camera>	activeCamera;
+		Core::mutex 					updateMutex;
 	};
 }
 

@@ -11,8 +11,7 @@ extern void InstallInputApiFuncs( TrustedRegion* trustedRegion );
 extern void InstallCamApiFuncs( TrustedRegion* trustedRegion );
 
 ClientWorld::ClientWorld() :
-	inputQueue( 3 ),
-	activeCamera( nullptr ) {
+	inputQueue( 3 ) {
 }
 
 void ClientWorld::InstallApiFuncs( TrustedRegion* trustedRegion ) {

@@ -21,6 +21,8 @@
 #include <meshmod/materialface.h>
 #include <algorithm>
 
+#include "LWObject2GO.h"
+
 #define UNREFERENCED_PARAMETER(x) (void)x
 
 //---------------------------------------------------------------------------
@@ -924,6 +926,35 @@ namespace LWObject2Go_Local
 	}
 }
 
+namespace MeshImport
+{
+	LWOImp::LWOImp( const std::string& filename ) {
+		LightWave::Object object;
+		LightWave::LWO_Loader loader( filename );
+		object.loader = &loader;
+
+		scene = std::make_shared<MeshMod::Scene>();
+		mesh = LightWaveObject2GoMesh( object );
+		MeshMod::SceneNodePtr node = std::make_shared<MeshMod::SceneNode>();
+		node->type = "Mesh";
+		node->name = filename;
+		node->addObject( mesh );
+		scene->sceneNodes.push_back( node );
+	}
+	bool LWOImp::loadedOk() const {
+		if( scene && !scene->sceneNodes.empty() ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	LWOImp::~LWOImp() {
+	}
+	MeshMod::ScenePtr LWOImp::toMeshMod() {
+		return scene;
+	}
+
+}
 /**
 Short description.
 Detailed description

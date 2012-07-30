@@ -133,6 +133,20 @@ void TexStorageBuffer( Gl::Memory::Name name, GLenum fmt,  Gl::Memory::Name buff
 	GL_CHECK
 }
 
+void TexStorage2DMultisample( Gl::Memory::Name name, GLint samples, GLenum fmt, GLint width, GLint height ) {
+	glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, name );
+	glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, samples, fmt, width, height, false);
+	glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, 0 );
+
+}
+
+void TexStorage3DMultisample( Gl::Memory::Name name, GLint samples, GLenum fmt, GLint width, GLint height, GLint depth ) {
+	glBindTexture( GL_TEXTURE_2D_MULTISAMPLE_ARRAY, name );
+	glTexImage3DMultisample( GL_TEXTURE_2D_MULTISAMPLE_ARRAY, samples, fmt, width, height, depth, false );
+	glBindTexture( GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0 );
+}
+
+
 // These Image functions must use SubImage as Storage allocated can't
 // call glImageXXX as they could potentially try to resize which isn't allowed
 
@@ -156,6 +170,8 @@ void TexImage1D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt
 	}
 	GL_CHECK
 }
+
+
 
 void TexImage2D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt, GLint width, GLint height, uint8_t* memPtr ) {
 	auto pixFmt = GlFormat::getPixelFormat( fmt );
@@ -351,7 +367,13 @@ Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 	}
 
 	if( pStruct->flags & TCF_MULTISAMPLE ) {
-		TODO_ASSERT( false && "Multisample texture TODO" );
+		CORE_ASSERT( (pStruct->flags & TCF_1D | pStruct->flags & TCF_3D) == 0 );
+		pTexture->sampleCount = pStruct->sampleCount;
+		if( pStruct->flags & TCF_ARRAY ) {
+			TexStorage3DMultisample( name, pTexture->sampleCount, pTexture->format, pTexture->width, pTexture->height, pTexture->slices );
+		} else {
+			TexStorage2DMultisample( name, pTexture->sampleCount, pTexture->format, pTexture->width, pTexture->height );
+		}
 	} else {
 		if( pStruct->flags & TCF_1D ) {
 			if( pStruct->flags & TCF_ARRAY ) {

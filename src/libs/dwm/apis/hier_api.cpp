@@ -8,6 +8,7 @@
 #include "core/resourceman.h"
 #include "core/coreresources.h"
 #include "scene/hie.h"
+#include "dwm/world.h"
 
 #include "apis.h"
 
@@ -75,11 +76,14 @@ int HierGetNodeCount( _VT_PARAMS1( HierHandle handle ) ) {
 }
 
 void HierSetLocalTransform( _VT_PARAMS3( HierHandle handle, _VT_PTR( const HierTransformParams* const, params ), int nodeId ) ) {
+	World* world = (World*) threadCtx->owner->world;
+
 	HierTransformParams safeParams;
 	memcpy( &safeParams, (void*) UNTRUSTED_PTR_TO_TRUSTED(params), sizeof( HierTransformParams ) );
 
 	auto hie = (Scene::Hie*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
 
+	Core::lock_guard<Core::mutex> updateGuard( *world->getUpdateMutex() );
 	hie->getTransformNode( nodeId )->setLocalPosition( Math::Vector3(	safeParams.localPos[0], 
 	                                          					safeParams.localPos[1], 
 	                                          					safeParams.localPos[2]) );

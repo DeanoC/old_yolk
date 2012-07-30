@@ -6,6 +6,7 @@
 #include "meshimport/meshimport.h"
 #include "meshimport/assimp.h"
 #include "meshimport/grometxtimp.h"
+#include "meshimport/LWObject2GO.h"
 #include "meshimport/LWScene2GO.h"
 #include "export/export.h"
 #include "export/wobexp.h"
@@ -76,19 +77,24 @@ int Main() {
 	using namespace MeshMod;
 	using namespace Export;
 
-	if( inPath.Extension() == ".lws" ) {
+	auto ext = inPath.Extension();
+
+	if(  ext == ".lws" || ext == ".lwo" ) {
 		LOG(INFO) << "Input Path : " << inPath.DirName().value().c_str() << "\n";
 		chdir( inPath.DirName().value().c_str() );
 
 		std::shared_ptr<ImportInterface> importer;
-		importer = std::make_shared<LWSImp>( inPath.BaseName().value() );
+		if( inPath.Extension() == ".lwo" ) {
+			importer = std::make_shared<LWOImp>( inPath.BaseName().value() );
+		} else {
+			importer = std::make_shared<LWSImp>( inPath.BaseName().value() );
+		}
 		if( importer->loadedOk() == false ) {
 			LOG(INFO) << "Input file <" << inPath.BaseName().value() <<"> not found or unable to be loaded\n";
 			return 1;
 		}
 		OutputScene( outPath, importer );
-	} else 
-	if( inPath.Extension() == ".txt" ) {
+	} else if( ext == ".txt" ) {
 		LOG(INFO) << "Input Path : " << inPath.DirName().value().c_str() << "\n";
 		chdir( inPath.DirName().value().c_str() );
 
@@ -100,16 +106,16 @@ int Main() {
 		}
 		OutputScene( outPath, importer );
 	} else
-	if(	inPath.Extension() == ".png" || inPath.Extension() == ".tga" ||
-		inPath.Extension() == ".jpg" || inPath.Extension() == ".psd" ||
-		inPath.Extension() == ".bmp" || inPath.Extension() == ".gif" ) {
+	if(	ext == ".png" || ext == ".tga" ||
+		ext == ".jpg" || ext == ".psd" ||
+		ext == ".bmp" || ext == ".gif" ) {
 
 		DoTexture( inPath, outPath );
 
 	} else
-	if( inPath.Extension() == ".hdr" ) {
+	if( ext == ".hdr" ) {
 	} else
-	if( inPath.Extension() == ".tao" ) {
+	if( ext == ".tao" ) {
 		DoTextureAtlas( inPath, outPath );
 	} else
 	{

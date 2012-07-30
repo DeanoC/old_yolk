@@ -22,36 +22,37 @@ namespace Scene {
 		path = path.ReplaceExtension( ".hie" );
 
 		std::ifstream inStream( path.value().c_str(), std::ifstream::binary );
-		inStream.read( (char*)&header, sizeof(header) );
+		inStream.read( (char*)&header, sizeof(HierarchyFileHeader) );
 		if( !inStream.good() ) {
 			LOG(INFO) << "Hie File " << pFilename << " not found\n";
 			return std::shared_ptr<HierarchyFileHeader>();
 		}
 		if( header.uiMagic == HierType ) {
-			// load the nodes
-			std::shared_ptr<HierarchyFileHeader> spHeader( (HierarchyFileHeader*) CORE_NEW char[sizeof(header) + header.numNodes * sizeof(HierarchyNode) + header.linkBlockSize ] ); 
-			HierarchyFileHeader* pHeader = spHeader.get();
-			memcpy( pHeader, &header, sizeof(header) );
-			if( pHeader->version != HierVersion ) {
+			if( header.version != HierVersion ) {
 				LOG(INFO) << "Hie File " << pFilename << " version incorrect\n";
-				return std::shared_ptr<HierarchyFileHeader>();				
+				return std::shared_ptr<HierarchyFileHeader>();
 			}
 
-			HierarchyNode* nodes = (HierarchyNode*) (pHeader + 1);
-			inStream.read( (char*)nodes, header.numNodes * sizeof(HierarchyNode) );
+			// load the nodes
+			std::shared_ptr<HierarchyFileHeader> spHeader( (HierarchyFileHeader*) 
+				CORE_NEW char[sizeof(HierarchyFileHeader) + header.dataBlockSize ] ); 
 
-			// load the links, 1 uint16_t numchild followed by
-			uint8_t* links = (uint8_t*)(nodes + header.numNodes);
-			inStream.read( (char*)links, header.linkBlockSize );
-			pHeader->pLinkBlock.p = links;
+			HierarchyFileHeader* pHeader = spHeader.get();
+			memcpy( pHeader, &header, sizeof(HierarchyFileHeader) );
+
+			HierarchyNode* onodes = (HierarchyNode*) (pHeader + 1);
+			inStream.read( (char*)onodes, header.dataBlockSize );
+			HierarchyNode* nodes = (HierarchyNode*) Core::alignTo( (uintptr_t) onodes, 8 );
 
 			for(int i = 0;i < header.numNodes;++i ) {
-				nodes[i].children.p = fixupPointer<HierarchyTree>( links, nodes[i].children.o.l );
-				nodes[i].nodeName.p = fixupPointer<const char>( links, nodes[i].nodeName.o.l );
-				if( nodes[i].meshName.p != 0 ) {
+				if( nodes[i].meshName.o.l != 0 ) {
 					// we do mesh name but will also do any other union'ed pointer
-					nodes[i].meshName.p = fixupPointer<const char>( links, nodes[i].meshName.o.l );
+					nodes[i].meshName.p = fixupPointer<const char>( onodes, nodes[i].meshName.o.l );
 				}
+				if( nodes[i].children.o.l != 0 ) {
+					nodes[i].children.p = fixupPointer<HierarchyTree>( onodes, nodes[i].children.o.l );
+				}
+				nodes[i].nodeName.p = fixupPointer<const char>( onodes, nodes[i].nodeName.o.l );
 			}
 			return spHeader;
 		}

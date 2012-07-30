@@ -15,6 +15,7 @@
 namespace Gl {
 
 void* DataBuffer::map( MAP_ACCESS access, MAP_FLAGS flags, size_t offset, size_t bytes ) {
+	GL_CHECK
 
 	if( bytes == 0 ) {
 #if !defined( BUFFER_RANGE_ALWAYS )
@@ -92,8 +93,8 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 											const DataBuffer::CreationStruct* creation ) {
 	DataBuffer* dbuffer = CORE_NEW DataBuffer();
 	dbuffer->generateName( MNT_DATA_BUFFER );
-//	dbuffer->size = (size_t)Core::alignTo( creation->size, DataBuffer::MIN_BUFFER_SIZE);
-	dbuffer->size = creation->size;
+//	dbuffer->size = creation->size;
+	dbuffer->size = (size_t)Core::alignTo( creation->size, DataBuffer::MIN_BUFFER_SIZE);
 	CORE_ASSERT( dbuffer->size >= creation->size );
 	dbuffer->type = creation->type;
 

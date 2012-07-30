@@ -29,19 +29,25 @@ namespace Gl {
 	namespace GPUConstants {
 		struct Light;
 	};
-
+#if 0
 	class SceneCapturePipeline : public Scene::Pipeline {
 	public:
 		friend class Gfx;
 
 		virtual const char* getName() const { return "scene capture"; };
 
-		virtual void bind( Scene::RenderContext* _context, bool clear );
-		virtual void unbind( Scene::RenderContext* context );
+		virtual void bind( Scene::RenderContext* _context );
+		virtual void unbind();
+
+		virtual int getGeomPassCount() { return 1; }
+		virtual void startGeomPass( int i ) {};
+		virtual void endGeomPass ( int i ) {};
 
 		virtual void display( Scene::RenderContext* context, int backWidth, int backHeight );
+		virtual void merge( Scene::RenderContext* rc ){};
 
 		virtual void conditionWob( const char* name, struct Scene::WobResource* wob );
+
 
 	protected:
 		SceneCapturePipeline( size_t index );
@@ -107,7 +113,7 @@ namespace Gl {
 		size_t						numIndices;
 		int							indexType;
 	};
-
+#endif
 }
 
 #endif

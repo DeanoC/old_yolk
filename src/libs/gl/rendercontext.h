@@ -1,4 +1,4 @@
-#pragma once
+	#pragma once
 
 #if !defined(WIERD_GL_RENDERCONTEXT_H)
 #define WIERD_GL_RENDERCONTEXT_H
@@ -60,6 +60,7 @@ public:
 
 	ProgramPipelineObject* getCurrentPpo() const { return curPpo; }
 
+	Fbo* getFbo() const { return fbo.get(); };
 #if PLATFORM == WIN32
 	// if any windows call need GLRC or DC grab from here (not cross platform obviously...)
 	HDC											hDC;

@@ -24,13 +24,19 @@ namespace Gl {
 
 		FAP_MAX_ATTACHMENT_POINTS = 9,
 	};
+	enum FBO_FRAMEBUFFER_SD {
+		FFSD_SOURCE = GL_READ_FRAMEBUFFER,
+		FFSD_DEST = GL_DRAW_FRAMEBUFFER,
+		FFSD_BOTH = GL_FRAMEBUFFER,
+	};
+
 	class Fbo : public Memory { 
 	public:
 		Fbo();
 		virtual ~Fbo();
 
-		void bind();
-		void unbind();
+		void bind( FBO_FRAMEBUFFER_SD target = FFSD_BOTH );
+		void unbind( FBO_FRAMEBUFFER_SD target = FFSD_BOTH );
 
 		void attach( FBO_ATTACHMENT_POINT pnt, const TexturePtr& target );
 		void detach( FBO_ATTACHMENT_POINT pnt );

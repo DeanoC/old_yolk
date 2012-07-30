@@ -42,7 +42,7 @@ void Heightfield::render( RenderContext* rc, const int pipelineName ) {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
-	context->getConstantCache().changeObject( prevWVP, getTransformNode()->getWorldTransform() );
+	context->getConstantCache().changeObject( prevWVP, getTransformNode()->getRenderMatrix() );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
 	prevWVP = context->getConstantCache().getMatrix( RENDER_BACKEND::CVN_WORLD_VIEW_PROJ );

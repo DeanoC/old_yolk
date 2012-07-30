@@ -56,10 +56,10 @@ public:
 	void setLocalTransform( const Math::Vector3& pos, const Math::Quaternion& orient, const Math::Vector3& scale );
 
 	//! returns the transform on this node in local space NOTE: This is compartively expensive (not cached)
-	const Math::Matrix4x4 getLocalTransform() const;
+	const Math::Matrix4x4 getLocalMatrix() const;
 
 	//! return the world transform of this node
-	const Math::Matrix4x4& getWorldTransform() const;
+	const Math::Matrix4x4& getWorldMatrix() const;
 
 	const NodeContainer& getNodeContainer() const {
 		return children;
@@ -79,6 +79,8 @@ public:
 	// draws using debug lines the node axis and its children
 	void debugDisplay() const;
 
+	const Math::Matrix4x4& getRenderMatrix() { return renderMatrix; }
+	void setRenderMatrix() { renderMatrix = getWorldMatrix(); }
 
 protected:
 	void setParent( TransformNode* parent );
@@ -95,6 +97,7 @@ protected:
 	mutable Math::Matrix4x4*	transform;
 	//! flag for whether to transform matrix is currently valid
 	mutable bool				transformCached;
+	Math::Matrix4x4				renderMatrix; // double buffer world transform
 
 
 	TransformNode*		parent;

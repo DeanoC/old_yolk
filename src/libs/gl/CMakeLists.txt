@@ -34,14 +34,18 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} ${glload_c_src_files} )
 foreach( sc ${shader_files} )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp 
 						COMMAND bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp ${sc}
-						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} )
+						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} 
+						COMMENT "${sc}: if this fails create the directory part of ${sc} in the build folders manually" 
+					)
 	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
 endforeach( sc ${shader_files} )
 
 foreach( clc ${cl_files} )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${clc}.cpp 
 						COMMAND bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${clc} ${CMAKE_CURRENT_BINARY_DIR}/${clc}.cpp ${clc}
-						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${clc} )
+						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${clc} 
+						COMMENT "${clc}: if this fails create the directory part of ${clc} in the build folders manually"	
+					)
 	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${clc}.cpp )
 endforeach( clc ${cl_files} )
 

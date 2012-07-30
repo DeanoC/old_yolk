@@ -175,7 +175,7 @@ namespace Core {
 		levelStack.push(0.f);
 
 		// for culling to work we want to move the frstum into local bvh space
-		Frustum localFrustum( transform->getWorldTransform() * frustum->m_Matrix );
+		Frustum localFrustum( transform->getWorldMatrix() * frustum->m_Matrix );
 		while( !nodeStack.empty() ) {
 			Node* node = nodeStack.top(); nodeStack.pop();
 			float level = levelStack.top(); levelStack.pop();
@@ -204,7 +204,7 @@ namespace Core {
 			}
 
 			if( !hidden ) {
-				waabb.drawDebug( col, transform->getWorldTransform() );
+				waabb.drawDebug( col, transform->getWorldMatrix() );
 				for( unsigned int i=0;i < node->m_nChildren;++i ){
 					nodeStack.push( &m_nodes[node->m_firstIndex+i] );
 					levelStack.push( level );

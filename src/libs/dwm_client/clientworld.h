@@ -15,17 +15,12 @@ public:
 
 	virtual ApiSetupFunction getApiSetupFunction() override { return &InstallApiFuncs; } 
 
-	// TODO multiple screens etc.
-	void setActiveCamera( std::shared_ptr<Scene::Camera> cam ) { activeCamera = cam; }
-	std::shared_ptr<Scene::Camera> getActiveCamera() { return activeCamera; }
-
 	void queueInputFrame( const InputFrame& frame );
 	bool dequeueInputFrame( InputFrame* frame ); 	//!< return false if no input to dequeue
 
 	static void InstallApiFuncs( class TrustedRegion* trustedRegion );
 protected:
 	Core::BoundedBuffer<InputFrame>		inputQueue;
-	std::shared_ptr<Scene::Camera>		activeCamera;
 };
 
 typedef std::shared_ptr<ClientWorld> ClientWorldPtr;
