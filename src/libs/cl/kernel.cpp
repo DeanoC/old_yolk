@@ -25,7 +25,7 @@ Kernel* Kernel::internalCreate( const Core::ResourceHandleBase* handle, const ch
 	const std::string progLibAndKernelName( pName );
 	const std::string::size_type kernalNameStart = progLibAndKernelName.find( "|" );
 	if( kernalNameStart == std::string::npos ) {
-		LOG(ERROR) << progLibAndKernelName << " doesn't have a | seperating library from kernel function name";
+		LOG(ERROR) << progLibAndKernelName << " doesn't have a | separating library from kernel function name";
 		return NULL;
 	}
 	const std::string progLibName( progLibAndKernelName.begin(), progLibAndKernelName.begin() + kernalNameStart );

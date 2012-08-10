@@ -13,6 +13,5 @@ void main() {
 					texelFetch( msaa, uv, 5 ) + 
 					texelFetch( msaa, uv, 6 ) + 
 					texelFetch( msaa, uv, 7 );
-
 	outColour0 = colour * (1.0/8.0);
 }

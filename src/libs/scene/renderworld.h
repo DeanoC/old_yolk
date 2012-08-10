@@ -55,6 +55,8 @@ namespace Scene {
 
 		std::shared_ptr<Scene::Camera>	activeCamera;
 		Core::mutex 					updateMutex;
+		std::shared_ptr<Scene::Camera> 	renderCamera;
+		std::shared_ptr<Scene::Camera> 	debugCamera;
 	};
 }
 

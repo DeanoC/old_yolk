@@ -118,15 +118,15 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 	if( creation->flags & DBCF_CPU_READBACK ) {
 		if( creation->flags & DBCF_CPU_UPDATES ) {
 			usage = GL_STREAM_READ; // is this right??
-			// issue warning that readbakc and update on the same buffer is 
+			// issue warning that read-back and update on the same buffer is 
 			// likely a performance issue
 			LOG(INFO) << name << " : DBCF_CPU_READBACK and DBCF_CPU_UPDATES on the same buffer may be slow";
 		} else {
 			if( creation->flags & DBCF_ONCE ) {
-				usage = GL_STATIC_READ; // once only readback
+				usage = GL_STATIC_READ; // once only read-back
 			} else if( creation->flags & DBCF_INTERMITANT ) {
-				usage = GL_DYNAMIC_READ; // readbacks will occur every now and again
-			} else usage = GL_STREAM_READ; // regular CPU readbacks
+				usage = GL_DYNAMIC_READ; // read-backs will occur every now and again
+			} else usage = GL_STREAM_READ; // regular CPU read-backs
 		}
 	} else if( creation->flags & DBCF_CPU_UPDATES ) {
 		if( creation->flags & DBCF_ONCE ) {
@@ -139,7 +139,7 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 			usage = GL_STATIC_COPY; // once only GPU update
 		} else if( creation->flags & DBCF_INTERMITANT ) {
 			usage = GL_DYNAMIC_COPY; // GPU updates will occur every now and again
-		} else usage = GL_STREAM_COPY; // regular GPU upda/tes
+		} else usage = GL_STREAM_COPY; // regular GPU updates
 	}
 
 #if BUFFER_METHOD == BUFFER_OLD

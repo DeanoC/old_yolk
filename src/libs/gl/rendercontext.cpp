@@ -282,6 +282,7 @@ void RenderContext::popDebugMarker() const {
 
 void RenderContext::setCamera( const Scene::CameraPtr& _cam ) {
 	constantCache->setCamera( _cam );
+	viewFrustum = &_cam->getFrustum();
 }
 
 void RenderContext::prepToRender() {

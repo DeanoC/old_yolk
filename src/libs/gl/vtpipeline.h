@@ -9,12 +9,19 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if !defined( WIERD_GL_VT_PIPELINE_H__ )
-#define WIERD_GL_VT_PIPELINE_H__
+#if !defined( VT_GL_VT_PIPELINE_H_ )
+#define VT_GL_VT_PIPELINE_H_
 
 #include "core/resources.h"
 #include "scene/pipeline.h"
 #include "vao.h"
+#include "cl/image.h"
+#include "cl/kernel.h"
+#include "cl/cmdqueue.h"
+
+namespace Cl {
+	class Context;
+}
 
 namespace Scene {
 	class RenderContext;	
@@ -49,28 +56,61 @@ namespace Gl {
 
 	protected:
 		enum GEOM_PASSES {
-			Z_PREPASS = 0,
-			MAIN_PASS = 1,
+			FRAG_COUNTER = 0,
+			CAPTURE_FRAGMENTS,
+			MAIN_PASS,
+			NUM_GEOM_PASSES,
 		};
+		const size_t pipelineIndex;
+
 		VtPipeline( size_t index );
 		virtual ~VtPipeline();
 
-		const size_t pipelineIndex;
+		void createCaptureBuffers();
 
 		// only valid between bind and unbind
 		Gl::RenderContext* context;
-		void bindZPrepassGeomPass();
-		void bindMainGeomPass();
+		void startMainGeomPass();
+		void startFragCountGeomPass();
+		void endFragCountGeomPass();
+		void startCaptureFragmentsGeomPass();
 
-		Core::ScopedResourceHandle<TextureHandle>	depthRtHandle;
-		Core::ScopedResourceHandle<TextureHandle>	colourRtHandle;
+#define CSRH(x) Core::ScopedResourceHandle< x >
 
-		Core::ScopedResourceHandle<ProgramHandle>	zprepassProgramHandle;
-		Core::ScopedResourceHandle<ProgramHandle>	mainProgramHandle;
-		Core::ScopedResourceHandle<ProgramHandle>	resolve8msaaProgramHandle;
+		CSRH( DataBufferHandle )	fragmentsBufferHandle;
+		CSRH( DataBufferHandle )	scratchInitHandle;
+		CSRH( DataBufferHandle )	scratchBufHandle;
+		CSRH( DataBufferHandle )	facesBufferHandle;
 
-		Core::ScopedResourceHandle<DataBufferHandle> dummyVBOHandle;
-		Core::ScopedResourceHandle<VaoHandle> dummyVaoHandle;
+		CSRH( Cl::BufferHandle )	fragmentsClBufferHandle;
+		CSRH( Cl::BufferHandle )	facesClBufferHandle;
+
+		CSRH( TextureHandle )		depthRtHandle;
+		CSRH( TextureHandle )		colourRtHandle;
+		CSRH( TextureHandle )		fragCountRtHandle;
+		CSRH( TextureHandle )		fragmentsTexHandle;
+		CSRH( TextureHandle )		scratchTexHandle;
+		CSRH( TextureHandle )		fragHeaderRtHandle;
+		CSRH( TextureHandle )		pixelTempRtHandle;
+		CSRH( TextureHandle )		facesTexHandle;
+
+		CSRH( ProgramHandle )		fragCountProgramHandle;
+		CSRH( ProgramHandle )		fragHeaderProgramHandle;
+		CSRH( ProgramHandle )		captureFragmentsProgramHandle;
+		CSRH( ProgramHandle )		mainProgramHandle;
+		CSRH( ProgramHandle )		resolve8msaaProgramHandle;
+		CSRH( ProgramHandle )		debugCaptureFragmentsProgramHandle;
+
+		CSRH( DataBufferHandle ) 	dummyVBOHandle;
+		CSRH( VaoHandle ) 			dummyVaoHandle;
+
+#undef CSRH
+
+		unsigned int 				targetWidth;
+		unsigned int 				targetHeight;
+		unsigned int 				targetSamples;
+		Cl::Context*				contextCl;
+
 	};
 
 	class VtPipelineDataStore : public Scene::PipelineDataStore {

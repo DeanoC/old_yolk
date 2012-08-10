@@ -25,8 +25,17 @@ DECLARE_FRAGMENT( fs_vertcol );
 DECLARE_FRAGMENT( vs_ndcpos_col_uv );
 DECLARE_FRAGMENT( fs_tex_vertcol );
 DECLARE_FRAGMENT( vs_transform_only );
+DECLARE_FRAGMENT( vs_transform_world_ndc );
 DECLARE_FRAGMENT( gs_makefullscreen );
+DECLARE_FRAGMENT( gs_makefullscreen_ms );
+DECLARE_FRAGMENT( gs_makefullscreen_scaled );
 DECLARE_FRAGMENT( fs_resolve8msaa );
+DECLARE_FRAGMENT( fs_constant_1 );
+DECLARE_FRAGMENT( fs_alloc32 );
+DECLARE_FRAGMENT( gs_geom_capture_image );
+DECLARE_FRAGMENT( fs_capture_fragments );
+DECLARE_FRAGMENT( gs_prim_id );
+DECLARE_FRAGMENT( fs_debug_captured_fragments );
 
 DECLARE_PROGRAM( basic );
 DECLARE_PROGRAM( flat_basic );
@@ -34,6 +43,11 @@ DECLARE_PROGRAM( 2dcolour );
 DECLARE_PROGRAM( basicsprite );
 DECLARE_PROGRAM( depth_only );
 DECLARE_PROGRAM( resolve8msaa );
+DECLARE_PROGRAM( adder );
+DECLARE_PROGRAM( alloc32 );
+DECLARE_PROGRAM( geom_capture_adder );
+DECLARE_PROGRAM( capture_fragments );
+DECLARE_PROGRAM( debug_captured_fragments );
 
 namespace {
 const int MAX_GLSL_INCLUDES = 128;
@@ -65,8 +79,17 @@ void ShaderMan::initDefaultPrograms() {
 	REGISTER_FRAGMENT( vs_ndcpos_col_uv );
 	REGISTER_FRAGMENT( fs_tex_vertcol );
 	REGISTER_FRAGMENT( vs_transform_only );
+	REGISTER_FRAGMENT( vs_transform_world_ndc );
 	REGISTER_FRAGMENT( gs_makefullscreen );
+	REGISTER_FRAGMENT( gs_makefullscreen_ms );
+	REGISTER_FRAGMENT( gs_makefullscreen_scaled );
 	REGISTER_FRAGMENT( fs_resolve8msaa );
+	REGISTER_FRAGMENT( fs_constant_1 );
+	REGISTER_FRAGMENT( fs_alloc32 );
+	REGISTER_FRAGMENT( gs_geom_capture_image );
+	REGISTER_FRAGMENT( fs_capture_fragments );
+	REGISTER_FRAGMENT( gs_prim_id );
+	REGISTER_FRAGMENT( fs_debug_captured_fragments );
 
 	REGISTER_PROGRAM( flat_basic );
 	REGISTER_PROGRAM( basic );
@@ -74,6 +97,12 @@ void ShaderMan::initDefaultPrograms() {
 	REGISTER_PROGRAM( basicsprite );
 	REGISTER_PROGRAM( depth_only );
 	REGISTER_PROGRAM( resolve8msaa );
+	REGISTER_PROGRAM( adder );
+	REGISTER_PROGRAM( alloc32 );
+	REGISTER_PROGRAM( geom_capture_adder );
+	REGISTER_PROGRAM( capture_fragments );
+	REGISTER_PROGRAM( debug_captured_fragments );
+
 }
 
 const char* ShaderMan::getProgramSource( const std::string& prgName ) const {
@@ -140,16 +169,12 @@ Program* ShaderMan::internalCreate( const Core::ResourceHandleBase* baseHandle, 
 	prg->name = glCreateShaderProgramv( programStage, count, glsrc );
 	prg->wholeProgram = false;
 
-	glValidateProgram( prg->name );
-	GLint validStatus = GL_FALSE;
-	glGetProgramiv( prg->name, GL_VALIDATE_STATUS, &validStatus);
-	if(validStatus == GL_FALSE) {
-        int logLength = 0;
-        glGetProgramiv(prg->name, GL_INFO_LOG_LENGTH, &logLength);
-        char* log = CORE_STACK_NEW_ARRAY( char, logLength );
-        glGetProgramInfoLog(prg->name, logLength, &logLength, log);
-        LOG(ERROR) << "Validate program :  " << programName << " :\n" << log;
-//		DebugBreak();
+	int logLength = 0;
+	glGetProgramiv(prg->name, GL_INFO_LOG_LENGTH, &logLength);
+	if( logLength > 0 ) {
+		char* log = CORE_STACK_NEW_ARRAY( char, logLength );
+		glGetProgramInfoLog(prg->name, logLength, &logLength, log);
+		LOG(FATAL) << "Validate program :  " << programName << " :\n" << log;
 		return NULL;
 	}
 	if( creation || creation->numTransformFeedbackItems > 0 ) {

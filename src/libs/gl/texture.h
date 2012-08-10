@@ -68,7 +68,7 @@ namespace Gl {
 			// only used with the relevant flag set
 			union {
 				uint32_t	sampleCount;			//!< TCF_MULTISAMPLE this is the number of samples for AA
-				void*		prefillData;			//!< TCF_PRE_FILL this is the data that will be copied into the texture
+				const void*	prefillData;			//!< TCF_PRE_FILL this is the data that will be copied into the texture
 				uint32_t	bufferName;				//!< TCF_BUFFER this is the buffer used as backing
 			};
 			union {

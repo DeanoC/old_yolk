@@ -22,6 +22,7 @@ namespace Scene {
 
 		//! sets the projection of the camera, fov is total not half
 		void setProjection( float fov, float aspect, float znear, float zfar );
+		void setOrthographic( float _left, float _right, float _top, float _bottom, float _znear, float _zfar );
 
 		void setFOV( float fov, float aspect = 1.0f );
 		void setDepthRange( float znear, float zfar );
@@ -41,9 +42,16 @@ namespace Scene {
 
 	protected:
 		void setProjection(); // uses already stored values
+		void setOrthographic(); // uses already stored values
 
 		Math::Matrix4x4 viewMatrix;
 		Math::Matrix4x4 projectionMatrix;
+		bool			ortho;
+		float			left;
+		float			right;
+		float			top;
+		float			bottom;
+
 		float			zNear;
 		float			zFar;
 		float			xScale;		// the fov xscale

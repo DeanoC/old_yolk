@@ -27,115 +27,112 @@ public:
 	};
 
 public:
-	Math::Plane m_Planes[ 6 ];
-	Math::Matrix4x4 m_Matrix;
+	Math::Plane planes[ 6 ];
+	Math::Matrix4x4 matrix;
 
 public:
 #if COMPILER != CUDA_COMPILER
 	CALL Frustum() {};
 
-	Frustum( const Math::Matrix4x4& Matrix ) {
-		createFromMatrix( Matrix );
+	Frustum( const Math::Matrix4x4& _matrix ) {
+		createFromMatrix( _matrix );
 	}
 #endif
 
 	//! distance from the frustum to a point
 	//! if the point is inside, the return value will be < 0
-	CALL float distanceToPoint( const Math::Vector3& Point ) const {
+	CALL float distanceToPoint( const Math::Vector3& point ) const {
 		float closestPoint = FLT_MAX;
 		for( int i=0; i < 6; ++i ) {
-			closestPoint = Math::Min( Math::DotPoint( m_Planes[i], Point ), closestPoint );
+			closestPoint = Math::Min( Math::DotPoint( planes[i], point ), closestPoint );
 		}
 		return closestPoint;
 	}
 
 	//!Taking an AABB min and max in world space, work out its interaction with the view frustum
 	CALL CULL_RESULT cullAABB( const Core::AABB& oAABB ) const {
-		bool Intersect = false;
-		Math::Vector3 Min, Max;
+		bool intersect = false;
+		Math::Vector3 vMin, vMax;
 
 		for (int i=0; i<6; i++) {
-			Min = oAABB.getMinExtent();
-			Max = oAABB.getMaxExtent();
+			vMin = oAABB.getMinExtent();
+			vMax = oAABB.getMaxExtent();
 
-			if (m_Planes[i].a > 0) {
-				Min.x = oAABB.getMaxExtent().x;
-				Max.x = oAABB.getMinExtent().x;
+			if (planes[i].a > 0) {
+				vMin.x = oAABB.getMaxExtent().x;
+				vMax.x = oAABB.getMinExtent().x;
 			}
-			if (m_Planes[i].b > 0) {
-				Min.y = oAABB.getMaxExtent().y;
-				Max.y = oAABB.getMinExtent().y;
+			if (planes[i].b > 0) {
+				vMin.y = oAABB.getMaxExtent().y;
+				vMax.y = oAABB.getMinExtent().y;
 			}
-			if (m_Planes[i].c > 0) {
-				Min.z = oAABB.getMaxExtent().z;
-				Max.z = oAABB.getMinExtent().z;
+			if (planes[i].c > 0) {
+				vMin.z = oAABB.getMaxExtent().z;
+				vMax.z = oAABB.getMinExtent().z;
 			}
 
-			if(  Math::DotPoint(m_Planes[i], Min) < 0) {
+			if(  Math::DotPoint(planes[i], vMin) < 0) {
 				return OUTSIDE;
 			}
-			if( Math::DotPoint(m_Planes[i], Max) <= 0) {
-				Intersect = true;
+			if( Math::DotPoint(planes[i], vMax) <= 0) {
+				intersect = true;
 			}
 		}
 
-		return (Intersect) ? CROSSING : INSIDE;
+		return (intersect) ? CROSSING : INSIDE;
 	}
 
-	CALL void createFromMatrix( const Math::Matrix4x4& Matrix ) {
-		m_Matrix = Matrix;
+	CALL void createFromMatrix( const Math::Matrix4x4& _matrix ) {
+		matrix = _matrix;
 
 		// Left clipping plane
-		m_Planes[0].a = Matrix._14 + Matrix._11;
-		m_Planes[0].b = Matrix._24 + Matrix._21;
-		m_Planes[0].c = Matrix._34 + Matrix._31;
-		m_Planes[0].d = Matrix._44 + Matrix._41;
+		planes[0].a = matrix._14 + matrix._11;
+		planes[0].b = matrix._24 + matrix._21;
+		planes[0].c = matrix._34 + matrix._31;
+		planes[0].d = matrix._44 + matrix._41;
 
 		// Right clipping plane
-		m_Planes[1].a = Matrix._14 - Matrix._11;
-		m_Planes[1].b = Matrix._24 - Matrix._21;
-		m_Planes[1].c = Matrix._34 - Matrix._31;
-		m_Planes[1].d = Matrix._44 - Matrix._41;
+		planes[1].a = matrix._14 - matrix._11;
+		planes[1].b = matrix._24 - matrix._21;
+		planes[1].c = matrix._34 - matrix._31;
+		planes[1].d = matrix._44 - matrix._41;
 
 		// Top clipping plane
-		m_Planes[2].a = Matrix._14 - Matrix._12;
-		m_Planes[2].b = Matrix._24 - Matrix._22;
-		m_Planes[2].c = Matrix._34 - Matrix._32;
-		m_Planes[2].d = Matrix._44 - Matrix._42;
+		planes[2].a = matrix._14 - matrix._12;
+		planes[2].b = matrix._24 - matrix._22;
+		planes[2].c = matrix._34 - matrix._32;
+		planes[2].d = matrix._44 - matrix._42;
 
 		// Bottom clipping plane
-		m_Planes[3].a = Matrix._14 + Matrix._12;
-		m_Planes[3].b = Matrix._24 + Matrix._22;
-		m_Planes[3].c = Matrix._34 + Matrix._32;
-		m_Planes[3].d = Matrix._44 + Matrix._42;
+		planes[3].a = matrix._14 + matrix._12;
+		planes[3].b = matrix._24 + matrix._22;
+		planes[3].c = matrix._34 + matrix._32;
+		planes[3].d = matrix._44 + matrix._42;
 
 		// Near clipping plane
-		m_Planes[4].a = Matrix._13;
-		m_Planes[4].b = Matrix._23;
-		m_Planes[4].c = Matrix._33;
-		m_Planes[4].d = Matrix._43;
+		planes[4].a = matrix._13;
+		planes[4].b = matrix._23;
+		planes[4].c = matrix._33;
+		planes[4].d = matrix._43;
 
 		// Far clipping plane
-		m_Planes[5].a = Matrix._14 - Matrix._13;
-		m_Planes[5].b = Matrix._24 - Matrix._23;
-		m_Planes[5].c = Matrix._34 - Matrix._33;
-		m_Planes[5].d = Matrix._44 - Matrix._43;
+		planes[5].a = matrix._14 - matrix._13;
+		planes[5].b = matrix._24 - matrix._23;
+		planes[5].c = matrix._34 - matrix._33;
+		planes[5].d = matrix._44 - matrix._43;
 
 		for ( int i = 0; i < 6; ++i ) {
-			m_Planes[i] = Math::Normalise( m_Planes[i] );
+			planes[i] = Math::Normalise( planes[i] );
 		}
 	}
-
-#if PLATFORM != GPU
-	void debugDraw( const Core::Colour& colour ) const {
+	void getWorldSpacePoints( Math::Vector3 pts[8] ) const {
 		//     e----h
 		//	  /|   /|
-		//	 / f--|-g
+		//	 / f--/-g
 		/// /  / /  /
-		//	a---d /   
+		//	a---d  /   
 		//	|/   |/
 		//  b___c
-
 		Math::Vector3 a( -1, -1, 0 );
 		Math::Vector3 b( -1,  1, 0 );
 		Math::Vector3 c(  1,  1, 0 );
@@ -145,21 +142,28 @@ public:
 		Math::Vector3 g(  1,  1, 0.99999f );
 		Math::Vector3 h(  1, -1, 0.99999f );
 
-		Math::Matrix4x4 inv = Math::InverseMatrix( m_Matrix );
+		Math::Matrix4x4 inv = Math::InverseMatrix( matrix );
 
-		a = Math::TransformAndProject( a, inv );
-		b = Math::TransformAndProject( b, inv );
-		c = Math::TransformAndProject( c, inv );
-		d = Math::TransformAndProject( d, inv );
-		e = Math::TransformAndProject( e, inv );
-		f = Math::TransformAndProject( f, inv );
-		g = Math::TransformAndProject( g, inv );
-		h = Math::TransformAndProject( h, inv );
+		pts[0] = Math::TransformAndProject( a, inv );
+		pts[1] = Math::TransformAndProject( b, inv );
+		pts[2] = Math::TransformAndProject( c, inv );
+		pts[3] = Math::TransformAndProject( d, inv );
+		pts[4] = Math::TransformAndProject( e, inv );
+		pts[5] = Math::TransformAndProject( f, inv );
+		pts[6] = Math::TransformAndProject( g, inv );
+		pts[7] = Math::TransformAndProject( h, inv );
 
-		g_pDebugRender->worldRect( colour, a, b, c, d );
-		g_pDebugRender->worldRect( colour, e, f, g, h );
-		g_pDebugRender->worldRect( colour, a, b, f, e );
-		g_pDebugRender->worldRect( colour, c, d, h, g );
+	}
+
+#if PLATFORM != GPU
+	void debugDraw( const Core::Colour& colour ) const {
+		Math::Vector3 pts[8];
+		getWorldSpacePoints( pts );
+
+		g_pDebugRender->worldRect( colour, pts[0], pts[1], pts[2], pts[3] );
+		g_pDebugRender->worldRect( colour, pts[4], pts[5], pts[6], pts[7] );
+		g_pDebugRender->worldRect( colour, pts[0], pts[1], pts[5], pts[4] );
+		g_pDebugRender->worldRect( colour, pts[2], pts[3], pts[7], pts[6] );
 	}
 #endif
 };

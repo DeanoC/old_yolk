@@ -28,12 +28,11 @@ Buffer* Buffer::internalCreate( const Core::ResourceHandleBase* handle, const ch
 	cl_int _err;
 
 	if( creation->flags & BCF_FROM_GL ) {
-		Gl::DataBufferHandlePtr dbHandle = (Gl::DataBufferHandlePtr) creation->data;
-		Gl::DataBufferPtr db = dbHandle->acquire();
 		buffer->name = clCreateFromGLBuffer(	creation->context->getContext(), 
-												flags, db->getName(), &_err ); 
+												flags, creation->glbuffer->getName(), &_err ); 
 		CL_CHECK( "clCreateFromGLBuffer", _err );
-		buffer->size = db->getSize();
+		buffer->glDataBufferPtr = creation->glbuffer; // ensure gl buffer survives as long as this does
+		buffer->size = creation->glbuffer->getSize();
 		return buffer;
 	}
 

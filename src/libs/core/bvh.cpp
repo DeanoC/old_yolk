@@ -175,7 +175,7 @@ namespace Core {
 		levelStack.push(0.f);
 
 		// for culling to work we want to move the frstum into local bvh space
-		Frustum localFrustum( transform->getWorldMatrix() * frustum->m_Matrix );
+		Frustum localFrustum( transform->getWorldMatrix() * frustum->matrix );
 		while( !nodeStack.empty() ) {
 			Node* node = nodeStack.top(); nodeStack.pop();
 			float level = levelStack.top(); levelStack.pop();

@@ -81,7 +81,7 @@ void DwmClient::run() {
 	auto debugCam = std::make_shared<DebugCamContext>( world.get(), ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
 
-	DevelopmentContext::get()->activateContext( "DebugCam" );
+	DevelopmentContext::get()->activateContext( "InputHandler" );
 
 	// flush 'load' time from first time update
 	Clock::get()->update();

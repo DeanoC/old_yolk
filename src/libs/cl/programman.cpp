@@ -13,7 +13,7 @@
 #define DECLARE_LIBRARY( x )		extern const char* binary_data_kernels_ ## x ## _cl;
 #define REGISTER_LIBRARY( x )		programSrc[ #x ] = binary_data_kernels_ ## x ## _cl;
 
-// ouside namespace
+// outside name space
 DECLARE_LIBRARY( helloworld );
 
 namespace Cl {

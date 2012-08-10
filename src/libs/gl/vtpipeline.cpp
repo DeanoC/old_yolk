@@ -1,8 +1,7 @@
 //!-----------------------------------------------------
 //!
-//! @file forwardpipeline.cpp
-//! @brief A pipeline that represent a standard ol' fashioned
-//! forward rendering pass.
+//! @file vtpipeline.cpp
+//! @brief A pipeline that represent the games renderer
 //!
 //!-----------------------------------------------------
 
@@ -17,6 +16,8 @@
 #include "rendercontext.h"
 #include "wobbackend.h"
 #include "imagecomposer.h"
+#include "cl/platform.h"
+
 #include "vtpipeline.h"
 
 namespace Gl {
@@ -24,36 +25,38 @@ namespace Gl {
 VtPipeline::VtPipeline( size_t index ) :
 	pipelineIndex( index )
 {
+	contextCl = Cl::Platform::get()->getPrimaryContext().get();
+
+	targetWidth = Gfx::get()->getScreenWidth();
+	targetHeight = Gfx::get()->getScreenHeight();
+	targetSamples = 8;
 
 	Texture::CreationStruct fpcrt = {
 		TCF_2D | TCF_RENDER_TARGET | TCF_MULTISAMPLE,
-		TF_RGBA8888, 1,
-		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(),
-		0, 0, 8
+		TF_RGBA8888, 
+		1, targetWidth, targetHeight, 0, 0, targetSamples
 	};
 	colourRtHandle.reset( TextureHandle::create( "_vtpipe_colrt", &fpcrt ) );
 
 	Texture::CreationStruct fpdrt = {
 		TCF_2D | TCF_RENDER_TARGET | TCF_MULTISAMPLE,
-		GL_DEPTH24_STENCIL8, 1,
-		Gfx::get()->getScreenWidth(), Gfx::get()->getScreenHeight(),
-		0, 0, 8
+		GL_DEPTH24_STENCIL8, 
+		1, targetWidth, targetHeight, 0, 0, targetSamples
 	};
 	depthRtHandle.reset( TextureHandle::create( "_vtpipe_depthrt", &fpdrt ) );
 
 	DataBuffer::CreationStruct fpdvb = {
 		DBCF_NONE, DBT_VERTEX, 0, nullptr
 	};
-	
 	dummyVBOHandle.reset( DataBufferHandle::create( "_vtpipe_dummy_vb", &fpdvb ) );
-
 	Vao::CreationStruct fpdvoa = { 0 };
 	dummyVaoHandle.reset( VaoHandle::create( "_vtpipe_dummy_vao", &fpdvoa ) );
 
-	zprepassProgramHandle.reset( ProgramHandle::create( "depth_only" ) );
 	mainProgramHandle.reset( ProgramHandle::create( "flat_basic" ) );
 	resolve8msaaProgramHandle.reset( ProgramHandle::create( "resolve8msaa" ) );
+	debugCaptureFragmentsProgramHandle.reset( ProgramHandle::create( "debug_captured_fragments" ) );
 
+	createCaptureBuffers();
 }
 
 VtPipeline::~VtPipeline() {
@@ -67,25 +70,7 @@ void VtPipeline::bind( Scene::RenderContext* rc ) {
 	glCullFace(GL_FRONT);
 }
 
-void VtPipeline::bindZPrepassGeomPass() {
-	TexturePtr depthRt = depthRtHandle.acquire();
-	ProgramPtr program = zprepassProgramHandle.acquire();
-
-	context->useAsDepthOnlyRenderTargets( depthRt );
-	glViewport( 0, 0, depthRt->getWidth(), depthRt->getHeight() );
-	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
-
-	glClearBufferfi( GL_DEPTH_STENCIL, 0, 1.0, 0 );
-
-	glEnable( GL_DEPTH_TEST );
-	glDepthFunc( GL_LEQUAL );
-	glDepthMask( GL_TRUE );
-
-}
-
-void VtPipeline::bindMainGeomPass() {
+void VtPipeline::startMainGeomPass() {
 	TexturePtr colourRt = colourRtHandle.acquire();
 	TexturePtr depthRt = depthRtHandle.acquire();
 	ProgramPtr program = mainProgramHandle.acquire();
@@ -95,10 +80,11 @@ void VtPipeline::bindMainGeomPass() {
 	context->getConstantCache().updateGPU( program );
 	context->getConstantCache().bind();
 
-	float colClr[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
+	float colClr[4] = { 0, 0, 0, 1.0f };
 	glClearBufferfv( GL_COLOR, 0, colClr );
+	glEnable( GL_DEPTH_TEST );
 	glDepthMask( GL_FALSE );
-
+	glDisable( GL_BLEND );
 }
 
 void VtPipeline::unbind() {
@@ -183,23 +169,43 @@ void VtPipeline::merge( Scene::RenderContext* rc ) {
 //		Math::Vector2(0,0), Math::Vector2(1,1), 
 //		Core::RGBAColour::unpackARGB(0xFFFFFFFF), 3 );
 	RenderContext* context = (RenderContext*) rc;
-
-	TexturePtr colourRt = colourRtHandle.acquire();
-	ProgramPtr program = resolve8msaaProgramHandle.acquire();
 	DataBufferPtr dummyVBO = dummyVBOHandle.acquire();
 	VaoPtr dummyVao = dummyVaoHandle.acquire();
 
-	// setup resolve program, textures and constants
-	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, colourRt->getName() );
+	if( 0 ) {
+		TexturePtr colourRt = colourRtHandle.acquire();
+		ProgramPtr program = resolve8msaaProgramHandle.acquire();
 
-	// draw quad
+		// setup resolve program, textures and constants
+		context->bindWholeProgram( program );
+		glActiveTexture( GL_TEXTURE0 );
+		glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, colourRt->getName() );
+	} else {
+//		TexturePtr fragHeaderTex = fragHeaderRtHandle.acquire();
+//		TexturePtr fragmentsTex = fragmentsTexHandle.acquire();
+//		glActiveTexture( GL_TEXTURE1 );
+//		glBindTexture( GL_TEXTURE_2D, fragHeaderTex->getName() );
+//		glActiveTexture( GL_TEXTURE2 );
+//		glBindTexture( GL_TEXTURE_BUFFER, fragmentsTex->getName() );
+
+	}
+
+	ProgramPtr program = debugCaptureFragmentsProgramHandle.acquire();
+	context->bindWholeProgram( program );
+struct 	context->getConstantCache().bind();
+
 	glBindBuffer( GL_ARRAY_BUFFER, dummyVBO->getName() );
 	glBindVertexArray( dummyVao->getName() );
+
+	TexturePtr fragCountTex = fragCountRtHandle.acquire();
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, fragCountTex->getName() );
+
+	// draw quad
  	glDrawArrays( GL_POINTS, 0, 1 );
+
+	TexturePtr colourRt = colourRtHandle.acquire();
+	context->useAsRenderTargets( 1, { &colourRt } );
 
 }
 
@@ -246,34 +252,32 @@ VtPipelineDataStore::~VtPipelineDataStore() {
 	}
 }
 
-int VtPipeline::getGeomPassCount() {
-	return 2;
-}
-
 void VtPipeline::startGeomPass( int i ) {
 	switch( i ) {
-		case Z_PREPASS:
-		context->pushDebugMarker( "VtPipeline::ZPrePass" );
-		bindZPrepassGeomPass();
+		case FRAG_COUNTER:
+		context->pushDebugMarker( "VtPipeline::BinCounterPass" );
+		startFragCountGeomPass();
+		break;
+
+		case CAPTURE_FRAGMENTS:
+		context->pushDebugMarker( "VtPipeline::CaptureFragmentsPass" );
+		startCaptureFragmentsGeomPass();
 		break;
 
 		case MAIN_PASS:
 		context->pushDebugMarker( "VtPipeline::MainPass" );
-		bindMainGeomPass();
+		startMainGeomPass();
 		break;
+
 	}
 }
 
 void VtPipeline::endGeomPass ( int i ) {
 	switch( i ) {
-		case Z_PREPASS:
-		context->popDebugMarker();
-		break;
-
-		case MAIN_PASS:
-		context->popDebugMarker();
-		break;
+		case FRAG_COUNTER: endFragCountGeomPass(); break;		
+		default: break;
 	}
+	context->popDebugMarker();
 }
 
 

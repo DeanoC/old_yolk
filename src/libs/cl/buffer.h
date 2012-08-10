@@ -5,11 +5,15 @@
 //! Contains the cl buffer resource class
 //!
 //!-----------------------------------------------------
-#if !defined(WIERD_CL_BUFFER_H)
-#define WIERD_CL_BUFFER_H
+#if !defined(YOLK_CL_BUFFER_H)
+#define YOLK_CL_BUFFER_H
 
 #include "core/resources.h"
 #include "memoryobject.h"
+
+namespace Gl {
+	class DataBuffer;
+}
 
 namespace Cl {
 	class Context;
@@ -22,7 +26,7 @@ namespace Cl {
 		BCF_PREFILL				= BIT(3),	//!< copy to kernel global on create (implied for IMMUTABLE)
 		BCF_ALLOC_HOST			= BIT(4),	//!< memory is in host memory space
 		BCF_USE_HOST			= BIT(5),	//!< memory pointed by data is used directly MUST last as long as the buffer!
-		BCF_FROM_GL				= BIT(6),	//!< CL buffer from a GL databuffer, data = DataBufferHandlePtr
+		BCF_FROM_GL				= BIT(6),	//!< CL buffer from a GL databuffer, gldata = DataBufferHandlePtr
 	};
 
 	class Buffer :	public MemoryObject,
@@ -30,9 +34,10 @@ namespace Cl {
 	public:	
 		struct CreationStruct {
 			Context*					context;	//<! which contex is the buffer from	
-			BUFFER_CREATION_FLAGS		flags;		//<! how its filled, mapped, etc.
+			uint32_t					flags;		//<! how its filled, mapped, etc.
 			size_t						size;		//<! size in bytes
 			void*						data;		//<! data to fill if PRE_FILLing
+			std::shared_ptr<Gl::DataBuffer> glbuffer;	//<! shared pointer to the gl buffer we are from if BCF_FROM_GL is set
 		};
 		struct LoadStruct {};
 
@@ -41,6 +46,7 @@ namespace Cl {
 		static Buffer* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationStruct* creation );
 	protected:
 		size_t size;
+		std::shared_ptr<Gl::DataBuffer>		glDataBufferPtr;
 	};
 
 	typedef const Core::ResourceHandle<BufferRType, Buffer> BufferHandle;

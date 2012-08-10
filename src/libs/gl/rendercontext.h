@@ -61,6 +61,12 @@ public:
 	ProgramPipelineObject* getCurrentPpo() const { return curPpo; }
 
 	Fbo* getFbo() const { return fbo.get(); };
+
+	const Scene::CameraPtr getCamera() { return constantCache->getCamera(); }
+
+	const Core::Frustum* getFrustum() { return viewFrustum; }
+
+
 #if PLATFORM == WIN32
 	// if any windows call need GLRC or DC grab from here (not cross platform obviously...)
 	HDC											hDC;
@@ -70,7 +76,20 @@ public:
 	unsigned long								x11Window;
 	void*										glxContext;
 #endif
+
 private:
+	boost::scoped_ptr<ConstantCache>				constantCache;
+	// note in most cases frustum and camera match, but in some debug cases they
+	// might not (to allow you see how frustum culling is working or not)
+	const Core::Frustum*						viewFrustum;
+	boost::scoped_ptr<Fbo>						fbo;
+	boost::scoped_array<TexturePtr>				boundRenderTargets;
+	boost::scoped_ptr<ProgramPipelineObject>	ppo;
+	boost::scoped_array<ProgramPtr>				boundPrograms;
+	ProgramPipelineObject*						curPpo;
+	bool										debugOutputInstalled;
+
+
 #if PLATFORM == WIN32
 	// context must be created on main thread
 	void setGlContext( HDC _hDC, HGLRC _hRC );
@@ -79,16 +98,6 @@ private:
 	void setGlContext( void* dis, unsigned long win, void* ctx );
 #endif
 
-	boost::scoped_ptr<ConstantCache>				constantCache;
-	// note in most cases frustum and camera match, but in some debug cases they
-	// might not (to allow you see how frustum culling is working or not)
-	Core::Frustum*								viewFrustum;
-	boost::scoped_ptr<Fbo>						fbo;
-	boost::scoped_array<TexturePtr>				boundRenderTargets;
-	boost::scoped_ptr<ProgramPipelineObject>		ppo;
-	boost::scoped_array<ProgramPtr>				boundPrograms;
-	ProgramPipelineObject*						curPpo;
-	bool										debugOutputInstalled;
 };
 
 }

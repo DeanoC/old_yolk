@@ -8,34 +8,5 @@
 	],
     "settings":
     {
-        "sublimegdb_sourcedir": "/home/deano/projects/yolk",
-        "sublimegdb_workingdir": "/home/deano/rpg.sh/live",
-        // NOTE: You MUST provide --interpreter=mi for the plugin to work
-        "sublimegdb_commandline": "gdb --interpreter=mi ./go",
-     
-        "sublimeclang_options":
-        [
-            "-D_WIN32",
-            "-IC:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include",
-            "-IZ:/Projects/Cyberspace/llvm/include",
-            "-ID:/builds/yolk/submodules/nacl-llvm/llvm/include",
-            "-IZ:/Projects/Cyberspace/yolk_repo/submodules/native_client/src",
-            "-IZ:/Projects/Cyberspace/yolk_repo/src/libs",
-            "-IZ:/Projects/Cyberspace/yolk_repo/src/libs/glog/include",
-            "-ID:/builds/yolk/src/libs",
-            "-IC:/boost/include/boost_1_48_0",
-            "-DNACL_WINDOWS=1",
-            "-DNACL_OSX=0",
-            "-DNACL_LINUX=0",
-            "-D_WIN32_WINNT=0x501",
-            "-D__STDC_LIMIT_MACROS=1",
-            "-DNOMINMAX=1",
-            "-DNACL_BUILD_ARCH=x86",
-            "-DNACL_BUILD_SUBARCH=32",
-            "-DNACL_TARGET_ARCH=x86",
-            "-DNACL_TARGET_SUBARCH=32"
-        ],
-        "sublimeclang_enabled": false,
-        "sublimeclang_show_output_panel": false
     }	
 }

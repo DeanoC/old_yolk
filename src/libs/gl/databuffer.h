@@ -42,7 +42,7 @@ namespace Gl {
 			DATA_BUFFER_CREATION_FLAGS	flags;	//<! how its filled, mapped, etc.
 			DATA_BUFFER_TYPE			type;	//<! data type stored
 			size_t						size;	//<! size in bytes
-			void*						data;	//<! data to fill if PRE_FILLing
+			const void*					data;	//<! data to fill if PRE_FILLing
 		};
 		struct LoadStruct {};
 

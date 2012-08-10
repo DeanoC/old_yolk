@@ -11,6 +11,7 @@
 namespace Scene {
 
 Camera::Camera() : 
+	ortho( false ),
 	yScale( 1.0f ),
 	xScale( 1.0f ),
 	zNear( 0.1 ),
@@ -22,13 +23,27 @@ void Camera::setProjection( float fov, float aspect, float znear, float zfar ) {
 	xScale = aspect / yScale;
 	zNear = znear;
 	zFar = zfar;
+	ortho = false;
 	setProjection();
+}
+void Camera::setOrthographic( float _left, float _right, 
+							float _top, float _bottom, 
+							float _znear, float _zfar ) {
+	left = _left;
+	right = _right;
+	top = _top;
+	bottom = _bottom;
+	zNear = _znear;
+	zFar = _zfar;
+	ortho = true;
+	setOrthographic();
 }
 
 void Camera::setFOV( float fov, float aspect ) {
 	yScale = 1.f / tanf(fov/2);
 	xScale = aspect / yScale;
 
+	ortho = false;
 	setProjection();
 }
 
@@ -36,14 +51,30 @@ void Camera::setDepthRange( float near, float far ) {
 	zNear = near;
 	zFar = far;
 
-	setProjection();
+	if( ortho ) {
+		setOrthographic();
+	} else {
+		setProjection();
+	}
 }
 
 void Camera::setProjection() {
-	projectionMatrix = Math::Matrix4x4(	xScale,		0,		0,								0,
-										0,			yScale,	0,								0,
-										0,			0,		(zFar+zNear)/(zFar-zNear),		1,
-										0,			0,		-(2*zNear*zFar)/(zFar-zNear),	0 );
+	projectionMatrix = Math::Matrix4x4(	
+		xScale,		0,		0,								0,
+		0,			yScale,	0,								0,
+		0,			0,		(zFar+zNear)/(zFar-zNear),		1,
+		0,			0,		-(2*zNear*zFar)/(zFar-zNear),	0 
+	);
+	invalidate();		
+}
+
+void Camera::setOrthographic() {
+	projectionMatrix = Math::Matrix4x4( 
+		2.0f / (right - left), 	0, 						0, 							0, 
+		0, 						2.0f / (top - bottom), 	0, 							0,
+		0, 						0, 						-2.0f / (zFar - zNear), 	0,
+		-(right+left)/(right-left), -(top+bottom)/(top-bottom), -(zFar+zNear)/(zFar-zNear), 1 
+	);
 	invalidate();		
 }
 

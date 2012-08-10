@@ -101,11 +101,6 @@ void Gfx::shutdownScreen() {
 void Gfx::present( int backWidth, int backHeight ) {
 	resourceLoader->showLoadingIfNeeded( finalComposer.get() );
 
-	// clear the backbuffer
-//	float colClr[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-//	glClearBufferfv( GL_COLOR, 0, colClr );
-//	glClearBufferfi( GL_DEPTH_STENCIL, 0, 1.0, 0 );
-
 	auto forId = hashPipeline[ "forward" ];
 	auto vtId = hashPipeline[ "vt" ];
 
