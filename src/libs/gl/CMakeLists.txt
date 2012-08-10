@@ -7,7 +7,10 @@ file( GLOB c_src_files *.c )
 file( GLOB header_files *.h *.inl *.hpp *.hxx )
 if( UNIX )
 	add_definitions( "-DLOAD_X11" )
-	list( APPEND c_src_files posix/gfx.cpp )
+	list( APPEND cpp_src_files posix/gfx.cpp )
+else()
+	add_definitions( "-DGLEW_STATIC" )
+	list( APPEND cpp_src_files windows/gfx.cpp )
 endif()
 
 file( GLOB shader_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -49,11 +52,11 @@ foreach( clc ${cl_files} )
 	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${clc}.cpp )
 endforeach( clc ${cl_files} )
 
-ADD_MSVC_PRECOMPILED_HEADER( "gl.h" "${cpp_src_files}" )
+ADD_MSVC_PRECOMPILED_HEADER( "ogl.h" "${cpp_src_files}" )
 add_library( gl ${src_files} ${header_files}  )
 
 list( APPEND targ_link_libs core )
 target_link_libraries( gl ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( gl PROPERTIES SOLUTION_FOLDER "libs")
+set_target_properties( gl PROPERTIES FOLDER "Libs")

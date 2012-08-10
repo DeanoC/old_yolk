@@ -10,4 +10,4 @@ ADD_MSVC_PRECOMPILED_HEADER( "meshops.h" "${cpp_src_files}" )
 add_library( meshops ${src_files} ${header_files} )
 
 # make a nice hierachy
-set_target_properties( meshops PROPERTIES SOLUTION_FOLDER "mesh")
+set_target_properties( meshops PROPERTIES FOLDER "Libs")

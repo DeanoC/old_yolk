@@ -166,7 +166,7 @@ enum KeyTable {
 #undef NK_KEY_MAP
 };
 
-extern void KeyboardWinProcessKeyMessages( UINT uMsg, WPARAM wParam, LPARAM lParam );
+extern void KeyboardWinProcessKeyMessages( uint32_t message, uint16_t wParam, uint32_t lParam );
 
 
 }	//namespace Core

@@ -6,4 +6,6 @@
 #include "core/core.h"
 #include "core/vector_math.h"
 
+#include "gl/ogl.h"
+
 #endif // YOLK_SCENE_SCENE_H_

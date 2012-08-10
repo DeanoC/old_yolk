@@ -84,6 +84,17 @@
 #	include <vector>
 #endif
 
+// VC11 isn't fully CPP11 yet doesn't have atomic for example
+#if COMPILER == MS_COMPILER
+#include <boost/atomic.hpp>
+namespace std {
+	using boost::atomic;
+}
+
+#else
+#include <atomic>
+#endif
+
 #include <fstream>
 // these are auto forwarding to the tr1 implementations of the platform if it supports them
 #	include <functional>

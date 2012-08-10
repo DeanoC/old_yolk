@@ -7,7 +7,7 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
 add_executable( convert ${src_files} ${header_files} )
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} meshimport meshmod meshops export binify assimp json_spirit )
+list( APPEND targ_link_libs ${Core_LIBRARIES} meshimport meshmod meshops export binify json_spirit )
 if( UNIX )
 	list( APPEND targ_link_libs pthread dl )
 endif()

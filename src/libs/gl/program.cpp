@@ -3,7 +3,7 @@
 
  @brief	Implements the program objects.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "program.h"
 
 namespace Gl {

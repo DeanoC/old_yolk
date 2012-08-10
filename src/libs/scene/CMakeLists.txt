@@ -14,4 +14,4 @@ ADD_MSVC_PRECOMPILED_HEADER( "scene.h" "${cpp_src_files}" )
 add_library( scene ${src_files} ${header_files}  )
 
 # make a nice hierachy
-set_target_properties( scene PROPERTIES SOLUTION_FOLDER "libs")
+set_target_properties( scene PROPERTIES FOLDER "Libs")

@@ -1,5 +1,7 @@
 cmake_minimum_required( VERSION 2.8 )
 
+ENABLE_LANGUAGE( ASM )
+
 LIST( APPEND tbb_src_files
   arena.cpp
   cache_aligned_allocator.cpp
@@ -30,13 +32,31 @@ LIST( APPEND tbb_src_files
   tbb_statistics.cpp
   tbb_thread.cpp
 )
-add_library( tbb ${tbb_src_files} )
+IF( UNIX )
+
+ELSE()
+
+	LIST( APPEND tbb_asm_files "intel64-masm/atomic_support.asm" "intel64-masm/intel64_misc.asm" )
+	foreach( tas ${tbb_asm_files} )
+    GET_FILENAME_COMPONENT( asmfname ${tas} NAME_WE ) 
+    SET( asmname  "${CMAKE_CURRENT_BINARY_DIR}/${asmfname}.obj" )
+		add_custom_command( OUTPUT ${asmname}
+							COMMAND ml64 ${CMAKE_CURRENT_SOURCE_DIR}/${tas} /c /Fo ${asmfname}
+							DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${tas} 
+					)
+		list( APPEND tbb_obj_files ${asmname} )
+	endforeach( tas ${tbb_asm_files} )
+ENDIF()
+
+add_library( tbb ${tbb_src_files} ${tbb_obj_files} )
 add_definitions( "-D__TBB_BUILD=1")
 list( APPEND targ_link_libs tbb_rml )
 
 if( UNIX )
 	add_definitions( "-DUSE_PTHREAD")
 	list( APPEND targ_link_libs pthread dl )
+else()
+	add_definitions( "-DTBB_USE_CAPTURED_EXCEPTION -DUSE_WINTHREAD" )
 endif()
 target_link_libraries( tbb ${targ_link_libs} )
 

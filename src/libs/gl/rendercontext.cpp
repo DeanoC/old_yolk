@@ -1,5 +1,8 @@
-#include "gl/gl.h"
+#include "ogl.h"
+#if PLATFORM == WINDOWS
+#else
 #include "glxew.h"
+#endif
 
 #include "texture.h"
 #include "fbo.h"
@@ -114,33 +117,6 @@ void RenderContext::threadActivate() {
 #elif PLATFORM == POSIX
 	glXMakeCurrent( (Display*) x11Display, x11Window, (GLXContext) glxContext );
 #endif
-
-//		IF_DEBUG( 
-	if( debugOutputInstalled == false ) {
-		const std::string testStr( "Gl debugging callback installed" );
-		if( glDebugMessageCallbackAMD ) {
-			glDebugMessageCallbackAMD(&debugOutputAMD, NULL);
-			GL_CHECK
-			glDebugMessageEnableAMD(0, 0, 0, NULL, GL_TRUE);
-			GL_CHECK
-			glDebugMessageInsertAMD(GL_DEBUG_CATEGORY_APPLICATION_AMD, 
-				GL_DEBUG_SEVERITY_LOW_AMD, 1, testStr.length(), testStr.c_str() );
-			GL_CHECK
-		} else if(glDebugMessageControlARB) {
-			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-			GL_CHECK
-			glDebugMessageCallbackARB(&debugOutput, NULL);
-			GL_CHECK
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-			GL_CHECK
-			glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 
-				1, GL_DEBUG_SEVERITY_LOW_ARB, testStr.length(), testStr.c_str() );
-			GL_CHECK
-		}
-		debugOutputInstalled = true;
-	}
-//		);
-
 }
 
 void RenderContext::reset() {
@@ -288,6 +264,32 @@ void RenderContext::setCamera( const Scene::CameraPtr& _cam ) {
 void RenderContext::prepToRender() {
 	// fbo NULL used to mark first activation
 	if( fbo == NULL ) {
+//		IF_DEBUG( 
+		if( debugOutputInstalled == false ) {
+			const std::string testStr( "Gl debugging callback installed" );
+			if( glDebugMessageCallbackAMD ) {
+				glDebugMessageCallbackAMD(&debugOutputAMD, NULL);
+				GL_CHECK
+				glDebugMessageEnableAMD(0, 0, 0, NULL, GL_TRUE);
+				GL_CHECK
+				glDebugMessageInsertAMD(GL_DEBUG_CATEGORY_APPLICATION_AMD, 
+					GL_DEBUG_SEVERITY_LOW_AMD, 1, testStr.length(), testStr.c_str() );
+				GL_CHECK
+			} else if(glDebugMessageControlARB) {
+				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+				GL_CHECK
+				glDebugMessageCallbackARB(&debugOutput, NULL);
+				GL_CHECK
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+				GL_CHECK
+				glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 
+					1, GL_DEBUG_SEVERITY_LOW_ARB, testStr.length(), testStr.c_str() );
+				GL_CHECK
+			}
+			debugOutputInstalled = true;
+		}
+	//		);
+
 		GL_CHECK
 		constantCache.reset( CORE_NEW ConstantCache() );
 		fbo.reset( CORE_NEW Fbo() );

@@ -15,7 +15,6 @@
 
 #if !defined( YOLK_GL_CRACKER_H__ )
 #define YOLK_GL_CRACKER_H__
-
 #include "dxgiformat.h"
 
 class GlFormat {

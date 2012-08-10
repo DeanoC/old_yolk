@@ -1,3 +1,6 @@
+#if !defined( YOLK_MESHMOD_MESHIMPORT_H_ )
+#define YOLK_MESHMOD_MESHIMPORT_H_
+
 #include <core/core.h>
 
 #include <meshmod/scene.h>
@@ -14,3 +17,5 @@ namespace MeshImport {
 		virtual MeshMod::ScenePtr toMeshMod() = 0;
 	};
 }
+
+#endif

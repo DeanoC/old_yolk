@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "debugprims.h"
 #include "shaderman.h"
@@ -18,7 +18,7 @@
 
 
 // compute renderer needs CL
-#include "cl/cl.h"
+#include "cl/ocl.h"
 #include "cl/platform.h"
 
 #include "gfx.h"

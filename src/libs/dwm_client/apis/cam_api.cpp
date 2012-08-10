@@ -36,10 +36,10 @@ void CamSetFOV( _VT_PARAMS3( CamHandle handle, float fov, float aspect ) ) {
 	cam->setFOV( fov * Math::degree_to_radian<float>(), aspect );
 }
 
-void CamSetDepthRange( _VT_PARAMS3( CamHandle handle, float near, float far ) ) {
+void CamSetDepthRange( _VT_PARAMS3( CamHandle handle, float znear, float zfar ) ) {
 	ClientWorld* clientWorld = (ClientWorld*) threadCtx->owner->world;
 	auto cam = clientWorld->getCamera( handle );
-	cam->setDepthRange( near, far );
+	cam->setDepthRange( znear, zfar );
 }
 
 void CamSetView( _VT_PARAMS2( CamHandle handle, _VT_PTR( const float*, unMatrix ) ) ) {

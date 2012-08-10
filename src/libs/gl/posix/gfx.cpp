@@ -1,4 +1,4 @@
-#include "gl/gl.h"
+#include "gl/ogl.h"
 #include "glxew.h"
 #include "scene/rendercontext.h"
 #include "gl/rendercontext.h"

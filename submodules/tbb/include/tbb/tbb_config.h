@@ -37,6 +37,11 @@
     - known compiler/platform issues
 **/
 
+// Deano added for vs11
+#ifndef TBB_USE_CAPTURED_EXCEPTION
+#	define TBB_USE_CAPTURED_EXCEPTION 1
+#endif
+
 #define __TBB_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
 /** Presence of compiler features **/

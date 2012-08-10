@@ -11,8 +11,8 @@ file( GLOB header_files *.h *.inl *.hpp *.hxx)
 
 list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
-ADD_MSVC_PRECOMPILED_HEADER( "meshmod_pch.h" "${cpp_src_files}" )
+ADD_MSVC_PRECOMPILED_HEADER( "meshmod.h" "${cpp_src_files}" )
 add_library( meshmod ${src_files} ${header_files} )
 
 # make a nice hierachy
-set_target_properties( meshmod PROPERTIES SOLUTION_FOLDER "libs")
+set_target_properties( meshmod PROPERTIES FOLDER "Libs")

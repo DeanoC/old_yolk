@@ -66,8 +66,7 @@ public:
 
 	const Core::Frustum* getFrustum() { return viewFrustum; }
 
-
-#if PLATFORM == WIN32
+#if PLATFORM == WINDOWS
 	// if any windows call need GLRC or DC grab from here (not cross platform obviously...)
 	HDC											hDC;
 	HGLRC										hRC;
@@ -76,8 +75,14 @@ public:
 	unsigned long								x11Window;
 	void*										glxContext;
 #endif
-
 private:
+#if PLATFORM == WINDOWS
+	// context must be created on main thread
+	void setGlContext( HDC _hDC, HGLRC _hRC );
+#else
+	// context must be created on main thread
+	void setGlContext( void* dis, unsigned long win, void* ctx );
+#endif
 	boost::scoped_ptr<ConstantCache>				constantCache;
 	// note in most cases frustum and camera match, but in some debug cases they
 	// might not (to allow you see how frustum culling is working or not)
@@ -88,15 +93,6 @@ private:
 	boost::scoped_array<ProgramPtr>				boundPrograms;
 	ProgramPipelineObject*						curPpo;
 	bool										debugOutputInstalled;
-
-
-#if PLATFORM == WIN32
-	// context must be created on main thread
-	void setGlContext( HDC _hDC, HGLRC _hRC );
-#else
-	// context must be created on main thread
-	void setGlContext( void* dis, unsigned long win, void* ctx );
-#endif
 
 };
 

@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "databuffer.h"
 #include "gpu_constants.h"
 #include "program.h"

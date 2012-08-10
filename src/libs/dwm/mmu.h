@@ -9,8 +9,11 @@
 #define DWM_MMU_H_ 1
 
 #include "core/singleton.h"
-#include <sys/mman.h>
 
+#if PLATFORM_OS == MS_WINDOWS
+#else
+#	include <sys/mman.h>
+#endif
 
 #if CPU_FAMILY == CPU_X86 && CPU_BIT_SIZE == 32
 struct LdtEntry {

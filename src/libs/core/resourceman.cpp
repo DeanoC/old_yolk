@@ -303,7 +303,7 @@ void ResourceMan::registerResourceType (	uint32_t type,
 }
 
 std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBase* pHandle ) {
-	int alreadyAcquiring = std::atomic_fetch_add( &pHandle->acquiring, 1 );	
+	int alreadyAcquiring = pHandle->acquiring.fetch_add( 1 );	
 
 	if( alreadyAcquiring ) {
 		pHandle->acquiring += -1;	

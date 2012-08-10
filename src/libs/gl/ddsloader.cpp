@@ -5,7 +5,7 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
-#include "gl.h"
+#include "ogl.h"
 #include "core/fileio.h"
 
 #include "dds.h"

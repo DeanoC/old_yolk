@@ -8,7 +8,7 @@
 #include "scene.h"
 #include "core/resourceman.h"
 #if RENDER_BACKEND == Gl
-#include "gl/gl.h"
+#include "gl/ogl.h"
 #include "gl/rendercontext.h"
 #endif
 #include "heightfield.h"

@@ -29,7 +29,7 @@ set( Boost_USE_STATIC_LIBS   ON )
 set( Boost_USE_STATIC_RUNTIME OFF )
 set( Boost_USE_MULTITHREADED ON )
 set( BOOST_VERSION 1.48.0 )
-set( BOOST_COMPONENTS program_options thread date_time regex system )
+set( BOOST_COMPONENTS program_options thread date_time regex system filesystem )
 set( Boost_DEBUG OFF )
 
 find_package( Boost ${BOOST_VERSION} QUIET COMPONENTS ${BOOST_COMPONENTS} )

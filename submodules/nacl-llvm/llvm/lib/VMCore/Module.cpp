@@ -709,7 +709,7 @@ static const char *NeededPrefix = "NeededRecord_";
 
 void
 Module::dumpMeta(raw_ostream &OS) const {
-  OS << "OutputFormat: ";
+/*  OS << "OutputFormat: ";
   switch (getOutputFormat()) {
     case Module::ObjectOutputFormat: OS << "object"; break;
     case Module::SharedOutputFormat: OS << "shared"; break;
@@ -733,7 +733,7 @@ Module::dumpMeta(raw_ostream &OS) const {
       OS << NR.Symbols[j];
     }
     OS << "\n";
-  }
+  } */
 }
 
 void Module::addNeededRecord(StringRef DynFile, GlobalValue *GV) {

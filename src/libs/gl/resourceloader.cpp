@@ -9,7 +9,7 @@
 //! TODO GL errors abound :(
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "scene/wobfile.h"
 #include "scene/hierfile.h"
@@ -235,11 +235,11 @@ void ResourceLoaderImpl::PushOntoLoaderContext( const Core::ResourceHandleBase* 
 	switch( handle->getType() ) {
 	case WobType: res = WobCreateResource( handle, flags, pName, pData ); break;
 	case HierType: res = HierCreateResource( handle, flags, pName, pData ); break;
-//	case TextureType: res = TextureCreateResource( handle, flags, pName, pData );break;
-//	case TextureAtlasType: res = TextureAtlasCreateResource( handle, flags, pName, pData );break;
-//	case ProgramRType: res = ProgramCreateResource( handle, flags, pName, pData ); break;
+	case TextureType: res = TextureCreateResource( handle, flags, pName, pData );break;
+	case TextureAtlasType: res = TextureAtlasCreateResource( handle, flags, pName, pData );break;
+	case ProgramRType: res = ProgramCreateResource( handle, flags, pName, pData ); break;
 	case DataBufferRType: res = DataBufferCreateResource( handle, flags, pName, pData ); break;
-//	case XboRType: res = XboCreateResource( handle, flags, pName, pData ); break;
+	case XboRType: res = XboCreateResource( handle, flags, pName, pData ); break;
 	case VaoRType: res = VaoCreateResource( handle, flags, pName, pData ); break; 
 	default: {
 			ResourceLoaderImpl::workCounter++;

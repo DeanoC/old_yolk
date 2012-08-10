@@ -12,9 +12,9 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 # ADD_MSVC_PRECOMPILED_HEADER( "convertmesh_pch.h" "${cpp_src_files}" )
 add_executable( dvm_owned_dedi ${src_files} ${header_files} )
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} dwm dwm_client riak-cpp protocols protobuf json_spirit gl cl scene )
+list( APPEND targ_link_libs ${Core_LIBRARIES} dwm dwm_client riak-cpp protocols protobuf json_spirit gl cl scene ${OPENCL_LIBRARY} )
 if( UNIX )
-	list( APPEND targ_link_libs pthread dl GL OpenCL X11 )
+	list( APPEND targ_link_libs pthread dl GL X11 )
 endif()
 
 target_link_libraries( dvm_owned_dedi ${targ_link_libs} )

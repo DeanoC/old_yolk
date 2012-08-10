@@ -18,12 +18,12 @@
 //---------------------------------------------------------------------------
 // Includes
 //---------------------------------------------------------------------------
-#if defined(_DEBUG)
-#	define _CRTDBG_MAP_ALLOC
-#endif
+//#if defined(_DEBUG)
+//#	define _CRTDBG_MAP_ALLOC
+//#endif
 
 #include <sstream>
-#include <crtdbg.h>
+//#include <crtdbg.h>
 
 //---------------------------------------------------------------------------
 // Enums and typedefs

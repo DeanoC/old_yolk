@@ -3,8 +3,9 @@
 #include "core/fileio.h"
 #include "core/stb_image.h"
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 #include "meshimport/meshimport.h"
-#include "meshimport/assimp.h"
+//#include "meshimport/assimp.h"
 #include "meshimport/grometxtimp.h"
 #include "meshimport/LWObject2GO.h"
 #include "meshimport/LWScene2GO.h"
@@ -54,11 +55,7 @@ int Main() {
 		return 1;
 	}
 
-	char cwd[ PATH_MAX ];
-	if( getcwd( cwd, PATH_MAX ) == NULL ) {
-		LOG(INFO) << "Directory failure\n";
-		return 1;
-	}
+	const std::string cwd = boost::filesystem::current_path().string();
 
 	const std::string inname = vm["input"].as<std::string>();
 	FilePath inPath( inname );
@@ -81,7 +78,7 @@ int Main() {
 
 	if(  ext == ".lws" || ext == ".lwo" ) {
 		LOG(INFO) << "Input Path : " << inPath.DirName().value().c_str() << "\n";
-		chdir( inPath.DirName().value().c_str() );
+		boost::filesystem::current_path( inPath.DirName().value().c_str() );
 
 		std::shared_ptr<ImportInterface> importer;
 		if( inPath.Extension() == ".lwo" ) {
@@ -96,7 +93,7 @@ int Main() {
 		OutputScene( outPath, importer );
 	} else if( ext == ".txt" ) {
 		LOG(INFO) << "Input Path : " << inPath.DirName().value().c_str() << "\n";
-		chdir( inPath.DirName().value().c_str() );
+		boost::filesystem::current_path( inPath.DirName().value().c_str() );
 
 		std::shared_ptr<ImportInterface> importer;
 		importer = std::make_shared<GromeTxtImp>( inPath.BaseName().value() );
@@ -119,13 +116,15 @@ int Main() {
 		DoTextureAtlas( inPath, outPath );
 	} else
 	{
-		std::shared_ptr<ImportInterface> importer;
+/*		std::shared_ptr<ImportInterface> importer;
 		importer = std::make_shared<AssImp>( inPath.BaseName().value() );
 		if( importer->loadedOk() == false ) {
 			LOG(INFO) << "Input file <" << inPath.BaseName().value() <<"> not found or unable to be loaded\n";
 			return 1;
 		}
-		OutputScene( outPath, importer );
+		OutputScene( outPath, importer );*/
+		LOG(INFO) << "Input file <" << inPath.BaseName().value() <<"> can not be covnerted\n";
+
 	}
 
 	return 0;
@@ -138,7 +137,7 @@ void OutputScene( Core::FilePath outPath, std::shared_ptr<MeshImport::ImportInte
 	using namespace Export;
 
 	LOG(INFO) << "Output Path : " << outPath.DirName().value().c_str() << "\n";
-	chdir( outPath.DirName().value() .c_str() );
+	boost::filesystem::current_path( outPath.DirName().value() .c_str() );
 
 	Core::ResourceManifestEntryVector manifest;
 	auto outBaseName = outPath.BaseName();
@@ -162,7 +161,7 @@ void OutputScene( Core::FilePath outPath, std::shared_ptr<MeshImport::ImportInte
 
 void DoTexture( const Core::FilePath& inFullPath, const Core::FilePath& outPath ) {
 	LOG(INFO) << "Input Path : " << inFullPath.DirName().value().c_str() << "\n";
-	chdir( inFullPath.DirName().value().c_str() );
+	boost::filesystem::current_path( inFullPath.DirName().value().c_str() );
 
 	Core::FilePath inPath = inFullPath.BaseName();
 
@@ -274,7 +273,7 @@ void DoTexture( const Core::FilePath& inFullPath, const Core::FilePath& outPath 
 		}
 
 		LOG(INFO) << "Output Path : " << outPath.DirName().value().c_str() << "\n";
-		chdir( outPath.DirName().value().c_str() );
+		boost::filesystem::current_path( outPath.DirName().value().c_str() );
 
 		Export::SaveTexture( tex, outPath.BaseName() );
 
@@ -286,7 +285,7 @@ void DoTexture( const Core::FilePath& inFullPath, const Core::FilePath& outPath 
 
 void DoTextureAtlas( const Core::FilePath& inFullPath, const Core::FilePath& outPath ) {
 	LOG(INFO) << "Input Path : " << inFullPath.DirName().value().c_str() << "\n";
-	chdir( inFullPath.DirName().value().c_str() );
+	boost::filesystem::current_path( inFullPath.DirName().value().c_str() );
 
 	Core::FilePath inPath = inFullPath.BaseName();
 
@@ -303,7 +302,7 @@ void DoTextureAtlas( const Core::FilePath& inFullPath, const Core::FilePath& out
 	}
 
 	LOG(INFO) << "Output Path : " << outPath.DirName().value().c_str() << "\n";
-	chdir( outPath.DirName().value().c_str() );
+	boost::filesystem::current_path( outPath.DirName().value().c_str() );
 
 	SaveTextureAtlas( filenames, sprites, outPath );
 }

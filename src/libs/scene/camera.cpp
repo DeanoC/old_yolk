@@ -47,9 +47,9 @@ void Camera::setFOV( float fov, float aspect ) {
 	setProjection();
 }
 
-void Camera::setDepthRange( float near, float far ) {
-	zNear = near;
-	zFar = far;
+void Camera::setDepthRange( float _near, float _far ) {
+	zNear = _near;
+	zFar = _far;
 
 	if( ortho ) {
 		setOrthographic();

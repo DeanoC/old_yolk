@@ -1,7 +1,7 @@
 layout( points, invocations = 1 ) in;
 layout( triangle_strip, max_vertices = 3 ) out;
 
-layout( location = 1 ) out vec2 outUV;
+layout( location = 1 ) smooth out vec2 outUV;
 
 void main() {
     gl_Position = vec4( 0.0, 3.0, 0.0, 1.0 );

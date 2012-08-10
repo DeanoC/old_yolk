@@ -1,7 +1,8 @@
+#include "gl/glew.h"
+
 #include "export.h"
 #include "core/coreresources.h"
-#include "gl/gl.h"
-#include "gl/glew.h"
+#include "gl/ogl.h"
 
 #include "gl/glformat_cracker.h"
 

@@ -1,6 +1,6 @@
 #include "core/core.h"
-#include "gl/gl.h"
-#include "cl/cl.h"
+#include "gl/ogl.h"
+#include "cl/ocl.h"
 #include "gl/gfx.h"
 #include "cl/platform.h"
 #include "core/coreresources.h"

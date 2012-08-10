@@ -84,21 +84,21 @@ SET ( NO_EXPORT OFF CACHE BOOL
 
 # Search for external dependencies, and build them from source if not found
 # Search for zlib
-find_package(ZLIB)
-if( NOT ZLIB_FOUND )
-  message(STATUS "compiling zlib from souces")
-  include(CheckIncludeFile)
-  include(CheckTypeSize)
-  include(CheckFunctionExists)
-  # compile from sources
-  add_subdirectory(contrib/zlib)
-  set(ZLIB_FOUND 1)
-  set(ZLIB_LIBRARIES zlib)
-  set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/zlib)
-else(NOT ZLIB_FOUND)
-  ADD_DEFINITIONS(-DASSIMP_BUILD_NO_OWN_ZLIB)
-endif(NOT ZLIB_FOUND)
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+#find_package(ZLIB)
+#if( NOT ZLIB_FOUND )
+#  message(STATUS "compiling zlib from souces")
+#  include(CheckIncludeFile)
+#  include(CheckTypeSize)
+#  include(CheckFunctionExists)
+#  # compile from sources
+#  add_subdirectory(contrib/zlib)
+#  set(ZLIB_FOUND 1)
+#  set(ZLIB_LIBRARIES zlib)
+#  set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/zlib)
+#else(NOT ZLIB_FOUND)
+#  ADD_DEFINITIONS(-DASSIMP_BUILD_NO_OWN_ZLIB)
+#endif(NOT ZLIB_FOUND)
+#INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 
 # Search for unzip
 if (PKG_CONFIG_FOUND)

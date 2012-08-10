@@ -3,7 +3,7 @@
 
  @brief	Implements the fbo class.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "fbo.h"
 
 namespace {

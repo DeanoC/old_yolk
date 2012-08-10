@@ -3,7 +3,7 @@
 
  @brief	Implements the vertex array objects.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "vao.h"
 
 namespace Gl {
