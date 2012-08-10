@@ -78,7 +78,7 @@ void X86NaClRewriteFinalPass::RewriteIndirectJump(MachineBasicBlock &MBB,
   MachineInstr &MI = *MBBI;
   DebugLoc DL = MI.getDebugLoc();
 
-  DEBUG(dbgs() << "rewrite indirect jump " << MBB);
+//  DEBUG(dbgs() << "rewrite indirect jump " << MBB);
 
   unsigned reg32 = MI.getOperand(0).getReg();
   unsigned reg64 = getX86SubSuperRegister(reg32, MVT::i64);
@@ -112,7 +112,7 @@ void X86NaClRewriteFinalPass::RewriteIndirectJump(MachineBasicBlock &MBB,
   BuildMI(MBB, MBBI, DL, TII->get(TargetOpcode::BUNDLE_UNLOCK));
   MI.eraseFromParent();
 
-  DEBUG(dbgs() << "done rewrite indirect jump " << MBB);
+//  DEBUG(dbgs() << "done rewrite indirect jump " << MBB);
 }
 
 void X86NaClRewriteFinalPass::RewriteDirectCall(MachineBasicBlock &MBB,
@@ -120,11 +120,11 @@ void X86NaClRewriteFinalPass::RewriteDirectCall(MachineBasicBlock &MBB,
     bool Is64Bit) {
   MachineInstr &MI = *MBBI;
   DebugLoc DL = MI.getDebugLoc();
-  DEBUG(dbgs() << "rewrite direct call " << MBB);
+//  DEBUG(dbgs() << "rewrite direct call " << MBB);
   const MachineOperand &MO = MI.getOperand(0);
   // rewrite calls to immediates as indirect calls.
   if (MO.isImm()) {
-    DEBUG(dbgs() << " is immediate " << MO);
+//    DEBUG(dbgs() << " is immediate " << MO);
     // First, rewrite as a move imm->reg + indirect call sequence,
     BuildMI(MBB, MBBI, DL, TII->get(X86::MOV32ri))
             .addReg(X86::ECX)
@@ -185,7 +185,7 @@ bool X86NaClRewriteFinalPass::ApplyCommonRewrites(MachineBasicBlock &MBB,
   case X86::NACL_SETJ64:
   case X86::NACL_LONGJ32:
   case X86::NACL_LONGJ64:
-    dbgs() << "inst, opcode not handled: " << MI << Opcode;
+//    dbgs() << "inst, opcode not handled: " << MI << Opcode;
     assert(false && "NaCl Pseudo-inst not handled");
   case X86::NACL_RET32:
   case X86::NACL_RET64:
@@ -203,16 +203,16 @@ bool X86NaClRewriteFinalPass::runOnMachineFunction(MachineFunction &MF) {
   const X86Subtarget *subtarget = &TM->getSubtarget<X86Subtarget>();
   assert(subtarget->isTargetNaCl() && "Target in NaClRewriteFinal is not NaCl");
 
-  DEBUG(dbgs() << "*************** NaCl Rewrite Final ***************\n");
-  DEBUG(dbgs() << " funcnum " << MF.getFunctionNumber() << " "
-               << MF.getFunction()->getName() << "\n");
+//  DEBUG(dbgs() << "*************** NaCl Rewrite Final ***************\n");
+//  DEBUG(dbgs() << " funcnum " << MF.getFunctionNumber() << " "
+//               << MF.getFunction()->getName() << "\n");
 
   for (MachineFunction::iterator MFI = MF.begin(), E = MF.end(); 
        MFI != E; ++MFI) {
     modified |= runOnMachineBasicBlock(*MFI);
   }
 
-  DEBUG(dbgs() << "************* NaCl Rewrite Final Done *************\n");
+//  DEBUG(dbgs() << "************* NaCl Rewrite Final Done *************\n");
   return modified;
 }
 

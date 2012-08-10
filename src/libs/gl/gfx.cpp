@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "debugprims.h"
 #include "shaderman.h"

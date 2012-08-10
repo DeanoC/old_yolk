@@ -49,6 +49,9 @@ public:
 	//! Updates internal 'frame' time ; returns FRAME_PERIOD in seconds
 	float step();
 
+	//! sleep the thread for the specified time
+	static void sleep( float fTimeInSecs );
+
 
 private:
 	static const float FRAME_PERIOD;

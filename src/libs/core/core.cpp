@@ -64,8 +64,8 @@ void Init( void ) {
 	ResourceMan::init();
 	InstallResourceTypes();
 #if PLATFORM == WINDOWS 
-	_CrtSetDbgFlag( _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_ALLOC_MEM_DF);
-	_CrtSetReportHook( &WinCrtReportHook );
+//	_CrtSetDbgFlag( _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_ALLOC_MEM_DF);
+//	_CrtSetReportHook( &WinCrtReportHook );
 #endif
 
 #if defined( USE_GLOG )

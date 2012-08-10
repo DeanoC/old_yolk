@@ -10,6 +10,7 @@
 
 #include "core/resources.h"
 #include "memoryobject.h"
+#include <GL/gl.h>
 
 namespace Cl {
 	class Context;

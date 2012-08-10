@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "gfx.h"
 #include "databuffer.h"
 #include "vao.h"
@@ -65,12 +65,12 @@ DebugPrims::~DebugPrims() {
 }
 
 void DebugPrims::ndcLine( const Core::Colour& colour, const Math::Vector2& a, const Math::Vector2& b ) {
-	int nlv = std::atomic_fetch_add( &numLineVertices, 2 );
+	int nlv = numLineVertices.fetch_add( 2 );
 	if( nlv+2 > MAX_DEBUG_VERTICES) {
 		// TODO as drawing can occur on any thread, we can't flush like we used to (as uses GL context)
 		// so for now drop it, TODO queue up flushes
 //		flush();
-		std::atomic_fetch_add( &numLineVertices, -2 );
+		numLineVertices.fetch_add( -2 );
 		return;
 	}
 
@@ -87,12 +87,12 @@ void DebugPrims::worldLine( const Core::Colour& colour,
 							const Math::Vector3& b ) {
 	using namespace Math;
 
-	int nwv = std::atomic_fetch_add( &numLineWorldVertices, 2 );
+	int nwv = numLineWorldVertices.fetch_add( 2 );
 	if( nwv+2 > MAX_DEBUG_VERTICES) {
 		// TODO as drawing can occur on any thread, we can't flush like we used to (as uses GL context)
 		// so for now drop it, TODO queue up flushes
 //		flush();
-		std::atomic_fetch_add( &numLineWorldVertices, -2 );
+		numLineWorldVertices.fetch_add( -2 );
 		return;
 	}
 

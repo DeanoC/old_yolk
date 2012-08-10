@@ -9,7 +9,7 @@ file( GLOB c_src_files *.c )
 file( GLOB header_files *.h *.inl *.hpp *.hxx apis/*.h )
 list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
-ADD_MSVC_PRECOMPILED_HEADER( "dwm.h" "${cpp_src_files}" )
+#ADD_MSVC_PRECOMPILED_HEADER( "dwm.h" "${cpp_src_files}" )
 add_library( dwm STATIC ${src_files} ${header_files} )
 
 list( APPEND targ_link_libs ${Core_LIBRARIES} )

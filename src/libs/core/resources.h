@@ -22,22 +22,22 @@
 namespace Core {
 
 //! passed to resource create call backs
-template< uint32_t type, class rclass, uint32_t forcedCreateFlags = 0 >
-class ResourceHandle : public Core::TypedResourceHandle<type> {
+template< uint32_t _type, class rclass, uint32_t forcedCreateFlags = 0 >
+class ResourceHandle : public Core::TypedResourceHandle<_type> {
 public:
-	static const uint32_t Type = type;
+	static const uint32_t Type = _type;
 	typedef rclass														ResourceClass;
 	typedef std::shared_ptr<ResourceClass>								ResourcePtr;
-	typedef const ResourceHandle<type, rclass, forcedCreateFlags> 	ThisConstType;
+	typedef const ResourceHandle<_type, rclass, forcedCreateFlags> 		ThisConstType;
 
 	// helper to acquire a class that inherits off Resource<type>
 	ResourcePtr acquire() const {
-	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseAcquire<type>() );
+	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseAcquire<_type>() );
 	}
 
 	// helper to try and acquire a class that inherits off Resource<type>
 	ResourcePtr tryAcquire() const {
-	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseTryAcquire<type>() );
+	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseTryAcquire<_type>() );
 	}
 
 	static ThisConstType* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {

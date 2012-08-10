@@ -52,7 +52,7 @@ namespace MeshImport {
 		// grome store some *HUGE* data on a single text line, so to make it simple
 		// we keep even huger line buffers, twice... but still drop in the ocean of modern
 		// memory sizes
-		const int LINE_BUFFER_SIZE = 200 * 1024 * 1024;
+		static const int LINE_BUFFER_SIZE = 200 * 1024 * 1024;
 
 		unsigned int					lineNum;
 		char*							lineBuffer;

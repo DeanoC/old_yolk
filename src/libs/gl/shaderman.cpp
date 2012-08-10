@@ -3,7 +3,7 @@
 
  @brief	Implements the shader manager.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "program.h"
 #include "core/resources.h"
 #include "gpu_constants.h"
@@ -20,6 +20,7 @@ DECLARE_FRAGMENT( vs_passthrough );
 DECLARE_FRAGMENT( vs_basic );
 DECLARE_FRAGMENT( vs_flat_basic );
 DECLARE_FRAGMENT( fs_basic );
+DECLARE_FRAGMENT( fs_flat_basic );
 DECLARE_FRAGMENT( vs_ndcpos_col );
 DECLARE_FRAGMENT( fs_vertcol );
 DECLARE_FRAGMENT( vs_ndcpos_col_uv );
@@ -60,6 +61,7 @@ void ShaderMan::initDefaultPrograms() {
 	REGISTER_FRAGMENT( vs_basic );
 	REGISTER_FRAGMENT( vs_flat_basic );
 	REGISTER_FRAGMENT( fs_basic );
+	REGISTER_FRAGMENT( fs_flat_basic );
 	REGISTER_FRAGMENT( vs_ndcpos_col );
 	REGISTER_FRAGMENT( fs_vertcol );
 	REGISTER_FRAGMENT( vs_ndcpos_col_uv );
@@ -211,6 +213,7 @@ Program* ShaderMan::internalCreateWholeProgram( const Core::ResourceHandleBase* 
 			}
 
 			Memory::Name shaderName = glCreateShader( shaderType[i] );
+			GL_CHECK
 			glShaderSource( shaderName, count, glsrc, NULL );
 			GL_CHECK
 			glCompileShader( shaderName );

@@ -1,13 +1,15 @@
 cmake_minimum_required( VERSION 2.8.2 )
 if( UNIX )
 elseif( WIN32 )
-	set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /MP /D_ITERATOR_DEBUG_LEVEL=0" CACHE STRING "C++ Flags" )
+	set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /MP /D_ITERATOR_DEBUG_LEVEL=0 /DTBB_USE_CAPTURED_EXCEPTION=1" CACHE STRING "C++ Flags" )
 endif()
 
 set(LLVM_TARGETS_TO_BUILD X86
 CACHE STRING "Semicolon-separated list of targets to build, or \"all\".")
 set(LLVM_REQUIRES_RTTI 1 CACHE STRING "llvm uses RTTI")
-add_definitions( "-std=c++11")
+if( UNIX )
+	add_definitions( "-std=c++11")
+endif()
 # top level wierd cmake file
 project( Yolk )
 

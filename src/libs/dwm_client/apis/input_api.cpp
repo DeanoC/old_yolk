@@ -10,7 +10,7 @@ namespace Untrusted {
 }
 
 bool InputGetFrame( _VT_PARAMS1( _VT_PTR( Untrusted::InputFrame*, unFrame ) ) ) {
-	CORE_STATIC_ASSERT( sizeof(Untrusted::InputFrame) == sizeof(InputFrame) );
+//	CORE_STATIC_ASSERT( sizeof(Untrusted::InputFrame) == sizeof(InputFrame) );
 
 	InputFrame* frame = (InputFrame*)UNTRUSTED_PTR_TO_TRUSTED( unFrame );
 	ClientWorld* clientWorld = (ClientWorld*) threadCtx->owner->world;

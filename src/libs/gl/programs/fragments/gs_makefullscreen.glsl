@@ -1,7 +1,7 @@
 layout( points, invocations = 1 ) in;
 layout( triangle_strip, max_vertices = 4 ) out;
 
-layout( location = 1 ) out vec2 outUV;
+layout( location = 1 ) smooth out vec2 outUV;
 
 layout( binding = 0 ) uniform sampler2DMS msaa;
 

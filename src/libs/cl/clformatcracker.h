@@ -12,7 +12,7 @@
 #define WIERD_CL_CRACKER_H__
 
 #if 1 //defined(USE_OPENGL)
-#include "gl/gl.h"
+#include "gl/ogl.h"
 #endif
 
 class ClFormat {

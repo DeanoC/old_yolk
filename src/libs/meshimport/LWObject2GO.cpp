@@ -624,7 +624,7 @@ namespace LWObject2Go_Local
 						const unsigned int faceIdx = uvIt->pIndex + baseFace;
 
 						VertexIndex newVert;
-						if( (*uvEle)[ newVert ].isValid() == false ) {
+						if( (*uvEle)[ oldVert ].isValid() == false ) {
 							// first vertex is still virgin so we can use it without cloning
 							newVert = oldVert;
 						} else {

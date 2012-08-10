@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "gfx.h"
 #include "core/colour.h"
 #include "core/resourceman.h"

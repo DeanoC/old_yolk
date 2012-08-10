@@ -19,7 +19,8 @@
 #if !defined( __STDC_CONSTANT_MACROS )
 #	define __STDC_CONSTANT_MACROS
 #endif
-
+// for vc10/11
+#define _VARIADIC_MAX 10
 
 // set up the platform level defines
 #include "platform.h"

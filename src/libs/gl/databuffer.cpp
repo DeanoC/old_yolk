@@ -3,7 +3,7 @@
 
  @brief	Implements the data buffer objects.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "databuffer.h"
 
 #define BUFFER_OLD				0

@@ -17,4 +17,4 @@ list( APPEND targ_link_libs core )
 target_link_libraries( lightwaveloader ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( lightwaveloader PROPERTIES SOLUTION_FOLDER "libs")
+set_target_properties( lightwaveloader PROPERTIES FOLDER "Libs")

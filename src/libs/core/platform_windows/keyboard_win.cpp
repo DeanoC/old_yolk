@@ -10,17 +10,17 @@
 
 namespace Core {
 
-void KeyboardWinProcessKeyMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
+void KeyboardWinProcessKeyMessages( uint32_t message, uint16_t wParam, uint32_t lParam ) {
 	if( Keyboard::exists() == false )
 		return;
 
     // Consolidate the keyboard messages and pass them to the app's keyboard callback
-    if( uMsg == WM_KEYDOWN ||
-        uMsg == WM_SYSKEYDOWN ||
-        uMsg == WM_KEYUP ||
-        uMsg == WM_SYSKEYUP ) {
+    if( message == WM_KEYDOWN ||
+        message == WM_SYSKEYDOWN ||
+        message == WM_KEYUP ||
+        message == WM_SYSKEYUP ) {
 
-        bool bKeyDown = ( uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN );
+        bool bKeyDown = ( message == WM_KEYDOWN || message == WM_SYSKEYDOWN );
         DWORD dwMask = ( 1 << 29 );
         bool bAltDown = ( ( lParam & dwMask ) != 0 );
 

@@ -61,7 +61,7 @@ public:
 	ProgramPipelineObject* getCurrentPpo() const { return curPpo; }
 
 	Fbo* getFbo() const { return fbo.get(); };
-#if PLATFORM == WIN32
+#if PLATFORM == WINDOWS
 	// if any windows call need GLRC or DC grab from here (not cross platform obviously...)
 	HDC											hDC;
 	HGLRC										hRC;
@@ -71,7 +71,7 @@ public:
 	void*										glxContext;
 #endif
 private:
-#if PLATFORM == WIN32
+#if PLATFORM == WINDOWS
 	// context must be created on main thread
 	void setGlContext( HDC _hDC, HGLRC _hRC );
 #else

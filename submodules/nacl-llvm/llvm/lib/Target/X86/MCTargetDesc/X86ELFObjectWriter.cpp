@@ -107,7 +107,7 @@ unsigned X86ELFObjectWriter::GetRelocType(const MCValue &Target,
         default:
           llvm_unreachable("Unimplemented");
         case MCSymbolRefExpr::VK_None:
-      dbgs() << "ELF::R_X86_64_32S generated\n";
+//      dbgs() << "ELF::R_X86_64_32S generated\n";
           Type = ELF::R_X86_64_32S;
 //          Type = ELF::R_X86_64_64;
           break;

@@ -5,10 +5,10 @@
 //!
 //!-----------------------------------------------------
 
-#include "cl.h"
+#include "ocl.h"
 
 #if 1 //defined(USE_OPENGL)
-#include "gl/gl.h"
+#include "gl/ogl.h"
 #include "gl/gfx.h"
 #include "gl/rendercontext.h"
 #endif
@@ -206,8 +206,8 @@ void Platform::createDevices() {
 		cl_context_properties props[] = {
 			CL_CONTEXT_PLATFORM, (cl_context_properties) devices[0].platformId, 
 #if PLATFORM == WINDOWS
-			CL_WGL_HDC_KHR, (cl_context_properties) gfx->getThreadRenderContext(0)->hDC, 
-			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadRenderContext(0)->hRC,
+			CL_WGL_HDC_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->hDC, 
+			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->hRC,
 #elif PLATFORM == POSIX 
 			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->glxContext,
 			CL_GLX_DISPLAY_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->x11Display,

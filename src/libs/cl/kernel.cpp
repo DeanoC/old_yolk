@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "cl.h"
+#include "ocl.h"
 
 #include "context.h"
 #include "platform.h"

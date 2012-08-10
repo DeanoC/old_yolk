@@ -1,12 +1,14 @@
-#include "gl.h"
+#include "ogl.h"
+#include "wglew.h"
+#include "gfx.h"
+#include "rendercontext.h"
 #include "core/resourceman.h"
-#if PLATFORM == WINDOWS
 #include "core/platform_windows/win_shell.h"
-#endif
 
 #pragma comment( lib, "opengl32" )
+namespace Gl {
 
-#if !defined(GDEBBUGGER_FRIENDLY_STARTUP) && PLATFORM == WINDOWS
+#if !defined(GDEBBUGGER_FRIENDLY_STARTUP)
 
 bool Gfx::createGLContext() {
 
@@ -53,23 +55,18 @@ bool Gfx::createGLContext() {
 
 	HGLRC tempContext = wglCreateContext(hDC);
 	wglMakeCurrent(hDC, tempContext);
-	int lfRes = LoadFunctions();
-	if( lfRes == LS_LOAD_FAILED )
-		return  false;
 
-	lfRes = LoadWinFunctions( hDC );
-	if( lfRes == LS_LOAD_FAILED )
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
 		return  false;
 
 	// *required* versions and extension check here
 	unsigned int passedExtCheck = 0x1;
-	passedExtCheck &= ( IsVersionGEQ( 4, 2 ) > 0 ); // 4.2 is our base
-
-	// test a EXT_direct_state_access VAO function 
-	passedExtCheck &= (glVertexArrayVertexAttribOffsetEXT != nullptr);
+	passedExtCheck &= ( GLEW_VERSION_4_2 );
+//	passedExtCheck &= ( GLEW_EXT_direct_state_access );
 
 	if( passedExtCheck == false )
-		return false;
+		return false;	
 
 	// for out output buffer, we simple want a double buffered colour, nothing else
 	// all rendering will be done to off screen buffers, then blited to here for display
@@ -104,7 +101,8 @@ bool Gfx::createGLContext() {
  
 	return true;
 }
-#elif PLATFORM == WINDOWS
+#else
+
 HGLRC initialGLRC;
 bool Gfx::createGLContext() {
 	HDC hDC=GetDC(g_hWnd);
@@ -131,23 +129,18 @@ bool Gfx::createGLContext() {
 	if (!bResult) return false; 
 	HGLRC tempContext = wglCreateContext(hDC);
 	wglMakeCurrent(hDC, tempContext);
-	int lfRes = LoadFunctions();
-	if( lfRes == LS_LOAD_FAILED )
-		return  false;
 
-	lfRes = LoadWinFunctions( hDC );
-	if( lfRes == LS_LOAD_FAILED )
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
 		return  false;
 
 	// *required* versions and extension check here
 	unsigned int passedExtCheck = 0x1;
-	passedExtCheck &= ( IsVersionGEQ( 4, 2 ) > 0 ); // 4.2 is our base
-
-	// test a EXT_direct_state_access VAO function 
-	passedExtCheck &= (glVertexArrayVertexAttribOffsetEXT != nullptr);
+	passedExtCheck &= ( GLEW_VERSION_4_2 );
+//	passedExtCheck &= ( GLEW_EXT_direct_state_access );
 
 	if( passedExtCheck == false )
-		return false;
+		return false;	
  
 //	wglMakeCurrent(NULL,NULL);
 
@@ -172,7 +165,7 @@ void Gfx::createRenderContexts() {
 		, 0, 0
 	};
 
-	const int numThreads = 2; RENDER_CONTEXT + LOAD_CONTEXT
+	const int numThreads = 2; // RENDER_CONTEXT + LOAD_CONTEXT
  
 	renderContexts.reset( CORE_NEW_ARRAY RenderContext[ numThreads ] );
 	for( int i = 0; i < numThreads; ++i ) {
@@ -190,12 +183,9 @@ void Gfx::createRenderContexts() {
 #if !defined(GDEBBUGGER_FRIENDLY_STARTUP)
 			wglMakeCurrent(hDC, renderContexts[i].hRC);
 #endif
-			LoadFunctions();
-		#if PLATFORM == WINDOWS
-			LoadWinFunctions( hDC );
-		#endif
-	//		wglMakeCurrent(NULL, NULL);
 		}
 
 	}
 }
+
+} // end namespace

@@ -6,7 +6,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "scene/wobfile.h"
 #include "gfx.h"
@@ -165,7 +165,7 @@ void VtPipeline::display( Scene::RenderContext* rc, int backWidth, int backHeigh
 	RenderContext* context = (RenderContext*) rc;
 
 	TexturePtr colourRt = colourRtHandle.acquire();
-	context->useAsRenderTargets( 1, { &colourRt } );
+	context->useAsRenderTarget( colourRt );
 	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 	GL_CHECK
 //	glViewport( 0, 0, backWidth, backHeight );

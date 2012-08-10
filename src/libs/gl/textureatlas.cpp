@@ -5,7 +5,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "core/file_path.h"
 #include "core/fileio.h"
@@ -39,7 +39,12 @@ TextureAtlas* TextureAtlas::internalLoad( 	const Core::ResourceHandleBase* baseH
 
 	Core::FilePath path( pTextureAtlasFileName );
 	path = path.ReplaceExtension( ".tat" );
+
 	Core::MemFile fio( path.value().c_str() );
+	if( !fio.isValid() ) {
+		return nullptr;
+	}
+
 	TextureAtlasFileHeader header;
 	fio.read( (uint8_t*) &header, sizeof(TextureAtlasFileHeader) );
 	if( header.magic != TextureAtlasType ) {

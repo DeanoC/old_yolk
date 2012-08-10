@@ -5,11 +5,11 @@
 //!
 //!-----------------------------------------------------
 
-#include "cl.h"
+#include "ocl.h"
+#include "gl/ogl.h"
 
 #include "context.h"
 #include "clformatcracker.h"
-#include "gl/gl.h"
 #include "gl/texture.h"
 #include "image.h"
 

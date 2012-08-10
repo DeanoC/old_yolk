@@ -1,5 +1,5 @@
 #include "meshimport.h"
-
+#if 0
 // assimp include files. These three are usually needed.
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
@@ -123,3 +123,4 @@ void AssImp::ConvertAiMeshToGo( uint32_t matIndex, const aiMesh* mesh, MeshMod::
 }
 
 }
+#endif

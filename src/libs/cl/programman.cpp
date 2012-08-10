@@ -3,14 +3,14 @@
 
  @brief	Implements the program manager.
  */
-#include "cl.h"
+#include "ocl.h"
 #include "core/resources.h"
 #include "context.h"
 #include "kernel.h"
 #include "programlibrary.h"
 #include "programman.h"
 
-#define DECLARE_LIBRARY( x )		extern const char* binary_data_kernels_ ## x ## _cl;
+#define DECLARE_LIBRARY( x )		extern "C" const char* binary_data_kernels_ ## x ## _cl;
 #define REGISTER_LIBRARY( x )		programSrc[ #x ] = binary_data_kernels_ ## x ## _cl;
 
 // ouside namespace

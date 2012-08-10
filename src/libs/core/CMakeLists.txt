@@ -15,7 +15,7 @@ file( GLOB c_src_files *.c )
 file( GLOB header_files *.h *.inl *.hpp *.hxx)
 
 if( WIN32 )
-	file( GLOB platform_cpp_src_files platform_windows/*.cpp platform_windows/*.cxx)
+	file( GLOB platform_cpp_src_files platform_windows/*.cpp platform_windows/*.cpp)
 	file( GLOB platform_c_src_files platform_windows/*.c )
 	file( GLOB platform_header_files platform_windows/*.h platform_windows/*.inl platform_windows/*.hpp platform_windows/*.hxx )
 endif()

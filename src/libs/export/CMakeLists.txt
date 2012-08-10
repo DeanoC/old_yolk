@@ -12,4 +12,4 @@ list( APPEND targ_link_libs ${Core_LIBRARIES} meshmod meshops binify )
 target_link_libraries( export ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( export PROPERTIES SOLUTION_FOLDER "export")
+set_target_properties( export PROPERTIES FOLDER "Libs")

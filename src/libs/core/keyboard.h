@@ -11,8 +11,8 @@ namespace Core {
 
 class Keyboard : public Singleton<Keyboard> {
 public:
-	friend void KeyboardX11ProcessKeyEvent( bool down, XKeyEvent* event );
-
+	friend void KeyboardX11ProcessKeyEvent( bool down, struct XKeyEvent* event );
+	friend void KeyboardWinProcessKeyMessages( uint32_t message, uint16_t wParam, uint32_t lParam );
 	static const int MAX_KEY_CHARS = 256;
 
 	Keyboard() {

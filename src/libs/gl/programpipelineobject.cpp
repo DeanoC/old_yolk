@@ -3,7 +3,7 @@
 
  @brief	Implements the programpipelineobject class.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "programpipelineobject.h"
 
 namespace Gl {

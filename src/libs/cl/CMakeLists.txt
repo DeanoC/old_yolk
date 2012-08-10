@@ -22,8 +22,8 @@ foreach( sc ${cl_src_files} )
 	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
 endforeach( sc ${cl_src_files} )
 
-ADD_MSVC_PRECOMPILED_HEADER( "cl.h" "${cpp_src_files}" )
+#ADD_MSVC_PRECOMPILED_HEADER( "ocl.h" "${cpp_src_files}" )
 add_library( cl ${src_files} ${header_files}  )
 
 # make a nice hierachy
-set_target_properties( cl PROPERTIES SOLUTION_FOLDER "libs")
+set_target_properties( cl PROPERTIES FOLDER "Libs")

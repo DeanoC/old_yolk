@@ -6,7 +6,7 @@
 //!
 //!-----------------------------------------------------
 
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "scene/wobfile.h"
 #include "gfx.h"

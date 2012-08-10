@@ -53,11 +53,11 @@ namespace Core
 #	define CORE_GC_NEW_ROOT_ONLY 	new
 
 #	ifdef _DEBUG
-#		if PLATFORM_OS == MS_WINDOWS
-#			define CORE_NEW 		new ( _CLIENT_BLOCK | (Core::g_MemChkPointId << 16) , __FILE__ , __LINE__ )
-#		else
+//#		if PLATFORM_OS == MS_WINDOWS
+//#			define CORE_NEW 		new ( _CLIENT_BLOCK | (Core::g_MemChkPointId << 16) , __FILE__ , __LINE__ )
+//#		else
 #			define CORE_NEW 		new
-#		endif
+//#		endif
 #	else
 #		define CORE_NEW 			new
 #endif

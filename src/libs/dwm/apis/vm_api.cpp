@@ -1,4 +1,5 @@
 #include "dwm/dwm.h"
+#include "core/clock.h"
 #include "dwm/mmu.h"
 #include "dwm/sandboxmemorymanager.h"
 #include "dwm/trustedregion.h"
@@ -10,7 +11,7 @@ void VmExit( const IEEThreadContext* threadCtx ) {
 	threadCtx->owner->terminate();
 	// never return
 	while( true ) {
-		sleep( 1 );
+		Core::Clock::sleep( 0.001f );
 	}
 }
 void Vm_exit( const IEEThreadContext* threadCtx ) {
@@ -18,7 +19,7 @@ void Vm_exit( const IEEThreadContext* threadCtx ) {
 	LOG(INFO) << "**************_exit called from DWM *************\n";
 	// never return
 	while( true ) {
-		sleep( 1 );
+		Core::Clock::sleep( 0.001f );
 	}
 }
 
@@ -56,7 +57,11 @@ int VmMProtect( const IEEThreadContext* threadCtx, UNTRUSTED_UINTPTR_T addr, siz
 	return 0;
 }
 
+#if PLATFORM == WINDOWS
+__declspec( thread ) UNTRUSTED_UINTPTR_T tlsStorage;
+#else
 __thread UNTRUSTED_UINTPTR_T tlsStorage;
+#endif
 
 UNTRUSTED_UINTPTR_T VmGetTls() {
 	return tlsStorage;
@@ -98,6 +103,7 @@ int VmFStat( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBu
 	VmStat* stat = (VmStat*) UNTRUSTED_PTR_TO_TRUSTED( unBuf );
 	memset( stat, 0, sizeof( VmStat ) );
 
+#if PLATFORM != WINDOWS
 	// stdout
 	if( fd == STDOUT_FILENO || fd == STDIN_FILENO || fd == STDERR_FILENO ) {
 		struct stat sds;
@@ -113,7 +119,9 @@ int VmFStat( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBu
 		stat->blksize = sds.st_blksize;
 		stat->blocks = sds.st_blocks;
 		stat->ino2 = sds.st_ino;
-	} else {
+	} else 
+#endif	
+	{
 		LOG(INFO) << "TODO: VmFStat " << fd << " \n";
 	}
 	return 0;
@@ -122,9 +130,12 @@ int VmFStat( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBu
 uint32_t VmWrite( const IEEThreadContext* threadCtx, int fd, UNTRUSTED_UINTPTR_T unBuf, uint32_t num ) {
 	char* buf = (char*) UNTRUSTED_PTR_TO_TRUSTED( unBuf );
 
+#if PLATFORM != WINDOWS
 	if( fd == STDOUT_FILENO || fd == STDERR_FILENO ) {
 		write( fd, buf, num );
-	} else {
+	} else 
+#endif
+	{
 		LOG(INFO) << "TODO: VmWrite : ";
 		for( uint32_t i = 0; i < num; ++i ) {
 			LOG(INFO) << buf[i];
@@ -143,11 +154,15 @@ int VmGetTimeOfDay( const IEEThreadContext* threadCtx, UNTRUSTED_UINTPTR_T unTv 
 	struct timeval tv;
 	struct VmTimeVal *rtv = (VmTimeVal*) UNTRUSTED_PTR_TO_TRUSTED(unTv);
 
+#if PLATFORM == WINDOWS
+	TODO_ASSERT( false );
+#else
 	int r = gettimeofday( &tv, nullptr );
 	rtv->tv_sec = tv.tv_sec;
 	rtv->tv_usec = tv.tv_usec;
 
 	return r;
+#endif
 }
 struct VmTimeSpec {
   int64_t  tv_sec;
@@ -157,11 +172,14 @@ struct VmTimeSpec {
 void VmNanoSleep( const IEEThreadContext* threadCtx, UNTRUSTED_UINTPTR_T unTs ) {
 	struct VmTimeSpec *rts = (VmTimeSpec*) UNTRUSTED_PTR_TO_TRUSTED(unTs);
 
+#if PLATFORM == WINDOWS
+	Core::Clock::sleep( (float)rts->tv_sec + (rts->tv_nsec * 1e-9f) ); 
+#else
 	struct timespec ts;
 	ts.tv_sec = rts->tv_sec;
 	ts.tv_nsec = rts->tv_nsec;
 	nanosleep( &ts, nullptr );
-
+#endif
 }
 void InstallVmApiFuncs( TrustedRegion* trustedRegion ) {
 

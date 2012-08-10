@@ -3,7 +3,7 @@
 
  @brief	Implements the texture class.
  */
-#include "gl.h"
+#include "ogl.h"
 #include "core/resourceman.h"
 #include "core/fileio.h"
 #include "core/file_path.h"
