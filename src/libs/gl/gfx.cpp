@@ -83,7 +83,8 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 	// install pipelines
 	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW DebugPipeline(pipelines.size()) ) );
 //	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW SceneCapturePipeline(pipelines.size()) ) );
-	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW VtPipeline(pipelines.size()) ) );
+//	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW VtPipeline(pipelines.size()) ) );
+	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW DebugPipeline(pipelines.size()) ) );
 
 	// add pipelines into a fast name lookup system
 	for( size_t i = 0; i < pipelines.size(); ++i ) {

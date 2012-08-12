@@ -209,7 +209,7 @@ private:
 			Page() : vertexBufferHandle(nullptr), vertexBuffer( nullptr ),
 						numVertices(0), mapped(nullptr) {}
 
-			Page( Scene::DataBufferHandlePtr a, VaoHandlePtr b, Scene::ProgramHandlePtr c ) :
+			Page( Scene::DataBufferHandlePtr a, Scene::VertexInputHandlePtr b, Scene::ProgramHandlePtr c ) :
 				vertexBufferHandle(a), vaoHandle(b), programHandle(c), 
 				vertexBuffer( nullptr ), numVertices(0), 
 				mapped(nullptr) {}
@@ -230,7 +230,7 @@ private:
 			}
 
 			Scene::DataBufferHandlePtr		vertexBufferHandle;
-			VaoHandlePtr 					vaoHandle;
+			Scene::VertexInputHandlePtr 	vaoHandle;
 			Scene::ProgramHandlePtr			programHandle;
 
 			Scene::DataBufferPtr 			vertexBuffer;

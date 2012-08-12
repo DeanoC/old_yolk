@@ -78,15 +78,14 @@ void DebugPipeline::conditionWob( const char* cname, Scene::WobResource* wob ) {
 			DBCF_IMMUTABLE, DBT_INDEX, mat->uiNumIndices * indexSize, mat->pIndexData.p
 		};
 
-		DataBufferHandlePtr indexBuffer = DataBufferHandle::create( (mds->name + "_ib").c_str(), &indbcs, Core::RESOURCE_FLAGS::RMRF_NONE );
+		mds->indexBuffer = DataBufferHandle::create( (mds->name + "_ib").c_str(), &indbcs, Core::RESOURCE_FLAGS::RMRF_NONE );
 
 		mds->numIndices = mat->uiNumIndices;
 		mds->indexType = (indexSize == sizeof(uint32_t)) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
 		mds->vacs.elementCount = mat->numVertexElements;
-		mds->vacs.indexBuffer = indexBuffer;
 		for( int i = 0; i < mds->vacs.elementCount; ++i ) { 
-			mds->vacs.elements[i].type = (VAO_TYPE) mat->pElements.p[i].uiType; // identical at the moment
-			mds->vacs.elements[i].usage = (VAO_ELEMENT) mat->pElements.p[i].uiUsage; // identical at the moment
+			mds->vacs.elements[i].type = (VIN_TYPE) mat->pElements.p[i].uiType; // identical at the moment
+			mds->vacs.elements[i].usage = (VIN_ELEMENT) mat->pElements.p[i].uiUsage; // identical at the moment
 		}
 		size_t vertexSize = Vao::getVertexSize( mds->vacs.elementCount, mds->vacs.elements );
 
@@ -97,9 +96,9 @@ void DebugPipeline::conditionWob( const char* cname, Scene::WobResource* wob ) {
 
 		for( int i = 0; i < mds->vacs.elementCount; ++i ) { 
 			mds->vacs.data[i].buffer = vertexBuffer;
-			mds->vacs.data[i].offset = Vao::AUTO_OFFSET;
+			mds->vacs.data[i].offset = VI_AUTO_OFFSET;
 			mds->vacs.data[i].stream = 0;
-			mds->vacs.data[i].stride = Vao::AUTO_STRIDE;
+			mds->vacs.data[i].stride = VI_AUTO_STRIDE;
 		}
 		mds->vaoHandle = 0; // defer till renderomg
 	}
@@ -123,15 +122,15 @@ void DebugPipelineDataStore::render( Scene::RenderContext* rc ) {
 		if( mds->vaoHandle == 0 ) {
 			PerMaterial* mdsw = const_cast<PerMaterial*>(mds);
 			// defer creation, as vao have to be created sync which required acquire and could force other resource to be acquired
-			mdsw->vaoHandle = VaoHandle::create( (mds->name + Vao::genEleString(mds->vacs.elementCount, mds->vacs.elements)).c_str(), &mds->vacs );
+			mdsw->vaoHandle = Scene::VertexInputHandle::create( (mds->name + Vao::genEleString(mds->vacs.elementCount, mds->vacs.elements)).c_str(), &mds->vacs );
 		}
 
-		VaoPtr vao = mds->vaoHandle->tryAcquire();
+		auto vao = std::static_pointer_cast<Gl::Vao>( mds->vaoHandle->tryAcquire() );
 		if( !vao ) {
 //			LOG(INFO) << "vao not ready\n";
 			return;
 		}
-		auto ib = std::static_pointer_cast<Gl::DataBuffer>( mds->vacs.indexBuffer->tryAcquire() );
+		auto ib = std::static_pointer_cast<Gl::DataBuffer>( mds->indexBuffer->tryAcquire() );
 		if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 
 		glBindVertexArray( vao->getName() );
@@ -148,8 +147,8 @@ DebugPipelineDataStore::~DebugPipelineDataStore() {
 	for( int i = 0;i < numMaterials; ++i ) {
 		DebugPipelineDataStore::PerMaterial* mds = &materials[i];
 
-		if( mds->vacs.indexBuffer )
-			mds->vacs.indexBuffer->close();
+		if( mds->indexBuffer )
+			mds->indexBuffer->close();
 
 		if( mds->vacs.data[0].buffer )
 			mds->vacs.data[0].buffer->close();

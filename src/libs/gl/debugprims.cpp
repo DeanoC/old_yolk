@@ -37,19 +37,18 @@ DebugPrims::DebugPrims() {
 
 	Vao::CreationStruct vocs = {
 		2,
-		NULL,
 		{
 			{ VE_POSITION, VT_FLOAT3 },
 			{ VE_COLOUR0, VT_BYTEARGB },
 		},
 		{
-			vertexBufferHandle, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0,
-			vertexBufferHandle, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0,
+			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0,
+			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0,
 		}
 	};
 
 	const std::string vaoName = "_debugPrimVao_" + Vao::genEleString(vocs.elementCount, vocs.elements );
-	vaoHandle = VaoHandle::create( vaoName.c_str(), &vocs );
+	vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vocs );
 
 	vertexBuffer = vertexBufferHandle->acquire();
 	pVertices = (Vertex*) vertexBuffer->map( DBMA_WRITE_ONLY, DBMF_DISCARD );
@@ -235,7 +234,7 @@ void DebugPrims::flush() {
 
 	context->pushDebugMarker( "Debug Render Flush" );
 
-	VaoPtr vao = vaoHandle->tryAcquire();
+	auto vao = std::static_pointer_cast<Vao>( vaoHandle->tryAcquire() );
 	if( !vao ) {
 		numLineVertices = 0;
 		numLineWorldVertices = 0;

@@ -62,11 +62,12 @@ namespace Gl {
 		void render( Scene::RenderContext* context );
 	protected:
 		struct PerMaterial {
-			std::string					name;
-			Vao::CreationStruct			vacs; // index and vertex buffer handles are inside
-			VaoHandlePtr				vaoHandle;
-			size_t						numIndices;
-			int							indexType;
+			std::string						name;
+			Vao::CreationStruct				vacs; // vertex buffer handles are inside
+			Scene::VertexInputHandlePtr		vaoHandle;
+			size_t							numIndices;
+			int								indexType;
+			Scene::DataBufferHandlePtr		indexBuffer;
 		};
 		int numMaterials;
 		boost::scoped_array<PerMaterial>	materials;

@@ -233,7 +233,7 @@ void VtPipeline::endFragCountGeomPass() {
 
 void VtPipeline::startCaptureFragmentsGeomPass() {
 	auto dummyVBO = std::static_pointer_cast<Gl::DataBuffer>( dummyVBOHandle.acquire() );
-	VaoPtr dummyVao = dummyVaoHandle.acquire();
+	auto dummyVao = std::static_pointer_cast<Gl::Vao>( dummyVaoHandle.acquire() );
 
 	// clear per pixel temp to keep count of current fragment count
 	auto pixelTempRt = pixelTempRtHandle.acquire();

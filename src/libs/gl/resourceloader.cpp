@@ -109,6 +109,7 @@ std::shared_ptr<Core::ResourceBase> ProgramCreateResource( const Core::ResourceH
 //! Callback from the resource manager to create a data buffer
 std::shared_ptr<Core::ResourceBase> DataBufferCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
 	using namespace Core;
+	using namespace Scene;
 
 	const DataBuffer::CreationStruct* creation = (const DataBuffer::CreationStruct*) pData;
 
@@ -117,14 +118,15 @@ std::shared_ptr<Core::ResourceBase> DataBufferCreateResource( const Core::Resour
 	return std::static_pointer_cast<ResourceBase>( pResource );
 }
 
-//! Callback from the resource manager to create a data buffer
+//! Callback from the resource manager to create a vao buffer
 std::shared_ptr<Core::ResourceBase> VaoCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
 	using namespace Core;
+	using namespace Scene;
 
-	const Vao::CreationStruct* creation = (const Vao::CreationStruct*) pData;
+	const VertexInput::CreationStruct* creation = (const VertexInput::CreationStruct*) pData;
 
 	// currently only in memory is supported
-	VaoPtr pResource( Vao::internalCreate( handle, pName, creation ) );
+	VertexInputPtr pResource( Vao::internalCreate( handle, pName, creation ) );
 	return std::static_pointer_cast<ResourceBase>( pResource );
 }
 
@@ -223,7 +225,7 @@ void ResourceLoaderImpl::PushOntoLoaderContext( const Core::ResourceHandleBase* 
 	case ProgramRType: res = ProgramCreateResource( handle, flags, pName, pData ); break;
 	case DataBufferRType: res = DataBufferCreateResource( handle, flags, pName, pData ); break;
 	case XboRType: res = XboCreateResource( handle, flags, pName, pData ); break;
-	case VaoRType: res = VaoCreateResource( handle, flags, pName, pData ); break; 
+	case VinRType: res = VaoCreateResource( handle, flags, pName, pData ); break; 
 	default: {
 			ResourceLoaderImpl::workCounter++;
 			ioStrand->post( boost::bind<void>( ProcessLoader, handle, flags, pName, pData ) ); 
@@ -257,7 +259,7 @@ void ResourceLoaderImpl::installResourceTypes() {
 							NULL, 0, "" );
 	REG( DataBufferRType, cb, &SRD(DataBuffer), SO(DataBufferHandle), 
 							NULL, 0, "" );
-	REG( VaoRType, cb, &SRD(Vao), SO(VaoHandle), 
+	REG( VinRType, cb, &SRD(VertexInput), SO(VertexInputHandle), 
 							NULL, 0, "" );
 	REG( XboRType, cb, &SRD(Xbo), SO(XboHandle), 
 							NULL, 0, "" );

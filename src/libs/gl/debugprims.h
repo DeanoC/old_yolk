@@ -57,8 +57,8 @@ namespace Gl {
 
 		Scene::DataBufferHandlePtr			vertexBufferHandle;
 		Scene::DataBufferPtr				vertexBuffer;
-		VaoHandlePtr				vaoHandle;
-		Scene::ProgramHandlePtr			debugProgramHandle;	
+		Scene::VertexInputHandlePtr			vaoHandle;
+		Scene::ProgramHandlePtr				debugProgramHandle;	
 	};
 };
 

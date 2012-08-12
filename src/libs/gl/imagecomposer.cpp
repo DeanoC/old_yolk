@@ -13,6 +13,7 @@
 #include "rendercontext.h"
 #include "scene/databuffer.h"
 #include "scene/constantcache.h"
+#include "scene/vertexinput.h"
 
 #include "imagecomposer.h"
 
@@ -25,20 +26,20 @@ const uint32_t ImageComposer::SizeOfRenderType[ImageComposer::MAX_RENDER_TYPE] =
 
 const Vao::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] = {
 	{
-		3, nullptr,
-		{	{ VE_POSITION, 	VT_FLOAT2 },
-			{ VE_TEXCOORD0, VT_FLOAT2 },
-			{ VE_COLOUR0, 	VT_BYTEARGB }, },
-		{	nullptr, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0,
-			nullptr, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0,
-			nullptr, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0, }
+		3, 
+		{	{ Scene::VE_POSITION, 	Scene::VT_FLOAT2 },
+			{ Scene::VE_TEXCOORD0,	Scene::VT_FLOAT2 },
+			{ Scene::VE_COLOUR0, 	Scene::VT_BYTEARGB }, },
+		{	nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0,
+			nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0,
+			nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0, }
 	},
 	{
-		2, nullptr,
-		{	{ VE_POSITION, VT_FLOAT2 },
-			{ VE_COLOUR0, VT_BYTEARGB }, },
-		{	nullptr, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0,
-			nullptr, Vao::AUTO_OFFSET, Vao::AUTO_STRIDE, 0, }
+		2, 
+		{	{ Scene::VE_POSITION, Scene::VT_FLOAT2 },
+			{ Scene::VE_COLOUR0, Scene::VT_BYTEARGB }, },
+		{	nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0,
+			nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0, }
 	}
 };
 
@@ -85,7 +86,7 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 			vcs.data[i].buffer =  vertexBufferHandle;
 		}
 		const std::string vaoName = name + Vao::genEleString( vcs.elementCount, vcs.elements );
-		VaoHandlePtr vaoHandle = VaoHandle::create( vaoName.c_str(), &vcs );
+		VertexInputHandlePtr vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vcs );
 
 
 		layer.pageMap[ key ] = Layer::Page( vertexBufferHandle, vaoHandle, program[ key.type ] );
@@ -417,7 +418,7 @@ void ImageComposer::render() {
 
 			page.unmap();
 
-			VaoPtr vao = page.vaoHandle->tryAcquire();
+			auto vao = std::static_pointer_cast<Gl::Vao>( page.vaoHandle->tryAcquire() );
 			if( !vao ) {
 				++pmIt;
 				continue;
