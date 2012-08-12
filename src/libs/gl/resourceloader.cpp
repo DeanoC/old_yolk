@@ -60,16 +60,17 @@ std::shared_ptr<Core::ResourceBase> TextureCreateResource( const Core::ResourceH
 		if( flags & RMRF_PRELOAD ) {
 			bPreLoad = true;
 		}
-		TexturePtr pResource( Texture::internalLoad( handle, pName, bPreLoad ) );
+		Scene::TexturePtr pResource( Texture::internalLoad( handle, pName, bPreLoad ) );
 		return std::shared_ptr<ResourceBase>( pResource );
 	} else if( flags & RMRF_INMEMORYCREATE ) {
 		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;
-		TexturePtr pResource( Texture::internalCreate( pStruct ) );
+		Scene::TexturePtr pResource( Texture::internalCreate( pStruct ) );
 		return std::shared_ptr<ResourceBase>( pResource );
 	} else {
 		assert( false && "Unknown Resource Type" );
 		return std::shared_ptr<ResourceBase>();
 	}
+
 }
 
 std::shared_ptr<Core::ResourceBase> TextureAtlasCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {

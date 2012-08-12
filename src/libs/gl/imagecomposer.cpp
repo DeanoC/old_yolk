@@ -103,7 +103,7 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 	}
 }
 
-void ImageComposer::putTexture(	const TextureHandlePtr&			pTexture,
+void ImageComposer::putTexture(	const Scene::TextureHandlePtr&			pTexture,
 								unsigned int					renderStates,
 								const Math::Vector2&			pos,
 								const Math::Vector2&			size,
@@ -161,7 +161,7 @@ void ImageComposer::putSprite(	const TextureAtlasHandlePtr&	atlasHandle,
 	if( !atlas ) { return; }
 
 	const TextureAtlas::SubTexture& sprite = atlas->getSubTexture( texIndex );
-	TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
+	Scene::TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
 
 	// put this sprite on the appropaite layer
 	Layer& layer = layers[ layerNum ];
@@ -216,7 +216,7 @@ void ImageComposer::putSubSprite(
 	if( !atlas ) { return; }
 
 	const TextureAtlas::SubTexture& sprite = atlas->getSubTexture( texIndex );
-	TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
+	Scene::TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
 
 	// put this sprite on the appropaite layer
 	Layer& layer = layers[layerNum];
@@ -321,7 +321,7 @@ void ImageComposer::filledQuad( unsigned int					renderStates,
 
 }
 
-void ImageComposer::texturedRect(	const TextureHandlePtr&		pTexture,
+void ImageComposer::texturedRect(	const Scene::TextureHandlePtr&		pTexture,
 									unsigned int					renderStates,
 									const Math::Vector2&			pos,
 									const Math::Vector2&			size,
@@ -346,7 +346,7 @@ void ImageComposer::texturedRect(	const TextureHandlePtr&		pTexture,
 }
 
 
-void ImageComposer::texturedQuad( const TextureHandlePtr&		pTexture,
+void ImageComposer::texturedQuad( const Scene::TextureHandlePtr&		pTexture,
 								unsigned int					renderStates,
 								const Math::Vector2&			tl,
 								const Math::Vector2&			tr,
@@ -425,9 +425,8 @@ void ImageComposer::render() {
 			}
 			glBindVertexArray( vao->getName() );
 			GL_CHECK
-			TexturePtr tex;
 			if( pagekey.texture0 ) {
-				tex = pagekey.texture0->tryAcquire();
+				auto tex = std::static_pointer_cast<Gl::Texture>( pagekey.texture0->tryAcquire() );
 				if( tex ) {
 					glActiveTexture( GL_TEXTURE0 );
 					glBindTexture( GL_TEXTURE_2D, tex->getName() );
@@ -437,7 +436,7 @@ void ImageComposer::render() {
 			}
 
 			auto icProgram = program[ pagekey.type ]->acquire();
-			context->bindWholeProgram( icProgram );
+			context->bindProgram( icProgram );
 			context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
 			context->getConstantCache().updateGPU( icProgram );
 			context->bindConstants();

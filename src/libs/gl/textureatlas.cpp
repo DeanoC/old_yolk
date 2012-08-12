@@ -37,6 +37,8 @@ TextureAtlas* TextureAtlas::internalLoad( 	const Core::ResourceHandleBase* baseH
 											const char* pTextureAtlasFileName, 
 											bool preload ) {
 
+	using namespace Scene;
+
 	Core::FilePath path( pTextureAtlasFileName );
 	path = path.ReplaceExtension( ".tat" );
 
@@ -82,7 +84,7 @@ TextureAtlas* TextureAtlas::internalLoad( 	const Core::ResourceHandleBase* baseH
 
 void TextureAtlas::getSubTextureDimensions( unsigned int index, unsigned int& width , unsigned int& height ) const {
 	const auto& sub = subTextures[ index ];
-	TexturePtr texture = packedTextures[ sub.index ]->acquire();
+	Scene::TexturePtr texture = packedTextures[ sub.index ]->acquire();
 	width = (unsigned int)( 0.5f + (sub.u1 - sub.u0) * texture->getWidth() );
 	height = (unsigned int)( 0.5f + (sub.v1 - sub.v0) * texture->getHeight() );
 }

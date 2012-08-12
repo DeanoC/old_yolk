@@ -38,7 +38,7 @@ namespace Gl {
 		void bind( FBO_FRAMEBUFFER_SD target = FFSD_BOTH );
 		void unbind( FBO_FRAMEBUFFER_SD target = FFSD_BOTH );
 
-		void attach( FBO_ATTACHMENT_POINT pnt, const TexturePtr& target );
+		void attach( FBO_ATTACHMENT_POINT pnt, const Scene::TexturePtr& target );
 		void detach( FBO_ATTACHMENT_POINT pnt );
 
 		void detachAll();

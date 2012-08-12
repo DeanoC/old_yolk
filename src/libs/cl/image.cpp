@@ -29,8 +29,8 @@ Image* Image::internalCreate( const Core::ResourceHandleBase* handle, const char
 	cl_int _err;
 
 	if( creation->flags & ICF_FROM_GL ) {
-		Gl::TextureHandlePtr dbHandle = (Gl::TextureHandlePtr) creation->data;
-		Gl::TexturePtr db = dbHandle->acquire();
+		Scene::TextureHandlePtr dbHandle = (Scene::TextureHandlePtr) creation->data;
+		auto db = std::static_pointer_cast<Gl::Texture>( dbHandle->acquire() );
 		if( db->isRenderBuffer() ) {
 			img->name = clCreateFromGLRenderbuffer(	creation->context->getContext(), 
 									flags, db->getName(), &_err ); 

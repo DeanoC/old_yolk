@@ -101,7 +101,7 @@ public:
 	//! Places a textured colour quad on to the screen at a 
 	//! given NDC positions.
 	//!-----------------------------------------------------
-	void texturedQuad(			const TextureHandlePtr&			pTexture,
+	void texturedQuad(			const Scene::TextureHandlePtr&			pTexture,
 								unsigned int					renderStates,
 								const Math::Vector2&			tl,
 								const Math::Vector2&			tr,
@@ -119,7 +119,7 @@ public:
 	//! given NDC position and NDC size the sprite can also be 
 	//! coloured.
 	//!-----------------------------------------------------
-	void texturedRect(			const TextureHandlePtr&			pTexture,
+	void texturedRect(			const Scene::TextureHandlePtr&			pTexture,
 								unsigned int					renderStates,
 								const Math::Vector2&			pos,
 								const Math::Vector2&			fullsize,
@@ -134,7 +134,7 @@ public:
 	//! pos is at the center of where you wish to place it
 	//! size is equal either side of pos (i.e. total width == *2)
 	//!-----------------------------------------------------
-	void putTexture(	const TextureHandlePtr&			pTexture,
+	void putTexture(	const Scene::TextureHandlePtr&			pTexture,
 						unsigned int					renderStates,
 						const Math::Vector2&			pos,
 						const Math::Vector2&			size,
@@ -194,10 +194,10 @@ private:
 		//! a sort page, there are 0 or 1 textures, several different rendering state and different types (shaders)
 		//! this gives us unique pages only where nessecary. Sprites on the same page are rendered in 1 batch
 		struct PageKey {
-			PageKey( TextureHandlePtr a, uint32_t b, RENDER_TYPE c ) : 
+			PageKey( Scene::TextureHandlePtr a, uint32_t b, RENDER_TYPE c ) : 
 				texture0(a), renderStates(b), type(c) {}
 
-			TextureHandlePtr	texture0;
+			Scene::TextureHandlePtr	texture0;
 			uint32_t			renderStates;
 			RENDER_TYPE			type;
 

@@ -34,14 +34,14 @@ VtPipeline::VtPipeline( size_t index ) :
 
 	Texture::CreationStruct fpcrt = {
 		TCF_2D | TCF_RENDER_TARGET | TCF_MULTISAMPLE,
-		TF_RGBA8888, 
+		GTF_RGBA8, 
 		1, targetWidth, targetHeight, 0, 0, targetSamples
 	};
 	colourRtHandle.reset( TextureHandle::create( "_vtpipe_colrt", &fpcrt ) );
 
 	Texture::CreationStruct fpdrt = {
 		TCF_2D | TCF_RENDER_TARGET | TCF_MULTISAMPLE,
-		GL_DEPTH24_STENCIL8, 
+		GTF_DEPTH24_STENCIL8, 
 		1, targetWidth, targetHeight, 0, 0, targetSamples
 	};
 	depthRtHandle.reset( TextureHandle::create( "_vtpipe_depthrt", &fpdrt ) );
@@ -74,14 +74,14 @@ void VtPipeline::bind( Scene::RenderContext* rc ) {
 }
 
 void VtPipeline::startMainGeomPass() {
+	using namespace Scene;
 	TexturePtr colourRt = colourRtHandle.acquire();
 	TexturePtr depthRt = depthRtHandle.acquire();
 	Scene::ProgramPtr program = mainProgramHandle.acquire();
 
-
 	context->useAsRenderTargets( colourRt, depthRt );
-	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( ); //program );
+	context->bindProgram( program );
+	context->getConstantCache().updateGPU( program );
 	context->bindConstants();
 
 	float colClr[4] = { 0, 0, 0, 1.0f };
@@ -151,6 +151,7 @@ void VtPipeline::conditionWob( const char* cname, Scene::WobResource* wob ) {
 }
 
 void VtPipeline::display( Scene::RenderContext* rc, int backWidth, int backHeight ) {
+	using namespace Scene;
 	RenderContext* context = (RenderContext*) rc;
 
 	TexturePtr colourRt = colourRtHandle.acquire();
@@ -177,11 +178,11 @@ void VtPipeline::merge( Scene::RenderContext* rc ) {
 	auto dummyVao = std::static_pointer_cast<Gl::Vao>( dummyVaoHandle.acquire() );
 
 	if( 0 ) {
-		TexturePtr colourRt = colourRtHandle.acquire();
+		auto colourRt = std::static_pointer_cast<Gl::Texture>( colourRtHandle.acquire() );
 		ProgramPtr program = resolve8msaaProgramHandle.acquire();
 
 		// setup resolve program, textures and constants
-		context->bindWholeProgram( program );
+		context->bindProgram( program );
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, colourRt->getName() );
 	} else {
@@ -195,13 +196,13 @@ void VtPipeline::merge( Scene::RenderContext* rc ) {
 	}
 
 	ProgramPtr program = debugCaptureFragmentsProgramHandle.acquire();
-	context->bindWholeProgram( program );
+	context->bindProgram( program );
 	context->bindConstants();
 
 	glBindBuffer( GL_ARRAY_BUFFER, dummyVBO->getName() );
 	glBindVertexArray( dummyVao->getName() );
 
-	TexturePtr fragCountTex = fragCountRtHandle.acquire();
+	auto fragCountTex = std::static_pointer_cast<Gl::Texture>( fragCountRtHandle.acquire() );
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, fragCountTex->getName() );
 

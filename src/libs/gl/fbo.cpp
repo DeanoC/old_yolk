@@ -67,8 +67,9 @@ void Fbo::unbind( FBO_FRAMEBUFFER_SD target ) {
 	GL_CHECK
 }
 
-void Fbo::attach( FBO_ATTACHMENT_POINT pnt, const TexturePtr& target ) {
+void Fbo::attach( FBO_ATTACHMENT_POINT pnt, const Scene::TexturePtr& starget ) {
 	bool renderBufferType = false;
+	auto target = std::static_pointer_cast<Gl::Texture>( starget );
 
 	CORE_ASSERT( target );
 

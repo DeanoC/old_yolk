@@ -251,7 +251,7 @@ void DebugPrims::flush() {
 	GL_CHECK
 
 	auto debugProgram = debugProgramHandle->acquire();
-	context->bindWholeProgram( debugProgram );
+	context->bindProgram( debugProgram );
 	context->getConstantCache().updateGPU( debugProgram );
 	context->bindConstants();
 

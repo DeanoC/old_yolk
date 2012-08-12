@@ -50,7 +50,7 @@ namespace Gl {
 		}
 
 		//! get the handle to the specified packed texture
-		TextureHandlePtr getPackedTexture( unsigned int index ) const {
+		Scene::TextureHandlePtr getPackedTexture( unsigned int index ) const {
 			CORE_ASSERT( index < getNumberofPackedTextures() );
 			return packedTextures[  index ];
 		}
@@ -71,7 +71,7 @@ namespace Gl {
 	private:
 		TextureAtlas(){};
 
-		typedef std::vector<TextureHandlePtr>	PackedTextureContainer;
+		typedef std::vector<Scene::TextureHandlePtr>	PackedTextureContainer;
 		typedef std::vector<SubTexture>			SubTextureContainer;
 
 		PackedTextureContainer	packedTextures;

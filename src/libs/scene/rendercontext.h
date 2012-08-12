@@ -9,6 +9,9 @@
 #define YOLK_SCENE_RENDERCONTEXT_H_
 
 #include "scene/camera.h"
+#include "scene/program.h"
+#include "scene/constantcache.h"
+#include "scene/texture.h"
 
 namespace Scene {
 
@@ -23,7 +26,33 @@ namespace Scene {
 
 		virtual void bindConstants() = 0;
 
-	}; // sparse (largely dummy) interface to derive off to allow backends to hold context data
+		virtual void swapBuffers() = 0;
+		virtual void reset() = 0;
+		virtual void bindProgram( const Scene::ProgramPtr& prg ) = 0;
+		virtual void unbindProgram() = 0;
+
+		virtual void useAsRenderTargets( const TexturePtr& pTarget, const TexturePtr& pDepthTarget ) = 0;
+		virtual void useAsRenderTarget( TexturePtr pTarget ) = 0;
+		virtual void useAsDepthOnlyRenderTargets( TexturePtr pDepthTarget ) = 0;
+		virtual void useAsRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets, const TexturePtr& pDepthTarget ) = 0;
+		virtual void useAsRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets ) = 0;
+		virtual void useNoRenderTargets() = 0;
+
+
+		Scene::ConstantCache& getConstantCache() { return *constantCache; }
+		const Scene::ConstantCache& getConstantCache() const { return *constantCache; }
+	
+		const Scene::CameraPtr getCamera() { return constantCache->getCamera(); }
+		const Core::Frustum* getFrustum() { return viewFrustum; }
+
+	protected:
+		boost::scoped_ptr<Scene::ConstantCache>		constantCache;
+		// note in most cases frustum and camera match, but in some debug cases they
+		// might not (to allow you see how frustum culling is working or not)
+		const Core::Frustum*						viewFrustum;
+		boost::scoped_array<Scene::ProgramPtr>		boundPrograms;
+
+	};
 }
 
 #endif // end YOLK_SCENE_RENDERCONTEXT_H_

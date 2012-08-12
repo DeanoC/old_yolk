@@ -236,16 +236,7 @@ void TexImage3D( GLenum texType, GLint levels, Gl::Memory::Name name, GLenum fmt
 namespace Gl {
 
 Texture::Texture() :
-	width( 0 ),
-	height( 0 ),
-	depth( 0 ),
-	format( TF_UNKNOWN ),
-	mipLevels ( 0 ),
-	sampleCount( 1 ),
 	renderBuffer( false ) {
-}
-
-Texture::~Texture() {
 }
 
 //! Header of a Texture file	
@@ -266,6 +257,8 @@ struct TextureFileHeader {
 Texture* Texture::internalLoad( const Core::ResourceHandleBase* baseHandle, 
 								const char* pTextureFileName, 
 								bool preload ) {
+	using namespace Scene;
+
 	Core::FilePath path( pTextureFileName );
 	path = path.ReplaceExtension( ".txr" );
 	Core::MemFile fio( path.value().c_str() );
@@ -286,7 +279,7 @@ Texture* Texture::internalLoad( const Core::ResourceHandleBase* baseHandle,
 	}
 
 	CreationStruct cs;
-	cs.format = GtfToGlFormat[ header.format ];
+	cs.format = (GENERIC_TEXTURE_FORMAT) header.format;
 	cs.width = header.width;
 	cs.height = header.height;
 	cs.depth = header.depth;
@@ -324,6 +317,8 @@ Texture* Texture::internalLoad( const Core::ResourceHandleBase* baseHandle,
 }
 
 Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
+	using namespace Scene;
+
 	Texture* pTexture = CORE_NEW Texture();
 	pTexture->width = pStruct->width;
 	pTexture->height = pStruct->height;
@@ -331,6 +326,7 @@ Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 	pTexture->slices = pStruct->slices;
 	pTexture->mipLevels = pStruct->mipLevels;
 	pTexture->format = pStruct->format;
+	pTexture->glformat = GtfToGlFormat[ pStruct->format ];
 	Name name;
 	
 	GL_CHECK
@@ -342,9 +338,9 @@ Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 
 		if( pStruct->flags & TCF_MULTISAMPLE ) {
 			pTexture->sampleCount = pStruct->sampleCount;
-			glNamedRenderbufferStorageMultisampleEXT( name, pTexture->format, pTexture->sampleCount, pTexture->width, pTexture->height );
+			glNamedRenderbufferStorageMultisampleEXT( name, pTexture->glformat, pTexture->sampleCount, pTexture->width, pTexture->height );
 		} else {
-			glNamedRenderbufferStorageEXT( name, pTexture->format, pTexture->width, pTexture->height );
+			glNamedRenderbufferStorageEXT( name, pTexture->glformat, pTexture->width, pTexture->height );
 		}
 		return pTexture;
 	}
@@ -355,13 +351,13 @@ Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 
 	if(pStruct->flags & TCF_COMPRESS_ON_LOAD) {
 		if( pStruct->compressToFormat != 0xFFFFFFFF ) {
-			pTexture->format = pStruct->compressToFormat;
+			pTexture->format = (GENERIC_TEXTURE_FORMAT) pStruct->compressToFormat;
 		} else {
 			switch( GlFormat::getChannelCount( pTexture->format ) ) {
-			case 4: pTexture->format = GL_COMPRESSED_RGBA; break;
-			case 3: pTexture->format = GL_COMPRESSED_RGB; break;
-			case 2: pTexture->format = GL_COMPRESSED_RG; break;
-			case 1: pTexture->format = GL_COMPRESSED_RED; break;
+			case 4: pTexture->glformat = GL_COMPRESSED_RGBA; break;
+			case 3: pTexture->glformat = GL_COMPRESSED_RGB; break;
+			case 2: pTexture->glformat = GL_COMPRESSED_RG; break;
+			case 1: pTexture->glformat = GL_COMPRESSED_RED; break;
 			}
 		}
 	}
@@ -370,36 +366,36 @@ Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 		CORE_ASSERT( (pStruct->flags & TCF_1D | pStruct->flags & TCF_3D) == 0 );
 		pTexture->sampleCount = pStruct->sampleCount;
 		if( pStruct->flags & TCF_ARRAY ) {
-			TexStorage3DMultisample( name, pTexture->sampleCount, pTexture->format, pTexture->width, pTexture->height, pTexture->slices );
+			TexStorage3DMultisample( name, pTexture->sampleCount, pTexture->glformat, pTexture->width, pTexture->height, pTexture->slices );
 		} else {
-			TexStorage2DMultisample( name, pTexture->sampleCount, pTexture->format, pTexture->width, pTexture->height );
+			TexStorage2DMultisample( name, pTexture->sampleCount, pTexture->glformat, pTexture->width, pTexture->height );
 		}
 	} else {
 		if( pStruct->flags & TCF_1D ) {
 			if( pStruct->flags & TCF_ARRAY ) {
-				TexStorage2D( GL_TEXTURE_1D_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->slices );
+				TexStorage2D( GL_TEXTURE_1D_ARRAY, pTexture->mipLevels, name, pTexture->glformat, pTexture->width, pTexture->slices );
 			} else {
-				TexStorage1D( GL_TEXTURE_1D, pTexture->mipLevels, name, pTexture->format, pTexture->width );
+				TexStorage1D( GL_TEXTURE_1D, pTexture->mipLevels, name, pTexture->glformat, pTexture->width );
 			}
 		} else if( pStruct->flags & (TCF_2D | TCF_CUBE_MAP) ) {
 			if( pStruct->flags & TCF_CUBE_MAP ) {
 				if( pStruct->flags & TCF_ARRAY ) {
-					TexStorage3D( GL_TEXTURE_CUBE_MAP_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->slices );
+					TexStorage3D( GL_TEXTURE_CUBE_MAP_ARRAY, pTexture->mipLevels, name, pTexture->glformat, pTexture->width, pTexture->height, pTexture->slices );
 				} else {
-					TexStorage2D( GL_TEXTURE_CUBE_MAP, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height );
+					TexStorage2D( GL_TEXTURE_CUBE_MAP, pTexture->mipLevels, name, pTexture->glformat, pTexture->width, pTexture->height );
 				}
 			} else {
 				if( pStruct->flags & TCF_ARRAY ) {
-					TexStorage3D( GL_TEXTURE_2D_ARRAY, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->slices );
+					TexStorage3D( GL_TEXTURE_2D_ARRAY, pTexture->mipLevels, name, pTexture->glformat, pTexture->width, pTexture->height, pTexture->slices );
 				} else {
-					TexStorage2D( GL_TEXTURE_2D, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height );
+					TexStorage2D( GL_TEXTURE_2D, pTexture->mipLevels, name, pTexture->glformat, pTexture->width, pTexture->height );
 				}
 			}
 		} else if( pStruct->flags & TCF_3D ) {
 			CORE_ASSERT( (pStruct->flags & TCF_ARRAY) == 0 );
-			TexStorage3D( GL_TEXTURE_3D, pTexture->mipLevels, name, pTexture->format, pTexture->width, pTexture->height, pTexture->depth );
+			TexStorage3D( GL_TEXTURE_3D, pTexture->mipLevels, name, pTexture->glformat, pTexture->width, pTexture->height, pTexture->depth );
 		} else if( pStruct->flags & TCF_BUFFER ) {
-			TexStorageBuffer( name, pTexture->format, pStruct->bufferName );
+			TexStorageBuffer( name, pTexture->glformat, pStruct->bufferName );
 		}
 	}
 	GL_CHECK;
@@ -412,49 +408,49 @@ Texture* Texture::internalCreate( const CreationStruct* pStruct ) {
 		uint32_t slices = pStruct->slices;
 
 		// GL handles compressed format differently
-		if( GlFormat::isCompressed( pStruct->format ) && 
+		if( GlFormat::isCompressed( pTexture->glformat ) && 
 			(pStruct->flags & TCF_COMPRESS_ON_LOAD) == false) {
 				TODO_ASSERT( false && "Compress on load TODO" );
 		} else {
 			if( pStruct->flags & TCF_1D ) {
 				if( pStruct->flags & TCF_ARRAY ) {
 					TexImage2D( GL_TEXTURE_1D_ARRAY, pTexture->mipLevels, 
-							name, pTexture->format, 
+							name, pTexture->glformat, 
 							width, slices, memPtr );
 				} else {
 					TexImage1D( GL_TEXTURE_1D, pTexture->mipLevels, 
-							name, pTexture->format, 
+							name, pTexture->glformat, 
 							width, memPtr );
 				}
 			} else if( pStruct->flags & TCF_2D ) {
 				if( pStruct->flags & TCF_ARRAY ) {
 					if( (pStruct->flags & TCF_CUBE_MAP) == false ) {
 						TexImage3D( GL_TEXTURE_2D_ARRAY, pTexture->mipLevels, 
-								name, pTexture->format, 
+								name, pTexture->glformat, 
 								width, height, slices,
 								memPtr );
 					} else {
 						TexImage3D( GL_TEXTURE_CUBE_MAP_ARRAY, pTexture->mipLevels, 
-								name, pTexture->format, 
+								name, pTexture->glformat, 
 								width, height, slices,
 								memPtr );
 					}
 				} else {
 					if( (pStruct->flags & TCF_CUBE_MAP) == false ) {
 						TexImage2D( GL_TEXTURE_2D, pTexture->mipLevels, 
-								name, pTexture->format, 
+								name, pTexture->glformat, 
 								width, height, memPtr );
 					} else {
 						for( GLenum j = GL_TEXTURE_CUBE_MAP_POSITIVE_X; j < GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; ++j ) {
 							TexImage2D( j, pTexture->mipLevels, 
-									name, pTexture->format, 
+									name, pTexture->glformat, 
 									width, height, memPtr );
 						}
 					}
 				}
 			} else if( pStruct->flags & TCF_3D ) {
 				TexImage3D( GL_TEXTURE_3D, pTexture->mipLevels, 
-						name, pTexture->format, 
+						name, pTexture->glformat, 
 						width, height, depth,
 						memPtr );
 			}

@@ -86,14 +86,14 @@ namespace Gl {
 //		CSRH( Cl::BufferHandle )	fragmentsClBufferHandle;
 //		CSRH( Cl::BufferHandle )	facesClBufferHandle;
 
-		CSRH( TextureHandle )		depthRtHandle;
-		CSRH( TextureHandle )		colourRtHandle;
-		CSRH( TextureHandle )		fragCountRtHandle;
-		CSRH( TextureHandle )		fragmentsTexHandle;
-		CSRH( TextureHandle )		scratchTexHandle;
-		CSRH( TextureHandle )		fragHeaderRtHandle;
-		CSRH( TextureHandle )		pixelTempRtHandle;
-		CSRH( TextureHandle )		facesTexHandle;
+		CSRHS( TextureHandle )		depthRtHandle;
+		CSRHS( TextureHandle )		colourRtHandle;
+		CSRHS( TextureHandle )		fragCountRtHandle;
+		CSRHS( TextureHandle )		fragmentsTexHandle;
+		CSRHS( TextureHandle )		scratchTexHandle;
+		CSRHS( TextureHandle )		fragHeaderRtHandle;
+		CSRHS( TextureHandle )		pixelTempRtHandle;
+		CSRHS( TextureHandle )		facesTexHandle;
 
 		CSRHS( ProgramHandle )		fragCountProgramHandle;
 		CSRHS( ProgramHandle )		fragHeaderProgramHandle;

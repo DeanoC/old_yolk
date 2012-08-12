@@ -45,7 +45,7 @@ void VtPipeline::createCaptureBuffers() {
 	//---------------------------------------
 	// frag count
 	Texture::CreationStruct bcrt = {
-		TCF_2D | TCF_RENDER_TARGET, GL_R8, 
+		TCF_2D | TCF_RENDER_TARGET, GTF_R8, 
 		1, targetWidth, targetHeight, 0, 0
 	};
 	fragCountRtHandle.reset( TextureHandle::create( "_vtpipe_fragcount_rt", &bcrt ) );
@@ -53,7 +53,7 @@ void VtPipeline::createCaptureBuffers() {
 	//---------------------------------------
 	// frag header
 	Texture::CreationStruct bhrt = {
-		TCF_2D | TCF_RENDER_TARGET, GL_R32F,
+		TCF_2D | TCF_RENDER_TARGET, GTF_R32F,
 		1, targetWidth, targetHeight, 0, 0
 	};
 	fragHeaderRtHandle.reset( TextureHandle::create( "_vtpipe_fragheader_rt", &bhrt ) );
@@ -61,7 +61,7 @@ void VtPipeline::createCaptureBuffers() {
 	//---------------------------------------
 	// pixel temp 
 	Texture::CreationStruct pptrt = {
-		TCF_2D | TCF_RENDER_TARGET, GL_R32F,
+		TCF_2D | TCF_RENDER_TARGET, GTF_R32F,
 		1, targetWidth, targetHeight, 0, 0
 	};
 	pixelTempRtHandle.reset( TextureHandle::create( "_vtpipe_pixeltemp_rt", &pptrt ) );
@@ -82,7 +82,7 @@ void VtPipeline::createCaptureBuffers() {
 	scratchBufHandle.reset( DataBufferHandle::create( "_vtpipe_scratch_db", &scratchcs ) );
 	auto scratchBuf = std::static_pointer_cast<Gl::DataBuffer>( scratchBufHandle.acquire() );
 	Texture::CreationStruct scratchtcs = {
-		TCF_BUFFER, GL_R32UI,
+		TCF_BUFFER, GTF_R32UI,
 		1, 1, 1, 1, 1, scratchBuf->getName()
 	};
 	scratchTexHandle.reset( TextureHandle::create( "_vtpipe_scratch_tex", &scratchtcs ) );
@@ -97,7 +97,7 @@ void VtPipeline::createCaptureBuffers() {
 
 	auto fragmentsBuffer = std::static_pointer_cast<Gl::DataBuffer>( fragmentsBufferHandle.acquire() );
 	Texture::CreationStruct fragcs = {
-		TCF_BUFFER, GL_RGBA32UI, 1, 1, 1, 1, 1, fragmentsBuffer->getName()
+		TCF_BUFFER, GTF_RGBA32UI, 1, 1, 1, 1, 1, fragmentsBuffer->getName()
 	};
 	fragmentsTexHandle.reset( TextureHandle::create( "_vtpipe_binfrags_tex", &fragcs ) );
 
@@ -122,7 +122,7 @@ void VtPipeline::createCaptureBuffers() {
 
 	auto facesBuffer = std::static_pointer_cast<Gl::DataBuffer>( facesBufferHandle.acquire() );
 	Texture::CreationStruct facestcs = {
-		TCF_BUFFER, GL_RGBA32F, 1, 1, 1, 1, 1, facesBuffer->getName()
+		TCF_BUFFER, GTF_RGBA32F, 1, 1, 1, 1, 1, facesBuffer->getName()
 	};
 	facesTexHandle.reset( TextureHandle::create( "_vtpipe_faces_tex", &facestcs ) );
 
@@ -183,7 +183,7 @@ void VtPipeline::startFragCountGeomPass() {
 	GL_CHECK
 */
 	context->useAsRenderTarget( fcRt );
-	context->bindWholeProgram( program );
+	context->bindProgram( program );
 	context->getConstantCache().updateGPU( ); //program );
 	context->bindConstants();
 
@@ -236,12 +236,12 @@ void VtPipeline::startCaptureFragmentsGeomPass() {
 	auto dummyVao = std::static_pointer_cast<Gl::Vao>( dummyVaoHandle.acquire() );
 
 	// clear per pixel temp to keep count of current fragment count
-	auto pixelTempRt = pixelTempRtHandle.acquire();
+	auto pixelTempRt = std::static_pointer_cast<Gl::Texture>( pixelTempRtHandle.acquire() );
 	context->useAsRenderTarget( pixelTempRt );
 	float colClr[4] = { 0, 0, 0, 0 };
 	glClearBufferfv( GL_COLOR, 0, colClr );
 
-	auto fragHeaderTex = fragHeaderRtHandle.acquire();
+	auto fragHeaderTex = std::static_pointer_cast<Gl::Texture>( fragHeaderRtHandle.acquire() );
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, fragHeaderTex->getName() );
 	GL_CHECK
@@ -249,25 +249,23 @@ void VtPipeline::startCaptureFragmentsGeomPass() {
 	glBindImageTexture( 0, pixelTempRt->getName(), 0, 
 					GL_FALSE, 0, GL_READ_WRITE, GL_R32UI );
 	GL_CHECK
-	auto fragmentsTex = fragmentsTexHandle.acquire();
+	auto fragmentsTex = std::static_pointer_cast<Gl::Texture>( fragmentsTexHandle.acquire() );
 	glBindImageTexture( 1, fragmentsTex->getName(), 0, 
 					GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32UI );
 	GL_CHECK
-	auto scratchTex = scratchTexHandle.acquire();
+	auto scratchTex = std::static_pointer_cast<Gl::Texture>( scratchTexHandle.acquire() );
 	glBindImageTexture( 2, scratchTex->getName(), 0, 
 					GL_FALSE, 0, GL_READ_WRITE, GL_R32UI );
 	GL_CHECK
 
-
-
 	Scene::ProgramPtr program = captureFragmentsProgramHandle.acquire();
-	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( ); //program );
+	context->bindProgram( program );
+	context->getConstantCache().updateGPU( program );
 	context->bindConstants();
 
 	// bind a fake render target we never actually read or write it
 	// as we use image load / stores
-	TexturePtr depthRt = depthRtHandle.acquire();
+	auto depthRt = std::static_pointer_cast<Gl::Texture>( depthRtHandle.acquire() );
 	context->useAsDepthOnlyRenderTargets( depthRt );
 	glDisable( GL_DEPTH_TEST );
 	glDisable( GL_BLEND );

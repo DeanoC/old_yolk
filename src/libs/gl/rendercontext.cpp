@@ -97,12 +97,13 @@ void debugOutputAMD(GLuint id, GLenum category, GLenum severity, GLsizei, const 
 //	LOG(INFO) << debType << " : " << id << " : " << message;
 }
 
-RenderContext::RenderContext(void) :
-	viewFrustum( 0 ),
-	debugOutputInstalled( false )  {
+RenderContext::RenderContext() {
+	viewFrustum = nullptr;
+	debugOutputInstalled = false;
+
 }
 
-RenderContext::~RenderContext(void) {
+RenderContext::~RenderContext() {
 	fbo.reset(0);
 	boundPrograms.reset( 0 );
 	boundRenderTargets.reset( 0 );
@@ -118,13 +119,13 @@ void RenderContext::threadActivate() {
 }
 
 void RenderContext::reset() {
-	bindPipeline( ppo.get() );
+	bindPipeline( defaultPpo.get() );
 	useNoRenderTargets();
-	resetProgram( PT_VERTEX );
-	resetProgram( PT_TESS_CONTROL );
-	resetProgram( PT_TESS_EVAL );
-	resetProgram( PT_GEOMETRY );
-	resetProgram( PT_FRAGMENT );
+	resetShader( PT_VERTEX );
+	resetShader( PT_TESS_CONTROL );
+	resetShader( PT_TESS_EVAL );
+	resetShader( PT_GEOMETRY );
+	resetShader( PT_FRAGMENT );
 }
 
 #if PLATFORM == WINDOWS 
@@ -141,7 +142,7 @@ void RenderContext::setGlContext( void* dis, unsigned long win, void* ctx ) {
 
 #endif
 
-void RenderContext::useAsRenderTargets( const TexturePtr& pTarget, const TexturePtr& pDepthTarget ) {
+void RenderContext::useAsRenderTargets( const Scene::TexturePtr& pTarget, const Scene::TexturePtr& pDepthTarget ) {
 	useNoRenderTargets();
 	fbo->attach( FAP_COLOUR0, pTarget );
 	fbo->attach( FAP_DEPTH, pDepthTarget );
@@ -149,21 +150,21 @@ void RenderContext::useAsRenderTargets( const TexturePtr& pTarget, const Texture
 	boundRenderTargets[FAP_MAX_ATTACHMENT_POINTS-1] = pDepthTarget;
 	fbo->bind();
 }
-void RenderContext::useAsRenderTarget( TexturePtr pTarget ) {
+void RenderContext::useAsRenderTarget( Scene::TexturePtr pTarget ) {
 	useNoRenderTargets();
 	fbo->attach( FAP_COLOUR0, pTarget );
 	fbo->detach( FAP_DEPTH );
 	boundRenderTargets[0] = pTarget;
 	fbo->bind();
 }
-void RenderContext::useAsDepthOnlyRenderTargets( TexturePtr pDepthTarget ) {
+void RenderContext::useAsDepthOnlyRenderTargets( Scene::TexturePtr pDepthTarget ) {
 	useNoRenderTargets();
 	fbo->attach( FAP_DEPTH, pDepthTarget );
 	boundRenderTargets[FAP_MAX_ATTACHMENT_POINTS-1] = pDepthTarget;
 	fbo->bind();
 }
 
-void RenderContext::useAsRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets, const TexturePtr& pDepthTarget ) {
+void RenderContext::useAsRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const pTargets, const Scene::TexturePtr& pDepthTarget ) {
 	useNoRenderTargets();
 	fbo->attach( FAP_DEPTH, pDepthTarget );
 	boundRenderTargets[FAP_MAX_ATTACHMENT_POINTS-1] = pDepthTarget;
@@ -174,7 +175,7 @@ void RenderContext::useAsRenderTargets( unsigned int numTargets, const TexturePt
 	fbo->bind();
 }
 
-void RenderContext::useAsRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets ) {
+void RenderContext::useAsRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const pTargets ) {
 	useNoRenderTargets();
 	for( unsigned int i = 0; i < numTargets; ++i ) {
 		fbo->attach( (FBO_ATTACHMENT_POINT) (FAP_COLOUR0 + i), pTargets[i] );
@@ -197,7 +198,7 @@ void RenderContext::useNoRenderTargets() {
 	}
 }
 
-void RenderContext::setProgram( const Scene::ProgramPtr& sprg ) {
+void RenderContext::setShader( const Scene::ProgramPtr& sprg ) {
 	auto prg = std::static_pointer_cast<Program>( sprg );
 
 	CORE_ASSERT( prg != nullptr );
@@ -213,7 +214,7 @@ void RenderContext::setProgram( const Scene::ProgramPtr& sprg ) {
 	curPpo->attach( stage, prg );
 }
 
-void RenderContext::resetProgram( PROGRAM_TYPE type ) {
+void RenderContext::resetShader( PROGRAM_TYPE type ) {
 	PPO_STAGE stage;
 	switch( type ) {
 	case MNT_VERTEX_SHADER_OBJECT: stage = PPO_VERTEX_STAGE; break;
@@ -230,21 +231,21 @@ void RenderContext::bindPipeline( ProgramPipelineObject* pPPO ) {
 }
 
 void RenderContext::unbindPipeline() {
-	if( curPpo != ppo.get() ) {
+	if( curPpo != defaultPpo.get() ) {
 		curPpo->unbind();
 	}
-	curPpo = ppo.get();
+	curPpo = defaultPpo.get();
 	curPpo->bind();	
 }
 
-void RenderContext::bindWholeProgram( const Scene::ProgramPtr& sprg ) {
+void RenderContext::bindProgram( const Scene::ProgramPtr& sprg ) {
 	auto prg = std::static_pointer_cast<Program>( sprg );
 
 	curPpo = nullptr;
 	glUseProgram( prg->getName() );
 }
 
-void RenderContext::unbindWholeProgam() {
+void RenderContext::unbindProgram() {
 	glUseProgram( 0 );
 	unbindPipeline();
 }
@@ -270,13 +271,13 @@ void RenderContext::prepToRender() {
 		GL_CHECK
 		constantCache.reset( CORE_NEW Scene::ConstantCache() );
 		fbo.reset( CORE_NEW Fbo() );
-		ppo.reset( CORE_NEW ProgramPipelineObject() );
+		defaultPpo.reset( CORE_NEW ProgramPipelineObject() );
 	
 		boundRenderTargets.reset( CORE_NEW_ARRAY TexturePtr[ FAP_MAX_ATTACHMENT_POINTS ] );
 		boundPrograms.reset( CORE_NEW_ARRAY ProgramPtr[ PPO_MAX_STAGES ] );
 	}
 	GL_CHECK
-	bindPipeline( ppo.get() );
+	bindPipeline( defaultPpo.get() );
 	GL_CHECK
 }
 

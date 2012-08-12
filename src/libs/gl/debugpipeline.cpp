@@ -38,7 +38,7 @@ void DebugPipeline::bind( Scene::RenderContext* rc ) {
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
 	auto program = programHandle.acquire();
-	context->bindWholeProgram( program );
+	context->bindProgram( program );
 	context->getConstantCache().updateGPU( program );
 	context->bindConstants();
 
