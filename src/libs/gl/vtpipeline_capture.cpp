@@ -144,6 +144,8 @@ int VtPipeline::getGeomPassCount() {
 }
 
 void VtPipeline::startFragCountGeomPass() {
+	using namespace Scene;
+
 	// we hijack this pass for the actual geometry
 	// capture, for now I use imageStore in the geometry
 	// shader as this is portable across all GL4.2 cards
@@ -258,7 +260,7 @@ void VtPipeline::startCaptureFragmentsGeomPass() {
 
 
 
-	ProgramPtr program = captureFragmentsProgramHandle.acquire();
+	Scene::ProgramPtr program = captureFragmentsProgramHandle.acquire();
 	context->bindWholeProgram( program );
 	context->getConstantCache().updateGPU( ); //program );
 	context->bindConstants();

@@ -28,7 +28,7 @@ namespace Gl {
 		void bind();
 		void unbind();
 
-		void attach( PPO_STAGE stage, const ProgramPtr& prg );
+		void attach( PPO_STAGE stage, const Scene::ProgramPtr& prg );
 		void detach( PPO_STAGE stage );
 
 	};

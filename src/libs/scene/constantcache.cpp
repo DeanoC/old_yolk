@@ -322,7 +322,7 @@ void ConstantCache::updateGPUBlock( CONSTANT_FREQ_BLOCKS block ) const {
 	gpuHasBlocks |= BIT(block);
 }
 
-void ConstantCache::updateGPU( /*const ProgramPtr prg*/ ) {
+void ConstantCache::updateGPU( const ProgramPtr prg ) {
 	if( camera && camera->getCounter() != s_cacheCount ) {
 
 		s_cacheCount = camera->getCounter();
@@ -343,13 +343,13 @@ void ConstantCache::updateGPU( /*const ProgramPtr prg*/ ) {
 		gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_VIEW ]) | BIT(varFreq[ CVN_PROJ ]) | BIT(CF_STD_OBJECT) );
 	}
 
-//	if( prg && (gpuHasBlocks & prg->getUsedBuffers()) == prg->getUsedBuffers() ) {
-//		// upto date, nothing to do
-//		return;
-//	}
+	if( prg && (gpuHasBlocks & prg->getUsedBuffers()) == prg->getUsedBuffers() ) {
+		// upto date, nothing to do
+		return;
+	}
 
 	// what needs updating?
-	uint32_t needsUpdating = ~0;//(~gpuHasBlocks) & (prg ? prg->getUsedBuffers() : ~0);
+	uint32_t needsUpdating = (~gpuHasBlocks) & (prg ? prg->getUsedBuffers() : ~0);
 
 	for( int i = 0; i < CF_USER_BLOCKS; ++i ) {
 		if( needsUpdating & BIT(i) ) {

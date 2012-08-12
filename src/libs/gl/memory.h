@@ -4,8 +4,8 @@
  @brief	Declares the memory class.
  */
 #pragma once
-#if !defined( WIERD_GL_MEMORY_H__ )
-#define WIERD_GL_MEMORY_H__
+#if !defined( YOLK_GL_MEMORY_H_ )
+#define YOLK_GL_MEMORY_H_
 
 namespace Gl {
 

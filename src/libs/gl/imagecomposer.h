@@ -209,7 +209,7 @@ private:
 			Page() : vertexBufferHandle(nullptr), vertexBuffer( nullptr ),
 						numVertices(0), mapped(nullptr) {}
 
-			Page( Scene::DataBufferHandlePtr a, VaoHandlePtr b, ProgramHandlePtr c ) :
+			Page( Scene::DataBufferHandlePtr a, VaoHandlePtr b, Scene::ProgramHandlePtr c ) :
 				vertexBufferHandle(a), vaoHandle(b), programHandle(c), 
 				vertexBuffer( nullptr ), numVertices(0), 
 				mapped(nullptr) {}
@@ -230,8 +230,8 @@ private:
 			}
 
 			Scene::DataBufferHandlePtr		vertexBufferHandle;
-			VaoHandlePtr 			vaoHandle;
-			ProgramHandlePtr		programHandle;
+			VaoHandlePtr 					vaoHandle;
+			Scene::ProgramHandlePtr			programHandle;
 
 			Scene::DataBufferPtr 			vertexBuffer;
 			uint32_t				numVertices;
@@ -243,7 +243,7 @@ private:
 		int 										layerNum;
 	} layers[MAX_LAYERS];
 
-	ProgramHandlePtr	program[MAX_RENDER_TYPE];			//!< programs
+	Scene::ProgramHandlePtr	program[MAX_RENDER_TYPE];			//!< programs
 
 	const unsigned int maxSpritesPerLayer;				//! how many sprites per layer can this composer support
 	static const uint32_t SizeOfRenderType[MAX_RENDER_TYPE];

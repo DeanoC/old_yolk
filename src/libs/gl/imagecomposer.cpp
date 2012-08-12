@@ -45,8 +45,8 @@ const Vao::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] =
 ImageComposer::ImageComposer( int _maxSpritesPerLayer ) :
 	maxSpritesPerLayer( _maxSpritesPerLayer )
 {
-	program[ SIMPLE_SPRITE ] = ProgramHandle::create( "basicsprite" );
-	program[ SOLID_COLOUR ] = ProgramHandle::create( "2dcolour" );
+	program[ SIMPLE_SPRITE ] = Scene::ProgramHandle::create( "basicsprite" );
+	program[ SOLID_COLOUR ] = Scene::ProgramHandle::create( "2dcolour" );
 
 	for( int i = 0; i < MAX_LAYERS; ++i ) {
 		layers[i].layerNum = i;
@@ -438,7 +438,7 @@ void ImageComposer::render() {
 			auto icProgram = program[ pagekey.type ]->acquire();
 			context->bindWholeProgram( icProgram );
 			context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
-			context->getConstantCache().updateGPU( ); //icProgram );
+			context->getConstantCache().updateGPU( icProgram );
 			context->bindConstants();
 
 			switch( pagekey.renderStates ) {

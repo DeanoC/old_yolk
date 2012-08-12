@@ -197,8 +197,10 @@ void RenderContext::useNoRenderTargets() {
 	}
 }
 
-void RenderContext::setProgram( const ProgramPtr& prg ) {
-	CORE_ASSERT( prg != NULL );
+void RenderContext::setProgram( const Scene::ProgramPtr& sprg ) {
+	auto prg = std::static_pointer_cast<Program>( sprg );
+
+	CORE_ASSERT( prg != nullptr );
 
 	PPO_STAGE stage;
 	switch( prg->getType() ) {
@@ -235,7 +237,9 @@ void RenderContext::unbindPipeline() {
 	curPpo->bind();	
 }
 
-void RenderContext::bindWholeProgram( const ProgramPtr& prg ) {
+void RenderContext::bindWholeProgram( const Scene::ProgramPtr& sprg ) {
+	auto prg = std::static_pointer_cast<Program>( sprg );
+
 	curPpo = nullptr;
 	glUseProgram( prg->getName() );
 }
@@ -260,6 +264,7 @@ void RenderContext::setCamera( const Scene::CameraPtr& _cam ) {
 }
 
 void RenderContext::prepToRender() {
+	using namespace Scene;
 	// fbo NULL used to mark first activation
 	if( fbo == NULL ) {
 		GL_CHECK

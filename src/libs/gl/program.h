@@ -7,16 +7,19 @@
 //! GPU shader
 //!
 //!-----------------------------------------------------
-#if !defined(WIERD_GL_PROGRAM_H)
-#define WIERD_GL_PROGRAM_H
+#if !defined( YOLK_GL_PROGRAM_H_ )
+#define YOLK_GL_PROGRAM_H_
 
-#include <core/resources.h>
-#include "memory.h"
+#if !defined( YOLK_GL_MEMORY_H_ )
+#	include "memory.h"
+#endif
+
+#if !defined( YOLK_SCENE_PROGRAM_H_ )
+#	include "scene/program.h"
+#endif
 
 namespace Gl {
-	static const uint32_t ProgramRType = RESOURCE_NAME('G','P','R','G');
-
-
+	
 	enum PROGRAM_TYPE {
 		PT_VERTEX = GL_VERTEX_SHADER,
 		PT_FRAGMENT = GL_FRAGMENT_SHADER,
@@ -27,31 +30,16 @@ namespace Gl {
 		MAX_PROGRAM_TYPE = 5
 	};
 
-	class Program : public Memory,
-					public Core::Resource<ProgramRType> {
+	class Program : public Memory, public Scene::Program {
 	public:
-		friend class ShaderMan;
-		Program();
-		struct CreationStruct {
-			int				numTransformFeedbackItems;
-			bool			interleavedItems;
-			const char*		transformFeedbackItemNames[ 16 ]; // max items
-		};
-		struct LoadStruct {};
-
-		// bit flags of CONSTANT_FREQ tell which buffer are used by this program
-		uint32_t getUsedBuffers() const { return usedBuffers; }
-
 	protected:
-		uint32_t			usedBuffers;
+		friend class ShaderMan;
+		Program(){};
+
 		bool				wholeProgram;
 		// non pipelinr objects have shaders embedded
 		Memory::Name		wholeProgramShaders[ MAX_PROGRAM_TYPE ];
 	};
-
-	typedef const Core::ResourceHandle<ProgramRType, Program> ProgramHandle;
-	typedef ProgramHandle* ProgramHandlePtr;
-	typedef std::shared_ptr<Program> ProgramPtr;
 
 }
 

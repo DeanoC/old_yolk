@@ -6,10 +6,12 @@
 //! handles the shader system / compiler etc.
 //!
 //!-----------------------------------------------------
-#if !defined(WIERD_GL_SHADERMAN_H)
-#define WIERD_GL_SHADERMAN_H
+#if !defined( YOLK_GL_SHADERMAN_H)
+#define YOLK_GL_SHADERMAN_H
 
-#include "program.h"
+#if !defined( YOLK_GL_PROGRAM_H)
+#	include "program.h"
+#endif
 
 namespace Core {
 	class ResourceHandleBase;

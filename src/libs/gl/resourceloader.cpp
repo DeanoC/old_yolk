@@ -95,13 +95,15 @@ std::shared_ptr<Core::ResourceBase> TextureAtlasCreateResource( const Core::Reso
 //! Callback from the resource manager to create a program resource
 std::shared_ptr<Core::ResourceBase> ProgramCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
 	using namespace Core;
+	using namespace Scene;
 
 	const Program::CreationStruct* creation = (const Program::CreationStruct*) pData;
 
-	// for programs create or load is the same thing, source is internal, may choose
-	// to store a disk cache blob for faster compiling in future
-	ProgramPtr pResource( Gfx::get()->getShaderMan()->internalCreate( handle, pName, creation ) );
-	return std::shared_ptr<ResourceBase>( pResource );
+	// for programs at the moment create or load is the same thing, as source is internal,
+	// may choose to store a disk cache blob for faster compiling in future
+	Scene::ProgramPtr pResource( Gfx::get()->getShaderMan()->internalCreate( handle, pName, creation ) );
+	return std::static_pointer_cast<ResourceBase>( pResource );
+
 }
 
 //! Callback from the resource manager to create a data buffer
@@ -112,7 +114,6 @@ std::shared_ptr<Core::ResourceBase> DataBufferCreateResource( const Core::Resour
 
 	// currently only in memory is supported
 	Scene::DataBufferPtr pResource( DataBuffer::internalCreate( handle, pName, creation ) );
-
 	return std::static_pointer_cast<ResourceBase>( pResource );
 }
 
@@ -184,24 +185,6 @@ std::shared_ptr<Core::ResourceBase> HierCreateResource( const Core::ResourceHand
 	}
 }
 
-//! Callback from the resource manager to create a height field resource
-/*std::shared_ptr<Core::ResourceBase> HeightfieldCreateResource( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
-	using namespace Core;
-	using namespace Scene;
-
-	if( flags & RMRF_LOADOFFDISK ) {
-		bool bPreLoad = false;
-		if( flags & RMRF_PRELOAD ) {
-			bPreLoad = true;
-		}
-		HeightfieldPtr pResource( Heightfield::internalLoad( handle, pName, bPreLoad ) );
-		return std::shared_ptr<ResourceBase>( pResource );
-	} else {
-		CORE_ASSERT( false && "Can only load off disk" );
-		return std::shared_ptr<ResourceBase>();
-	}
-}
-*/
 void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
 	using namespace Scene;
 

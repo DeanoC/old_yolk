@@ -23,7 +23,7 @@ namespace Gl {
 DebugPipeline::DebugPipeline( size_t index ) :
 	pipelineIndex( index )
 {
-	programHandle.reset( ProgramHandle::create( "basic" ) );
+	programHandle.reset( Scene::ProgramHandle::create( "basic" ) );
 }
 	
 DebugPipeline::~DebugPipeline() {
@@ -37,9 +37,9 @@ void DebugPipeline::bind( Scene::RenderContext* rc ) {
 	// render direct to back buffer and back depth buffer
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-	ProgramPtr program = programHandle.acquire();
+	auto program = programHandle.acquire();
 	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( ); //program );
+	context->getConstantCache().updateGPU( program );
 	context->bindConstants();
 
 	glEnable( GL_DEPTH_TEST );

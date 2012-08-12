@@ -76,7 +76,7 @@ void VtPipeline::bind( Scene::RenderContext* rc ) {
 void VtPipeline::startMainGeomPass() {
 	TexturePtr colourRt = colourRtHandle.acquire();
 	TexturePtr depthRt = depthRtHandle.acquire();
-	ProgramPtr program = mainProgramHandle.acquire();
+	Scene::ProgramPtr program = mainProgramHandle.acquire();
 
 
 	context->useAsRenderTargets( colourRt, depthRt );
@@ -168,6 +168,7 @@ void VtPipeline::display( Scene::RenderContext* rc, int backWidth, int backHeigh
 }
 
 void VtPipeline::merge( Scene::RenderContext* rc ) {
+	using namespace Scene;
 //	composer->putTexture( colourRtHandle.get(), ImageComposer::ALPHA_BLEND, 
 //		Math::Vector2(0,0), Math::Vector2(1,1), 
 //		Core::RGBAColour::unpackARGB(0xFFFFFFFF), 3 );

@@ -95,12 +95,12 @@ namespace Gl {
 		CSRH( TextureHandle )		pixelTempRtHandle;
 		CSRH( TextureHandle )		facesTexHandle;
 
-		CSRH( ProgramHandle )		fragCountProgramHandle;
-		CSRH( ProgramHandle )		fragHeaderProgramHandle;
-		CSRH( ProgramHandle )		captureFragmentsProgramHandle;
-		CSRH( ProgramHandle )		mainProgramHandle;
-		CSRH( ProgramHandle )		resolve8msaaProgramHandle;
-		CSRH( ProgramHandle )		debugCaptureFragmentsProgramHandle;
+		CSRHS( ProgramHandle )		fragCountProgramHandle;
+		CSRHS( ProgramHandle )		fragHeaderProgramHandle;
+		CSRHS( ProgramHandle )		captureFragmentsProgramHandle;
+		CSRHS( ProgramHandle )		mainProgramHandle;
+		CSRHS( ProgramHandle )		resolve8msaaProgramHandle;
+		CSRHS( ProgramHandle )		debugCaptureFragmentsProgramHandle;
 
 		CSRHS( DataBufferHandle ) 	dummyVBOHandle;
 		CSRH( VaoHandle ) 			dummyVaoHandle;

@@ -49,9 +49,9 @@ namespace Gl {
 
 		Gl::RenderContext*			context;
 
-		Core::ScopedResourceHandle<TextureHandle>	depthRtHandle;
-		Core::ScopedResourceHandle<TextureHandle>	colourRtHandle;
-		Core::ScopedResourceHandle<ProgramHandle>	programHandle;
+		Core::ScopedResourceHandle<TextureHandle>			depthRtHandle;
+		Core::ScopedResourceHandle<TextureHandle>			colourRtHandle;
+		Core::ScopedResourceHandle<Scene::ProgramHandle>	programHandle;
 	};
 
 	class DebugPipelineDataStore : public Scene::PipelineDataStore {

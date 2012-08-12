@@ -10,7 +10,7 @@
 
 #include "core/vector_math.h"
 #include "scene/databuffer.h"
-//#include "program.h"
+#include "scene/program.h"
 //#include "cl/buffer.h"
 #include "scene/camera.h"
 
@@ -93,7 +93,7 @@ namespace Scene {
 		// callers responsability for user (non shared) blocks, passing null (default)
 		// will update all the gpu blocks that need updating, regardless of whether its
 		// accessed by the current shader
-		void updateGPU( /*const ProgramPtr prg = nullptr */ );
+		void updateGPU( const ProgramPtr prg = nullptr  );
 		// fast path if you suspect only object varaibles have changed
 		void updateGPUObjectOnly();
 

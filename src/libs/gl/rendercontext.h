@@ -1,7 +1,6 @@
-	#pragma once
-
-#if !defined(WIERD_GL_RENDERCONTEXT_H)
-#define WIERD_GL_RENDERCONTEXT_H
+#pragma once
+#if !defined(WIERD_GL_RENDERCONTEXT_H_)
+#define WIERD_GL_RENDERCONTEXT_H_
 
 #include "core/frustum.h"
 #include "memory.h"
@@ -45,7 +44,7 @@ public:
 	void useNoRenderTargets();
 
 	// these set programs into the current pipeline
-	void setProgram( const ProgramPtr& prg );
+	void setProgram( const Scene::ProgramPtr& prg );
 	void resetProgram( PROGRAM_TYPE type );
 
 	// use this pipeline instead of the context pipeline
@@ -54,7 +53,7 @@ public:
 	void unbindPipeline();
 
 	// replace the pipeline with a whole program (all shaders linked into one)
-	void bindWholeProgram( const ProgramPtr& prg );
+	void bindWholeProgram( const Scene::ProgramPtr& prg );
 	// return to render context pipeline 
 	void unbindWholeProgam();
 
@@ -94,7 +93,7 @@ private:
 	boost::scoped_ptr<Fbo>						fbo;
 	boost::scoped_array<TexturePtr>				boundRenderTargets;
 	boost::scoped_ptr<ProgramPipelineObject>	ppo;
-	boost::scoped_array<ProgramPtr>				boundPrograms;
+	boost::scoped_array<Scene::ProgramPtr>		boundPrograms;
 	ProgramPipelineObject*						curPpo;
 	bool										debugOutputInstalled;
 

@@ -54,7 +54,7 @@ DebugPrims::DebugPrims() {
 	vertexBuffer = vertexBufferHandle->acquire();
 	pVertices = (Vertex*) vertexBuffer->map( DBMA_WRITE_ONLY, DBMF_DISCARD );
 
-	debugProgramHandle = ProgramHandle::create( "2dcolour" );
+	debugProgramHandle = Scene::ProgramHandle::create( "2dcolour" );
 }
 
 DebugPrims::~DebugPrims() {
@@ -253,7 +253,7 @@ void DebugPrims::flush() {
 
 	auto debugProgram = debugProgramHandle->acquire();
 	context->bindWholeProgram( debugProgram );
-	context->getConstantCache().updateGPU( );//debugProgram );
+	context->getConstantCache().updateGPU( debugProgram );
 	context->bindConstants();
 
 	if( numLineWorldVertices != 0 ) {

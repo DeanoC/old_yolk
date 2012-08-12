@@ -26,7 +26,8 @@ void ProgramPipelineObject::unbind() {
 	GL_CHECK
 }
 
-void ProgramPipelineObject::attach( PPO_STAGE stage, const ProgramPtr& prg ) {
+void ProgramPipelineObject::attach( PPO_STAGE stage, const Scene::ProgramPtr& sprg ) {
+	auto prg = std::static_pointer_cast<Gl::Program>( sprg );
 	glUseProgramStages( name, stage, prg->getName() );
 	GL_CHECK
 }
