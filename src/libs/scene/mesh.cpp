@@ -64,7 +64,7 @@ void Mesh::render( RenderContext* rc, const int pipelineName ) {
 							getTransformNode()->getRenderMatrix() );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
-	prevWVP = context->getConstantCache().getMatrix( RENDER_BACKEND::CVN_WORLD_VIEW_PROJ );
+	prevWVP = context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
 
 	WobResourcePtr wob = meshHandle->tryAcquire();
 	if( wob ) {

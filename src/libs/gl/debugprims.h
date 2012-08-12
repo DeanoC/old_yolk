@@ -55,8 +55,8 @@ namespace Gl {
 		std::atomic<int>			numLineWorldVertices;		//!< Number of vertices currently used by the world space line drawer
 		DebugRenderInterface*		pPrevDRI;					//!< the previous Debug Render Interface
 
-		DataBufferHandlePtr			vertexBufferHandle;
-		DataBufferPtr				vertexBuffer;
+		Scene::DataBufferHandlePtr			vertexBufferHandle;
+		Scene::DataBufferPtr				vertexBuffer;
 		VaoHandlePtr				vaoHandle;
 		ProgramHandlePtr			debugProgramHandle;	
 	};

@@ -11,7 +11,8 @@
 #include "core/resourceman.h"
 #include "textureatlas.h"
 #include "rendercontext.h"
-#include "constantcache.h"
+#include "scene/databuffer.h"
+#include "scene/constantcache.h"
 
 #include "imagecomposer.h"
 
@@ -62,6 +63,7 @@ void ImageComposer::clearImage() {
 }
 
 ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Layer& layer, ImageComposer::Layer::PageKey& key ) {
+	using namespace Scene;
 	Layer::PageMap::iterator pmIt = layer.pageMap.find( key );
 	if( pmIt == layer.pageMap.end() ) {
 		// insert a new page
@@ -396,10 +398,12 @@ void ImageComposer::texturedQuad( const TextureHandlePtr&		pTexture,
 
 
 void ImageComposer::render() {
+	using namespace Scene;
 
 	auto context = Gfx::get()->getThreadRenderContext( Gfx::RENDER_CONTEXT );
 
-	glDisable(GL_CULL_FACE);
+	glDisable( GL_CULL_FACE );
+	glDisable( GL_DEPTH_TEST );
 
 	for( unsigned int i=0;i < MAX_LAYERS;++i) {
 		Layer::PageMap::iterator pmIt = layers[i].pageMap.begin();
@@ -420,28 +424,30 @@ void ImageComposer::render() {
 			}
 			glBindVertexArray( vao->getName() );
 			GL_CHECK
-
-			auto icProgram = program[ pagekey.type ]->acquire();
-			context->bindWholeProgram( icProgram );
-			context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
-			context->getConstantCache().updateGPU( icProgram );
-			context->getConstantCache().bind();
-
 			TexturePtr tex;
 			if( pagekey.texture0 ) {
 				tex = pagekey.texture0->tryAcquire();
 				if( tex ) {
 					glActiveTexture( GL_TEXTURE0 );
 					glBindTexture( GL_TEXTURE_2D, tex->getName() );
+					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f );
+					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f );
 				}
 			}
 
+			auto icProgram = program[ pagekey.type ]->acquire();
+			context->bindWholeProgram( icProgram );
+			context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
+			context->getConstantCache().updateGPU( ); //icProgram );
+			context->bindConstants();
+
 			switch( pagekey.renderStates ) {
+			default:
 				case NORMAL:
 				glDisable( GL_BLEND );
 //				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
 				break;
-			case COLOUR_MASK:
+/*			case COLOUR_MASK:
 				glDisable( GL_BLEND );
 //				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
 			break;
@@ -460,7 +466,7 @@ void ImageComposer::render() {
 				glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
 				glBlendFuncSeparate( GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,  GL_ONE_MINUS_SRC_ALPHA );
 //				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
-				break;
+				break;*/
 			}
 			glDrawArrays( GL_TRIANGLES, 0, page.numVertices );
 			GL_CHECK;

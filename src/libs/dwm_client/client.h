@@ -8,7 +8,9 @@ public:
 	DwmClient();
 	~DwmClient();
 
+	void start();
 	void run();
+	void end();
 
 	ClientWorldPtr getClientWorld() const { return world; }
 protected:

@@ -1,7 +1,7 @@
 layout( points, invocations = 1 ) in;
 layout( triangle_strip, max_vertices = 3 ) out;
 
-layout( location = 0 ) out vec2 outUV;
+layout( location = 0 ) smooth out vec2 outUV;
 
 layout( binding = 0 ) uniform sampler2D tex;
 

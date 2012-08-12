@@ -47,6 +47,19 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 		return false;
 
 	createRenderContexts();
+	
+	// some logging
+#if 1
+	int gsAtomicCounter = 0;
+	int fsAtomicCounter = 0;
+	glGetIntegerv( GL_MAX_GEOMETRY_ATOMIC_COUNTERS, &gsAtomicCounter );
+	glGetIntegerv( GL_MAX_FRAGMENT_ATOMIC_COUNTERS, &fsAtomicCounter );
+	LOG(INFO) << "Geometry Shader atomics : " << gsAtomicCounter;
+	LOG(INFO) << "Fragment Shader atomics : " << fsAtomicCounter;
+	int samples;
+	glGetIntegerv( GL_MAX_SAMPLES, &samples);
+	LOG(INFO) << "MSAA samples : " << samples;
+#endif
 
 	using namespace Cl;
 	// compute render needs to setup CL render to go
@@ -77,19 +90,6 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 		hashPipeline[ pipelines[i]->getName() ] = i;
 	}
 
-	// some logging
-#if 1
-	int gsAtomicCounter = 0;
-	int fsAtomicCounter = 0;
-	glGetIntegerv( GL_MAX_GEOMETRY_ATOMIC_COUNTERS, &gsAtomicCounter );
-	glGetIntegerv( GL_MAX_FRAGMENT_ATOMIC_COUNTERS, &fsAtomicCounter );
-	LOG(INFO) << "Geometry Shader atomics : " << gsAtomicCounter;
-	LOG(INFO) << "Fragment Shader atomics : " << fsAtomicCounter;
-	int samples;
-	glGetIntegerv( GL_MAX_SAMPLES, &samples);
-	LOG(INFO) << "MSAA samples : " << samples;
-#endif
-
 
 	return true;
 }
@@ -97,7 +97,7 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 void Gfx::shutdownScreen() {
 	renderContexts.reset( 0 );
 }
-
+		
 void Gfx::present( int backWidth, int backHeight ) {
 	resourceLoader->showLoadingIfNeeded( finalComposer.get() );
 
@@ -107,9 +107,10 @@ void Gfx::present( int backWidth, int backHeight ) {
 	// merge pipelines and display
 	// bind, merge, unbind, this is needed to get debug market correct
 	// and the keep the rule that each bind needs an unbind
-	pipelines[ forId ]->bind( &renderContexts[RENDER_CONTEXT] );
-	pipelines[ vtId ]->merge( &renderContexts[RENDER_CONTEXT] );
-	pipelines[ forId ]->unbind();
+//	pipelines[ forId ]->bind( &renderContexts[RENDER_CONTEXT] );
+//	pipelines[ vtId ]->merge( &renderContexts[RENDER_CONTEXT] );
+//	pipelines[ forId ]->unbind();
+	pipelines[ vtId ]->display(&renderContexts[RENDER_CONTEXT],0,0 );
 
 	// merge are allowed (and have to for MSAA) to fiddle with things
 	// that binds set, so merge must be followed by unbind, but as we

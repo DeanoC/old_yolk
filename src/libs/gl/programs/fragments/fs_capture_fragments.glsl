@@ -1,9 +1,9 @@
-#include "clforgl.glsl"
+#include "shared_structs.hlsl"
 #include "constant_blocks.glsl"
 
 layout( binding = 0 ) uniform sampler2D fragHeader;
 layout( r32i, binding = 1 ) uniform restrict iimageBuffer countTemp;
-layout( rgba32ui, binding = 2 ) uniform restrict writeonly uimageBuffer fragBuffer;
+layout( rgba32ui, binding = 2 ) uniform writeonly uimageBuffer fragBuffer;
 
 void main() {
 	const ivec2 pixCoords = ivec2(gl_FragCoord.xy);

@@ -25,7 +25,8 @@ namespace Gl {
 VtPipeline::VtPipeline( size_t index ) :
 	pipelineIndex( index )
 {
-	contextCl = Cl::Platform::get()->getPrimaryContext().get();
+	using namespace Scene;
+//	contextCl = Cl::Platform::get()->getPrimaryContext().get();
 
 	targetWidth = Gfx::get()->getScreenWidth();
 	targetHeight = Gfx::get()->getScreenHeight();
@@ -56,7 +57,7 @@ VtPipeline::VtPipeline( size_t index ) :
 	resolve8msaaProgramHandle.reset( ProgramHandle::create( "resolve8msaa" ) );
 	debugCaptureFragmentsProgramHandle.reset( ProgramHandle::create( "debug_captured_fragments" ) );
 
-	createCaptureBuffers();
+//	createCaptureBuffers();
 }
 
 VtPipeline::~VtPipeline() {
@@ -65,6 +66,8 @@ VtPipeline::~VtPipeline() {
 void VtPipeline::bind( Scene::RenderContext* rc ) {
 	context = (Gl::RenderContext*) rc;
 	context->pushDebugMarker( "VtPipeline" );
+
+	glViewport( 0, 0, targetWidth, targetHeight );
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
@@ -75,10 +78,11 @@ void VtPipeline::startMainGeomPass() {
 	TexturePtr depthRt = depthRtHandle.acquire();
 	ProgramPtr program = mainProgramHandle.acquire();
 
+
 	context->useAsRenderTargets( colourRt, depthRt );
 	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
+	context->getConstantCache().updateGPU( ); //program );
+	context->bindConstants();
 
 	float colClr[4] = { 0, 0, 0, 1.0f };
 	glClearBufferfv( GL_COLOR, 0, colClr );
@@ -89,7 +93,6 @@ void VtPipeline::startMainGeomPass() {
 
 void VtPipeline::unbind() {
 	context->popDebugMarker();
-	context->getConstantCache().unbind();
 
 	context = nullptr;
 
@@ -169,7 +172,7 @@ void VtPipeline::merge( Scene::RenderContext* rc ) {
 //		Math::Vector2(0,0), Math::Vector2(1,1), 
 //		Core::RGBAColour::unpackARGB(0xFFFFFFFF), 3 );
 	RenderContext* context = (RenderContext*) rc;
-	DataBufferPtr dummyVBO = dummyVBOHandle.acquire();
+	auto dummyVBO = std::static_pointer_cast<Gl::DataBuffer>( dummyVBOHandle.acquire() );
 	VaoPtr dummyVao = dummyVaoHandle.acquire();
 
 	if( 0 ) {
@@ -192,7 +195,7 @@ void VtPipeline::merge( Scene::RenderContext* rc ) {
 
 	ProgramPtr program = debugCaptureFragmentsProgramHandle.acquire();
 	context->bindWholeProgram( program );
-	context->getConstantCache().bind();
+	context->bindConstants();
 
 	glBindBuffer( GL_ARRAY_BUFFER, dummyVBO->getName() );
 	glBindVertexArray( dummyVao->getName() );
@@ -205,7 +208,7 @@ void VtPipeline::merge( Scene::RenderContext* rc ) {
  	glDrawArrays( GL_POINTS, 0, 1 );
 
 	TexturePtr colourRt = colourRtHandle.acquire();
-	context->useAsRenderTargets( 1, { &colourRt } );
+	context->useAsRenderTarget( colourRt );
 
 }
 
@@ -224,7 +227,7 @@ void VtPipelineDataStore::render( Scene::RenderContext* rc ) {
 
 		VaoPtr vao = mds->vaoHandle->tryAcquire();
 		if( !vao ) {/*LOG(INFO) << "vao not ready\n";*/	return; }
-		DataBufferPtr ib = mds->vacs.indexBuffer->tryAcquire();
+		auto ib = std::static_pointer_cast<Gl::DataBuffer>( mds->vacs.indexBuffer->tryAcquire() );
 		if( !ib ) { /*LOG(INFO) << "ib not ready\n";*/return; }
 
 		glBindVertexArray( vao->getName() );
@@ -254,16 +257,17 @@ VtPipelineDataStore::~VtPipelineDataStore() {
 
 void VtPipeline::startGeomPass( int i ) {
 	switch( i ) {
-		case FRAG_COUNTER:
-		context->pushDebugMarker( "VtPipeline::BinCounterPass" );
-		startFragCountGeomPass();
-		break;
+//		case FRAG_COUNTER:
+//		context->pushDebugMarker( "VtPipeline::BinCounterPass" );
+//		startFragCountGeomPass();
+//		break;
 
-		case CAPTURE_FRAGMENTS:
-		context->pushDebugMarker( "VtPipeline::CaptureFragmentsPass" );
-		startCaptureFragmentsGeomPass();
-		break;
+//		case CAPTURE_FRAGMENTS:
+//		context->pushDebugMarker( "VtPipeline::CaptureFragmentsPass" );
+//		startCaptureFragmentsGeomPass();
+//		break;
 
+	default:
 		case MAIN_PASS:
 		context->pushDebugMarker( "VtPipeline::MainPass" );
 		startMainGeomPass();
@@ -274,7 +278,7 @@ void VtPipeline::startGeomPass( int i ) {
 
 void VtPipeline::endGeomPass ( int i ) {
 	switch( i ) {
-		case FRAG_COUNTER: endFragCountGeomPass(); break;		
+//		case FRAG_COUNTER: endFragCountGeomPass(); break;		
 		default: break;
 	}
 	context->popDebugMarker();

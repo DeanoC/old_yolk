@@ -1,5 +1,6 @@
 #include "core/core.h"
 #include "dwm_client/client.h"
+#include "scene/hie.h"
 
 #include "boost/program_options.hpp"
 #include "json_spirit/json_spirit_reader.h"
@@ -48,11 +49,19 @@ int Main() {
 
 
 	DwmClient client;
-	auto gfxThread = std::make_shared<Core::thread>( 
-			boost::bind( &DwmClient::run, &client ) 
-		);
+	client.start();
+	ClientWorldPtr world = client.getClientWorld();
 
-	gfxThread->join();
+	Scene::HiePtr land = std::make_shared<Scene::Hie>( "tutlvl1.hie" );
+	world->addRenderable( land );
+	client.run();
+	client.end();
+
+//	auto gfxThread = std::make_shared<Core::thread>( 
+//			boost::bind( &DwmClient::run, &client ) 
+//		);
+
+//	gfxThread->join();
 
 	return 0;
 }

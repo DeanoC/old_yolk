@@ -111,9 +111,9 @@ std::shared_ptr<Core::ResourceBase> DataBufferCreateResource( const Core::Resour
 	const DataBuffer::CreationStruct* creation = (const DataBuffer::CreationStruct*) pData;
 
 	// currently only in memory is supported
-	DataBufferPtr pResource( DataBuffer::internalCreate( handle, pName, creation ) );
+	Scene::DataBufferPtr pResource( DataBuffer::internalCreate( handle, pName, creation ) );
 
-	return std::shared_ptr<ResourceBase>( pResource );
+	return std::static_pointer_cast<ResourceBase>( pResource );
 }
 
 //! Callback from the resource manager to create a data buffer
@@ -124,7 +124,7 @@ std::shared_ptr<Core::ResourceBase> VaoCreateResource( const Core::ResourceHandl
 
 	// currently only in memory is supported
 	VaoPtr pResource( Vao::internalCreate( handle, pName, creation ) );
-	return std::shared_ptr<ResourceBase>( pResource );
+	return std::static_pointer_cast<ResourceBase>( pResource );
 }
 
 //! Callback from the resource manager to create a data buffer
@@ -133,7 +133,7 @@ std::shared_ptr<Core::ResourceBase> XboCreateResource( const Core::ResourceHandl
 
 	// currently only in memory is supported
 	XboPtr pResource( Xbo::internalCreate( handle, pName ) );
-	return std::shared_ptr<ResourceBase>( pResource );
+	return std::static_pointer_cast<ResourceBase>( pResource );
 }
 
 
@@ -319,9 +319,20 @@ void ResourceLoaderImpl::showLoadingIfNeeded( ImageComposer* composer ) {
 	}
 	composer->putSprite( loadTextureAtlas, 1, 
 					ImageComposer::ALPHA_BLEND, 
-					Math::Vector2( 0.85f, 0.95f ),
+//					Math::Vector2( 0.85f, 0.95f ),
+					Math::Vector2( 0.0f, 0.0f ),
 					Math::Vector2( 0.15f, 0.05f ),
 					Core::RGBAColour::unpackARGB(0x80FFFFFF),
+					1 );
+
+	auto texAtlas = loadTextureAtlas->acquire();
+	composer->texturedRect( texAtlas->getPackedTexture(0), 
+					ImageComposer::ALPHA_BLEND, 
+					Math::Vector2( 0.0f, 0.0f ),
+					Math::Vector2( 0.5f, 0.5f ),
+					Core::RGBAColour::unpackARGB(0xFFFFFFFF),
+					Math::Vector2( 0.0f, 0.0f ),
+					Math::Vector2( 1.0f, 1.0f ),
 					1 );
 
 }

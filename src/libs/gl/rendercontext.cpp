@@ -4,12 +4,14 @@
 #include "glxew.h"
 #endif
 
-#include "texture.h"
-#include "fbo.h"
-#include "programpipelineobject.h"
+#include "gl/texture.h"
+#include "gl/fbo.h"
+#include "gl/programpipelineobject.h"
+#include "gl/databuffer.h"
+#include "scene/constantcache.h"
 #include "rendercontext.h"
 
-namespace {
+namespace Gl {
 
 void debugOutput (
     GLenum source,
@@ -60,7 +62,7 @@ void debugOutput (
 		LOG(WARNING) << debSource << " : " << debType << " : " << id << " : " << message;
 	} else {
 		//if(severity == GL_DEBUG_SEVERITY_LOW_ARB)
-//		LOG(INFO) << debSource << " : " << debType << " : " << id << " : " << message;
+		LOG(INFO) << debSource << " : " << debType << " : " << id << " : " << message;
 	}
 }
 void debugOutputAMD(GLuint id, GLenum category, GLenum severity, GLsizei, const GLchar* message, GLvoid*) {
@@ -84,7 +86,7 @@ void debugOutputAMD(GLuint id, GLenum category, GLenum severity, GLsizei, const 
             strcpy(debType, "message");
 
     if(severity == GL_DEBUG_SEVERITY_HIGH_AMD) {
-			LOG(ERROR) << debType << " : " << id << " : " << message;
+			LOG(FATAL) << debType << " : " << id << " : " << message;
 //			DebugBreak();
 	} else if(severity == GL_DEBUG_SEVERITY_MEDIUM_AMD) {
 			LOG(WARNING) << debType << " : " << id << " : " << message;
@@ -94,10 +96,6 @@ void debugOutputAMD(GLuint id, GLenum category, GLenum severity, GLsizei, const 
 
 //	LOG(INFO) << debType << " : " << id << " : " << message;
 }
-
-} // end anon namespace
-
-namespace Gl {
 
 RenderContext::RenderContext(void) :
 	viewFrustum( 0 ),
@@ -113,10 +111,10 @@ RenderContext::~RenderContext(void) {
 void RenderContext::threadActivate() {
 #if PLATFORM == WINDOWS 
 	wglMakeCurrent(hDC, hRC);
-	while( glGetError() != GL_NO_ERROR ){};
 #elif PLATFORM == POSIX
 	glXMakeCurrent( (Display*) x11Display, x11Window, (GLXContext) glxContext );
 #endif
+	GL_CHECK
 }
 
 void RenderContext::reset() {
@@ -264,34 +262,8 @@ void RenderContext::setCamera( const Scene::CameraPtr& _cam ) {
 void RenderContext::prepToRender() {
 	// fbo NULL used to mark first activation
 	if( fbo == NULL ) {
-//		IF_DEBUG( 
-		if( debugOutputInstalled == false ) {
-			const std::string testStr( "Gl debugging callback installed" );
-			if( glDebugMessageCallbackAMD ) {
-				glDebugMessageCallbackAMD(&debugOutputAMD, NULL);
-				GL_CHECK
-				glDebugMessageEnableAMD(0, 0, 0, NULL, GL_TRUE);
-				GL_CHECK
-				glDebugMessageInsertAMD(GL_DEBUG_CATEGORY_APPLICATION_AMD, 
-					GL_DEBUG_SEVERITY_LOW_AMD, 1, testStr.length(), testStr.c_str() );
-				GL_CHECK
-			} else if(glDebugMessageControlARB) {
-				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-				GL_CHECK
-				glDebugMessageCallbackARB(&debugOutput, NULL);
-				GL_CHECK
-				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-				GL_CHECK
-				glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 
-					1, GL_DEBUG_SEVERITY_LOW_ARB, testStr.length(), testStr.c_str() );
-				GL_CHECK
-			}
-			debugOutputInstalled = true;
-		}
-	//		);
-
 		GL_CHECK
-		constantCache.reset( CORE_NEW ConstantCache() );
+		constantCache.reset( CORE_NEW Scene::ConstantCache() );
 		fbo.reset( CORE_NEW Fbo() );
 		ppo.reset( CORE_NEW ProgramPipelineObject() );
 	
@@ -309,6 +281,15 @@ void RenderContext::swapBuffers() {
 #elif PLATFORM == POSIX
 	glXSwapBuffers ( (Display*) x11Display, x11Window );
 #endif
+}
+
+void RenderContext::bindConstants() {
+	using namespace Scene;
+	for( int i = 0; i < Scene::CF_USER_BLOCKS; ++i ) {
+		const auto db = std::static_pointer_cast<Gl::DataBuffer>( constantCache->getBlock( (Scene::CONSTANT_FREQ_BLOCKS)i)->acquire() );
+		glBindBufferBase( GL_UNIFORM_BUFFER, i, db->getName() );
+		GL_CHECK
+	}
 }
 
 }

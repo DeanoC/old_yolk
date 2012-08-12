@@ -21,6 +21,8 @@ namespace Scene {
 		virtual void threadActivate() = 0; 	// must be called once, before this context is used on a particular thread
 		virtual void prepToRender() = 0; // used to indicate this render context is used for rendering versus loading/non visual render stuff
 
+		virtual void bindConstants() = 0;
+
 	}; // sparse (largely dummy) interface to derive off to allow backends to hold context data
 }
 

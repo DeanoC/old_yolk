@@ -10,7 +10,7 @@
 #include "databuffer.h"
 #include "vao.h"
 #include "programpipelineobject.h"
-#include "constantcache.h"
+#include "scene/constantcache.h"
 #include "rendercontext.h"
 #include "core/resourceman.h"
 
@@ -23,6 +23,7 @@
 
 namespace Gl {
 DebugPrims::DebugPrims() {
+	using namespace Scene;
 	pPrevDRI = Core::g_pDebugRender;
 	Core::g_pDebugRender = this;
 	numLineVertices = 0;
@@ -51,7 +52,7 @@ DebugPrims::DebugPrims() {
 	vaoHandle = VaoHandle::create( vaoName.c_str(), &vocs );
 
 	vertexBuffer = vertexBufferHandle->acquire();
-	pVertices = (Vertex*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY, DataBuffer::MF_DISCARD );
+	pVertices = (Vertex*) vertexBuffer->map( DBMA_WRITE_ONLY, DBMF_DISCARD );
 
 	debugProgramHandle = ProgramHandle::create( "2dcolour" );
 }
@@ -227,6 +228,7 @@ void DebugPrims::worldSphere( const Core::Colour& colour, const Math::Vector3& p
 }
 
 void DebugPrims::flush() {
+	using namespace Scene;
 	if( numLineWorldVertices + numLineVertices == 0 )
 		return;
 	auto context = Gfx::get()->getThreadRenderContext( Gfx::RENDER_CONTEXT );
@@ -251,8 +253,8 @@ void DebugPrims::flush() {
 
 	auto debugProgram = debugProgramHandle->acquire();
 	context->bindWholeProgram( debugProgram );
-	context->getConstantCache().updateGPU( debugProgram );
-	context->getConstantCache().bind();
+	context->getConstantCache().updateGPU( );//debugProgram );
+	context->bindConstants();
 
 	if( numLineWorldVertices != 0 ) {
 		glDrawArrays( GL_LINES, WORLD_LINE_START_INDEX, numLineWorldVertices );
@@ -260,11 +262,11 @@ void DebugPrims::flush() {
 	}
 	if( numLineVertices != 0 ) {
 		context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
-		context->getConstantCache().updateGPU( debugProgram );
+		context->getConstantCache().updateGPU( );// debugProgram );
 		glDrawArrays( GL_LINES, NDC_LINE_START_INDEX, numLineVertices );
 		GL_CHECK;
 	}
-	pVertices = (Vertex*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY, DataBuffer::MF_DISCARD );
+	pVertices = (Vertex*) vertexBuffer->map( DBMA_WRITE_ONLY, DBMF_DISCARD );
 
 	numLineVertices = 0;
 	numLineWorldVertices = 0;

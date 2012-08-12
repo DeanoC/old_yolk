@@ -51,7 +51,7 @@ DwmClient::DwmClient() {
 DwmClient::~DwmClient() {
 }
 
-void DwmClient::run() {
+void DwmClient::start() {
 	using namespace Core;
 	using namespace Scene;
 	using namespace Gl;
@@ -75,16 +75,24 @@ void DwmClient::run() {
 	ctx->threadActivate();
 	ctx->prepToRender();
 
-	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
-	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
+	// camera stuff is stuffed needs refactor
+//	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
+//	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
 
 	auto debugCam = std::make_shared<DebugCamContext>( world.get(), ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
 
-	DevelopmentContext::get()->activateContext( "InputHandler" );
+	DevelopmentContext::get()->activateContext( "DebugCam" );
+}
+
+void DwmClient::run() {
+	using namespace Core;
+	using namespace Scene;
+	using namespace Gl;
 
 	// flush 'load' time from first time update
 	Clock::get()->update();
+	Scene::RenderContext* ctx = (Scene::RenderContext*) Gfx::get()->getThreadRenderContext( Gfx::RENDER_CONTEXT );
 
 	// Main loop
 	while( !s_quitFlag ) {
@@ -100,6 +108,13 @@ void DwmClient::run() {
 		Gl::Gfx::get()->present( curWinWidth, curWinHeight );
 		Core::HouseKeep();
 	}	
+
+}
+
+void DwmClient::end() {
+	using namespace Core;
+	using namespace Scene;
+	using namespace Gl;
 
 	Gfx::get()->shutdownScreen();
 	Gfx::shutdown();	

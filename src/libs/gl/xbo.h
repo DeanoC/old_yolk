@@ -27,8 +27,8 @@ namespace Gl {
 			return xbo;
 		}
 
-		void setBuffer( int index, const DataBufferHandlePtr& buffer ) {
-			auto buf = buffer->acquire();
+		void setBuffer( int index, const Scene::DataBufferHandlePtr& buffer ) {
+			auto buf = std::static_pointer_cast<Gl::DataBuffer>( buffer->acquire() );
 			glBindTransformFeedback( GL_TRANSFORM_FEEDBACK, getName() ); 
 			glBindBufferBase( GL_TRANSFORM_FEEDBACK_BUFFER, index, buf->getName() );
 			glBindTransformFeedback( GL_TRANSFORM_FEEDBACK, 0 ); 

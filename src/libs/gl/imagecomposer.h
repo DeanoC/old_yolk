@@ -209,7 +209,7 @@ private:
 			Page() : vertexBufferHandle(nullptr), vertexBuffer( nullptr ),
 						numVertices(0), mapped(nullptr) {}
 
-			Page( DataBufferHandlePtr a, VaoHandlePtr b, ProgramHandlePtr c ) :
+			Page( Scene::DataBufferHandlePtr a, VaoHandlePtr b, ProgramHandlePtr c ) :
 				vertexBufferHandle(a), vaoHandle(b), programHandle(c), 
 				vertexBuffer( nullptr ), numVertices(0), 
 				mapped(nullptr) {}
@@ -218,7 +218,7 @@ private:
 				if( vertexBuffer == nullptr ) {
 					vertexBuffer = vertexBufferHandle->acquire();
 				}
-				mapped = (void*) vertexBuffer->map( DataBuffer::MA_WRITE_ONLY, DataBuffer::MF_DISCARD );
+				mapped = (void*) vertexBuffer->map( Scene::DBMA_WRITE_ONLY, Scene::DBMF_DISCARD );
 				numVertices = 0;
 			}
 
@@ -229,11 +229,11 @@ private:
 				mapped = nullptr;
 			}
 
-			DataBufferHandlePtr		vertexBufferHandle;
+			Scene::DataBufferHandlePtr		vertexBufferHandle;
 			VaoHandlePtr 			vaoHandle;
 			ProgramHandlePtr		programHandle;
 
-			DataBufferPtr 			vertexBuffer;
+			Scene::DataBufferPtr 			vertexBuffer;
 			uint32_t				numVertices;
 			void*					mapped;
 		};

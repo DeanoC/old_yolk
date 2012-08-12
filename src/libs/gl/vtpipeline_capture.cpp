@@ -41,7 +41,7 @@ static const uint32_t scratchInit[SML_MAX_LOCATIONS] = {
 };
 
 void VtPipeline::createCaptureBuffers() {
-
+	using namespace Scene;
 	//---------------------------------------
 	// frag count
 	Texture::CreationStruct bcrt = {
@@ -53,7 +53,7 @@ void VtPipeline::createCaptureBuffers() {
 	//---------------------------------------
 	// frag header
 	Texture::CreationStruct bhrt = {
-		TCF_2D | TCF_RENDER_TARGET, GL_R32UI,
+		TCF_2D | TCF_RENDER_TARGET, GL_R32F,
 		1, targetWidth, targetHeight, 0, 0
 	};
 	fragHeaderRtHandle.reset( TextureHandle::create( "_vtpipe_fragheader_rt", &bhrt ) );
@@ -61,7 +61,7 @@ void VtPipeline::createCaptureBuffers() {
 	//---------------------------------------
 	// pixel temp 
 	Texture::CreationStruct pptrt = {
-		TCF_2D | TCF_RENDER_TARGET, GL_R32UI,
+		TCF_2D | TCF_RENDER_TARGET, GL_R32F,
 		1, targetWidth, targetHeight, 0, 0
 	};
 	pixelTempRtHandle.reset( TextureHandle::create( "_vtpipe_pixeltemp_rt", &pptrt ) );
@@ -80,7 +80,7 @@ void VtPipeline::createCaptureBuffers() {
 		DBCF_GPU_COPY, DBT_TEXTURE, scratchics.size,
 	};
 	scratchBufHandle.reset( DataBufferHandle::create( "_vtpipe_scratch_db", &scratchcs ) );
-	auto scratchBuf = scratchBufHandle.acquire();
+	auto scratchBuf = std::static_pointer_cast<Gl::DataBuffer>( scratchBufHandle.acquire() );
 	Texture::CreationStruct scratchtcs = {
 		TCF_BUFFER, GL_R32UI,
 		1, 1, 1, 1, 1, scratchBuf->getName()
@@ -95,18 +95,18 @@ void VtPipeline::createCaptureBuffers() {
 	};
 	fragmentsBufferHandle.reset( DataBufferHandle::create( "_vtpipe_binfrags_db", &fbcs ) );
 
-	auto fragmentsBuffer = fragmentsBufferHandle.acquire();
+	auto fragmentsBuffer = std::static_pointer_cast<Gl::DataBuffer>( fragmentsBufferHandle.acquire() );
 	Texture::CreationStruct fragcs = {
 		TCF_BUFFER, GL_RGBA32UI, 1, 1, 1, 1, 1, fragmentsBuffer->getName()
 	};
 	fragmentsTexHandle.reset( TextureHandle::create( "_vtpipe_binfrags_tex", &fragcs ) );
 
-	Cl::Buffer::CreationStruct clfbcs = {
+/*	Cl::Buffer::CreationStruct clfbcs = {
 		contextCl,
 		Cl::BCF_FROM_GL | Cl::BCF_KERNEL_READ,
 		0, nullptr, fragmentsBufferHandle.acquire()
 	};
-	fragmentsClBufferHandle.reset( Cl::BufferHandle::create( "_vtpipe_binfrags_cl_buf", &clfbcs ) );
+	fragmentsClBufferHandle.reset( Cl::BufferHandle::create( "_vtpipe_binfrags_cl_buf", &clfbcs ) );*/
 
 	//---------------------------------------
 	// geometry capture buffer, texture and CL buffer 
@@ -120,19 +120,19 @@ void VtPipeline::createCaptureBuffers() {
 	};
 	facesBufferHandle.reset( DataBufferHandle::create( "_vtpipe_faces_db", &facescs ) );
 
-	auto facesBuffer = facesBufferHandle.acquire();
+	auto facesBuffer = std::static_pointer_cast<Gl::DataBuffer>( facesBufferHandle.acquire() );
 	Texture::CreationStruct facestcs = {
 		TCF_BUFFER, GL_RGBA32F, 1, 1, 1, 1, 1, facesBuffer->getName()
 	};
 	facesTexHandle.reset( TextureHandle::create( "_vtpipe_faces_tex", &facestcs ) );
 
-	Cl::Buffer::CreationStruct clfabcs = {
+/*	Cl::Buffer::CreationStruct clfabcs = {
 		contextCl,
 		Cl::BCF_FROM_GL | Cl::BCF_KERNEL_READ,
 		0, nullptr, facesBufferHandle.acquire()
 	};
 	facesClBufferHandle.reset( Cl::BufferHandle::create( "_vtpipe_faces_cl_buf", &clfabcs ) );
-
+*/
 	// programs
 	fragCountProgramHandle.reset( ProgramHandle::create( "adder" ) );
 	fragHeaderProgramHandle.reset( ProgramHandle::create( "alloc32" ) );
@@ -154,8 +154,8 @@ void VtPipeline::startFragCountGeomPass() {
 
 	//----------------------------
 	// reset scratch frame statics via gpu -> gpu copy
-	auto initer = scratchInitHandle.acquire();
-	auto scratch = scratchBufHandle.acquire();
+	auto initer = std::static_pointer_cast<Gl::DataBuffer>( scratchInitHandle.acquire() );
+	auto scratch = std::static_pointer_cast<Gl::DataBuffer>( scratchBufHandle.acquire() );
 	glBindBuffer( GL_COPY_READ_BUFFER, initer->getName() );
 	glBindBuffer( GL_COPY_WRITE_BUFFER, scratch->getName() );
 	glCopyBufferSubData( GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, initer->getSize() );
@@ -168,7 +168,7 @@ void VtPipeline::startFragCountGeomPass() {
 	ProgramPtr program = fragCountProgramHandle.acquire();
 
 	const uint32_t targetDims[4] = { targetWidth, targetHeight, 0, 0 };
-	context->getConstantCache().setUIVector( CVN_TARGET_DIMS, targetDims );
+	context->getConstantCache().setUIVector( Scene::CVN_TARGET_DIMS, targetDims );
 /*
 	auto scratchTex = scratchTexHandle.acquire();
 	glBindImageTexture( 0, scratchTex->getName(), 0, 
@@ -182,8 +182,8 @@ void VtPipeline::startFragCountGeomPass() {
 */
 	context->useAsRenderTarget( fcRt );
 	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
+	context->getConstantCache().updateGPU( ); //program );
+	context->bindConstants();
 
 	float colClr[4] = { 0.1, 0, 0, 0 };
 	glClearBufferfv( GL_COLOR, 0, colClr );
@@ -218,7 +218,7 @@ void VtPipeline::endFragCountGeomPass() {
 	context->bindWholeProgram( program );
 
 	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
+	context->bindConstants();
 
 	// draw quad write only
 	glDisable( GL_BLEND );
@@ -230,7 +230,7 @@ void VtPipeline::endFragCountGeomPass() {
 }
 
 void VtPipeline::startCaptureFragmentsGeomPass() {
-	DataBufferPtr dummyVBO = dummyVBOHandle.acquire();
+	auto dummyVBO = std::static_pointer_cast<Gl::DataBuffer>( dummyVBOHandle.acquire() );
 	VaoPtr dummyVao = dummyVaoHandle.acquire();
 
 	// clear per pixel temp to keep count of current fragment count
@@ -260,8 +260,8 @@ void VtPipeline::startCaptureFragmentsGeomPass() {
 
 	ProgramPtr program = captureFragmentsProgramHandle.acquire();
 	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
+	context->getConstantCache().updateGPU( ); //program );
+	context->bindConstants();
 
 	// bind a fake render target we never actually read or write it
 	// as we use image load / stores

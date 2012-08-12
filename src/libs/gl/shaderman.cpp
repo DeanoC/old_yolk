@@ -6,7 +6,8 @@
 #include "ogl.h"
 #include "program.h"
 #include "core/resources.h"
-#include "gpu_constants.h"
+#include "scene/gpu_constants.h"
+#include "scene/constantcache.h"
 #include "gfx.h"
 #include "cl/platform.h"
 #include "cl/programman.h"
@@ -14,7 +15,7 @@
 #include "shaderman.h"
 
 // outside namespace
-DECLARE_SHARED_WITH_CL( clforgl );
+DECLARE_SHARED_WITH_CL( shared_structs );
 DECLARE_SHARED_WITH_CL( constant_blocks );
 DECLARE_FRAGMENT( vs_passthrough );
 DECLARE_FRAGMENT( vs_basic );
@@ -62,6 +63,14 @@ const char* pragDebug ="#pragma debug(on)\n";
 const GLenum shaderType[ Gl::MAX_PROGRAM_TYPE ] = { 
 	GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_GEOMETRY_SHADER, GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER };
 
+#define YOLK_GL_VALIDATE_PRG_OFFSETS( p, b, v ) {								\
+	GLuint ind = 0;																\
+	GLint offset = -1;															\
+	const char* name = #v;														\
+	glGetUniformIndices( prg->name, 1, &name, &ind );							\
+	glGetActiveUniformsiv( prg->name, 1, &ind, GL_UNIFORM_OFFSET, &offset );	\
+	CORE_ASSERT( offsetof( Scene::GPUConstants:: b, v ) == offset );						\
+	}
 }
 
 namespace Gl {
@@ -69,7 +78,7 @@ ShaderMan::ShaderMan() {
 }
 
 void ShaderMan::initDefaultPrograms() {
-	REGISTER_SHARED_WITH_CL( clforgl );
+	REGISTER_SHARED_WITH_CL( shared_structs );
 	REGISTER_SHARED_WITH_CL( constant_blocks );
 	REGISTER_FRAGMENT( vs_passthrough );
 	REGISTER_FRAGMENT( vs_basic );
@@ -167,7 +176,7 @@ Program* ShaderMan::internalCreate( const Core::ResourceHandleBase* baseHandle, 
 		glsrc[i] = glstrsrc[i].c_str();
 	}
 
-	prg->type = (MEM_NAME_TYPE) programStage;
+	prg->memtype = (MEM_NAME_TYPE) programStage;
 	prg->name = glCreateShaderProgramv( programStage, count, glsrc );
 	prg->wholeProgram = false;
 
@@ -367,6 +376,7 @@ void ShaderMan::preprocess( std::string& srcString, int& count, std::string* gls
 }
 
 void ShaderMan::buildUniformTables( Program* prg ) {
+	using namespace Scene;
 	// now work out constant blocks and check for standard layout and matrices
 	GLint numUniformBlocks = 0;
 	glGetProgramiv( prg->name, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
@@ -378,38 +388,38 @@ void ShaderMan::buildUniformTables( Program* prg ) {
 	}
 
 	if( prg->usedBuffers & BIT( CF_STATIC ) ) {
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, Static, dummy ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, Static, dummy ); 
 	}
 	if( prg->usedBuffers & BIT( CF_PER_FRAME ) ) {
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerFrame, frameCount ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerFrame, frameCount ); 
 	}
 	if( prg->usedBuffers & BIT( CF_PER_PIPELINE ) ) {
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerPipeline, matrixProjection ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerPipeline, matrixProjectionInverse ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerPipeline, matrixProjectionIT ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerPipeline, matrixProjection ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerPipeline, matrixProjectionInverse ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerPipeline, matrixProjectionIT ); 
 	}
 	if( prg->usedBuffers & BIT( CF_PER_VIEWS ) ) {
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixView ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewInverse ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewIT ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewProjection ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewProjectionInverse ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewProjectionIT ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixView ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewInverse ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewIT ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewProjection ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewProjectionInverse ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerViews, matrixViewProjectionIT ); 
 	}
 	if( prg->usedBuffers & BIT( CF_PER_TARGETS ) ) {
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, PerTargets, targetDims ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, PerTargets, targetDims ); 
 	}
 	if( prg->usedBuffers & BIT( CF_STD_OBJECT ) ) {
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorld ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldInverse ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldIT ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldView ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewInverse ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewIT ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewProjection ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewProjectionInverse ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewProjectionIT ); 
-		WIERD_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixPreviousWorldViewProjection ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorld ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldInverse ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldIT ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldView ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewInverse ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewIT ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewProjection ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewProjectionInverse ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixWorldViewProjectionIT ); 
+		YOLK_GL_VALIDATE_PRG_OFFSETS( prg->name, StdObject, matrixPreviousWorldViewProjection ); 
 	}
 }
 

@@ -7,7 +7,7 @@
 #include "memory.h"
 #include "texture.h"
 #include "program.h"
-#include "constantcache.h"
+#include "scene/constantcache.h"
 #include "scene/rendercontext.h"
 
 namespace Gl {
@@ -22,12 +22,16 @@ public:
 	RenderContext(void);
 	~RenderContext(void);
 
-	virtual void pushDebugMarker( const char* text ) const;
-	virtual void popDebugMarker() const;
-	virtual void setCamera( const Scene::CameraPtr& _cam );
-	virtual void threadActivate(); 	// must be called once before this context on a particular thread
-	virtual void prepToRender(); // used to indicate this render context is used for rendering versus loading/non visual render stuff
+	//---------------------------------------------------------------
 
+	virtual void pushDebugMarker( const char* text ) const override;
+	virtual void popDebugMarker() const override;
+	virtual void setCamera( const Scene::CameraPtr& _cam ) override;
+	virtual void threadActivate() override; 	// must be called once before this context on a particular thread
+	virtual void prepToRender() override; // used to indicate this render context is used for rendering versus loading/non visual render stuff
+	virtual void bindConstants() override;
+
+	//---------------------------------------------------------------
 	void swapBuffers();
 
 	// reset to default
@@ -55,8 +59,8 @@ public:
 	void unbindWholeProgam();
 
 
-	ConstantCache& getConstantCache() { return *constantCache; }
-	const ConstantCache& getConstantCache() const { return *constantCache; }
+	Scene::ConstantCache& getConstantCache() { return *constantCache; }
+	const Scene::ConstantCache& getConstantCache() const { return *constantCache; }
 
 	ProgramPipelineObject* getCurrentPpo() const { return curPpo; }
 
@@ -83,7 +87,7 @@ private:
 	// context must be created on main thread
 	void setGlContext( void* dis, unsigned long win, void* ctx );
 #endif
-	boost::scoped_ptr<ConstantCache>				constantCache;
+	boost::scoped_ptr<Scene::ConstantCache>		constantCache;
 	// note in most cases frustum and camera match, but in some debug cases they
 	// might not (to allow you see how frustum culling is working or not)
 	const Core::Frustum*						viewFrustum;

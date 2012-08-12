@@ -1,4 +1,4 @@
-#include "clforgl.glsl"
+#include "shared_structs.hlsl"
 #include "constant_blocks.glsl"
 layout( location = VE_POSITION ) in vec4 inPosition;
 layout( location = VE_NORMAL ) in vec3 inNormal;

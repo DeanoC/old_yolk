@@ -5,10 +5,65 @@
 #include "core/resourceman.h"
 #include "core/platform_windows/win_shell.h"
 
+//#define GDEBBUGGER_FRIENDLY_STARTUP
+
 #pragma comment( lib, "opengl32" )
 namespace Gl {
 
-#if !defined(GDEBBUGGER_FRIENDLY_STARTUP)
+extern void debugOutputAMD(GLuint id, GLenum category, GLenum severity, GLsizei, const GLchar* message, GLvoid*);
+extern void debugOutput ( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam );
+
+#if defined(GDEBBUGGER_FRIENDLY_STARTUP)
+
+HGLRC initialGLRC;
+bool Gfx::createGLContext() {
+	HDC hDC=GetDC(g_hWnd);
+
+	PIXELFORMATDESCRIPTOR pfd;
+	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
+    pfd.nSize           = sizeof(PIXELFORMATDESCRIPTOR); 
+    pfd.nVersion        = 1; 
+    pfd.dwFlags         = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER ;
+    pfd.iPixelType      = PFD_TYPE_RGBA; 
+    pfd.cColorBits      = 24; 
+    pfd.cRedBits        = 8; 
+    pfd.cGreenBits      = 8; 
+    pfd.cBlueBits       = 8; 
+    pfd.cAlphaBits      = 8;
+    pfd.cDepthBits      = 24; 
+    pfd.cStencilBits    = 8; 
+    pfd.iLayerType      = PFD_MAIN_PLANE; 
+
+	int nPixelFormat = ChoosePixelFormat(hDC, &pfd);
+	if (nPixelFormat == 0) return false;
+ 
+	BOOL bResult = SetPixelFormat (hDC, nPixelFormat, &pfd); 
+	if (!bResult) return false; 
+	HGLRC tempContext = wglCreateContext(hDC);
+	wglMakeCurrent(hDC, tempContext);
+
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+		return  false;
+
+	// *required* versions and extension check here
+	unsigned int passedExtCheck = 0x1;
+	passedExtCheck &= ( GLEW_VERSION_4_2 );
+//	passedExtCheck &= ( GLEW_EXT_direct_state_access );
+
+	if( passedExtCheck == false )
+		return false;	
+ 
+//	wglMakeCurrent(NULL,NULL);
+
+	// done with dummy now!
+//	wglDeleteContext(tempContext);
+
+	initialGLRC = tempContext;
+	return true;
+}
+
+#else
 
 bool Gfx::createGLContext() {
 
@@ -93,7 +148,7 @@ bool Gfx::createGLContext() {
 	if( SetPixelFormat( hDC, pixelFormat, NULL ) == false ) 
 		return false;
 
-	wglMakeCurrent(NULL,NULL);
+	wglMakeCurrent( hDC, NULL );
 
 	// done with dummy now!
 	wglDeleteContext(tempContext);
@@ -101,62 +156,12 @@ bool Gfx::createGLContext() {
  
 	return true;
 }
-#else
-
-HGLRC initialGLRC;
-bool Gfx::createGLContext() {
-	HDC hDC=GetDC(g_hWnd);
-
-	PIXELFORMATDESCRIPTOR pfd;
-	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-    pfd.nSize           = sizeof(PIXELFORMATDESCRIPTOR); 
-    pfd.nVersion        = 1; 
-    pfd.dwFlags         = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER ;
-    pfd.iPixelType      = PFD_TYPE_RGBA; 
-    pfd.cColorBits      = 24; 
-    pfd.cRedBits        = 8; 
-    pfd.cGreenBits      = 8; 
-    pfd.cBlueBits       = 8; 
-    pfd.cAlphaBits      = 8;
-    pfd.cDepthBits      = 24; 
-    pfd.cStencilBits    = 8; 
-    pfd.iLayerType      = PFD_MAIN_PLANE; 
-
-	int nPixelFormat = ChoosePixelFormat(hDC, &pfd);
-	if (nPixelFormat == 0) return false;
- 
-	BOOL bResult = SetPixelFormat (hDC, nPixelFormat, &pfd); 
-	if (!bResult) return false; 
-	HGLRC tempContext = wglCreateContext(hDC);
-	wglMakeCurrent(hDC, tempContext);
-
-	GLenum err = glewInit();
-	if (GLEW_OK != err)
-		return  false;
-
-	// *required* versions and extension check here
-	unsigned int passedExtCheck = 0x1;
-	passedExtCheck &= ( GLEW_VERSION_4_2 );
-//	passedExtCheck &= ( GLEW_EXT_direct_state_access );
-
-	if( passedExtCheck == false )
-		return false;	
- 
-//	wglMakeCurrent(NULL,NULL);
-
-	// done with dummy now!
-//	wglDeleteContext(tempContext);
-
-	initialGLRC = tempContext;
-	return true;
-}
 #endif
-
 void Gfx::createRenderContexts() {
 	HDC hDC=GetDC(g_hWnd);
 	int attribs[] = {
 		WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-		WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 2,
 		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
 		IF_DEBUG(
@@ -166,26 +171,48 @@ void Gfx::createRenderContexts() {
 	};
 
 	const int numThreads = 2; // RENDER_CONTEXT + LOAD_CONTEXT
+	const std::string testStr( "Gl debugging callback installed" );
  
 	renderContexts.reset( CORE_NEW_ARRAY RenderContext[ numThreads ] );
 	for( int i = 0; i < numThreads; ++i ) {
 		HGLRC hRC = 
-#if !defined(GDEBBUGGER_FRIENDLY_STARTUP)
-			wglCreateContextAttribsARB(hDC,0, attribs);
+#if defined(GDEBBUGGER_FRIENDLY_STARTUP)
+			( i == 0 ) ? initialGLRC : wglCreateContext(hDC);
 #else
-			( i != 0 ) ? wglCreateContext(hDC) : initialGLRC;
+			wglCreateContextAttribsARB(hDC,0, attribs);
 #endif
 		renderContexts[i].setGlContext( hDC, hRC );
 		if( i != 0 ) {
 			wglShareLists( renderContexts[0].hRC, renderContexts[i].hRC );
 		}
-		if( i == 0 ) {
+		wglMakeCurrent( hDC,hRC );
+		GL_CHECK
 #if !defined(GDEBBUGGER_FRIENDLY_STARTUP)
-			wglMakeCurrent(hDC, renderContexts[i].hRC);
-#endif
+		if( i == 0 ) {
+			if( glDebugMessageCallbackAMD ) {
+				glDebugMessageCallbackAMD(&debugOutputAMD, NULL);
+				GL_CHECK
+				glDebugMessageEnableAMD(0, 0, 0, NULL, GL_TRUE);
+				GL_CHECK
+				glDebugMessageInsertAMD(GL_DEBUG_CATEGORY_APPLICATION_AMD, 
+					GL_DEBUG_SEVERITY_LOW_AMD, 1, testStr.length(), testStr.c_str() );
+				GL_CHECK
+			} else if(glDebugMessageControlARB) {
+				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+				GL_CHECK
+				glDebugMessageCallbackARB(&debugOutput, NULL);
+				GL_CHECK
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+				GL_CHECK
+				glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 
+					1, GL_DEBUG_SEVERITY_LOW_ARB, testStr.length(), testStr.c_str() );
+				GL_CHECK
+			}
 		}
-
+#endif
 	}
+
+	renderContexts[0].threadActivate();
 }
 
 } // end namespace

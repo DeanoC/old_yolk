@@ -16,17 +16,6 @@
 namespace Gl {
 	static const uint32_t ProgramRType = RESOURCE_NAME('G','P','R','G');
 
-	enum CONSTANT_FREQ_BLOCKS {
-		CF_STATIC = 0,
-		CF_PER_FRAME,
-		CF_PER_PIPELINE,
-		CF_PER_VIEWS,
-		CF_PER_TARGETS,
-		CF_STD_OBJECT,
-
-		CF_USER_BLOCKS,
-		CF_MAX_BLOCKS = 16,
-	};
 
 	enum PROGRAM_TYPE {
 		PT_VERTEX = GL_VERTEX_SHADER,

@@ -12,15 +12,46 @@
 #define BUFFER_METHOD			BUFFER_DSA
 #define BUFFER_RANGE_ALWAYS
 
+
+namespace {
+	// map DATA_BUFFER_TYPE to GL
+	static const uint32_t DBT_Map[] = {
+		GL_ARRAY_BUFFER, 										// DBT_VERTEX 
+		GL_ELEMENT_ARRAY_BUFFER, 								// DBT_INDEX
+		GL_UNIFORM_BUFFER,										// DBT_CONSTANTS
+		GL_ATOMIC_COUNTER_BUFFER,								// DBT_ATOMIC_COUNTERS
+		GL_TEXTURE_BUFFER, 										// DBT_TEXTURE
+		GL_TRANSFORM_FEEDBACK_BUFFER,							// DBT_GENERAL
+	};
+	
+	// map DATA_BUFFER_MAP_ACCESS to GL
+	static const uint32_t DBMA_Map[] = {
+		GL_MAP_READ_BIT,										// DBMA_READ_ONLY
+		GL_MAP_WRITE_BIT,										// DBMA_WRITE_ONLY
+		GL_MAP_WRITE_BIT | GL_MAP_READ_BIT,						// DBMA_READ_WRITE
+	};
+
+	// map DATA_BUFFER_MAP_FLAGS to GL
+	static const uint32_t DBMF_Map[] = {
+		0,														// DBMF_NONE
+		GL_MAP_INVALIDATE_BUFFER_BIT,							// DBMF_DISCARD
+		GL_MAP_UNSYNCHRONIZED_BIT,								// DBMF_UNSYNC
+	};
+
+}
+
 namespace Gl {
 
-void* DataBuffer::map( MAP_ACCESS access, MAP_FLAGS flags, size_t offset, size_t bytes ) {
+void* DataBuffer::map( Scene::DATA_BUFFER_MAP_ACCESS _access, Scene::DATA_BUFFER_MAP_FLAGS _flags, size_t offset, size_t bytes ) {
 	GL_CHECK
+
+	const auto access = DBMA_Map[ _access ];
+	const auto flags = DBMF_Map[ _flags ];
 
 	if( bytes == 0 ) {
 #if !defined( BUFFER_RANGE_ALWAYS )
 		GLbitfield mbaccess;
-		if ( (access & (MA_READ_ONLY|GL_MAP_WRITE_BIT)) == (MA_READ_ONLY|GL_MAP_WRITE_BIT) ) {
+		if ( (access & (GL_MAP_WRITE_BIT|GL_MAP_READ_BIT)) == (GL_MAP_WRITE_BIT|GL_MAP_READ_BIT) ) {
 			mbaccess = GL_READ_WRITE;
 		} else if( access & MA_READ_ONLY ) {
 			mbaccess = GL_READ_ONLY;
@@ -31,11 +62,11 @@ void* DataBuffer::map( MAP_ACCESS access, MAP_FLAGS flags, size_t offset, size_t
 		}
 
 #if BUFFER_METHOD == BUFFER_OLD
-		glBindBufferBase( type, 14, name );
+		glBindBufferBase( DBT_Map[ type ], 14, name );
 		GL_CHECK
-		auto ret = glMapBuffer( type, mbaccess );		
+		auto ret = glMapBuffer( DBT_Map[ type ], mbaccess );		
 		GL_CHECK
-		glBindBufferBase( type, 14, 0 );
+		glBindBufferBase( DBT_Map[ type ], 14, 0 );
 		GL_CHECK
 #else
 		auto ret = glMapNamedBufferEXT( name, mbaccess );
@@ -50,7 +81,7 @@ void* DataBuffer::map( MAP_ACCESS access, MAP_FLAGS flags, size_t offset, size_t
 	GLbitfield gflags = (GLbitfield) access;
 	GLbitfield mflags = (GLbitfield) flags;
 	
-	if( flags & MF_DISCARD ) {
+	if( flags & Scene::DBMF_DISCARD ) {
 		if( bytes != size ) {
 			// swap whole buffer bit for ranged bit
 			mflags = (flags & ~GL_MAP_INVALIDATE_BUFFER_BIT) | GL_MAP_INVALIDATE_RANGE_BIT;
@@ -60,11 +91,11 @@ void* DataBuffer::map( MAP_ACCESS access, MAP_FLAGS flags, size_t offset, size_t
 	bytes = (size_t)Core::alignTo( bytes, DataBuffer::MIN_BUFFER_SIZE );
 
 #if BUFFER_METHOD == BUFFER_OLD
-	glBindBufferBase( type, 14, name );
+	glBindBufferBase( DBT_Map[ type ], 14, name );
 	GL_CHECK
-	auto ret = glMapBufferRange( type, offset, size, gflags | mflags );		
+	auto ret = glMapBufferRange( DBT_Map[ type ], offset, size, gflags | mflags );		
 	GL_CHECK
-	glBindBufferBase( type, 14, 0 );
+	glBindBufferBase( DBT_Map[ type ], 14, 0 );
 	GL_CHECK
 #else
 	auto ret = glMapNamedBufferRangeEXT( name, offset, size, gflags | mflags );
@@ -75,11 +106,11 @@ void* DataBuffer::map( MAP_ACCESS access, MAP_FLAGS flags, size_t offset, size_t
 
 void DataBuffer::unmap() {
 #if BUFFER_METHOD == BUFFER_OLD
-	glBindBufferBase( type, 14, name );
+	glBindBufferBase( DBT_Map[ type ], 14, name );
 	GL_CHECK
-	glUnmapBuffer( type );
+	glUnmapBuffer( DBT_Map[ type ] );
 	GL_CHECK
-	glBindBufferBase( type, 14, 0 );
+	glBindBufferBase( DBT_Map[ type ], 14, 0 );
 	GL_CHECK
 #else
 	glUnmapNamedBufferEXT( name );
@@ -91,6 +122,8 @@ void DataBuffer::unmap() {
 DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHandle, 
 											const char* name, 
 											const DataBuffer::CreationStruct* creation ) {
+	using namespace Scene;
+
 	DataBuffer* dbuffer = CORE_NEW DataBuffer();
 	dbuffer->generateName( MNT_DATA_BUFFER );
 //	dbuffer->size = creation->size;
@@ -101,11 +134,11 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 	// immutable are pre-filled and never changed by cpu or gpu
 	if( creation->flags & DBCF_IMMUTABLE ) {
 #if BUFFER_METHOD == BUFFER_OLD
-		glBindBuffer( dbuffer->type, dbuffer->getName() );
+		glBindBuffer( DBT_Map[ dbuffer->type ], dbuffer->getName() );
 		GL_CHECK
-		glBufferData( dbuffer->type, dbuffer->size, creation->data,  GL_STATIC_DRAW );
+		glBufferData( DBT_Map[ dbuffer->type ], dbuffer->size, creation->data,  GL_STATIC_DRAW );
 		GL_CHECK
-		glBindBuffer( dbuffer->type, 0 );
+		glBindBuffer( DBT_Map[ dbuffer->type ], 0 );
 		GL_CHECK
 #else
 		glNamedBufferDataEXT( dbuffer->getName(), dbuffer->size, creation->data,  GL_STATIC_DRAW );
@@ -143,11 +176,11 @@ DataBuffer* DataBuffer::internalCreate(	const Core::ResourceHandleBase* baseHand
 	}
 
 #if BUFFER_METHOD == BUFFER_OLD
-	glBindBuffer( dbuffer->type, dbuffer->getName() );
+	glBindBuffer( DBT_Map[ dbuffer->type ], dbuffer->getName() );
 	GL_CHECK
-	glBufferData( dbuffer->type, dbuffer->size, NULL, usage );
+	glBufferData( DBT_Map[ dbuffer->type ], dbuffer->size, NULL, usage );
 	GL_CHECK
-	glBindBuffer( dbuffer->type, 0 );
+	glBindBuffer( DBT_Map[ dbuffer->type ], 0 );
 	GL_CHECK
 #else
 	glNamedBufferDataEXT( dbuffer->getName(), dbuffer->size, NULL, usage );

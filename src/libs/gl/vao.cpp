@@ -103,6 +103,7 @@ Vao::Vao() {
 
 Vao* Vao::internalCreate(const Core::ResourceHandleBase* baseHandle, 
 							const char* pName, const Vao::CreationStruct* cr ) {
+	using namespace Scene;
 	CORE_ASSERT( cr->elementCount >= 0 );
 
 	DataBufferPtr dbs[ MAX_ELEMENT_COUNT ];
@@ -135,7 +136,7 @@ Vao* Vao::internalCreate(const Core::ResourceHandleBase* baseHandle,
 	Vao* vao = CORE_NEW Vao();
 	for( int i = 0; i < cr->elementCount; ++i ) {
 
-		DataBufferPtr db = dbs[i];
+		auto db = std::static_pointer_cast<Gl::DataBuffer>( dbs[i] );
 		
 		CORE_ASSERT( db->getName() );
 		glVertexArrayVertexAttribOffsetEXT( vao->getName(),

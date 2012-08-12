@@ -4,8 +4,8 @@
 
  @brief	This allows sharing with glsl or CL uniform blocks
  */
-#if !defined( WIERD_GL_GPU_CONSTANTS_H__ )
-#define WIERD_GL_GPU_CONSTANTS_H__
+#if !defined( YOLK_GL_GPU_CONSTANTS_H_ )
+#define YOLK_GL_GPU_CONSTANTS_H_
 
 namespace Gl {
 	namespace GPUConstants {
@@ -40,14 +40,7 @@ namespace Gl {
 	
 }
 
-#define WIERD_GL_VALIDATE_PRG_OFFSETS( p, b, v ) {									\
-	GLuint ind = 0;																\
-	GLint offset = -1;															\
-	const char* name = #v;														\
-	glGetUniformIndices( prg->name, 1, &name, &ind );							\
-	glGetActiveUniformsiv( prg->name, 1, &ind, GL_UNIFORM_OFFSET, &offset );	\
-	CORE_ASSERT( offsetof( Gl::GPUConstants:: b, v ) == offset );						\
-	}
-#define WIERD_GL_GET_OFFSET_IN_BLOCK( b, v ) offsetof( Gl::GPUConstants:: b, v )
-#define WIERD_GL_GET_SIZEOF_PRG_VAR( b, v ) sizeof( ((Gl::GPUConstants:: b *)0)->v )
+
+#define YOLK_GL_GET_OFFSET_IN_BLOCK( b, v ) offsetof( Gl::GPUConstants:: b, v )
+#define YOLK_GL_GET_SIZEOF_PRG_VAR( b, v ) sizeof( ((Gl::GPUConstants:: b *)0)->v )
 #endif

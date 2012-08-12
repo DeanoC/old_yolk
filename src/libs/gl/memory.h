@@ -42,24 +42,24 @@ namespace Gl {
 		}
 
 		const Name getName() const { return name; }
-		const MEM_NAME_TYPE getType() const { return type; }
+		const MEM_NAME_TYPE getType() const { return memtype; }
 
 	protected:
 		Name	name;
-		MEM_NAME_TYPE type;
+		MEM_NAME_TYPE memtype;
 		// everything in opengl has a name
 		static void generateNames( MEM_NAME_TYPE type, unsigned int num, Name* outNames );
 		static void deleteNames( MEM_NAME_TYPE type, unsigned int num, Name* inNames );
 
 		// internal helpers to name this memory object
 		Name generateName( MEM_NAME_TYPE _type ) {
-			type = _type;
-			generateNames( type, 1, &name );
+			memtype = _type;
+			generateNames( memtype, 1, &name );
 			return name;
 		}
 
 		void deleteName() {
-			deleteNames( type, 1, &name );
+			deleteNames( memtype, 1, &name );
 			name = 0;
 		}
 	};

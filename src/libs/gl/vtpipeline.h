@@ -15,9 +15,9 @@
 #include "core/resources.h"
 #include "scene/pipeline.h"
 #include "vao.h"
-#include "cl/image.h"
-#include "cl/kernel.h"
-#include "cl/cmdqueue.h"
+//#include "cl/image.h"
+//#include "cl/kernel.h"
+//#include "cl/cmdqueue.h"
 
 namespace Cl {
 	class Context;
@@ -75,15 +75,16 @@ namespace Gl {
 		void endFragCountGeomPass();
 		void startCaptureFragmentsGeomPass();
 
+#define CSRHS(x) Core::ScopedResourceHandle< Scene:: x >
 #define CSRH(x) Core::ScopedResourceHandle< x >
 
-		CSRH( DataBufferHandle )	fragmentsBufferHandle;
-		CSRH( DataBufferHandle )	scratchInitHandle;
-		CSRH( DataBufferHandle )	scratchBufHandle;
-		CSRH( DataBufferHandle )	facesBufferHandle;
+		CSRHS( DataBufferHandle )	fragmentsBufferHandle;
+		CSRHS( DataBufferHandle )	scratchInitHandle;
+		CSRHS( DataBufferHandle )	scratchBufHandle;
+		CSRHS( DataBufferHandle )	facesBufferHandle;
 
-		CSRH( Cl::BufferHandle )	fragmentsClBufferHandle;
-		CSRH( Cl::BufferHandle )	facesClBufferHandle;
+//		CSRH( Cl::BufferHandle )	fragmentsClBufferHandle;
+//		CSRH( Cl::BufferHandle )	facesClBufferHandle;
 
 		CSRH( TextureHandle )		depthRtHandle;
 		CSRH( TextureHandle )		colourRtHandle;
@@ -101,9 +102,10 @@ namespace Gl {
 		CSRH( ProgramHandle )		resolve8msaaProgramHandle;
 		CSRH( ProgramHandle )		debugCaptureFragmentsProgramHandle;
 
-		CSRH( DataBufferHandle ) 	dummyVBOHandle;
+		CSRHS( DataBufferHandle ) 	dummyVBOHandle;
 		CSRH( VaoHandle ) 			dummyVaoHandle;
 
+#undef CSRSH
 #undef CSRH
 
 		unsigned int 				targetWidth;

@@ -39,8 +39,8 @@ void DebugPipeline::bind( Scene::RenderContext* rc ) {
 
 	ProgramPtr program = programHandle.acquire();
 	context->bindWholeProgram( program );
-	context->getConstantCache().updateGPU( program );
-	context->getConstantCache().bind();
+	context->getConstantCache().updateGPU( ); //program );
+	context->bindConstants();
 
 	glEnable( GL_DEPTH_TEST );
 	glDepthMask(GL_TRUE);
@@ -50,7 +50,6 @@ void DebugPipeline::bind( Scene::RenderContext* rc ) {
 
 void DebugPipeline::unbind() {
 	context->popDebugMarker();
-	context->getConstantCache().unbind();
 	context = nullptr;
 }
 
@@ -132,11 +131,8 @@ void DebugPipelineDataStore::render( Scene::RenderContext* rc ) {
 //			LOG(INFO) << "vao not ready\n";
 			return;
 		}
-		DataBufferPtr ib = mds->vacs.indexBuffer->tryAcquire();
-		if( !ib ) {
-//			LOG(INFO) << "ib not ready\n";
-			return;
-		}
+		auto ib = std::static_pointer_cast<Gl::DataBuffer>( mds->vacs.indexBuffer->tryAcquire() );
+		if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 
 		glBindVertexArray( vao->getName() );
 		GL_CHECK

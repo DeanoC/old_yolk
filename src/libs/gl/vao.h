@@ -64,14 +64,14 @@ namespace Gl {
 		static const uint32_t AUTO_STRIDE = 0xFFFFFF;
 
 		struct CreationStruct {
-			int						elementCount;			//<! how many vertex elements
-			DataBufferHandlePtr		indexBuffer;			//!< indexBuffer, null if not
-			VaoElement				elements[MAX_ELEMENT_COUNT];
+			int								elementCount;			//<! how many vertex elements
+			Scene::DataBufferHandlePtr		indexBuffer;			//!< indexBuffer, null if not
+			VaoElement						elements[MAX_ELEMENT_COUNT];
 			struct {
-				DataBufferHandlePtr		buffer;
-				size_t					offset;				//!< AUTO_OFFSET == packed
-				uint32_t				stride : 24;		//!< AUTO_STRIDE == packed
-				uint32_t				stream : 8;			//!< stream number
+				Scene::DataBufferHandlePtr		buffer;
+				size_t							offset;				//!< AUTO_OFFSET == packed
+				uint32_t						stride : 24;		//!< AUTO_STRIDE == packed
+				uint32_t						stream : 8;			//!< stream number
 			} data[MAX_ELEMENT_COUNT];
 		};
 		struct LoadStruct {};
