@@ -45,7 +45,6 @@ namespace Gl {
 	protected:
 		DebugPipeline( size_t index );
 		virtual ~DebugPipeline();
-		const size_t				pipelineIndex;
 
 		Gl::RenderContext*			context;
 

@@ -190,6 +190,7 @@ Platform::Platform() {
 	programMan.reset( CORE_NEW ProgramMan() );
 }
 void Platform::createDevices() {
+	using namespace Scene;
 	// no devices to create or already created, then nothing todo
 	if( totalDeviceCount <= 0 ) return;
 	if( devices[0].context != 0 ) return;
@@ -205,12 +206,14 @@ void Platform::createDevices() {
 		CORE_ASSERT( devices[0].glShare == true );
 		cl_context_properties props[] = {
 			CL_CONTEXT_PLATFORM, (cl_context_properties) devices[0].platformId, 
+#if 0 // TODO
 #if PLATFORM == WINDOWS
-			CL_WGL_HDC_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->hDC, 
-			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->hRC,
+			CL_WGL_HDC_KHR, (cl_context_properties) gfx->getThreadContext( Renderer::RENDER_CONTEXT )->hDC, 
+			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadContext( Renderer::RENDER_CONTEXT )->hRC,
 #elif PLATFORM == POSIX 
-			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->glxContext,
-			CL_GLX_DISPLAY_KHR, (cl_context_properties) gfx->getThreadRenderContext( Gl::Gfx::RENDER_CONTEXT )->x11Display,
+			CL_GL_CONTEXT_KHR, (cl_context_properties) gfx->getThreadContext( Renderer::RENDER_CONTEXT )->glxContext,
+			CL_GLX_DISPLAY_KHR, (cl_context_properties) gfx->getThreadContext( Renderer::RENDER_CONTEXT )->x11Display,
+#endif
 #endif
 			0, 0
 		};

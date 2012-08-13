@@ -5,14 +5,12 @@
 //!-----------------------------------------------------
 
 #include "scene.h"
-#include "renderable.h"
 #include "core/frustum.h"
+#include "renderer.h"
+#include "renderable.h"
 #include "rendercontext.h"
-#if RENDER_BACKEND == Gl
-#include "gl/gfx.h"
-#elif RENDER_BACKEND == Dx11
-#include "dx11/gfx.h"
-#endif
+#include "pipeline.h"
+#include "screen.h"
 
 #include "renderworld.h"
 
@@ -21,7 +19,6 @@ namespace Scene {
 RenderWorld::RenderWorld() :
 	activeCamera( nullptr ) {
 	renderCamera = std::make_shared<Scene::Camera>();
-	debugCamera = std::make_shared<Scene::Camera>();
 }
 
 RenderWorld::~RenderWorld() {
@@ -77,11 +74,7 @@ void RenderWorld::removeCamera( uint32_t index ) {
 	*enIt = nullptr;
 }
 
-
-void RenderWorld::renderRenderables( RenderContext* context, const size_t pipelineIndex ) {
-	using namespace RENDER_BACKEND;
-	Gfx* gfx = Gfx::get();
-
+void RenderWorld::determineVisibles() {
 	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
 
 	// *copy* over the active camera, so if the game thread runs faster than the render one
@@ -89,11 +82,8 @@ void RenderWorld::renderRenderables( RenderContext* context, const size_t pipeli
 	if( activeCamera ) {
 		*renderCamera.get() = *activeCamera.get();
 	}
-	context->setCamera( renderCamera );
-	Pipeline* pipeline = gfx->getPipeline( pipelineIndex );
-	pipeline->bind( context );
 
-	// first go through and cull renderables, also copy matrixes under
+	// go through and cull renderables, also copy matrixes under
 	// a lock to ensure other thread updates of renderables transform
 	// isn't reflected to the renderer mid frame
 	visibleRenderables.clear();
@@ -101,22 +91,26 @@ void RenderWorld::renderRenderables( RenderContext* context, const size_t pipeli
 
 	RenderableContainer::const_iterator it = renderables.cbegin();
 	while( it != renderables.cend() ) {
-		const RenderablePtr& toRender = (*it);
-		const uint32_t index = (uint32_t) 
-				std::distance( renderables.cbegin(), it );
+		const size_t index = std::distance( renderables.cbegin(), it );
 
-		toRender->getTransformNode()->setRenderMatrix();
-		toRender->getWorldAABB( waabb );
+		(*it)->getTransformNode()->setRenderMatrix();
+		(*it)->getWorldAABB( waabb );
 //			if( activeCamera &&
 //				activeCamera->getFrustum().cullAABB( waabb ) != 
 //								Core::Frustum::OUTSIDE ) 
 		{
-			visibleRenderables.push_back( index );
+			visibleRenderables.push_back( (uint32_t) index );
 		}
 
 		++it;
 	}
-	updateLock.unlock();
+}
+
+void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline ) {
+
+	pipeline->bind( context );
+
+	context->setCamera( renderCamera );
 
 	for( auto i = 0; i < pipeline->getGeomPassCount(); ++i ) {
 		pipeline->startGeomPass( i );
@@ -124,8 +118,7 @@ void RenderWorld::renderRenderables( RenderContext* context, const size_t pipeli
 		// output geometry
 		STIndexContainer::const_iterator rmit = visibleRenderables.cbegin();
 		while( rmit != visibleRenderables.cend() ) {
-			const RenderablePtr& toRender = renderables[ (*rmit) ];
-			toRender->render( context, pipelineIndex );
+			renderables[(*rmit)]->render( context, pipeline );
 			++rmit;
 		}
 
@@ -134,39 +127,13 @@ void RenderWorld::renderRenderables( RenderContext* context, const size_t pipeli
 
 	pipeline->unbind();
 }
-void RenderWorld::debugDraw( RenderContext* context ) {
-	return;
-	using namespace RENDER_BACKEND;
-	Gfx* gfx = Gfx::get();
 
-	if( activeCamera ) {
-		*debugCamera.get() = *activeCamera.get();
-	}
-	context->setCamera( debugCamera );
+void RenderWorld::render( const ScreenPtr screen, RenderContext* context ) {
+	Pipeline* pipeline = screen->getRenderer()->getPipeline( 1 );
 
-	Pipeline* pipeline = gfx->getPipeline( 0 );
-	pipeline->bind( context );
+	determineVisibles();
 
-	Core::AABB waabb;
-	RenderableContainer::const_iterator it = renderables.begin();
-	while( it != renderables.end() ) {
-		const RenderablePtr& toRender = (*it);
-		toRender->getWorldAABB( waabb );
-//		if( debugCamera &&
-//			debugCamera->getFrustum().cullAABB( waabb ) != 
-//							Core::Frustum::OUTSIDE ) 
-		{
-			toRender->debugDraw( context );
-		}
-		++it;
-	}
-
-	pipeline->unbind();
-
-}
-
-void RenderWorld::render( RenderContext* context ) {
-	renderRenderables( context, 1 );
+	renderRenderables( context, pipeline );
 }
 
 }

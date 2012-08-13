@@ -6,15 +6,15 @@
 //! of this class
 //!
 //!-----------------------------------------------------
-#if !defined(YOLK_GL_TEXTUREATLAS_H_)
-#define YOLK_GL_TEXTUREATLAS_H_
-
+#if !defined( YOLK_SCENE_TEXTUREATLAS_H_ )
+#define YOLK_SCENE_TEXTUREATLAS_H_
 #pragma once
-#if !defined( YOLK_GL_TEXTURE_H_ )
+
+#if !defined( YOLK_SCENE_TEXTURE_H_ )
 #	include "texture.h"
 #endif
 
-namespace Gl {
+namespace Scene {
 	//! Texture Atlas Type
 	static const uint32_t TextureAtlasType = RESOURCE_NAME('T','X','A','T');
 
@@ -50,7 +50,7 @@ namespace Gl {
 		}
 
 		//! get the handle to the specified packed texture
-		Scene::TextureHandlePtr getPackedTexture( unsigned int index ) const {
+		TextureHandlePtr getPackedTexture( unsigned int index ) const {
 			CORE_ASSERT( index < getNumberofPackedTextures() );
 			return packedTextures[  index ];
 		}
@@ -71,7 +71,7 @@ namespace Gl {
 	private:
 		TextureAtlas(){};
 
-		typedef std::vector<Scene::TextureHandlePtr>	PackedTextureContainer;
+		typedef std::vector<TextureHandlePtr>	PackedTextureContainer;
 		typedef std::vector<SubTexture>			SubTextureContainer;
 
 		PackedTextureContainer	packedTextures;

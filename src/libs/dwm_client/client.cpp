@@ -1,8 +1,6 @@
 #include "core/core.h"
 #include "gl/ogl.h"
-#include "cl/ocl.h"
 #include "gl/gfx.h"
-#include "cl/platform.h"
 #include "core/coreresources.h"
 #include "scene/hie.h"
 #include "scene/camera.h"
@@ -15,10 +13,9 @@
 #include "clientworld.h"
 #include "client.h"
 
-#define START_FULLSCREEN	false
+#define START_FLAGS			(SCRF_DEBUGPRIMS | SCRF_OVERLAY)
 #define START_WIDTH			1024
 #define START_HEIGHT		1024
-#define START_AA			AA_NONE
 
 namespace {
 	int s_screenWidth = START_WIDTH;
@@ -43,7 +40,6 @@ void ResizeCallback( int width, int height ) {
 	curWinHeight = height;
 }
 
-
 DwmClient::DwmClient() {
 	world = std::make_shared<ClientWorld>();
 }
@@ -54,45 +50,40 @@ DwmClient::~DwmClient() {
 void DwmClient::start() {
 	using namespace Core;
 	using namespace Scene;
-	using namespace Gl;
 
-	Gfx::init();
-	if( !Cl::Platform::exists() )
-		Cl::Platform::init();
+	Gl::Gfx::init();
+	renderer = static_cast< Renderer* >( Gl::Gfx::get() );
 
-
-	InitWindow( s_screenWidth, s_screenHeight, START_FULLSCREEN );
-	bool glOk = Gfx::get()->createScreen( s_screenWidth, s_screenHeight, START_FULLSCREEN, Gl::Gfx::START_AA );
-	if( glOk == false ) {
-		LOG(ERROR) << "GL unable to find adequate GPU";
-		return;
-	}
+	InitWindow( s_screenWidth, s_screenHeight, !!(START_FLAGS & SCRF_FULLSCREEN) );
 	SystemMessage::get()->registerQuitCallback( QuitCallback );
 	SystemMessage::get()->registerDebugModeChangeCallback( DebugModeCallback );
 	SystemMessage::get()->registerResizeCallback( ResizeCallback );
 
-	Scene::RenderContext* ctx = (Scene::RenderContext*) Gfx::get()->getThreadRenderContext( Gfx::RENDER_CONTEXT );
-	ctx->threadActivate();
-	ctx->prepToRender();
+	screen = renderer->createScreen( s_screenWidth, s_screenHeight, START_FLAGS );
+	if( !screen ) {
+		LOG(ERROR) << "Unable to find adequate GPU";
+		return;
+	}
 
-	// camera stuff is stuffed needs refactor
-//	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
-//	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
-
-	auto debugCam = std::make_shared<DebugCamContext>( world.get(), ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
-	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
-
-	DevelopmentContext::get()->activateContext( "DebugCam" );
 }
 
 void DwmClient::run() {
 	using namespace Core;
 	using namespace Scene;
-	using namespace Gl;
+
+	RenderContext* ctx = renderer->getThreadContext( Renderer::RENDER_CONTEXT );
+	// render context has been setup to use this thread by the same thread that created teh screen 
+
+	// camera stuff is stuffed needs refactor
+//	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
+//	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
+	auto debugCam = std::make_shared<DebugCamContext>( world.get(), ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
+	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
+
+	DevelopmentContext::get()->activateContext( "DebugCam" );
 
 	// flush 'load' time from first time update
 	Clock::get()->update();
-	Scene::RenderContext* ctx = (Scene::RenderContext*) Gfx::get()->getThreadRenderContext( Gfx::RENDER_CONTEXT );
 
 	// Main loop
 	while( !s_quitFlag ) {
@@ -101,11 +92,11 @@ void DwmClient::run() {
 
 		DevelopmentContext::get()->update( deltaT );
 
-		world->render( ctx );
+		world->render( screen, ctx );
 
 		DevelopmentContext::get()->display();
 
-		Gl::Gfx::get()->present( curWinWidth, curWinHeight );
+//		Gl::Gfx::get()->present( curWinWidth, curWinHeight );
 		Core::HouseKeep();
 	}	
 
@@ -114,8 +105,7 @@ void DwmClient::run() {
 void DwmClient::end() {
 	using namespace Core;
 	using namespace Scene;
-	using namespace Gl;
 
-	Gfx::get()->shutdownScreen();
-	Gfx::shutdown();	
+	renderer->destroyScreen();
+	Gl::Gfx::shutdown();	
 }

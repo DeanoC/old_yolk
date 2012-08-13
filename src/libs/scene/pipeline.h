@@ -18,9 +18,11 @@ namespace Scene {
 
 	class Pipeline {
 	public:
+		Pipeline ( size_t index ) : pipelineIndex( index ){};
 		// misc
 		virtual ~Pipeline(){};
 		virtual const char* getName() const = 0;
+		const size_t getIndex() const { return pipelineIndex; }
 
 		// making this the pipeline currently active/unactive
 		virtual void bind( RenderContext* _context ) = 0;
@@ -40,6 +42,8 @@ namespace Scene {
 		// setup 
 		virtual void conditionWob( const char* name, struct WobResource* wob ) = 0;
 	protected:
+		const size_t				pipelineIndex;
+
 	};
 
 	// pipeline data should derive off this, which will ensure it get 

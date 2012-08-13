@@ -21,6 +21,7 @@
 namespace Scene {
 	// forward decl
 	class RenderContext;
+	class Pipeline;
 
 	//!-----------------------------------------------------
 	//!
@@ -43,13 +44,13 @@ namespace Scene {
 		virtual ~Renderable(){};
 
 		//! called to render this thing
-		virtual void render( RenderContext* context, const int pipelineIndex ) = 0;
+		virtual void render( RenderContext* context, Pipeline* pipeline ) = 0;
 
-		virtual void debugDraw( RenderContext* context ) const {
+/*		virtual void debugDraw( RenderContext* context ) const {
 			Core::AABB waabb;
 			getWorldAABB( waabb );
 			waabb.drawDebug( Core::RGBAColour(1,1,1,1), Math::IdentityMatrix() );
-		}
+		}*/
 
 		//! get the transform node directly for attaching
 		const Core::TransformNode* getTransformNode() const { return transformNode; }
@@ -78,7 +79,6 @@ namespace Scene {
 		// return upto arraySize actual renderables of R_TYPE in outArray,
 		// returns number inf array
 		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const = 0;
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) = 0;
 
 	protected:
 		Core::TransformNode*		transformNode;

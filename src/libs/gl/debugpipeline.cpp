@@ -15,13 +15,13 @@
 #include "vao.h"
 #include "rendercontext.h"
 #include "wobbackend.h"
-#include "imagecomposer.h"
+#include "scene/imagecomposer.h"
 #include "debugpipeline.h"
 
 namespace Gl {
 
 DebugPipeline::DebugPipeline( size_t index ) :
-	pipelineIndex( index )
+	Scene::Pipeline( index )
 {
 	programHandle.reset( Scene::ProgramHandle::create( "basic" ) );
 }

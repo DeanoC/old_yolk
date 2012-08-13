@@ -15,7 +15,7 @@ namespace Cl {
 	public:
 		cl_context							getContext() { return context; }
 
-		int									getNumDevices() const { return devices.size(); }
+		int									getNumDevices() const { return (int) devices.size(); }
 		const cl_device_id*					getDevices() const { return &devices[0]; }
 		CmdQueuePtr							getCmdQueue( int deviceIndex ) { return cmdQueues[deviceIndex]; }
 		const DEVICE_EXTENSIONS_FLAGS*		getDeviceFlags() const { return &deviceFlags[0]; }

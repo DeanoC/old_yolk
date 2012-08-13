@@ -13,8 +13,9 @@
 #include "core/resourceman.h"
 #include "scene/wobfile.h"
 #include "scene/hierfile.h"
+#include "scene/textureatlas.h"
+#include "scene/imagecomposer.h"
 #include "texture.h"
-#include "textureatlas.h"
 #include "program.h"
 #include "databuffer.h"
 #include "vao.h"
@@ -22,7 +23,6 @@
 #include "wobbackend.h"
 #include "gfx.h"
 #include "shaderman.h"
-#include "imagecomposer.h"
 #include "rendercontext.h"
 
 #include "resourceloader.h"
@@ -36,7 +36,7 @@ public:
 	ResourceLoaderImpl();
 	~ResourceLoaderImpl();
 
-	void showLoadingIfNeeded( ImageComposer* composer );
+	void showLoadingIfNeeded( Scene::ImageComposer* composer );
 
 	void installResourceTypes();
 	static void PushOntoLoaderContext( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  );
@@ -44,7 +44,7 @@ public:
 	static std::shared_ptr<boost::asio::io_service::strand>	ioStrand;
 
 	std::shared_ptr<Core::thread>						loaderThread;
-	TextureAtlasHandlePtr 								loadTextureAtlas;
+	Scene::TextureAtlasHandlePtr 						loadTextureAtlas;
 	static std::atomic<int>								workCounter;
 };
 std::shared_ptr<boost::asio::io_service> ResourceLoaderImpl::io;
@@ -61,11 +61,11 @@ std::shared_ptr<Core::ResourceBase> TextureCreateResource( const Core::ResourceH
 			bPreLoad = true;
 		}
 		Scene::TexturePtr pResource( Texture::internalLoad( handle, pName, bPreLoad ) );
-		return std::shared_ptr<ResourceBase>( pResource );
+		return std::static_pointer_cast<ResourceBase>( pResource );
 	} else if( flags & RMRF_INMEMORYCREATE ) {
 		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;
 		Scene::TexturePtr pResource( Texture::internalCreate( pStruct ) );
-		return std::shared_ptr<ResourceBase>( pResource );
+		return std::static_pointer_cast<ResourceBase>( pResource );
 	} else {
 		assert( false && "Unknown Resource Type" );
 		return std::shared_ptr<ResourceBase>();
@@ -81,8 +81,8 @@ std::shared_ptr<Core::ResourceBase> TextureAtlasCreateResource( const Core::Reso
 		if( flags & RMRF_PRELOAD ) {
 			bPreLoad = true;
 		}
-		TextureAtlasPtr pResource( TextureAtlas::internalLoad( handle, pName, bPreLoad ) );
-		return std::shared_ptr<ResourceBase>( pResource );
+		Scene::TextureAtlasPtr pResource( Scene::TextureAtlas::internalLoad( handle, pName, bPreLoad ) );
+		return std::static_pointer_cast<ResourceBase>( pResource );
 	} else if( flags & RMRF_INMEMORYCREATE ) {
 //		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;
 //		TexturePtr pResource( Texture::internalCreateTexture( pStruct ) );
@@ -153,7 +153,7 @@ std::shared_ptr<Core::ResourceBase> WobCreateResource( const Core::ResourceHandl
 		pResource->header = WobLoad( pName );
 		WobFileHeader* header = pResource->header.get();
 
-		pResource->backEnd.reset( CORE_NEW WobBackEnd(gfx->getNumPipelines()) );
+		pResource->backEnd.reset( CORE_NEW WobBackEnd( (int) gfx->getNumPipelines()) );
 
 		for( size_t i = 0; i < gfx->getNumPipelines(); ++i ) {
 			Scene::Pipeline* pipe = gfx->getPipeline( i );
@@ -281,7 +281,7 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 
 	loaderThread = std::make_shared<Core::thread>( 
 		[&] {
-			auto ctx = Gl::Gfx::get()->getThreadRenderContext( Gl::Gfx::LOAD_CONTEXT );
+			auto ctx = Gl::Gfx::get()->getThreadContext( Gl::Gfx::LOAD_CONTEXT );
 			ctx->threadActivate();
 			sig = true;
 			boost::asio::io_service::work w( *io );
@@ -294,7 +294,8 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 	};
 }
 
-void ResourceLoaderImpl::showLoadingIfNeeded( ImageComposer* composer ) {
+void ResourceLoaderImpl::showLoadingIfNeeded( Scene::ImageComposer* composer ) {
+	using namespace Scene;
 	if( ResourceLoaderImpl::workCounter > 0) {
 		composer->putSprite( loadTextureAtlas, 0, 
 						ImageComposer::ALPHA_BLEND, 
@@ -339,7 +340,7 @@ void ResourceLoader::installResourceTypes() {
 	impl.installResourceTypes();
 }
 
-void ResourceLoader::showLoadingIfNeeded( ImageComposer* composer ) {
+void ResourceLoader::showLoadingIfNeeded( Scene::ImageComposer* composer ) {
 	impl.showLoadingIfNeeded( composer );	
 }
 

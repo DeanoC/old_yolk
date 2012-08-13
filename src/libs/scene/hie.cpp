@@ -6,9 +6,9 @@
 //!-----------------------------------------------------
 
 #include "scene.h"
-
-#include "core/debug_render.h"
 #include "mesh.h"
+#include "pipeline.h"
+
 #include "hie.h"
 
 namespace Scene
@@ -85,21 +85,12 @@ Hie::~Hie() {
 	}
 }
 
-void Hie::render( RenderContext* context, const int pipelineName ) {
+void Hie::render( RenderContext* context, Pipeline* pipeline ) {
 	OwnedMeshes::const_iterator it = ownedMeshes.begin();
 	while( it != ownedMeshes.end() ) {
-		(*it)->render( context, pipelineName );
+		(*it)->render( context, pipeline );
 		++it;
 	}
-}
-
-void Hie::debugDraw( RenderContext* context ) const {
-	OwnedMeshes::const_iterator it = ownedMeshes.begin();
-	while( it != ownedMeshes.end() ) {
-		(*it)->debugDraw( context );
-		++it;
-	}
-	getTransformNode()->debugDisplay();
 }
 
 }

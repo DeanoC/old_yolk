@@ -27,6 +27,7 @@
 namespace Scene {
 	// forward decl
 	class RenderContext;
+	class Pipeline;
 
 	class Hie : public Renderable {
 	public:
@@ -38,22 +39,9 @@ namespace Scene {
 		//! dtor
 		virtual ~Hie();
 
-		virtual void debugDraw(	RenderContext* context ) const;
+		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
 
-		virtual void render( RenderContext* context, const int pipelineName );
-
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const {
-			if( _type == R_MESH ) {
-				int numMeshes = Math::Min<int>(ownedMeshes.size(), arraySize );
-				for( int i=0;i < numMeshes;++i ) {
-					outArray[i] = ownedMeshes[i].get();
-				}
-				return numMeshes;
-			} else {
-				return 0;
-			}
-		}
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) {
+		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const override {
 			if( _type == R_MESH ) {
 				int numMeshes = Math::Min<int>(ownedMeshes.size(), arraySize );
 				for( int i=0;i < numMeshes;++i ) {

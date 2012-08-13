@@ -8,6 +8,7 @@
 #include "ogl.h"
 #include "core/resourceman.h"
 #include "scene/wobfile.h"
+#include "scene/imagecomposer.h"
 #include "gfx.h"
 #include "texture.h"
 #include "databuffer.h"
@@ -15,21 +16,20 @@
 #include "fbo.h"
 #include "rendercontext.h"
 #include "wobbackend.h"
-#include "imagecomposer.h"
-#include "cl/platform.h"
+//#include "cl/platform.h"
 
 #include "vtpipeline.h"
 
 namespace Gl {
 
 VtPipeline::VtPipeline( size_t index ) :
-	pipelineIndex( index )
+	Scene::Pipeline( index )
 {
 	using namespace Scene;
 //	contextCl = Cl::Platform::get()->getPrimaryContext().get();
 
-	targetWidth = Gfx::get()->getScreenWidth();
-	targetHeight = Gfx::get()->getScreenHeight();
+	targetWidth = 1024; // TODO Gfx::get()->getScreenWidth();
+	targetHeight = 1024; // TODO Gfx::get()->getScreenHeight();
 	targetSamples = 8;
 
 	Texture::CreationStruct fpcrt = {

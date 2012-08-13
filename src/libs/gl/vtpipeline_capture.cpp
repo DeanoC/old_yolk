@@ -1,6 +1,7 @@
 #include "ogl.h"
 #include "core/resources.h"
 #include "scene/wobfile.h"
+#include "scene/imagecomposer.h"
 #include "gfx.h"
 #include "shaderman.h"
 #include "texture.h"
@@ -9,16 +10,15 @@
 #include "fbo.h"
 #include "rendercontext.h"
 #include "wobbackend.h"
-#include "imagecomposer.h"
 #include "vtpipeline.h"
 
 // compute renderer needs CL
-#include "cl/ocl.h"
-#include "cl/platform.h"
-#include "cl/kernel.h"
-#include "cl/image.h"
-#include "cl/programman.h"
-#include "cl/buffer.h"
+//#include "cl/ocl.h"
+//#include "cl/platform.h"
+//#include "cl/kernel.h"
+//#include "cl/image.h"
+//#include "cl/programman.h"
+//#include "cl/buffer.h"
 
 
 namespace Gl {

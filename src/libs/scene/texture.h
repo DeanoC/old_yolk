@@ -73,11 +73,6 @@ namespace Scene {
 
 		struct LoadStruct {};
 
-		static Texture* internalLoad( const Core::ResourceHandleBase* baseHandle, 
-												const char* pTextureFileName, 
-												bool preload );
-		static Texture* internalCreate( const CreationStruct* pStruct );
-
 		Texture() :	width( 0 ), height( 0 ), depth( 0 ), slices( 0 ), mipLevels ( 0 ), sampleCount( 1 ) {}
 
 		//! dtor

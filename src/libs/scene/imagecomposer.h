@@ -3,27 +3,30 @@
 //! \file imagecomposer.h
 //!
 //!-----------------------------------------------------
-#if !defined(YOLK_GL_IMAGECOMPOSER_H_)
-#define YOLK_GL_IMAGECOMPOSER_H_
+#if !defined( YOLK_SCENE_IMAGECOMPOSER_H_ )
+#define YOLK_SCENE_IMAGECOMPOSER_H_
 #pragma once
 
-#if !defined( YOLK_GL_TEXTUREATLAS_H_ )
+#if !defined( YOLK_SCENE_TEXTUREATLAS_H_ )
 #	include "textureatlas.h"
 #endif
 #if !defined( YOLK_CORE_COLOUR_H_ )
 #	include "core/colour.h"
 #endif
-#if !defined( YOLK_GL_DATABUFFER_H_ )
+#if !defined( YOLK_SCENE_DATABUFFER_H_ )
 #	include "databuffer.h"
 #endif
-#if !defined( YOLK_GL_VAO_H_ )
-#	include "vao.h"
+#if !defined( YOLK_SCENE_VERTEXINPUT_H_ )
+#	include "vertexinput.h"
 #endif
-#if !defined( YOLK_GL_PROGRAMPIPELINEOBJECT_H_ )
-#	include "programpipelineobject.h"
+#if !defined( YOLK_SCENE_PROGRAM_H_ )
+#	include "program.h"
+#endif
+#if !defined( YOLK_SCENE_RENDERCONTEXT_H_ )
+#	include "rendercontext.h"
 #endif
 
-namespace Gl {
+namespace Scene {
 //!-----------------------------------------------------
 //!
 //! An Image composer is the renderer for 2D graphics
@@ -58,8 +61,7 @@ public:
 	static const int MAX_LAYERS = 16;
 
 	// note this are rendered in this order. i.e. NORMAL first, then alpha test then blend etc.
-	enum RENDER_STATES
-	{
+	enum RENDER_STATES {
 		NORMAL = 0,			//!< res.argb = tex.argb * iterator.argb
 		COLOUR_MASK,		//!< res.argb = tex.rgb * iterator.rgb
 		ALPHA_MASK,			//!< res.a = tex.a * iterator.a
@@ -169,7 +171,7 @@ public:
 						unsigned int					layer );
 
 	//! Cause all the image operations to be submitted
-	void render();
+	void render( RenderContext* context );
 
 private:
 	//! used internally to select the correct rendering settings (vertex decl etc.)
@@ -194,10 +196,10 @@ private:
 		//! a sort page, there are 0 or 1 textures, several different rendering state and different types (shaders)
 		//! this gives us unique pages only where nessecary. Sprites on the same page are rendered in 1 batch
 		struct PageKey {
-			PageKey( Scene::TextureHandlePtr a, uint32_t b, RENDER_TYPE c ) : 
+			PageKey( TextureHandlePtr a, uint32_t b, RENDER_TYPE c ) : 
 				texture0(a), renderStates(b), type(c) {}
 
-			Scene::TextureHandlePtr	texture0;
+			TextureHandlePtr	texture0;
 			uint32_t			renderStates;
 			RENDER_TYPE			type;
 
@@ -209,7 +211,7 @@ private:
 			Page() : vertexBufferHandle(nullptr), vertexBuffer( nullptr ),
 						numVertices(0), mapped(nullptr) {}
 
-			Page( Scene::DataBufferHandlePtr a, Scene::VertexInputHandlePtr b, Scene::ProgramHandlePtr c ) :
+			Page( DataBufferHandlePtr a, VertexInputHandlePtr b, ProgramHandlePtr c ) :
 				vertexBufferHandle(a), vaoHandle(b), programHandle(c), 
 				vertexBuffer( nullptr ), numVertices(0), 
 				mapped(nullptr) {}
@@ -229,11 +231,10 @@ private:
 				mapped = nullptr;
 			}
 
-			Scene::DataBufferHandlePtr		vertexBufferHandle;
-			Scene::VertexInputHandlePtr 	vaoHandle;
-			Scene::ProgramHandlePtr			programHandle;
-
-			Scene::DataBufferPtr 			vertexBuffer;
+			DataBufferHandlePtr		vertexBufferHandle;
+			VertexInputHandlePtr 	vaoHandle;
+			ProgramHandlePtr			programHandle;
+			DataBufferPtr 			vertexBuffer;
 			uint32_t				numVertices;
 			void*					mapped;
 		};
@@ -243,11 +244,11 @@ private:
 		int 										layerNum;
 	} layers[MAX_LAYERS];
 
-	Scene::ProgramHandlePtr	program[MAX_RENDER_TYPE];			//!< programs
+	ProgramHandlePtr	program[MAX_RENDER_TYPE];			//!< programs
 
 	const unsigned int maxSpritesPerLayer;				//! how many sprites per layer can this composer support
 	static const uint32_t SizeOfRenderType[MAX_RENDER_TYPE];
-	static const Vao::CreationStruct VaoCS[MAX_RENDER_TYPE];
+	static const VertexInput::CreationStruct VaoCS[MAX_RENDER_TYPE];
 	Layer::Page& findOrCreatePage( Layer& layer, Layer::PageKey& key );
 
 

@@ -2,6 +2,8 @@
 #define YOLK_DWM_CLIENT_CLIENT_H_ 1
 
 #include "dwm_client/clientworld.h"
+#include "scene/renderer.h"
+#include "scene/screen.h"
 
 class DwmClient {
 public:
@@ -15,6 +17,8 @@ public:
 	ClientWorldPtr getClientWorld() const { return world; }
 protected:
 	ClientWorldPtr						world;
+	Scene::Renderer*					renderer;
+	Scene::ScreenPtr					screen;
 };
 
 

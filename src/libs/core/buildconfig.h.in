@@ -1,25 +1,17 @@
 #pragma once
-#if !defined( WIERD_BUILD_CONFIG_H )
-#define WIERD_BUILD_CONFIG_H
+#if !defined( YOLK_BUILD_CONFIG_H )
+#define YOLK_BUILD_CONFIG_H
 
-#cmakedefine DX11_FOUND
 #cmakedefine USE_DX11
 #cmakedefine USE_OPENGL
 #cmakedefine USE_OPENCL
-
-#if defined( USE_OPENGL )
-	#define RENDER_BACKEND Gl
-#elif defined( USE_DX11 )
-	#define RENDER_BACKEND Dx11
-#endif
-
 #cmakedefine USE_V8
 #cmakedefine USE_GLOG
 #cmakedefine IS_HOST_64_BIT
 
 // some compile time constants set by the build system
-#define WIERD_VERSION_MAJOR 	${${PROJECT}_VERSION_MAJOR}
-#define WIERD_VERSION_MINOR 	${${PROJECT}_VERSION_MINOR}
-#define WIERD_VERSION_REVISION 	${${PROJECT}_VERSION_REVISION}
+#define ${PROJECT}_VERSION_MAJOR 	${${PROJECT}_VERSION_MAJOR}
+#define ${PROJECT}_VERSION_MINOR 	${${PROJECT}_VERSION_MINOR}
+#define ${PROJECT}_VERSION_REVISION 	${${PROJECT}_VERSION_REVISION}
 
 #endif

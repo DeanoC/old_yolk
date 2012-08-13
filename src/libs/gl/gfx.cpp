@@ -7,78 +7,61 @@
 
 #include "ogl.h"
 #include "core/resourceman.h"
-#include "debugprims.h"
-#include "shaderman.h"
+#include "scene/debugprims.h"
+#include "scene/imagecomposer.h"
 
+#include "shaderman.h"
 #include "rendercontext.h"
 #include "debugpipeline.h"
 #include "vtpipeline.h"
 #include "resourceloader.h"
-#include "imagecomposer.h"
-
-
-// compute renderer needs CL
-#include "cl/ocl.h"
-#include "cl/platform.h"
+#include "screen.h"
 
 #include "gfx.h"
 
 namespace Gl {
 
 Gfx::Gfx() {
-	if( !Cl::Platform::exists() )
-		Cl::Platform::init();
+	valid = createGLContext();
+	if( valid ) {
+		valid = setGlPixelFormat( 0 ); // TODO stereo
+	}
+	if( valid ) {
+		createRenderContexts();
+
+		// some logging
+	#if 1
+		int gsAtomicCounter = 0;
+		int fsAtomicCounter = 0;
+		glGetIntegerv( GL_MAX_GEOMETRY_ATOMIC_COUNTERS, &gsAtomicCounter );
+		glGetIntegerv( GL_MAX_FRAGMENT_ATOMIC_COUNTERS, &fsAtomicCounter );
+		LOG(INFO) << "Geometry Shader atomics : " << gsAtomicCounter;
+		LOG(INFO) << "Fragment Shader atomics : " << fsAtomicCounter;
+		int samples;
+		glGetIntegerv( GL_MAX_SAMPLES, &samples);
+		LOG(INFO) << "MSAA samples : " << samples;
+	}
 }
 
 Gfx::~Gfx() {
 }
 
-bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight, 
-						bool bFullScreen, 
-						ANTI_ALIASING aaSetting) {
-	screenWidth = iWidth;
-	screenHeight = iHeight;
-	aaSetting = aaSetting;
-	frameCount = 0;
-	totalPrimitiveCount = 0;
-	passPrimitiveCount = 0;
+Scene::ScreenPtr Gfx::createScreen( uint32_t _width, uint32_t _height, uint32_t _flags ) {
+	using namespace Scene;
+	if( !valid ) return Scene::ScreenPtr();
 
-	if( createGLContext() == false )
-		return false;
 
-	createRenderContexts();
-	
-	// some logging
-#if 1
-	int gsAtomicCounter = 0;
-	int fsAtomicCounter = 0;
-	glGetIntegerv( GL_MAX_GEOMETRY_ATOMIC_COUNTERS, &gsAtomicCounter );
-	glGetIntegerv( GL_MAX_FRAGMENT_ATOMIC_COUNTERS, &fsAtomicCounter );
-	LOG(INFO) << "Geometry Shader atomics : " << gsAtomicCounter;
-	LOG(INFO) << "Fragment Shader atomics : " << fsAtomicCounter;
-	int samples;
-	glGetIntegerv( GL_MAX_SAMPLES, &samples);
-	LOG(INFO) << "MSAA samples : " << samples;
-#endif
-
-	using namespace Cl;
-	// compute render needs to setup CL render to go
-	if( !Cl::Platform::exists() )
-		Cl::Platform::init();
-	Cl::Platform::get()->createDevices();
+	#endif
 
 	resourceLoader.reset( CORE_NEW ResourceLoader() );
 	resourceLoader->installResourceTypes();
 
 	// first render context is the main threads to abuse
-	renderContexts[ RENDER_CONTEXT ].threadActivate();
-	renderContexts[ RENDER_CONTEXT ].prepToRender();
+	renderContexts[ RENDER_CONTEXT ]->threadActivate();
+	renderContexts[ RENDER_CONTEXT ]->prepToRender();
 
 	shaderMan.reset( CORE_NEW ShaderMan() );
 	shaderMan->initDefaultPrograms();
-
-	debugPrims.reset( CORE_NEW DebugPrims() );
-	finalComposer.reset( CORE_NEW ImageComposer() );
 
 	// install pipelines
 	pipelines.push_back( std::unique_ptr<Scene::Pipeline>( CORE_NEW DebugPipeline(pipelines.size()) ) );
@@ -91,15 +74,27 @@ bool Gfx::createScreen(	unsigned int iWidth, unsigned int iHeight,
 		hashPipeline[ pipelines[i]->getName() ] = i;
 	}
 
-
-	return true;
+	auto screen = std::make_shared<Gl::Screen>();
+	screen->width = _width;
+	screen->height = _height;
+	screen->flags = _flags; 
+	screen->renderer = this;
+	// TODO stero
+	if( screen->flags & SCRF_DEBUGPRIMS ) {
+		screen->debugPrims.reset( CORE_NEW Scene::DebugPrims() );
+	}
+	if( screen->flags & SCRF_OVERLAY ) {
+		screen->imageComposer.reset( CORE_NEW Scene::ImageComposer() );
+	}
+	return std::static_pointer_cast<Scene::Screen>( screen );
 }
 
-void Gfx::shutdownScreen() {
-	renderContexts.reset( 0 );
+void Gfx::destroyScreen() {
+	renderContexts.clear();
 }
 		
 void Gfx::present( int backWidth, int backHeight ) {
+	/*
 	resourceLoader->showLoadingIfNeeded( finalComposer.get() );
 
 	auto forId = hashPipeline[ "forward" ];
@@ -124,17 +119,7 @@ void Gfx::present( int backWidth, int backHeight ) {
 
 	frameCount++;
 	totalPrimitiveCount = 0;
-}
-
-RenderContext* Gfx::getThreadRenderContext( THREAD_CONTEXT index ) const {
-	return &renderContexts[index];
-}
-
-const std::string& Gfx::getShaderModelAsString( const SHADER_MODEL sm  ) { 
-	static std::string smStrings[] = {
-		"GL4_2",
-	};
-	return smStrings[ sm ] ; 
+	*/
 }
 
 } // end Gl namespace

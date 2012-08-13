@@ -64,7 +64,8 @@ bool Gfx::createGLContext() {
 }
 
 #else
-
+HGLRC tempContext;
+HWND temphWnd;
 bool Gfx::createGLContext() {
 
 	// Register class
@@ -108,7 +109,7 @@ bool Gfx::createGLContext() {
 	BOOL bResult = SetPixelFormat (hDC, nPixelFormat, &pfd); 
 	if (!bResult) return false; 
 
-	HGLRC tempContext = wglCreateContext(hDC);
+	tempContext = wglCreateContext(hDC);
 	wglMakeCurrent(hDC, tempContext);
 
 	GLenum err = glewInit();
@@ -123,12 +124,15 @@ bool Gfx::createGLContext() {
 	if( passedExtCheck == false )
 		return false;	
 
+	return true;
+}
+
+bool Gfx::setGlPixelFormat(uint32_t flags ) {
 	// for out output buffer, we simple want a double buffered colour, nothing else
 	// all rendering will be done to off screen buffers, then blited to here for display
 	int pixelFormat;
 	UINT numFormats;
-	float fAttributes[] = {0,0};
-	hDC = GetDC(g_hWnd);
+	HDC hDC = GetDC(g_hWnd);
  
 	int iAttributes[] = { 
 		WGL_DRAW_TO_WINDOW_ARB,		GL_TRUE,
@@ -139,6 +143,7 @@ bool Gfx::createGLContext() {
 		WGL_DEPTH_BITS_ARB,			0,
 		WGL_STENCIL_BITS_ARB,		0,
 		WGL_DOUBLE_BUFFER_ARB,		GL_TRUE,
+		WGL_STEREO_ARB,				(flags & Scene::SCRF_STEREO) ? GL_TRUE : GL_FALSE,
 		0, 0 };
 
 	if( wglChoosePixelFormatARB( hDC, iAttributes, NULL, 1, 
@@ -146,16 +151,17 @@ bool Gfx::createGLContext() {
 		return false;
 
 	if( SetPixelFormat( hDC, pixelFormat, NULL ) == false ) 
-		return false;
+		return false;	
 
 	wglMakeCurrent( hDC, NULL );
 
 	// done with dummy now!
 	wglDeleteContext(tempContext);
-	DestroyWindow( hWnd );
+	DestroyWindow( temphWnd );
  
-	return true;
+	return true;	
 }
+
 #endif
 void Gfx::createRenderContexts() {
 	HDC hDC=GetDC(g_hWnd);
@@ -170,20 +176,22 @@ void Gfx::createRenderContexts() {
 		, 0, 0
 	};
 
-	const int numThreads = 2; // RENDER_CONTEXT + LOAD_CONTEXT
 	const std::string testStr( "Gl debugging callback installed" );
  
-	renderContexts.reset( CORE_NEW_ARRAY RenderContext[ numThreads ] );
-	for( int i = 0; i < numThreads; ++i ) {
+	renderContexts.push_back( std::unique_ptr<RenderContext>( CORE_NEW RenderContext() ) );
+	renderContexts.push_back( std::unique_ptr<RenderContext>( CORE_NEW RenderContext() ) );
+
+	for( int i = 0; i < renderContexts.size(); ++i ) {
 		HGLRC hRC = 
 #if defined(GDEBBUGGER_FRIENDLY_STARTUP)
 			( i == 0 ) ? initialGLRC : wglCreateContext(hDC);
 #else
 			wglCreateContextAttribsARB(hDC,0, attribs);
 #endif
-		renderContexts[i].setGlContext( hDC, hRC );
+		auto rc = (Gl::RenderContext*)renderContexts[i].get();
+		rc->setGlContext( hDC, hRC );
 		if( i != 0 ) {
-			wglShareLists( renderContexts[0].hRC, renderContexts[i].hRC );
+			wglShareLists( ((Gl::RenderContext*)renderContexts[0].get())->hRC, rc->hRC );
 		}
 		wglMakeCurrent( hDC,hRC );
 		GL_CHECK
@@ -212,7 +220,7 @@ void Gfx::createRenderContexts() {
 #endif
 	}
 
-	renderContexts[0].threadActivate();
+	renderContexts[0]->threadActivate();
 }
 
 } // end namespace

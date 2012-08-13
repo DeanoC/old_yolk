@@ -17,8 +17,9 @@
 #define DECLARE_CL_LIBRARY( x )			extern "C" const char* binary_data_programs_kernels_ ## x ## _cl; 
 
 // special GLSL definations, that can be shared with CL programs (lots of restrictions basically structures only!)
-#define REGISTER_SHARED_WITH_CL(x)		Gfx::get()->getShaderMan()->registerProgramSource( #x, ::binary_data_programs_ ## x ## _hlsl ); \
-										Cl::Platform::get()->getProgramMan()->registerLibrarySource( #x , binary_data_programs_ ## x ## _hlsl );
+#define REGISTER_SHARED_WITH_CL(x)		Gfx::get()->getShaderMan()->registerProgramSource( #x, ::binary_data_programs_ ## x ## _hlsl );
+//										Cl::Platform::get()->getProgramMan()->registerLibrarySource( #x , binary_data_programs_ ## x ## _hlsl );
+
 // GLSL programs or fragments
 #define REGISTER_PROGRAM( x )			Gfx::get()->getShaderMan()->registerProgramSource( #x, binary_data_programs_programs_ ## x ## _glsl );
 #define REGISTER_FRAGMENT( x )			Gfx::get()->getShaderMan()->registerProgramSource( "fragments_" #x, binary_data_programs_fragments_ ## x ## _glsl );

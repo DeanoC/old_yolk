@@ -61,7 +61,6 @@ namespace Gl {
 			MAIN_PASS,
 			NUM_GEOM_PASSES,
 		};
-		const size_t pipelineIndex;
 
 		VtPipeline( size_t index );
 		virtual ~VtPipeline();
@@ -111,7 +110,7 @@ namespace Gl {
 		unsigned int 				targetWidth;
 		unsigned int 				targetHeight;
 		unsigned int 				targetSamples;
-		Cl::Context*				contextCl;
+//		Cl::Context*				contextCl;
 
 	};
 

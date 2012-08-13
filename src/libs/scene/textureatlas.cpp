@@ -5,19 +5,18 @@
 //!
 //!-----------------------------------------------------
 
-#include "ogl.h"
+#include "scene.h"
 #include "core/resourceman.h"
 #include "core/file_path.h"
 #include "core/fileio.h"
 
 #include "textureatlas.h"
 
-namespace Gl {
+namespace Scene {
 
 TextureAtlas::~TextureAtlas() {
 	PackedTextureContainer::iterator texIt = packedTextures.begin();
-	while( texIt != packedTextures.end() )
-	{
+	while( texIt != packedTextures.end() ) {
 		Core::ResourceMan::get()->closeResource( *texIt );
 		++texIt;
 	}
@@ -36,8 +35,6 @@ struct TextureAtlasFileHeader {
 TextureAtlas* TextureAtlas::internalLoad( 	const Core::ResourceHandleBase* baseHandle, 
 											const char* pTextureAtlasFileName, 
 											bool preload ) {
-
-	using namespace Scene;
 
 	Core::FilePath path( pTextureAtlasFileName );
 	path = path.ReplaceExtension( ".tat" );
@@ -84,7 +81,7 @@ TextureAtlas* TextureAtlas::internalLoad( 	const Core::ResourceHandleBase* baseH
 
 void TextureAtlas::getSubTextureDimensions( unsigned int index, unsigned int& width , unsigned int& height ) const {
 	const auto& sub = subTextures[ index ];
-	Scene::TexturePtr texture = packedTextures[ sub.index ]->acquire();
+	TexturePtr texture = packedTextures[ sub.index ]->acquire();
 	width = (unsigned int)( 0.5f + (sub.u1 - sub.u0) * texture->getWidth() );
 	height = (unsigned int)( 0.5f + (sub.v1 - sub.v0) * texture->getHeight() );
 }

@@ -5,26 +5,25 @@
 //!
 //!-----------------------------------------------------
 
-#include "ogl.h"
-#include "gfx.h"
+#include "scene.h"
 #include "core/colour.h"
 #include "core/resourceman.h"
 #include "textureatlas.h"
 #include "rendercontext.h"
-#include "scene/databuffer.h"
-#include "scene/constantcache.h"
-#include "scene/vertexinput.h"
+#include "databuffer.h"
+#include "constantcache.h"
+#include "vertexinput.h"
 
 #include "imagecomposer.h"
 
-namespace Gl {
+namespace Scene {
 
 const uint32_t ImageComposer::SizeOfRenderType[ImageComposer::MAX_RENDER_TYPE] = {
 	sizeof( ImageComposer::SIMPLE_SPRITE ),
 	sizeof( ImageComposer::SOLID_COLOUR ),
 };
 
-const Vao::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] = {
+const VertexInput::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] = {
 	{
 		3, 
 		{	{ Scene::VE_POSITION, 	Scene::VT_FLOAT2 },
@@ -46,8 +45,8 @@ const Vao::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] =
 ImageComposer::ImageComposer( int _maxSpritesPerLayer ) :
 	maxSpritesPerLayer( _maxSpritesPerLayer )
 {
-	program[ SIMPLE_SPRITE ] = Scene::ProgramHandle::create( "basicsprite" );
-	program[ SOLID_COLOUR ] = Scene::ProgramHandle::create( "2dcolour" );
+	program[ SIMPLE_SPRITE ] = ProgramHandle::create( "basicsprite" );
+	program[ SOLID_COLOUR ] = ProgramHandle::create( "2dcolour" );
 
 	for( int i = 0; i < MAX_LAYERS; ++i ) {
 		layers[i].layerNum = i;
@@ -80,14 +79,13 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 		DataBufferHandlePtr vertexBufferHandle = DataBufferHandle::create( name.c_str(), &vbcs );
 
 		// copy vao creation struct template
-		Vao::CreationStruct vcs = VaoCS[ key.type ];
+		VertexInput::CreationStruct vcs = VaoCS[ key.type ];
 		// fill in this vertex buffer
 		for( int i = 0;i < vcs.elementCount; ++i ) {
 			vcs.data[i].buffer =  vertexBufferHandle;
 		}
-		const std::string vaoName = name + Vao::genEleString( vcs.elementCount, vcs.elements );
+		const std::string vaoName = name + VertexInput::genEleString( vcs.elementCount, vcs.elements );
 		VertexInputHandlePtr vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vcs );
-
 
 		layer.pageMap[ key ] = Layer::Page( vertexBufferHandle, vaoHandle, program[ key.type ] );
 		Layer::Page& page = layer.pageMap[ key ];
@@ -103,7 +101,7 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 	}
 }
 
-void ImageComposer::putTexture(	const Scene::TextureHandlePtr&			pTexture,
+void ImageComposer::putTexture(	const Scene::TextureHandlePtr&	pTexture,
 								unsigned int					renderStates,
 								const Math::Vector2&			pos,
 								const Math::Vector2&			size,
@@ -161,7 +159,7 @@ void ImageComposer::putSprite(	const TextureAtlasHandlePtr&	atlasHandle,
 	if( !atlas ) { return; }
 
 	const TextureAtlas::SubTexture& sprite = atlas->getSubTexture( texIndex );
-	Scene::TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
+	TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
 
 	// put this sprite on the appropaite layer
 	Layer& layer = layers[ layerNum ];
@@ -216,7 +214,7 @@ void ImageComposer::putSubSprite(
 	if( !atlas ) { return; }
 
 	const TextureAtlas::SubTexture& sprite = atlas->getSubTexture( texIndex );
-	Scene::TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
+	TextureHandlePtr texture = atlas->getPackedTexture( sprite.index );
 
 	// put this sprite on the appropaite layer
 	Layer& layer = layers[layerNum];
@@ -398,13 +396,11 @@ void ImageComposer::texturedQuad( const Scene::TextureHandlePtr&		pTexture,
 }
 
 
-void ImageComposer::render() {
+void ImageComposer::render( RenderContext* context ) {
 	using namespace Scene;
 
-	auto context = Gfx::get()->getThreadRenderContext( Gfx::RENDER_CONTEXT );
-
-	glDisable( GL_CULL_FACE );
-	glDisable( GL_DEPTH_TEST );
+//	glDisable( GL_CULL_FACE );
+//	glDisable( GL_DEPTH_TEST );
 
 	for( unsigned int i=0;i < MAX_LAYERS;++i) {
 		Layer::PageMap::iterator pmIt = layers[i].pageMap.begin();
@@ -418,20 +414,20 @@ void ImageComposer::render() {
 
 			page.unmap();
 
-			auto vao = std::static_pointer_cast<Gl::Vao>( page.vaoHandle->tryAcquire() );
+			auto vao = page.vaoHandle->tryAcquire();
 			if( !vao ) {
 				++pmIt;
 				continue;
 			}
-			glBindVertexArray( vao->getName() );
-			GL_CHECK
+//			glBindVertexArray( vao->getName() );
+//			GL_CHECK
 			if( pagekey.texture0 ) {
-				auto tex = std::static_pointer_cast<Gl::Texture>( pagekey.texture0->tryAcquire() );
+				auto tex = pagekey.texture0->tryAcquire();
 				if( tex ) {
-					glActiveTexture( GL_TEXTURE0 );
-					glBindTexture( GL_TEXTURE_2D, tex->getName() );
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f );
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f );
+//					glActiveTexture( GL_TEXTURE0 );
+//					glBindTexture( GL_TEXTURE_2D, tex->getName() );
+//					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f );
+//					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f );
 				}
 			}
 
@@ -444,7 +440,7 @@ void ImageComposer::render() {
 			switch( pagekey.renderStates ) {
 			default:
 				case NORMAL:
-				glDisable( GL_BLEND );
+//				glDisable( GL_BLEND );
 //				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
 				break;
 /*			case COLOUR_MASK:
@@ -468,14 +464,14 @@ void ImageComposer::render() {
 //				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
 				break;*/
 			}
-			glDrawArrays( GL_TRIANGLES, 0, page.numVertices );
-			GL_CHECK;
+//			glDrawArrays( GL_TRIANGLES, 0, page.numVertices );
+//			GL_CHECK;
 
 			++pmIt;
 		}
 	}
 
-	glDisable( GL_BLEND );
+//	glDisable( GL_BLEND );
 }
 
 bool ImageComposer::Layer::PageKey::operator <(const ImageComposer::Layer::PageKey &b) const {

@@ -11,8 +11,10 @@
 
 #include "scene/renderable.h"
 #include "scene/camera.h"
+#include "scene/screen.h"
 
 namespace Scene {
+	class Pipeline;
 
 	class RenderWorld {
 	public:
@@ -35,18 +37,17 @@ namespace Scene {
 		void setActiveCamera( std::shared_ptr<Scene::Camera> cam ) { activeCamera = cam; }
 		std::shared_ptr<Scene::Camera> getActiveCamera() { return activeCamera; }
 
-		virtual void render( RenderContext* context );
-
-		virtual void debugDraw( RenderContext* context );
+		virtual void render( const ScreenPtr screen, RenderContext* context );
 
 		Core::mutex* getUpdateMutex() { return &updateMutex; }
 
 	protected:
 		typedef tbb::concurrent_vector< RenderablePtr > RenderableContainer;
 		typedef tbb::concurrent_vector< CameraPtr > 	CameraContainer;
-		typedef std::vector< uint32_t > STIndexContainer;
+		typedef std::vector< uint32_t > 				STIndexContainer;
 
-		void renderRenderables(  RenderContext* context, const size_t pipelineIndex );
+		void determineVisibles();
+		void renderRenderables(  RenderContext* context, Pipeline* pipeline );
 
 		RenderableContainer				renderables;
 		STIndexContainer				visibleRenderables;
@@ -56,7 +57,6 @@ namespace Scene {
 		std::shared_ptr<Scene::Camera>	activeCamera;
 		Core::mutex 					updateMutex;
 		std::shared_ptr<Scene::Camera> 	renderCamera;
-		std::shared_ptr<Scene::Camera> 	debugCamera;
 	};
 }
 

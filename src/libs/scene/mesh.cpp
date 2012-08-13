@@ -7,10 +7,8 @@
 
 #include "scene.h"
 #include "core/resourceman.h"
-#if RENDER_BACKEND == Gl
-#include "gl/ogl.h"
-#include "gl/rendercontext.h"
-#endif
+#include "rendercontext.h"
+#include "pipeline.h"
 #include "mesh.h"
 
 namespace Scene {
@@ -55,8 +53,7 @@ Mesh::~Mesh() {
 	}
 }
 
-void Mesh::render( RenderContext* rc, const int pipelineName ) {
-	RENDER_BACKEND::RenderContext* context = (RENDER_BACKEND::RenderContext*) rc;
+void Mesh::render( RenderContext* context, Pipeline* pipeline ) {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
@@ -69,20 +66,10 @@ void Mesh::render( RenderContext* rc, const int pipelineName ) {
 	WobResourcePtr wob = meshHandle->tryAcquire();
 	if( wob ) {
 		localAabb = Core::AABB( wob->header->minAABB, wob->header->maxAABB );
-		wob->backEnd->pipelineDataStores[ pipelineName ]->render( context );
+		wob->backEnd->pipelineDataStores[ pipeline->getIndex() ]->render( context );
 	} else {
 //		LOG(INFO) << "Mesh not ready yet\n";
 	}
-}
-
-void Mesh::debugDraw( RenderContext* rc ) const {
-	Renderable::debugDraw( rc );
-
-//	WobResourcePtr pWob = m_MeshHandle->acquire();
-//	if(pWob->m_bvh) {
-//		pWob->m_bvh->DebugDraw( &m_SimpleTransformNode, context->viewFrustum );
-//	}
-
 }
 
 }

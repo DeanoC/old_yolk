@@ -8,7 +8,6 @@
 #include "core/fileio.h"
 #include "core/file_path.h"
 #include "gfx.h"
-#include "dds.h"
 #include "texture.h"
 
 namespace {

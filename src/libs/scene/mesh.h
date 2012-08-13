@@ -34,20 +34,9 @@ namespace Scene {
 		~Mesh();
 
 		//! inherited from Renderable
-		virtual void render( RenderContext* context, const int pipelineIndex );
+		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
 		
-		virtual void debugDraw( RenderContext* context ) const;
-
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const {
-			if( _type == R_MESH && arraySize > 0) {
-				outArray[0] = this;
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) {
+		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const override {
 			if( _type == R_MESH && arraySize > 0) {
 				outArray[0] = this;
 				return 1;
