@@ -25,8 +25,7 @@ static const uint32_t TextType						=	RESOURCE_NAME('T','E','X','T');
 
 //! An actual text resource
 struct TextResource : public Core::Resource<TextType> {
-	struct CreationStruct {};
-	struct LoadStruct {};
+	struct CreationInfo {};
 
 	boost::scoped_array<char>		text;
 };
@@ -50,8 +49,7 @@ struct ManifestEntry {
 };
 
 struct ManifestResource : public Core::Resource<ManifestType> {
-	struct CreationStruct {};
-	struct LoadStruct {};
+	struct CreationInfo {};
 
 	uint16_t							numEntries;
 	boost::scoped_array<ManifestEntry>	entries;
@@ -90,8 +88,7 @@ struct BinProperty {
 };
 
 struct BinPropertyResource : public Core::Resource<BinPropertyType> {
-	struct CreationStruct {};
-	struct LoadStruct {};
+	struct CreationInfo {};
 
 	uint16_t getNumProperties() { return numEntries; }
 	std::string getName( uint16_t index ) { return std::string( entries[index].name.p ); }	

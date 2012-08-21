@@ -15,10 +15,12 @@
 #if !defined( DXGIFORMAT_CRACKER_H__ )
 #define DXGIFORMAT_CRACKER_H__
 
+#include "scene/generictextureformat.h"
+
 class DXGIFormat {
 public:
 	//! is this texture format a depth stencil format?
-	static bool IsDepthStencilFormat( DXGI_FORMAT fmt ) {
+	static bool isDepthStencilFormat( DXGI_FORMAT fmt ) {
 		switch ( fmt ) {
 		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 		case DXGI_FORMAT_D32_FLOAT:
@@ -31,7 +33,7 @@ public:
 	}
 
 	//! return the TYPELESS version of each DXGI_FORMAT we really support
-	static DXGI_FORMAT GetTypelessTextureFormat( DXGI_FORMAT fmt ) {
+	static DXGI_FORMAT getTypelessTextureFormat( DXGI_FORMAT fmt ) {
 		switch ( fmt ) {
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
 		case DXGI_FORMAT_R32G32B32A32_UINT:
@@ -144,7 +146,7 @@ public:
 		}		
 	}
 	//! return the shader version of the depth of each depth/stencil DXGI_FORMAT format
-	static DXGI_FORMAT GetShaderDepthTextureFormat( DXGI_FORMAT fmt ) {
+	static DXGI_FORMAT getShaderDepthTextureFormat( DXGI_FORMAT fmt ) {
 		switch ( fmt ) {
 		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 			return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
@@ -172,7 +174,7 @@ public:
 	}
 
 	//! returns the number of channels per dxgi format
-	static unsigned int GetChannelCount( DXGI_FORMAT fmt ) {
+	static unsigned int getChannelCount( DXGI_FORMAT fmt ) {
 		switch( fmt ) {
 		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
@@ -229,7 +231,7 @@ public:
 	}
 
 	//! Returns the number of color channel bits in the specified DXGI_FORMAT
-	static unsigned int GetColorChannelBits( DXGI_FORMAT fmt ) {
+	static unsigned int getColourChannelBits( DXGI_FORMAT fmt ) {
 		switch( fmt ) {
 		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
@@ -310,7 +312,7 @@ public:
 	///
 	/// \return	The bit width of the format.
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	static unsigned int GetBitWidth( DXGI_FORMAT fmt ) {
+	static unsigned int getBitWidth( DXGI_FORMAT fmt ) {
 		switch( fmt ){
 		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
@@ -430,6 +432,185 @@ public:
 			return 0;
 		}
 	}
+
+	static GENERIC_TEXTURE_FORMAT getGenericFormat( DXGI_FORMAT fmt ) {
+		switch( fmt ) {
+		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:		return GTF_RGBA32F;
+		case DXGI_FORMAT_R32G32B32A32_SINT:			return GTF_RGBA32I;
+		case DXGI_FORMAT_R32G32B32A32_UINT:			return GTF_RGBA32UI;
+		case DXGI_FORMAT_R32G32B32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32_FLOAT:			return GTF_RGB32F;
+		case DXGI_FORMAT_R32G32B32_SINT:			return GTF_RGB32I;
+		case DXGI_FORMAT_R32G32B32_UINT:			return GTF_RGB32UI;
+		case DXGI_FORMAT_R32G32_TYPELESS:
+		case DXGI_FORMAT_R32G32_FLOAT:				return GTF_RG32F;
+		case DXGI_FORMAT_R32G32_SINT:				return GTF_RG32I;
+		case DXGI_FORMAT_R32G32_UINT:				return GTF_RG32UI;
+		case DXGI_FORMAT_R16G16B16A16_TYPELESS:
+		case DXGI_FORMAT_R16G16B16A16_UNORM:		return GTF_RGBA16;
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:		return GTF_RGBA16F;
+		case DXGI_FORMAT_R16G16B16A16_SINT:			return GTF_RGBA16I;
+		case DXGI_FORMAT_R16G16B16A16_UINT:			return GTF_RGBA16UI;
+		case DXGI_FORMAT_R16G16B16A16_SNORM:		return GTF_RGBA16_SNORM;
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+		case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
+		case DXGI_FORMAT_X32_TYPELESS_G8X24_UINT:	return GTF_DEPTH32F_STENCIL8;
+		case DXGI_FORMAT_R8G8B8A8_TYPELESS:
+		case DXGI_FORMAT_R8G8B8A8_UNORM:			return GTF_RGBA8;
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:		return GTF_SRGB8_ALPHA8;
+		case DXGI_FORMAT_R8G8B8A8_SINT:				return GTF_RGBA8I;
+		case DXGI_FORMAT_R8G8B8A8_UINT:				return GTF_RGBA8UI;
+		case DXGI_FORMAT_R8G8B8A8_SNORM:			return GTF_RGBA8_SNORM;
+		case DXGI_FORMAT_R16G16_TYPELESS:	
+		case DXGI_FORMAT_R16G16_UNORM:				return GTF_RG16;
+		case DXGI_FORMAT_R16G16_FLOAT:				return GTF_RG16F;
+		case DXGI_FORMAT_R16G16_SINT:				return GTF_RG16I;
+		case DXGI_FORMAT_R16G16_UINT:				return GTF_RG16UI;
+		case DXGI_FORMAT_R16G16_SNORM:				return GTF_RG16_SNORM;
+		case DXGI_FORMAT_R32_TYPELESS:	
+		case DXGI_FORMAT_D32_FLOAT:					return GTF_DEPTH_COMPONENT32F;
+		case DXGI_FORMAT_R32_FLOAT:					return GTF_R32F;
+		case DXGI_FORMAT_R32_SINT:					return GTF_R32I;
+		case DXGI_FORMAT_R32_UINT:					return GTF_R32UI;
+		case DXGI_FORMAT_R24G8_TYPELESS:	
+		case DXGI_FORMAT_D24_UNORM_S8_UINT:	
+		case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:	
+		case DXGI_FORMAT_X24_TYPELESS_G8_UINT:		return GTF_DEPTH24_STENCIL8;
+		case DXGI_FORMAT_R10G10B10A2_TYPELESS:	
+		case DXGI_FORMAT_R10G10B10A2_UNORM:			return GTF_RGB10_A2;
+		case DXGI_FORMAT_R10G10B10A2_UINT:			return GTF_RGB10_A2UI;
+		case DXGI_FORMAT_R11G11B10_FLOAT:			return GTF_R11F_G11F_B10F;
+		case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:		return GTF_RGB9_E5;
+		case DXGI_FORMAT_R8G8_TYPELESS:
+		case DXGI_FORMAT_R8G8_UNORM:				return GTF_RG8;
+		case DXGI_FORMAT_R8G8_SINT:					return GTF_RG8I;
+		case DXGI_FORMAT_R8G8_UINT:					return GTF_RG8UI;
+		case DXGI_FORMAT_R8G8_SNORM:				return GTF_RG8_SNORM;
+		case DXGI_FORMAT_R16_TYPELESS:		
+		case DXGI_FORMAT_R16_FLOAT:					return GTF_R16F;
+		case DXGI_FORMAT_D16_UNORM:					return GTF_DEPTH_COMPONENT16;
+		case DXGI_FORMAT_R16_UNORM:					return GTF_R16;
+		case DXGI_FORMAT_R16_SINT:					return GTF_R16I;
+		case DXGI_FORMAT_R16_UINT:					return GTF_R16UI;
+		case DXGI_FORMAT_R16_SNORM:					return GTF_R16_SNORM;
+		case DXGI_FORMAT_BC6H_TYPELESS:		
+		case DXGI_FORMAT_BC6H_UF16:					return GTF_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT;
+		case DXGI_FORMAT_BC6H_SF16:					return GTF_COMPRESSED_RGB_BPTC_SIGNED_FLOAT;
+		case DXGI_FORMAT_R8_TYPELESS:		
+		case DXGI_FORMAT_A8_UNORM:		
+		case DXGI_FORMAT_R8_UNORM:					return GTF_R8;
+		case DXGI_FORMAT_R8_SINT:					return GTF_R8I;
+		case DXGI_FORMAT_R8_UINT:					return GTF_R8UI;
+		case DXGI_FORMAT_R8_SNORM:					return GTF_R8_SNORM;
+		case DXGI_FORMAT_BC2_TYPELESS:		
+		case DXGI_FORMAT_BC2_UNORM:					return GTF_COMPRESSED_RGBA_S3TC_DXT3;
+		case DXGI_FORMAT_BC2_UNORM_SRGB:			return GTF_COMPRESSED_SRGB_ALPHA_S3TC_DXT3;
+		case DXGI_FORMAT_BC3_TYPELESS:		
+		case DXGI_FORMAT_BC3_UNORM:					return GTF_COMPRESSED_RGBA_S3TC_DXT3;
+		case DXGI_FORMAT_BC3_UNORM_SRGB:			return GTF_COMPRESSED_SRGB_ALPHA_S3TC_DXT5;
+		case DXGI_FORMAT_BC5_TYPELESS:		
+		case DXGI_FORMAT_BC5_UNORM:					return GTF_COMPRESSED_RG_RGTC2;
+		case DXGI_FORMAT_BC5_SNORM:					return GTF_COMPRESSED_SIGNED_RG_RGTC2;
+		case DXGI_FORMAT_BC7_TYPELESS:		
+		case DXGI_FORMAT_BC7_UNORM:					return GTF_COMPRESSED_RGBA_BPTC_UNORM;	
+		case DXGI_FORMAT_BC7_UNORM_SRGB:			return GTF_COMPRESSED_SRGB_ALPHA_BPTC_UNORM;	
+		case DXGI_FORMAT_BC1_TYPELESS:		
+		case DXGI_FORMAT_BC1_UNORM: 				return GTF_COMPRESSED_RGBA_S3TC_DXT1;
+		case DXGI_FORMAT_BC1_UNORM_SRGB: 			return GTF_COMPRESSED_SRGB_ALPHA_S3TC_DXT1;
+		case DXGI_FORMAT_BC4_TYPELESS:		
+		case DXGI_FORMAT_BC4_UNORM: 				return GTF_COMPRESSED_RED_RGTC1;
+		case DXGI_FORMAT_BC4_SNORM: 				return GTF_COMPRESSED_SIGNED_RED_RGTC1;
+		default: // unknown
+		case DXGI_FORMAT_UNKNOWN:
+		case DXGI_FORMAT_B5G6R5_UNORM:
+		case DXGI_FORMAT_B5G5R5A1_UNORM:
+		case DXGI_FORMAT_R1_UNORM:
+		case DXGI_FORMAT_R8G8_B8G8_UNORM:
+		case DXGI_FORMAT_G8R8_G8B8_UNORM:
+		case DXGI_FORMAT_B8G8R8A8_UNORM:
+		case DXGI_FORMAT_B8G8R8X8_UNORM:
+		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
+		case DXGI_FORMAT_B8G8R8A8_TYPELESS:
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+		case DXGI_FORMAT_B8G8R8X8_TYPELESS:
+		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
+													return GTF_UNKNOWN;
+		}
+	}
+
+	static DXGI_FORMAT getDXGIFormat( GENERIC_TEXTURE_FORMAT fmt ) {
+		switch( fmt ) {
+		case GTF_RGBA32F:  										return DXGI_FORMAT_R32G32B32A32_FLOAT;		
+		case GTF_RGBA32I:  										return DXGI_FORMAT_R32G32B32A32_SINT;			
+		case GTF_RGBA32UI:  									return DXGI_FORMAT_R32G32B32A32_UINT;			
+		case GTF_RGB32F:  										return DXGI_FORMAT_R32G32B32_FLOAT;			
+		case GTF_RGB32I:  										return DXGI_FORMAT_R32G32B32_SINT;			
+		case GTF_RGB32UI:  										return DXGI_FORMAT_R32G32B32_UINT;			
+		case GTF_RG32F:  										return DXGI_FORMAT_R32G32_FLOAT;				
+		case GTF_RG32I:  										return DXGI_FORMAT_R32G32_SINT;				
+		case GTF_RG32UI:  										return DXGI_FORMAT_R32G32_UINT;				
+		case GTF_RGBA16:  										return DXGI_FORMAT_R16G16B16A16_UNORM;		
+		case GTF_RGBA16F:  										return DXGI_FORMAT_R16G16B16A16_FLOAT;		
+		case GTF_RGBA16I:  										return DXGI_FORMAT_R16G16B16A16_SINT;			
+		case GTF_RGBA16UI:  									return DXGI_FORMAT_R16G16B16A16_UINT;			
+		case GTF_RGBA16_SNORM:  								return DXGI_FORMAT_R16G16B16A16_SNORM;		
+		case GTF_DEPTH32F_STENCIL8:  							return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;		
+		case GTF_RGBA8:  										return DXGI_FORMAT_R8G8B8A8_UNORM;			
+		case GTF_SRGB8_ALPHA8:  								return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;		
+		case GTF_RGBA8I:  										return DXGI_FORMAT_R8G8B8A8_SINT;				
+		case GTF_RGBA8UI:  										return DXGI_FORMAT_R8G8B8A8_UINT;				
+		case GTF_RGBA8_SNORM:  									return DXGI_FORMAT_R8G8B8A8_SNORM;			
+		case GTF_RG16:  										return DXGI_FORMAT_R16G16_UNORM;				
+		case GTF_RG16F:  										return DXGI_FORMAT_R16G16_FLOAT;				
+		case GTF_RG16I:  										return DXGI_FORMAT_R16G16_SINT;				
+		case GTF_RG16UI:  										return DXGI_FORMAT_R16G16_UINT;				
+		case GTF_RG16_SNORM:  									return DXGI_FORMAT_R16G16_SNORM;				
+		case GTF_DEPTH_COMPONENT32F:  							return DXGI_FORMAT_D32_FLOAT;					
+		case GTF_R32F:  										return DXGI_FORMAT_R32_FLOAT;					
+		case GTF_R32I:  										return DXGI_FORMAT_R32_SINT;					
+		case GTF_R32UI:  										return DXGI_FORMAT_R32_UINT;					
+		case GTF_DEPTH24_STENCIL8:  							return DXGI_FORMAT_D24_UNORM_S8_UINT;			
+		case GTF_RGB10_A2:  									return DXGI_FORMAT_R10G10B10A2_UNORM;			
+		case GTF_RGB10_A2UI:  									return DXGI_FORMAT_R10G10B10A2_UINT;			
+		case GTF_R11F_G11F_B10F:  								return DXGI_FORMAT_R11G11B10_FLOAT;			
+		case GTF_RGB9_E5:  										return DXGI_FORMAT_R9G9B9E5_SHAREDEXP;		
+		case GTF_RG8:  											return DXGI_FORMAT_R8G8_UNORM;				
+		case GTF_RG8I:  										return DXGI_FORMAT_R8G8_SINT;					
+		case GTF_RG8UI:  										return DXGI_FORMAT_R8G8_UINT;					
+		case GTF_RG8_SNORM:  									return DXGI_FORMAT_R8G8_SNORM;				
+		case GTF_R16F:  										return DXGI_FORMAT_R16_FLOAT;					
+		case GTF_DEPTH_COMPONENT16:  							return DXGI_FORMAT_D16_UNORM;					
+		case GTF_R16:  											return DXGI_FORMAT_R16_UNORM;					
+		case GTF_R16I:  										return DXGI_FORMAT_R16_SINT;					
+		case GTF_R16UI:  										return DXGI_FORMAT_R16_UINT;					
+		case GTF_R16_SNORM:  									return DXGI_FORMAT_R16_SNORM;					
+		case GTF_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:  			return DXGI_FORMAT_BC6H_UF16;					
+		case GTF_COMPRESSED_RGB_BPTC_SIGNED_FLOAT:		  		return DXGI_FORMAT_BC6H_SF16;					
+		case GTF_R8:  											return DXGI_FORMAT_R8_UNORM;					
+		case GTF_R8I:  											return DXGI_FORMAT_R8_SINT;					
+		case GTF_R8UI:  										return DXGI_FORMAT_R8_UINT;					
+		case GTF_R8_SNORM:  									return DXGI_FORMAT_R8_SNORM;					
+		case GTF_COMPRESSED_RGBA_S3TC_DXT3:		  				return DXGI_FORMAT_BC2_UNORM;					
+		case GTF_COMPRESSED_SRGB_ALPHA_S3TC_DXT3:	  			return DXGI_FORMAT_BC2_UNORM_SRGB;			
+		case GTF_COMPRESSED_RGBA_S3TC_DXT5:		  				return DXGI_FORMAT_BC3_UNORM;					
+		case GTF_COMPRESSED_SRGB_ALPHA_S3TC_DXT5:	  			return DXGI_FORMAT_BC3_UNORM_SRGB;			
+		case GTF_COMPRESSED_RG_RGTC2:  							return DXGI_FORMAT_BC5_UNORM;					
+		case GTF_COMPRESSED_SIGNED_RG_RGTC2:  					return DXGI_FORMAT_BC5_SNORM;					
+		case GTF_COMPRESSED_RGBA_BPTC_UNORM:		  			return DXGI_FORMAT_BC7_UNORM;					
+		case GTF_COMPRESSED_SRGB_ALPHA_BPTC_UNORM:		  		return DXGI_FORMAT_BC7_UNORM_SRGB;			
+		case GTF_COMPRESSED_RGBA_S3TC_DXT1:		  				return DXGI_FORMAT_BC1_UNORM; 				
+		case GTF_COMPRESSED_SRGB_ALPHA_S3TC_DXT1:	  			return DXGI_FORMAT_BC1_UNORM_SRGB; 			
+		case GTF_COMPRESSED_RED_RGTC1:  						return DXGI_FORMAT_BC4_UNORM; 				
+		case GTF_COMPRESSED_SIGNED_RED_RGTC1:  					return DXGI_FORMAT_BC4_SNORM; 				
+
+		default: // unknown
+		case GTF_UNKNOWN:
+																return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
 };
 
 #endif

@@ -56,11 +56,7 @@ std::shared_ptr<Core::ResourceBase> TextureCreateResource( const Core::ResourceH
 	using namespace Core;
 
 	if( flags & RMRF_LOADOFFDISK ) {
-		bool bPreLoad = false;
-		if( flags & RMRF_PRELOAD ) {
-			bPreLoad = true;
-		}
-		Scene::TexturePtr pResource( Texture::internalLoad( handle, pName, bPreLoad ) );
+		Scene::TexturePtr pResource( Texture::internalPreCreate( handle, pName, bPreLoad ) );
 		return std::static_pointer_cast<ResourceBase>( pResource );
 	} else if( flags & RMRF_INMEMORYCREATE ) {
 		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;
@@ -81,7 +77,7 @@ std::shared_ptr<Core::ResourceBase> TextureAtlasCreateResource( const Core::Reso
 		if( flags & RMRF_PRELOAD ) {
 			bPreLoad = true;
 		}
-		Scene::TextureAtlasPtr pResource( Scene::TextureAtlas::internalLoad( handle, pName, bPreLoad ) );
+		Scene::TextureAtlasPtr pResource( Scene::TextureAtlas::internalPreCreate( handle, pName, bPreLoad ) );
 		return std::static_pointer_cast<ResourceBase>( pResource );
 	} else if( flags & RMRF_INMEMORYCREATE ) {
 //		const Texture::CreationStruct* pStruct = (const Texture::CreationStruct*) pData;

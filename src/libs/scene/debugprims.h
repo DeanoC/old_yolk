@@ -45,7 +45,7 @@ namespace Scene {
 		virtual void worldBox( const Core::Colour& colour, const Math::Vector3& pos, const Math::Quaternion& orient, const float lx, const float ly, const float lz, const Math::Matrix4x4& transform = Math::IdentityMatrix() );
 
 		// Actually draw the debug renderables
-		void flush( RenderContext* context );
+		void render( RenderContext* context );
 
 	private:
 
@@ -57,14 +57,14 @@ namespace Scene {
 		struct Vertex {
 			Math::Vector3	pos;
 			uint32_t		colour;
-		} *pVertices;						//! format and pointer to the line vertices
+		};						//! format to the line vertices
+		Vertex						vertices[ MAX_DEBUG_VERTICES * 2 ];
 
 		std::atomic<int>			numLineVertices;			//!< Number of vertices currently used by the line drawer
 		std::atomic<int>			numLineWorldVertices;		//!< Number of vertices currently used by the world space line drawer
 		DebugRenderInterface*		pPrevDRI;					//!< the previous Debug Render Interface
 
 		DataBufferHandlePtr			vertexBufferHandle;
-		DataBufferPtr				vertexBuffer;
 		VertexInputHandlePtr		vaoHandle;
 		ProgramHandlePtr			debugProgramHandle;	
 	};

@@ -1,15 +1,31 @@
-#if defined( __OPENCL_VERSION__ )
+#if defined( D3D_SM5 )
+// d3d11
+#define constant_buffer(x, y) cbuffer x : register( b ## y )
+
+typedef int2				ivec2;
+typedef int3				ivec3;
+typedef int4				ivec4;
+typedef uint				uint32_t;
+typedef uint2				uvec2;
+typedef uint3				uvec3;
+typedef uint4				uvec4;
+typedef float2				vec2;
+typedef float3				vec3;
+typedef float4				vec4;
+typedef float4x4			mat4x4;
+typedef float4x4			float16;
+
+#elif defined( __OPENCL_VERSION__ )
 
 // opencl
 
-#define layout(x)
+#define constant_buffer(x, y) struct x
 
 #elif GL_core_profile == 1
 layout( row_major ) uniform;
 
 // glsl
-#define binding(x) layout( std140, binding = x )
-#define struct uniform 
+#define constant_buffer(x, y) layout( std140, binding = y ) uniform x
 
 #define int2	ivec2
 #define int3	ivec3
@@ -28,7 +44,7 @@ layout( row_major ) uniform;
 #else
 
 // C++ pc code here
-#define binding(x)
+#define constant_buffer(x, y) struct x
 
 typedef uint32_t			uvec2[2];
 typedef uint32_t			uvec3[3];

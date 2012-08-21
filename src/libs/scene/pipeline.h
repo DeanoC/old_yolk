@@ -12,13 +12,18 @@
 #if !defined( YOLK_SCENE_PIPELINE_H_ )
 #define YOLK_SCENE_PIPELINE_H_
 
+#ifndef YOLK_SCENE_TEXTURE_H_
+#include "texture.h"
+#endif
+
 namespace Scene {
 	// forward decl
 	class RenderContext;
+	class Wob;
 
 	class Pipeline {
 	public:
-		Pipeline ( size_t index ) : pipelineIndex( index ){};
+		friend class Renderer;
 		// misc
 		virtual ~Pipeline(){};
 		virtual const char* getName() const = 0;
@@ -26,23 +31,23 @@ namespace Scene {
 
 		// making this the pipeline currently active/unactive
 		virtual void bind( RenderContext* _context ) = 0;
-		virtual void unbind() = 0;
+		virtual void unbind( RenderContext* _context ) = 0;
 
 		// geometry passes
 		// each pipeline needs geometry submitting, it should be
 		// sent GeomPassCoutn times with start and end bracketing it
 		virtual int getGeomPassCount() = 0;
-		virtual void startGeomPass( int i ) = 0;
-		virtual void endGeomPass ( int i ) = 0;
+		virtual void startGeomPass( RenderContext* _context, int i ) = 0;
+		virtual void endGeomPass ( RenderContext* _context, int i ) = 0;
 
-		// merging or display results
-		virtual void display( RenderContext* context, int backWidth, int backHeight ) = 0;
-		virtual void merge( RenderContext* rc ) = 0;
+		virtual TextureHandlePtr getResult() = 0;
 
 		// setup 
-		virtual void conditionWob( const char* name, struct WobResource* wob ) = 0;
+		virtual void conditionWob( Wob* wob ) = 0;
 	protected:
-		const size_t				pipelineIndex;
+		void setRendererIndex( size_t index ) { pipelineIndex = index; }
+		Pipeline () : pipelineIndex( ~0 ){};
+		size_t				pipelineIndex;
 
 	};
 

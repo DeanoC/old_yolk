@@ -1,10 +1,18 @@
 #include "core/core.h"
+#if defined( USE_OPENGL )
 #include "gl/ogl.h"
 #include "gl/gfx.h"
+#endif
+#if defined( USE_DX11 )
+#include "dx11/dx11.h"
+#include "dx11/gfx.h"
+#endif
+
 #include "core/coreresources.h"
 #include "scene/hie.h"
 #include "scene/camera.h"
 #include "scene/rendercontext.h"
+#include "scene/debugpipeline.h"
 #include "core/clock.h"
 #include "core/sysmsg.h"
 #include "core/development_context.h"
@@ -51,8 +59,15 @@ void DwmClient::start() {
 	using namespace Core;
 	using namespace Scene;
 
+#if defined( USE_OPENGL )
 	Gl::Gfx::init();
 	renderer = static_cast< Renderer* >( Gl::Gfx::get() );
+#elif defined( USE_DX11 )
+	Dx11::Gfx::init();
+	renderer = static_cast< Renderer* >( Dx11::Gfx::get() );
+#else
+	#error ASCII Renderer TODO
+#endif
 
 	InitWindow( s_screenWidth, s_screenHeight, !!(START_FLAGS & SCRF_FULLSCREEN) );
 	SystemMessage::get()->registerQuitCallback( QuitCallback );
@@ -65,13 +80,15 @@ void DwmClient::start() {
 		return;
 	}
 
+	renderer->addPipeline( std::make_shared<Scene::DebugPipeline>() );
+
 }
 
 void DwmClient::run() {
 	using namespace Core;
 	using namespace Scene;
 
-	RenderContext* ctx = renderer->getThreadContext( Renderer::RENDER_CONTEXT );
+	RenderContext* ctx = renderer->getPrimaryContext();
 	// render context has been setup to use this thread by the same thread that created teh screen 
 
 	// camera stuff is stuffed needs refactor
@@ -92,11 +109,10 @@ void DwmClient::run() {
 
 		DevelopmentContext::get()->update( deltaT );
 
-		world->render( screen, ctx );
+		world->render( screen, "debug", ctx );
 
 		DevelopmentContext::get()->display();
-
-//		Gl::Gfx::get()->present( curWinWidth, curWinHeight );
+		world->displayRenderResults( screen, "debug", ctx );
 		Core::HouseKeep();
 	}	
 
@@ -106,6 +122,10 @@ void DwmClient::end() {
 	using namespace Core;
 	using namespace Scene;
 
-	renderer->destroyScreen();
+//	renderer->destroyScreen();
+#if defined( USE_OPENGL )
 	Gl::Gfx::shutdown();	
+#elif defined( USE_DX11 )
+	Dx11::Gfx::shutdown();
+#endif
 }

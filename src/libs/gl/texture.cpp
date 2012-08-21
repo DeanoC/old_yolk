@@ -253,7 +253,7 @@ struct TextureFileHeader {
 	// padding so that properties start on a 64 bit alignment 
 };
 
-Texture* Texture::internalLoad( const Core::ResourceHandleBase* baseHandle, 
+Texture* Texture::internalPreCreate( const Core::ResourceHandleBase* baseHandle, 
 								const char* pTextureFileName, 
 								bool preload ) {
 	using namespace Scene;

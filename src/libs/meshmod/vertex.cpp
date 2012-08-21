@@ -39,7 +39,7 @@ An exact copy of the input vertex is created and its index returned, point reps 
 @return index of the new vertex
 */
 unsigned int Mesh::cloneVertex( const VertexIndex vertexToCopy ) {
-	const VertexIndex newIndex = vertexContainer.cloneElement( vertexToCopy );
+	const VertexIndex newIndex = (const VertexIndex) vertexContainer.cloneElement( vertexToCopy );
 
 	// add to the point rep list (increased via vertex container)
 	const VertexIndex temp = (*pointRep)[vertexToCopy].next;
@@ -58,7 +58,7 @@ Adds a new position (which has the effect of creating a new vertex), updates the
 @return index of new vertex
 */
 VertexIndex Mesh::addPosition( const float x, const float y, const float z ) {
-	const VertexIndex oldSize = vertexContainer.size();
+	const VertexIndex oldSize = (const VertexIndex) vertexContainer.size();
 
 	// default to linking to itself
 	const VertexIndex link = oldSize;

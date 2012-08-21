@@ -23,8 +23,9 @@
 
 #include "LWObject2GO.h"
 
+#if !defined(UNREFERENCED_PARAMETER)
 #define UNREFERENCED_PARAMETER(x) (void)x
-
+#endif
 //---------------------------------------------------------------------------
 // Local Enums and typedefs
 //---------------------------------------------------------------------------

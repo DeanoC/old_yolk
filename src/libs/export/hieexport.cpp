@@ -94,7 +94,7 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 					}
 
 					if( objNum == 0 ) {
-						int childCount = node->getChildCount() + node->getObjectCount();
+						unsigned int childCount = node->getChildCount() + node->getObjectCount();
 						// any children minus this object link it up
 						if( childCount > 1 ) {
 							nodeStream << "0, NodeTree" << nodeIndex << " - beginLab"<< "\t\t\t\t\t // pointer to children node tree\n";
@@ -174,8 +174,8 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 					nodeStream << "0, NodeTree" << nodeIndex << " - beginLab"<< "\t\t\t\t\t // pointer to children node tree\n";
 					linkStream << "NodeTree" << nodeIndex << ":\n";
 					linkStream << (uint32_t) childCount << "\t\t\t\t\t // Number of Childen\n";
-					for( unsigned int i=0;i < childCount;++i ) {
-						int childNo = std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
+					for( unsigned int i=0;i < (unsigned int) childCount;++i ) {
+						int childNo = (int) std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
 						linkStream << "Node_" << childNo << " / " <<
 									"(Node_" << childNo << "_end - " <<
 									"Node_" << childNo << ")";
@@ -203,7 +203,7 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 	// produce a wob node header 
 	outStream << "// hierachy file\n";
 	outStream << ".type u32\n";
-	outStream << HierType << "\t// HIER\n";	// magic
+	outStream << HieType << "\t// HIER\n";	// magic
 	outStream << "(u16) " << nodeCounter << "\t\t\t\t\t // num nodes\n";
 	outStream << "(u8) " << (int)HierVersion << "\t\t\t\t\t // version\n";
 	if( scene->properties.size() > 0 ) {
@@ -248,7 +248,7 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 	Binify( outStream.str(), foutStream );
 	foutStream.close();
 
-	manifest.push_back( Core::ResourceManifestEntry(  HierType, pOutFilename.BaseName().RemoveExtension().value() ) );
+	manifest.push_back( Core::ResourceManifestEntry( HieType, pOutFilename.BaseName().RemoveExtension().value() ) );
 
 	return true;
 }

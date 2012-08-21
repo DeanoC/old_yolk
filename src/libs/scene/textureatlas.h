@@ -30,9 +30,12 @@ namespace Scene {
 	//!-----------------------------------------------------
 	class TextureAtlas : public Core::Resource<TextureAtlasType> {
 	public:
+		friend class ResourceLoader;
 
-		struct CreationStruct {};
-		struct LoadStruct {};
+		struct CreationStruct {
+			void*	data;	// just to pass to the second part of the loader
+		};
+		struct CreationInfo {};
 
 		struct SubTexture {
 			uint32_t 	index;
@@ -63,13 +66,10 @@ namespace Scene {
 		//! get the pixel dimensions of the subtexture with the specified index
 		void getSubTextureDimensions( unsigned int index, unsigned int& width , unsigned int& height ) const;
 
-		static TextureAtlas* internalLoad( 	const Core::ResourceHandleBase* baseHandle, 
-											const char* pTextureAtlasFileName, 
-											bool preload );
-
 		~TextureAtlas();
 	private:
 		TextureAtlas(){};
+		static const void* internalPreCreate( const char* name, const TextureAtlas::CreationInfo *creation );
 
 		typedef std::vector<TextureHandlePtr>	PackedTextureContainer;
 		typedef std::vector<SubTexture>			SubTextureContainer;

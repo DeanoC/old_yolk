@@ -13,6 +13,7 @@
 #include "riak/core_types.hxx"
 #include "riak/transport.hxx"
 #include "dwm/world.h"
+#include <boost/asio.hpp>
 
 class VMThreads;
 

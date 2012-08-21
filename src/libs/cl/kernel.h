@@ -69,13 +69,12 @@ namespace Cl {
 	class Kernel :	public Core::Resource<KernelRType> {
 	public:	
 		~Kernel();
-		struct CreationStruct {
+		struct CreationInfo {
 			Context*					context;	//<! which contex is the kernel for
 			KERNEL_CREATION_FLAGS		flags;		
 			DEVICE_EXTENSIONS_FLAGS		required;	//!< which extensions are required
 		};
-		struct LoadStruct {};
-		static Kernel* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationStruct* creation );
+		static Kernel* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationInfo* creation );
 
 		cl_kernel			getName() const { return name; }
 		template< typename T> void setArg( unsigned int num, const T& arg ) {

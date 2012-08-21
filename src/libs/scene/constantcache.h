@@ -24,7 +24,8 @@ namespace Scene {
 		CF_PER_TARGETS,
 		CF_STD_OBJECT,
 
-		CF_USER_BLOCKS,
+		CF_NUM_BLOCKS,
+
 		CF_MAX_BLOCKS = 16,
 	};
 	
@@ -93,11 +94,9 @@ namespace Scene {
 		// callers responsability for user (non shared) blocks, passing null (default)
 		// will update all the gpu blocks that need updating, regardless of whether its
 		// accessed by the current shader
-		void updateGPU( const ProgramPtr prg = nullptr  );
-		// fast path if you suspect only object varaibles have changed
-		void updateGPUObjectOnly();
+		void updateGPU( Scene::RenderContext* context, const ProgramPtr prg = nullptr  );
 
-		void updateGPUBlock( CONSTANT_FREQ_BLOCKS block ) const;
+		void updateGPUBlock( Scene::RenderContext* context, CONSTANT_FREQ_BLOCKS block ) const;
 
 		// ensure block is upto date first!
 		const DataBufferHandlePtr getBlock( CONSTANT_FREQ_BLOCKS block ) const;

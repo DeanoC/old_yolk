@@ -18,8 +18,7 @@ namespace Gl {
 				public Core::Resource<XboRType> {
 	public:
 
-		struct CreationStruct {};
-		struct LoadStruct {};
+		struct CreationInfo {};
 
 		static Xbo* internalCreate(	const Core::ResourceHandleBase* baseHandle, const char* pName ) {
 			Xbo* xbo = CORE_NEW Xbo();

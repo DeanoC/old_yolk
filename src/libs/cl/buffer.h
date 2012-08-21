@@ -32,18 +32,17 @@ namespace Cl {
 	class Buffer :	public MemoryObject,
 					public Core::Resource<BufferRType> {
 	public:	
-		struct CreationStruct {
+		struct CreationInfo {
 			Context*					context;	//<! which contex is the buffer from	
 			uint32_t					flags;		//<! how its filled, mapped, etc.
 			size_t						size;		//<! size in bytes
 			void*						data;		//<! data to fill if PRE_FILLing
 			std::shared_ptr<Gl::DataBuffer> glbuffer;	//<! shared pointer to the gl buffer we are from if BCF_FROM_GL is set
 		};
-		struct LoadStruct {};
 
 		size_t	getSize() const { return size; }
 
-		static Buffer* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationStruct* creation );
+		static Buffer* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationInfo* creation );
 	protected:
 		size_t size;
 		std::shared_ptr<Gl::DataBuffer>		glDataBufferPtr;

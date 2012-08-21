@@ -9,10 +9,15 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_RESOURCEMANAGER_H
-#define WIERD_CORE_RESOURCEMANAGER_H
+#ifndef YOLK_CORE_RESOURCEMAN_H_
+#define YOLK_CORE_RESOURCEMAN_H_
 
-#include "resourcebase.h"
+#ifndef YOLK_CORE_RESOURCEBASE_H_
+#	include "resourcebase.h"
+#endif
+#ifndef YOLK_CORE_SINGLETON_H_
+#	include "singleton.h"
+#endif
 
 namespace Core
 {
@@ -39,6 +44,9 @@ public:
 	//! called the resourcehandle is destroyed (on final Close), should call CORE_DELETE on the derived handle type
 	typedef void (*DestroyResourceHandleCallback)( ResourceHandleBase* handle );
 
+	//! when acquire is called pumping queues may be required to avoid deadlock. can be called on any thead so beware!
+	typedef void (*AcquirePumpCallback)();
+
 
 	//! register callback for a new resource type
 	void registerResourceType (		uint32_t type, //!< unique ID for resource
@@ -49,6 +57,7 @@ public:
 									ChangeResourceCallback pChange= 0, //!< Optional callback when change occurs
 									const std::string dir = ""			//!< Optional directory prefix
 									);
+	void registerAcquirePump( AcquirePumpCallback pump );
 
 	// Load or Create a resource, for load name is filename, data is the resource specific load structure, 
 	// for create name is internal name to allow caching or not, data is the resource specific create structure
@@ -75,6 +84,7 @@ public:
 
 	void internalAcquireComplete( const ResourceHandleBase* _handle, std::shared_ptr<ResourceBase>& _resource );
 
+	void internalPumpAcquirePump();
 private:
 	//! Internal AcquireResource used by TypedResourceHandle
 	template<uint32_t type>
@@ -94,12 +104,6 @@ template<uint32_t type>
 const TypedResourceHandle<type>* ResourceMan::loadCreateResource( const char* pName, const void* pData, const size_t sizeofData, uint32_t flags ) {
 	const ResourceHandleBase* pRHB = implOpenResource( pName, pData, sizeofData, type, (RESOURCE_FLAGS)flags );
 	const TypedResourceHandle<type>* pRH = (const TypedResourceHandle<type>*) pRHB;
-	if( flags & RMRF_PRELOAD ) {
-		if( pRH->resourceBase.expired() ) {
-			// note is allowed to return NULL for the shared pointer as its likely the object isn't ready
-			internalAcquireResource<type>( pRHB );
-		}
-	}
 	return pRH;
 }
 
@@ -139,8 +143,9 @@ inline std::shared_ptr<Resource<type_> > ResourceHandleBase::baseAcquire() const
 		} else {
 			std::shared_ptr<Resource<type_> > acquiredp( 
 					ResourceMan::get()->internalAcquireResource<type_>( this ) );
-			if( acquiredp )
-				return acquiredp;
+			if( acquiredp ) { return acquiredp; }
+
+			ResourceMan::get()->internalPumpAcquirePump();
 		}
 	} while( true );
 }

@@ -1,7 +1,7 @@
 //!-----------------------------------------------------
 //!
-//! \file texture_pc.cpp
-//! the texture functions on PC
+//! \file texture.cpp
+//! the texture functions on dx11
 //!
 //!-----------------------------------------------------
 
@@ -12,462 +12,222 @@
 #include "core/resourceman.h"
 #include "core/file_path.h"
 
-namespace Dx11
-{
+namespace Dx11 {
 
-Texture::Texture() :
-	m_baseTexture(0), 
-	m_primaryView(0),
-	m_extraView(0)
-{
-}
-
-Texture::~Texture() {
-	//
-	SAFE_RELEASE( m_extraView );
-	SAFE_RELEASE( m_primaryView );
-	SAFE_RELEASE( m_baseTexture );
-}
-
-Texture* Texture::InternalLoadTexture( const Core::ResourceHandleBase* baseHandle, const char* pFileName, bool bPreLoad ) {
-	Core::FilePath path( pFileName );
-	path = path.ReplaceExtension( ".dds" );
-	const char* pTextureFileName = path.value().c_str();
-
-	TextureHandlePtr handle = (TextureHandlePtr) baseHandle; 
-
+Scene::Texture* Texture::internalCreate( const void* data ) {
+	using namespace Scene;
 	HRESULT hr;
-
-	if( FAILED( handle->asyncResult ) && handle->asyncResultPtr == NULL ) {
-		// shader has started compiling but hasn't finished so wait
-		while( handle->asyncResult == E_PENDING && handle->asyncResultPtr == NULL ) {
-			DXFAIL( Graphics::Gfx::Get()->GetThreadPump()->ProcessDeviceWorkItems( 1 ) );
-		}
-		if( handle->asyncResult != E_PENDING && handle->asyncResultPtr == NULL ) {
-			if( FAILED( handle->asyncResult ) ) {
-				DXWARN( handle->asyncResult );			
-			}
-			LOG(INFO) << "Texture : " << pTextureFileName << " not found, using Defaulted.dds\n";
-			Texture::CreationStruct fromExist( CF_FROM_D3D_TEXTURE ) ;
-			ID3D11Resource* res = Graphics::Gfx::Get()->getDefaultedTexture()->Acquire().get()->m_baseTexture;
-			ID3D11Texture2D* pD3DTex;
-			hr = res->QueryInterface( __uuidof( *pD3DTex ), ( LPVOID* )&pD3DTex );
-			fromExist.platformParam0 = (uintptr_t)pD3DTex;
-			Texture* tex = InternalCreateTexture( &fromExist );
-			return tex;
-		}
-	} else if( bPreLoad ) {
-		// just doing a preload so kick one off
-		handle->asyncResultPtr = 0;
-		handle->asyncResult = E_PENDING;
-
-		hr = D3DX11CreateTextureFromFile(
-					Gfx::Get()->GetDevice(),
-					pTextureFileName,
-					NULL,
-					Gfx::Get()->GetThreadPump(),
-					(ID3D11Resource**)&handle->asyncResultPtr,
-					&handle->asyncResult
-					);
-		DXWARN( hr );
-		return NULL;
-	} else {
-		// stalling async load
-		handle->asyncResultPtr = 0;
-		handle->asyncResult = E_PENDING;
-
-		hr = D3DX11CreateTextureFromFile(
-					Gfx::Get()->GetDevice(),
-					pTextureFileName,
-					NULL,
-					Gfx::Get()->GetThreadPump(),
-					(ID3D11Resource**)&handle->asyncResultPtr,
-					&handle->asyncResult
-					);
-		DXWARN( hr );
-		return InternalLoadTexture( baseHandle, pFileName, false );
-	}
-
-	handle->asyncResult = S_OK;
-	Texture* pResource = CORE_NEW Texture();
-
-	D3D11_TEXTURE2D_DESC texDesc;
-	ID3D11Texture2D* pTexture = (ID3D11Texture2D*) &(*handle->asyncResultPtr);
-	handle->asyncResultPtr.Detach();
-	pTexture->GetDesc( &texDesc );
-	pResource->m_iWidth = texDesc.Width;
-	pResource->m_iHeight = texDesc.Height;
-	pResource->m_iFormat = texDesc.Format;
-	pResource->m_iMipLevels = texDesc.MipLevels;
-	pResource->m_baseTexture = pTexture;
-	DXFAIL( Gfx::Get()->GetDevice()->CreateShaderResourceView(pTexture, NULL, (ID3D11ShaderResourceView**) &pResource->m_primaryView ) );
-
-#if defined( _DEBUG )
-	pResource->m_baseTexture->SetPrivateData( WKPDID_D3DDebugObjectName, strlen(pFileName), pFileName );
-#endif
-
-	return pResource;
-}
-Texture* Texture::InternalCreateTexture( const Texture::CreationStruct* pStructOrig ) {
-	Texture* pResource = CORE_NEW Texture();
-	D3D11_TEXTURE2D_DESC texDesc = { 0 };
 
 	// copy and point to TODO big ugly but quick...
-	Texture::CreationStruct copyTCS = *pStructOrig;
-	Texture::CreationStruct* pStruct = &copyTCS;
+	Texture::CreationInfo copyTCS = *((Texture::CreationInfo*)data);
+	Texture::CreationInfo* creation = &copyTCS;
 
-	HRESULT hr;
+	DXGI_FORMAT fmt = DXGIFormat::getDXGIFormat( creation->format );
+	CORE_ASSERT( (creation->flags & RCF_D3D_FROM_OS ) || (fmt != DXGI_FORMAT_UNKNOWN) );
 
-	texDesc.Width = pStruct->iWidth;
-	texDesc.Height = pStruct->iHeight;
-	texDesc.MipLevels = pStruct->iMipLevels;
-	texDesc.ArraySize = 1;
-	texDesc.Format = pStruct->texFormat;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
+	uint32_t usage = 0;
+	uint32_t cpuAccess = 0;
+	boost::scoped_array< D3D11_SUBRESOURCE_DATA > initialData;
 
-	if( pStruct->iFlags & (CF_RAW_BUFFER | CF_STRUCTURED_BUFFER) ) {
-		pStruct->iFlags |= CF_BUFFER;
-	}
-	if( pStruct->iFlags & (CF_UAV_COUNTER | CF_UAV_APPEND | CF_DRAW_INDIRECT) ) {
-		pStruct->iFlags |= CF_BUFFER | CF_UAV;
-	}
+	// can't read and write from teh cpu to the same buffer
+	CORE_ASSERT( (( creation->flags & RCF_ACE_CPU_WRITE ) == false) || (( creation->flags & RCF_ACE_CPU_READ ) == false) );
 
-	if( pStruct->iFlags & CF_UAV ) {
-		texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
-		assert( (pStruct->iFlags & CF_MULTISAMPLE) == false ); // Dx11 limitation :(
-	}
-	if( pStruct->iFlags & CF_KEYEDMUTEX ) {
-		texDesc.MiscFlags|= D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
-	}
-	if( pStruct->iFlags & CF_CPU_READ  ) {
-		texDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_READ;
-		texDesc.Usage = D3D11_USAGE_DYNAMIC;
-	}
-	if( pStruct->iFlags & CF_CPU_WRITE ) {
-		texDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
-		texDesc.Usage = D3D11_USAGE_DYNAMIC;
-	}
-	if( pStruct->iFlags & CF_ARRAY ) {
-		assert( (pStruct->iFlags & CF_3D) == false );
-		// arrays of cubemaps are just depth * 6 for creation purpose
-		if( pStruct->iFlags & CF_CUBE_MAP ) {
-			assert( (pStruct->iFlags & CF_1D) == false );
-			texDesc.ArraySize = pStruct->iDepth * 6;
-			texDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
+	if( creation->flags & RCF_ACE_CPU_STAGING ) {
+		usage = D3D11_USAGE_STAGING; // CPU read-backs
+		cpuAccess = D3D11_CPU_ACCESS_READ;
+	} else if( creation->flags & RCF_ACE_CPU_WRITE ) {
+		if( creation->flags & RCF_ACE_ONCE ) {
+			usage = D3D11_USAGE_DEFAULT;
 		} else {
-			texDesc.ArraySize = pStruct->iDepth;
+			usage = D3D11_USAGE_DYNAMIC;
 		}
-	} else 	if( pStruct->iFlags & CF_CUBE_MAP ) {
-		assert( (pStruct->iFlags & CF_3D) == false );
-		assert( (pStruct->iFlags & CF_1D) == false );
-		// non arrayed cube map
-		texDesc.ArraySize = 6;
-		texDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
-	}
-	if( pStruct->iFlags & CF_STREAM_OUT ) {
-		texDesc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;
-	}
-	if( pStruct->iFlags & CF_VERTEX_BUFFER ) {
-		texDesc.BindFlags |= D3D11_BIND_VERTEX_BUFFER;
-	}
-
-	if( pStruct->iFlags & CF_FROM_D3D_TEXTURE ) {
-		// todo support non 2D from d3d textures, if rquired
-		ID3D11Texture2D* pTexture = (ID3D11Texture2D*) pStruct->fromD3DTex;
-		// ovveride passed in with ones in the existing textures
-		pTexture->GetDesc( &texDesc );
-		pResource->m_baseTexture = pTexture;
-	} else if( pStruct->iFlags & CF_RENDER_TARGET) {
-		if( pStruct->iFlags & CF_MULTISAMPLE && pStruct->platformParam0 > 1) {
-			texDesc.SampleDesc.Count = pStruct->sampleCount;
-			texDesc.SampleDesc.Quality = 0; // TODO quality
-		}
-
-		if( DXGIFormat::IsDepthStencilFormat( texDesc.Format ) ) {
-			texDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
-
-			// Dx10 backwards compat, can't bind depth surfaces to shaders if multisampling.
-			if( Graphics::Gfx::Get()->getShaderModel() == Gfx::SM4_0 && texDesc.SampleDesc.Count > 1 ) {
-				texDesc.BindFlags &= ~D3D11_BIND_SHADER_RESOURCE;
-			}
-		} else {
-			texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-		}
-	}
-
-	Core::scoped_array<D3D11_SUBRESOURCE_DATA> initialData;
-
-	if( pStruct->iFlags & CF_PRE_FILL ) {
-		assert( texDesc.Usage == 0 );
-		assert( (pStruct->iFlags & CF_MULTISAMPLE) == false );
-
+		cpuAccess = D3D11_CPU_ACCESS_WRITE;
+	} else if( creation->flags & RCF_ACE_GPU_WRITE_ONLY ) {
+		usage = D3D11_USAGE_DEFAULT;
+		cpuAccess = 0;
+	} else if( creation->flags & RCF_ACE_IMMUTABLE ) {
 		// each mip is a sub resource and each array slice is
-		uint32_t numMipLevels = (pStruct->iMipLevels > 0) ? pStruct->iMipLevels : 1;
-		uint32_t numSubResources = texDesc.ArraySize * numMipLevels;
-		texDesc.Usage = D3D11_USAGE_IMMUTABLE;
-		initialData.reset( CORE_NEW_ARRAY D3D11_SUBRESOURCE_DATA[numSubResources]);
-		uint8_t* memPtr = (uint8_t*) pStruct->prefillData;
-		for( unsigned int i =0;i < texDesc.ArraySize; ++i ) {
+		uint32_t numMipLevels = (creation->mipLevels > 0) ? creation->mipLevels : 1;
+		uint32_t numSubResources = creation->slices * numMipLevels;
+		initialData.reset( CORE_NEW_ARRAY D3D11_SUBRESOURCE_DATA[numSubResources] );
+		uint8_t* memPtr = (uint8_t*) creation->prefillData;
+		for( unsigned int i =0;i < creation->slices; ++i ) {
 			for( unsigned int j = 0; j < numMipLevels; ++j ) {
 				initialData[(i*numMipLevels)+j].pSysMem = memPtr;
-				if( pStruct->iFlags & CF_1D) {
+				if(creation->flags & RCF_TEX_1D ) {
 					memPtr += initialData[(i*numMipLevels)+j].SysMemPitch >> j;
-				} else if( pStruct->iFlags & CF_3D ) {
-					TODO_ASSERT(pStruct->iFlags & CF_3D);
-				} else {
-					initialData[(i*numMipLevels)+j].SysMemPitch = pStruct->prefillPitch  >> j;
-					memPtr += (initialData[(i*numMipLevels)+j].SysMemPitch * (texDesc.Height>>j));
+				} else if(creation->flags & RCF_TEX_2D ) {
+					initialData[(i*numMipLevels)+j].SysMemPitch = creation->prefillPitch >> j;
+					memPtr += (initialData[(i*numMipLevels)+j].SysMemPitch * (creation->height>>j));
+				} else if(creation->flags & RCF_TEX_3D ) {
+					TODO_ASSERT( creation->flags & RCF_TEX_3D );
 				}
 			}
 		}
-	}
-
-	if( (pStruct->iFlags & CF_FROM_D3D_TEXTURE) == false ) {
-		DXGI_FORMAT typelessFormat = texDesc.Format;
-		if( (pStruct->iFlags & CF_KEYEDMUTEX) == false ) {
-			typelessFormat = DXGIFormat::GetTypelessTextureFormat( texDesc.Format );
-		}
-
-		if( pStruct->iFlags & CF_BUFFER ) {
-			D3D11_BUFFER_DESC bufDesc;
-			bufDesc.BindFlags = texDesc.BindFlags;
-			bufDesc.CPUAccessFlags = texDesc.CPUAccessFlags;
-			bufDesc.MiscFlags = texDesc.MiscFlags;
-			bufDesc.Usage = texDesc.Usage;
-
-
-			if( pStruct->iFlags & CF_RAW_BUFFER ) {
-				bufDesc.MiscFlags |= D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
-				bufDesc.ByteWidth = texDesc.Width;
-			} else if( pStruct->iFlags & CF_STRUCTURED_BUFFER ) {
-				bufDesc.MiscFlags |= D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-				bufDesc.ByteWidth = texDesc.Width * pStruct->structureSize;
-				bufDesc.StructureByteStride = pStruct->structureSize;
-			} else {
-				bufDesc.ByteWidth = texDesc.Width * (DXGIFormat::GetBitWidth(texDesc.Format) / 8);
-			}
-			if( pStruct->iFlags & CF_DRAW_INDIRECT ) {
-				bufDesc.MiscFlags |= D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
-			}
-
-			ID3D11Buffer* pBuffer;
-			DXFAIL( Gfx::Get()->GetDevice()->CreateBuffer(&bufDesc, initialData.get(), &pBuffer ) );
-			pResource->m_baseTexture = pBuffer;
-
-		} else if( pStruct->iFlags & CF_1D ) {
-			assert( (pStruct->iFlags & CF_MULTISAMPLE) == false );
-			D3D11_TEXTURE1D_DESC texTexDesc;
-			texTexDesc.ArraySize = texDesc.ArraySize;
-			texTexDesc.BindFlags = texDesc.BindFlags;
-			texTexDesc.CPUAccessFlags = texDesc.CPUAccessFlags;
-			texTexDesc.Format = typelessFormat;
-			texTexDesc.MipLevels = texDesc.MipLevels;
-			texTexDesc.MiscFlags = texDesc.MiscFlags;
-			texTexDesc.Usage = texDesc.Usage;
-			texTexDesc.Width = texDesc.Width;
-			ID3D11Texture1D* pTexture;
-			DXFAIL( Gfx::Get()->GetDevice()->CreateTexture1D(&texTexDesc, initialData.get(), &pTexture ) );
-			pResource->m_baseTexture = pTexture;
-		} else if( pStruct->iFlags & CF_3D ) {
-			assert( (pStruct->iFlags & CF_MULTISAMPLE) == false );
-			D3D11_TEXTURE3D_DESC texTexDesc;
-			texTexDesc.BindFlags = texDesc.BindFlags;
-			texTexDesc.CPUAccessFlags = texDesc.CPUAccessFlags;
-			texTexDesc.Format = typelessFormat;
-			texTexDesc.MipLevels = texDesc.MipLevels;
-			texTexDesc.MiscFlags = texDesc.MiscFlags;
-			texTexDesc.Usage = texDesc.Usage;
-			texTexDesc.Width = texDesc.Width;
-			texTexDesc.Height = texDesc.Height;
-			texTexDesc.Depth = pStruct->iDepth;
-			ID3D11Texture3D* pTexture;
-			DXFAIL( Gfx::Get()->GetDevice()->CreateTexture3D(&texTexDesc, initialData.get(), &pTexture ) );
-			texDesc.ArraySize = texTexDesc.Depth; // pretend a 3D is an array just for a short bit
-			pResource->m_baseTexture = pTexture;
-		} else {
-			D3D11_TEXTURE2D_DESC texTexDesc = texDesc;
-			texTexDesc.Format = typelessFormat;
-			ID3D11Texture2D* pTexture;
-			DXFAIL( Gfx::Get()->GetDevice()->CreateTexture2D(&texTexDesc, initialData.get(), &pTexture ) );
-			pResource->m_baseTexture = pTexture;
-		}
-	}
-
-	pResource->m_iWidth = texDesc.Width;
-	pResource->m_iHeight = texDesc.Height;
-	pResource->m_iDepth = texDesc.ArraySize;
-	pResource->m_iFormat = texDesc.Format;
-	pResource->m_iMipLevels = texDesc.MipLevels;
-
-	// primary view
-	D3D11_SHADER_RESOURCE_VIEW_DESC srDesc;
-	bool noPrimaryView = false;
-	if( DXGIFormat::IsDepthStencilFormat( texDesc.Format ) ) {
-		srDesc.Format = DXGIFormat::GetShaderDepthTextureFormat( texDesc.Format );
-		// Dx10 backwards compat!
-		if( Graphics::Gfx::Get()->getShaderModel() == Gfx::SM4_0 && texDesc.SampleDesc.Count > 1 ) {
-			noPrimaryView = true;
-		}
+		usage = D3D11_USAGE_IMMUTABLE;
+		cpuAccess = 0;
+	} else if( creation->flags & RCF_ACE_CPU_READ ) {	
+		usage = D3D11_USAGE_DYNAMIC;
+		cpuAccess = D3D11_CPU_ACCESS_READ;
 	} else {
-		srDesc.Format = texDesc.Format;
+		usage = D3D11_USAGE_DEFAULT;
+		cpuAccess = 0;
 	}
 
-	if( noPrimaryView == false  ) {
-		if( pStruct->iFlags & CF_BUFFER ) {
-			// a buffer view is a shader resource view but typed as a buffer rather than a texture
-			srDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
-			if( pStruct->iFlags & CF_STRUCTURED_BUFFER ) {
-				srDesc.Format = DXGI_FORMAT_UNKNOWN;
-			}
-			srDesc.BufferEx.NumElements = pResource->m_iWidth;
-			srDesc.BufferEx.FirstElement = 0;
-			if( pStruct->iFlags & CF_RAW_BUFFER ) {
-				srDesc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
-			} else {
-				srDesc.BufferEx.Flags = 0;
-			}
-		} else if( pStruct->iFlags & CF_1D ) {
-			// 1d and arrays of them
-			if( pStruct->iFlags & CF_ARRAY ) {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1DARRAY;
-				srDesc.Texture1DArray.MipLevels = texDesc.MipLevels;
-				srDesc.Texture1DArray.MostDetailedMip = 0;
-				srDesc.Texture1DArray.ArraySize = texDesc.ArraySize;
-				srDesc.Texture1DArray.FirstArraySlice = 0;
-			} else {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
-				srDesc.Texture1D.MipLevels = texDesc.MipLevels;
-				srDesc.Texture1D.MostDetailedMip = 0;
-			}
-		} else if( pStruct->iFlags & CF_CUBE_MAP ) {
-			// cube and arrays of them
-			if( pStruct->iFlags & CF_ARRAY ) {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBEARRAY;
-				srDesc.TextureCubeArray.NumCubes = texDesc.ArraySize / 6;
-				srDesc.TextureCubeArray.First2DArrayFace = 0;
-				srDesc.TextureCubeArray.MipLevels = texDesc.MipLevels;
-				srDesc.TextureCubeArray.MostDetailedMip = 0;
-			} else {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-				srDesc.TextureCube.MipLevels = texDesc.MipLevels;
-				srDesc.TextureCube.MostDetailedMip = 0;
-			}
-		} else if( pStruct->iFlags & CF_3D ) {
-			// just 3d, currently no arrays of 3D
-			srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
-			srDesc.Texture2D.MipLevels = texDesc.MipLevels;
-			srDesc.Texture2D.MostDetailedMip = 0;
-		} else if( texDesc.SampleDesc.Count > 1 ) {
-			// 2D multisample and arrays of them
-			if( pStruct->iFlags & CF_ARRAY ) {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
-				srDesc.Texture2DMSArray.ArraySize = texDesc.ArraySize;
-				srDesc.Texture2DMSArray.FirstArraySlice = 0;
-			} else {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-			}
-		} else {
-			// good ol' fashioned 2D, well maybe an array of them...
-			if( pStruct->iFlags & CF_ARRAY ) {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-				srDesc.Texture2DArray.ArraySize = texDesc.ArraySize;
-				srDesc.Texture2DArray.FirstArraySlice = 0;
-				srDesc.Texture2DArray.MipLevels = texDesc.MipLevels;
-				srDesc.Texture2DArray.MostDetailedMip = 0;
-			} else {
-				srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-				srDesc.Texture2D.MipLevels = texDesc.MipLevels;
-				srDesc.Texture2D.MostDetailedMip = 0;
-			}
-		}
-
-		DXFAIL( Gfx::Get()->GetDevice()->CreateShaderResourceView(pResource->m_baseTexture, &srDesc, (ID3D11ShaderResourceView**)&pResource->m_primaryView ) );
+	uint32_t bind = 0;
+	uint32_t misc = 0;
+	if( creation->flags & RCF_BUF_CONSTANT ) {
+		bind |= D3D11_BIND_CONSTANT_BUFFER;
 	}
-	// extra view
-	if( pStruct->iFlags & CF_RENDER_TARGET ) {
-		if( DXGIFormat::IsDepthStencilFormat( texDesc.Format ) ) {
-			D3D11_DEPTH_STENCIL_VIEW_DESC dsDesc;
-			dsDesc.Flags = 0;
-			dsDesc.Format = texDesc.Format;
-			if( texDesc.SampleDesc.Count > 1 ) {
-				dsDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-			} else {
-				dsDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-				dsDesc.Texture2D.MipSlice = 0;
-			}
-			DXFAIL( Gfx::Get()->GetDevice()->CreateDepthStencilView( pResource->m_baseTexture, &dsDesc, (ID3D11DepthStencilView**)&pResource->m_extraView ) );
-
+	if( creation->flags & RCF_BUF_VERTEX ) {
+		bind |= D3D11_BIND_VERTEX_BUFFER;
+	}
+	if( creation->flags & RCF_BUF_INDEX ) {
+		bind |= D3D11_BIND_INDEX_BUFFER;
+	}
+	if( creation->flags & RCF_BUF_STREAMOUT ) {
+		bind |= D3D11_BIND_STREAM_OUTPUT;
+	}
+	if( creation->flags & RCF_PRG_READ ) {
+		bind |= D3D11_BIND_SHADER_RESOURCE;
+	}
+	if( creation->flags & RCF_OUT_UNORDERED_ACCESS ) {
+		bind |= D3D11_BIND_UNORDERED_ACCESS;
+		CORE_ASSERT( creation->samples <= 1 ); // dx11/hw limit no multisample uav
+	}
+	if( creation->flags & RCF_PRG_BYTE_ACCESS ) {
+		misc |= D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+	}
+	if( creation->flags & RCF_PRG_STRUCTURED ) {
+		misc |= D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	}
+	if( creation->flags & RCF_ACE_GPU_INDIRECT ) {
+		misc |= D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
+	}
+	if( creation->flags & RCF_OUT_RENDER_TARGET ) {
+		if( DXGIFormat::isDepthStencilFormat( fmt ) ) {
+			bind |= D3D11_BIND_DEPTH_STENCIL;
 		} else {
-			D3D11_RENDER_TARGET_VIEW_DESC rtDesc;
-			rtDesc.Format = texDesc.Format;
-			if( texDesc.SampleDesc.Count > 1 ) {
-				rtDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-			} else {
-				rtDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-				rtDesc.Texture2D.MipSlice = 0;
-			}
-			DXFAIL( Gfx::Get()->GetDevice()->CreateRenderTargetView( pResource->m_baseTexture, &rtDesc, (ID3D11RenderTargetView**) &pResource->m_extraView ) );
+			bind |= D3D11_BIND_RENDER_TARGET;
 		}
-	} else if( pStruct->iFlags & CF_UAV ) {
-		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-		if( pStruct->iFlags & CF_BUFFER ) {
-			if( pStruct->iFlags & CF_STRUCTURED_BUFFER ) {
-				uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-			} else {
-				uavDesc.Format = texDesc.Format;
-			}
-			uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-			uavDesc.Buffer.FirstElement = 0;
-			uavDesc.Buffer.Flags = 0;
-			uavDesc.Buffer.NumElements = pResource->m_iWidth;
-
-			if( pStruct->iFlags & CF_UAV_COUNTER ) {
-				uavDesc.Buffer.Flags  |= D3D11_BUFFER_UAV_FLAG_COUNTER;
-			}
-			if( pStruct->iFlags & CF_UAV_APPEND ) {
-				uavDesc.Buffer.Flags  |= D3D11_BUFFER_UAV_FLAG_APPEND ;
-			}
-			if( pStruct->iFlags & CF_RAW_BUFFER ) {
-				uavDesc.Buffer.Flags  |= D3D11_BUFFER_UAV_FLAG_RAW;
-			}
-
-		} else {
-			uavDesc.Format = texDesc.Format;
-			if( pStruct->iFlags & CF_1D ) {
-				if( pStruct->iFlags & CF_ARRAY ) {
-					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1DARRAY;
-					uavDesc.Texture1DArray.ArraySize = texDesc.ArraySize;
-					uavDesc.Texture1DArray.FirstArraySlice = 0;
-					uavDesc.Texture1DArray.MipSlice = 0;
-				} else {
-					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1D;
-					uavDesc.Texture1D.MipSlice = 0;
-				}
-			} else if( pStruct->iFlags & CF_3D ) {
-					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
-					uavDesc.Texture3D.FirstWSlice = 0;
-					uavDesc.Texture3D.MipSlice = 0;
-					uavDesc.Texture3D.WSize = texDesc.ArraySize;
-			} else {
-				if( pStruct->iFlags & CF_ARRAY ) {
-					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
-					uavDesc.Texture2DArray.ArraySize = texDesc.ArraySize;
-					uavDesc.Texture2DArray.FirstArraySlice = 0;
-					uavDesc.Texture2DArray.MipSlice = 0;
-				} else {
-					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-					uavDesc.Texture2D.MipSlice = 0;
-				}
-			}
-		}
-		DXFAIL( Gfx::Get()->GetDevice()->CreateUnorderedAccessView( pResource->m_baseTexture, &uavDesc, (ID3D11UnorderedAccessView**) &pResource->m_extraView ) );
+	}
+	if( creation->flags & RCF_TEX_CUBE_MAP ) {
+		misc |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 	}
 
-	return pResource;
+	D3DResourcePtr resource;
+
+	DXGI_FORMAT typelessFmt = DXGIFormat::getTypelessTextureFormat( fmt );
+
+	if( creation->flags & RCF_TEX_1D ) {
+		// no Multisample 1D textures
+		CORE_ASSERT( creation->samples <= 1 );
+		D3D11_TEXTURE1D_DESC texDesc;
+		texDesc.Width = creation->width;
+		texDesc.MipLevels = creation->mipLevels;
+		texDesc.ArraySize = creation->slices;
+		texDesc.Format = typelessFmt;
+		texDesc.BindFlags = bind;
+		texDesc.CPUAccessFlags = cpuAccess;
+		texDesc.MiscFlags = misc;
+
+		ID3D11Texture1D* texture;
+		DXFAIL( Gfx::getr()()->CreateTexture1D( &texDesc, initialData.get(), &texture ) );
+		resource = D3DResourcePtr( texture, false );
+
+	} else if( creation->flags & RCF_TEX_2D ) {
+
+		D3D11_TEXTURE2D_DESC texDesc;
+
+		ID3D11Texture2D* texture;
+		if( creation->flags & RCF_D3D_FROM_OS ) {
+			// todo support non 2D from d3d textures, if rquired
+			texture = (ID3D11Texture2D*) creation->referenceTex;
+			// ovveride passed in with ones in the existing textures
+			texture->GetDesc( &texDesc );
+			creation->width = texDesc.Width;
+			creation->height = texDesc.Height;
+			creation->mipLevels = texDesc.MipLevels;
+			creation->slices = texDesc.ArraySize;
+			creation->mipLevels = texDesc.MipLevels;
+			creation->samples = texDesc.SampleDesc.Count;
+			fmt = texDesc.Format;
+			creation->format = DXGIFormat::getGenericFormat( fmt ); 
+		} else {
+			texDesc.Width = creation->width;
+			texDesc.Height = creation->height;
+			texDesc.MipLevels = creation->mipLevels;
+			texDesc.ArraySize = creation->slices;
+			texDesc.Format = typelessFmt;
+			texDesc.SampleDesc.Count = creation->samples;
+			texDesc.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+			texDesc.Usage = (D3D11_USAGE) usage;
+			texDesc.BindFlags = bind;
+			texDesc.CPUAccessFlags = cpuAccess;
+			texDesc.MiscFlags = misc;
+			DXFAIL( Gfx::getr()()->CreateTexture2D( &texDesc, initialData.get(), &texture ) );
+		}
+		resource = D3DResourcePtr( texture, false );
+
+	} else if( creation->flags & RCF_TEX_3D ) {
+		// No multisample or arrays for 3D textures
+		CORE_ASSERT( creation->slices <= 1 );
+		CORE_ASSERT( creation->samples <= 1 );
+		D3D11_TEXTURE3D_DESC texDesc;
+		texDesc.Width = creation->width;
+		texDesc.Height = creation->height;
+		texDesc.Depth = creation->depth;
+		texDesc.MipLevels = creation->mipLevels;
+		texDesc.Format = typelessFmt;
+		texDesc.BindFlags = bind;
+		texDesc.CPUAccessFlags = cpuAccess;
+		texDesc.MiscFlags = misc;
+
+		ID3D11Texture3D* texture;
+		DXFAIL( Gfx::getr()()->CreateTexture3D( &texDesc, initialData.get(), &texture ) );
+		resource = D3DResourcePtr( texture, false );
+	}
+
+	Texture* tex = CORE_NEW Texture( resource );
+	tex->creationFlags = creation->flags;
+	tex->format = creation->format;
+	tex->width = creation->width;
+	tex->height = creation->height;
+	tex->depth = creation->depth;
+	tex->slices = creation->slices;
+	tex->mipLevels = creation->mipLevels;
+	tex->samples = creation->samples;
+	tex->d3dFormat = fmt;
+
+	// create default views for this texture
+	if( bind & D3D11_BIND_SHADER_RESOURCE ) {
+		CreationInfo vs = ViewCtor( 	tex->creationFlags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
+										tex->format );
+		tex->createView( SHADER_RESOURCE_VIEW, &vs );
+	}
+	if( bind & D3D11_BIND_RENDER_TARGET ) {		
+		CreationInfo vs = ViewCtor( 	tex->creationFlags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
+										tex->format );
+		tex->createView( RENDER_TARGET_VIEW, &vs );
+	}
+	if( bind & D3D11_BIND_DEPTH_STENCIL ) {		
+		CreationInfo vs = ViewCtor( 	tex->creationFlags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
+										tex->format );
+		tex->createView( DEPTH_STENCIL_VIEW, &vs );
+	}
+	if( bind & RCF_OUT_UNORDERED_ACCESS ) {
+		CreationInfo vs = ViewCtor( 	tex->creationFlags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
+										tex->format );
+		tex->createView( UNORDERED_ACCESS_VIEW, &vs );
+	}
+
+	return tex;
 }
-
+/*
 void* Texture::Lock( RenderContext* context, Texture::CPU_ACCESS access, uint32_t& iOutPitch ) {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mapper;
@@ -480,5 +240,6 @@ void* Texture::Lock( RenderContext* context, Texture::CPU_ACCESS access, uint32_
 void Texture::Unlock( RenderContext* context ) {
 	context->deviceContext->Unmap( m_baseTexture, 0 );
 }
+*/
 
-}; // end namespace Graphics
+}; // end namespace Dx11

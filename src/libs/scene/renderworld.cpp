@@ -110,10 +110,10 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 
 	pipeline->bind( context );
 
-	context->setCamera( renderCamera );
+//	context->setCamera( renderCamera );
 
 	for( auto i = 0; i < pipeline->getGeomPassCount(); ++i ) {
-		pipeline->startGeomPass( i );
+		pipeline->startGeomPass( context, i );
 
 		// output geometry
 		STIndexContainer::const_iterator rmit = visibleRenderables.cbegin();
@@ -122,18 +122,23 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 			++rmit;
 		}
 
-		pipeline->endGeomPass( i );
+		pipeline->endGeomPass( context, i );
 	}
 
-	pipeline->unbind();
+	pipeline->unbind( context );
 }
 
-void RenderWorld::render( const ScreenPtr screen, RenderContext* context ) {
-	Pipeline* pipeline = screen->getRenderer()->getPipeline( 1 );
+void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context ) {
+	Pipeline* pipeline = screen->getRenderer()->getPipeline( pipelineName );
 
 	determineVisibles();
 
 	renderRenderables( context, pipeline );
+}
+
+void RenderWorld::displayRenderResults( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context ) {
+	Pipeline* pipeline = screen->getRenderer()->getPipeline( pipelineName );
+	screen->display( pipeline->getResult() );
 }
 
 }

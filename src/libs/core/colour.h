@@ -6,27 +6,21 @@
 //!
 //!
 //!-----------------------------------------------------
-
 #pragma once
 
 #ifndef YOLK_CORE_COLOUR_H_
 #define YOLK_CORE_COLOUR_H_
 
-
-#include "vector_math.h"
-
-
+#ifndef CORE_VECTOR_MATHS_H_
+#	include "vector_math.h"
+#endif
 
 namespace Core
 {
-
-	
 class RGBAColour;
 
-
 //! Colour interface
-class Colour
-{
+class Colour {
 public:
 	//! intended to convert from internal colour space to RGBA
 	virtual const RGBAColour& getRGBAColour() const = 0;
@@ -36,9 +30,7 @@ public:
 	uint32_t packARGB() const;
 };
 
-
-class RGBAColour : public Colour, public Math::Vector4
-{
+class RGBAColour : public Colour, public Math::Vector4 {
 public:
 	RGBAColour() {}
 

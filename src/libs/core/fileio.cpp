@@ -60,7 +60,7 @@ namespace Core
 	}
 
 	MemFile::MemFile( File& file ) {
-		size = file.bytesLeft();
+		size = (size_t) file.bytesLeft();
 		buffer = CORE_NEW_ARRAY uint8_t[ size ];
 		file.read( buffer, size );
 		offset = 0;
@@ -72,7 +72,7 @@ namespace Core
 	bool MemFile::loadFile( const char* _path ) {
 		File file( _path );
 		if( file.isValid() ) {
-			size = file.bytesLeft();
+			size = (size_t) file.bytesLeft();
 			buffer = CORE_NEW_ARRAY uint8_t[ size ];
 			file.read( buffer, size );
 			offset = 0;
@@ -85,7 +85,7 @@ namespace Core
 		File file;
 		file.openText( _path );
 		if( file.isValid() ) {
-			size = file.bytesLeft() + 1;
+			size = (size_t) file.bytesLeft() + 1;
 			buffer = CORE_NEW_ARRAY uint8_t[ size ];
 			file.read( buffer, size - 1 );
 			buffer[ size - 1 ] = 0; // add end null

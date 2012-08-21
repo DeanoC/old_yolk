@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_CORE_UTILS_H
-#define WIERD_CORE_CORE_UTILS_H
+#ifndef YOLK_CORE_UTILS_H_
+#define YOLK_CORE_UTILS_H_
 
 ///-------------------------------------------------------------------------------------------------
 /// \def	NUM_ARRAY_ELEMENTS( array ) ( sizeof( (array) ) / sizeof( (array)[0] ) )

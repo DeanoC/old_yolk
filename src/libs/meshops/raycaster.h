@@ -87,7 +87,7 @@ private:
 	std::string			traceUVSetName;
 	unsigned int		subSampleCount;
 	float				maxDisplacement;
-	boost::scoped_ptr<Core::KDTree>		targetTree;
+	std::unique_ptr<Core::KDTree>		targetTree;
 	boost::scoped_array<float>			targetPositionData;
 	boost::scoped_array<unsigned int>	targetIndexData;
 };

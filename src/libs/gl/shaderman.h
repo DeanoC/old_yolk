@@ -34,7 +34,7 @@ namespace Gl {
 
 		void preprocess( std::string& src, int& count, std::string* glsrc );
 		void preprocessIncludes( std::string& src, std::list<std::string>& fragments );
-		void preprocessPatchSource( std::string& src );
+		virtual void preprocessPatchSource( std::string& src ) override;
 		void buildUniformTables( Program* prg );
 
 		typedef std::unordered_map< std::string, const char*> NameSourceMap;

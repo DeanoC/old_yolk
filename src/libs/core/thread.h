@@ -14,13 +14,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#ifndef WIERD_CORE_THREAD_H
-#define WIERD_CORE_THREAD_H
+#ifndef YOLK_CORE_THREAD_H_
+#define YOLK_CORE_THREAD_H_
 
 // todo automate selection
-#define USE_BOOST_THREADS
+//#define USE_BOOST_THREADS
 //#define USE_TBB_THREADS
-//#define USE_TR2_THREADS
+#define USE_STD_THREADS
 
 #if defined( USE_BOOST_THREADS )
 #	include <boost/thread.hpp>
@@ -29,8 +29,12 @@
 #if defined( USE_TBB_THREADS )
 #	include <tbb/tbb_thread.h>
 #endif
-#if defined( USE_TR2_THREADS )
+#if defined( USE_STD_THREADS )
 #	include <thread>
+#	include <future>
+#	include	<chrono>
+#	include	<atomic>
+#	include <condition_variable>
 #endif
 
 namespace Core
@@ -95,35 +99,23 @@ namespace Core
 
 	}
 #else
-	using std::tr2::thread;
-	using namespace std::tr2::this_thread;
-	using std::tr2::thread_group;
-	using std::tr2::thread_specific_ptr;
-	using std::tr2::lock_guard;
-	using std::tr2::unique_lock;
-	using std::tr2::shared_lock;
-	using std::tr2::upgrade_lock;
-	using std::tr2::upgrade_to_unique_lock;
-	using std::tr2::lock;
-	using std::tr2::try_lock;
-	using std::tr2::mutex;
-	using std::tr2::try_mutex;
-	using std::tr2::timed_mutex;
-	using std::tr2::recursive_mutex;
-	using std::tr2::recursive_try_mutex;
-	using std::tr2::recursive_timed_mutex;
-	using std::tr2::shared_mutex;
-	using std::tr2::condition_variable;
-	using std::tr2::condition_variable_any;
-	using std::tr2::call_once;
-	using std::tr2::barrier;
-	using namespace std::tr2::future_state;
-	using std::tr2::unique_future;
-	using std::tr2::shared_future;
-	using std::tr2::promise;
-	using std::tr2::packaged_task;
-	using std::tr2::wait_for_any;
-	using std::tr2::wait_for_all;
+	using std::thread;
+	using namespace std::this_thread;
+	using std::lock_guard;
+	using std::unique_lock;
+	using std::lock;
+	using std::try_lock;
+	using std::mutex;
+	using std::timed_mutex;
+	using std::recursive_mutex;
+	using std::recursive_timed_mutex;
+	using std::condition_variable;
+	using std::condition_variable_any;
+	using std::call_once;
+	using std::future;
+	using std::shared_future;
+	using std::promise;
+	using std::packaged_task;
 
 #endif
 } // end namespace Core

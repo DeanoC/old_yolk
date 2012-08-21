@@ -92,7 +92,7 @@ private:
 	float const* m_data;
 	unsigned int const* m_indices;
 
-	boost::scoped_ptr<KDTreeNode> m_root;
+	std::unique_ptr<KDTreeNode> m_root;
 	AABB m_bounds;
 
 	int m_currentDepth;

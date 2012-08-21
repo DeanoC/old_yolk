@@ -6,8 +6,8 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_DEBUG_H
-#define WIERD_CORE_DEBUG_H
+#ifndef YOLK_CORE_DEBUG_H_
+#define YOLK_CORE_DEBUG_H_
 
 //---------------------------------------------------------------------------
 // Defines
@@ -25,16 +25,17 @@
 #if DEBUG_LEVEL >= DEBUG_NONE
 	/// Do this on debug builds only
 #	define IF_DEBUG(x) x
-	/// start a section of code for debugging only
-#	define IF_DEBUG_START if(true){
-	/// end a section of code for debugging only
-#	define IF_DEBUG_END	 }
+	/// start a section of code for debugging only, the ELSE will be removed
+#	define IF_DEBUG_START 	if( true ) {
+#	define IF_DEBUG_ELSE  	} else {
+#	define IF_DEBUG_END	 	}
 #else
 	/// Do this on debug builds only, so remove completely
 #	define IF_DEBUG(x)
-	/// dead code optimiser will remove the code below
-#	define IF_DEBUG_START if(false){
-#	define IF_DEBUG_END	 }
+	/// dead code optimiser will remove the code below but use the ELSE
+#	define IF_DEBUG_START 	if( false ) {
+#	define IF_DEBUG_ELSE 	} else {
+#	define IF_DEBUG_END	 	}
 #endif
 
 #if DEBUG_LEVEL >= DEBUG_LOW
@@ -62,11 +63,11 @@
 #endif
 
 /// Assert and throw a incorrect parameter exception if assert fails
-#define PARAM_ASSERT( x ) if( !(x) ){ CoreThrowException(ParamError, "(" #x ")" " == false"); }
+#define PARAM_ASSERT( x ) if( !(x) ){ LOG(FATAL) << "Parameter Assert failed : " << #x << "\n"; CoreThrowException(ParamError, "(" #x ")" " == false"); }
 /// Assert and throw a TODO exception if assert fails
-#define TODO_ASSERT( x ) if( !(x) ){ CoreThrowException(TodoError, "(" #x ")" " == false"); }
+#define TODO_ASSERT( x ) if( !(x) ){ LOG(FATAL) << "TODO : " << #x << "\n"; CoreThrowException(TodoError, "(" #x ")" " == false"); }
 /// Assert and throw a TODO exception if assert fails
-#define CORE_ASSERT( x ) if( !(x) ){ CoreThrowException(AssertError, "(" #x ")" " == false"); }
+#define CORE_ASSERT( x ) if( !(x) ){ LOG(FATAL) << "Assert failed : " << #x << "\n"; CoreThrowException(AssertError, "(" #x ")" " == false"); }
 
 /// assert that memory pointer is not NULL
 #define MEM_CHK( x) if( (x) == 0 ){ CoreThrowException(MemError, #x); }

@@ -41,7 +41,7 @@ namespace Cl {
 	class Image :	public MemoryObject,
 					public Core::Resource<ImageRType> {
 	public:	
-		struct CreationStruct {
+		struct CreationInfo {
 			Context*					context;	//<! which contex is the buffer from	
 			IMAGE_CREATION_FLAGS		flags;		//<! how its filled, mapped, etc.
 			IMAGE_FORMAT				format;
@@ -49,9 +49,8 @@ namespace Cl {
 			size_t						height;		//<! height in pixels
 			void*						data;		//<! data to fill if PRE_FILLing
 		};
-		struct LoadStruct {};
 
-		static Image* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationStruct* creation );
+		static Image* internalCreate( const Core::ResourceHandleBase* handle, const char* pName, const CreationInfo* creation );
 
 		size_t getWidth() const { return width; }
 		size_t getHeight() const { return height; }

@@ -233,7 +233,7 @@ namespace
 				char* filename;
 				int lineNum;
 
-				if( _CrtIsMemoryBlock( data, size, &memNum, &filename, &lineNum ) )
+				if( _CrtIsMemoryBlock( data, (unsigned int) size, &memNum, &filename, &lineNum ) )
 				{
 					if( filename != NULL ) 
 					{

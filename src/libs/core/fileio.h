@@ -93,12 +93,12 @@ public:
 	explicit MemFile( const char* _path );
 	explicit MemFile( File& file );
 
-	explicit MemFile( uint64_t _size ) {
+	explicit MemFile( size_t _size ) {
 		buffer = CORE_NEW_ARRAY uint8_t[_size];
 		size = _size;
 		offset = 0;		
 	}
-	explicit MemFile( uint8_t* _mem, uint64_t _size ){
+	explicit MemFile( uint8_t* _mem, size_t _size ){
 		buffer = _mem;
 		size = _size;
 		offset = 0;
@@ -156,7 +156,7 @@ public:
 protected:
 	uint8_t*	buffer;
 	uint64_t	offset;
-	uint64_t	size;
+	size_t 	size;
 };
 
 

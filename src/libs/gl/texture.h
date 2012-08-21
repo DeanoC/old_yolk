@@ -14,7 +14,7 @@ namespace Gl {
 
 	class Texture : public Memory, public Scene::Texture {
 	public:
-		static Texture* internalLoad( const Core::ResourceHandleBase* baseHandle, 
+		static Texture* internalPreCreate( const Core::ResourceHandleBase* baseHandle, 
 												const char* pTextureFileName, 
 												bool preload );
 

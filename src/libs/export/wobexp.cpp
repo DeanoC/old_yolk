@@ -615,6 +615,10 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath pOutFilena
 	outStream << "(u16)" << WobVersion << "\t//Version\n";				// WobVersion
 	outStream << "(u16)" << numMaterials << "\t//numMaterials\n";		// number of materials
 	outStream << "(u32)" << uiFlags << flagComment.str();				// flags
+	//-- wob name
+	m_stringTable[ pOutFilename.BaseName().value()  + ":" ] = pOutFilename.BaseName().value();
+	outStream << ".align 8\n";
+	outStream << "0, " << pOutFilename.BaseName().value() << "// " << pOutFilename.BaseName().value() << "\n";
 
 	float minAABB[3], maxAABB[3];
 	CalcMeshAAB( minAABB, maxAABB );

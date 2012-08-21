@@ -5,14 +5,14 @@
 //! the engine graphics mesh class
 //!
 //!-----------------------------------------------------
-#if !defined(YOLK_SCENE_MESH_H)
-#define YOLK_SCENE_MESH_H
+#if !defined( YOLK_SCENE_MESH_H_ )
+#define YOLK_SCENE_MESH_H_
 
 #if !defined( YOLK_SCENE_RENDERABLE_H_ )
 #include "renderable.h"
 #endif
 
-#if !defined( YOLK_SCENE_WOBFILE_H )
+#if !defined( YOLK_SCENE_WOBFILE_H_ )
 #include "wobfile.h"
 #endif
 
@@ -45,12 +45,12 @@ namespace Scene {
 			}
 		}
 
-		WobResourcePtr getResource() const {
+		WobPtr getResource() const {
 			return meshHandle->acquire();
 		}
 
 	protected:
-		WobResourceHandlePtr		meshHandle;
+		WobHandlePtr				meshHandle;
 		Math::Matrix4x4*			ownedMatrix;
 		Math::Matrix4x4				prevWVP;
 	};

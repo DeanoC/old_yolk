@@ -1,32 +1,12 @@
-#include "gl/glew.h"
 
+#include <iomanip>
 #include "export.h"
 #include "core/coreresources.h"
-#include "gl/ogl.h"
-
-#include "gl/glformat_cracker.h"
+#include "scene/generictextureformat.h"
+#include "scene/gtfcracker.h"
 
 #define GTF_START_MACRO static std::string GtfStrings[] = {
 #define GTF_MOD_MACRO(x) #x,
-#define GTF_END_MACRO };
-#include "scene/generictextureformat.h"
-
-#define GL_COMPRESSED_RGBA_S3TC_DXT1 			GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
-#define GL_COMPRESSED_RGBA_S3TC_DXT3 			GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
-#define GL_COMPRESSED_RGBA_S3TC_DXT5 			GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
-#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1 		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT
-#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3 		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT
-#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5 		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT
-#define GL_COMPRESSED_RGBA_BPTC_UNORM 			GL_COMPRESSED_RGBA_BPTC_UNORM_ARB
-#define GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM 	GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB
-
-#define GL_COMPRESSED_RGB_S3TC_DXT1 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT 
-#define GL_COMPRESSED_SRGB_S3TC_DXT1 			GL_COMPRESSED_SRGB_S3TC_DXT1_EXT 
-#define GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT 	GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB
-#define GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT 	GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB
-
-#define GTF_START_MACRO static uint32_t GtfToGlFormat[] = {
-#define GTF_MOD_MACRO(x) GL_##x,
 #define GTF_END_MACRO };
 #include "scene/generictextureformat.h"
 
@@ -47,9 +27,8 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 							const GENERIC_TEXTURE_FORMAT outFmt,
 							std::ostringstream& stream  ) {
 	using namespace Export;
-	const uint32_t glf = GtfToGlFormat[ outFmt ];
-	const unsigned int outBits = GlFormat::getBitWidth( glf );
-	const unsigned int outChannels = GlFormat::getChannelCount( glf );
+	const unsigned int outBits = GtfFormat::getBitWidth( outFmt );
+	const unsigned int outChannels = GtfFormat::getChannelCount( outFmt );
 	stream << std::hex << std::setiosflags( std::ios_base::showbase );
 	stream.width(8);
 	if( outBits <= 8 ) {
@@ -84,7 +63,7 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 					}
 				}
 
-				if( in.flags & BitmapInput::BI_RGBA ) {
+/*				if( in.flags & BitmapInput::BI_RGBA ) {
 					CORE_ASSERT( in.channels == 4 );
 					// swap RGBA to ABGR
 					const uint32_t r = expandedData[0];
@@ -92,19 +71,24 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 					expandedData[1] = expandedData[1]; // blue
 					expandedData[2] = expandedData[2]; // green
 					expandedData[3] = r; // red
-				} else {
+				} else */{
 					// just swap order so when read by LE target comes out okay
 					// TODO big endian targets
-					for( auto c = 0; c < in.channels; ++c ) {
-						std::swap( expandedData[c], expandedData[in.channels-c]);
-					}
+					const uint32_t r = expandedData[0];
+					const uint32_t g = expandedData[1];
+					const uint32_t b = expandedData[2];
+					const uint32_t a = expandedData[3];
+					expandedData[0] = a;
+					expandedData[1] = b;
+					expandedData[2] = g;
+					expandedData[3] = r;
 				}
 
 				int accumCount = 32;
 				uint32_t payload;
 				// now cut back down to out precision and channels
 				for( auto c = 0; c < outChannels; ++c ) {
-					const auto chanBits = GlFormat::getChannelBits( glf, c );
+					const auto chanBits = GtfFormat::getChannelBits( outFmt, c );
 					expandedData[c] >>= (32 - chanBits);
 					expandedData[c] &= ((1 << chanBits) - 1);
 

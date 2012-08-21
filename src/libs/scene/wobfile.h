@@ -16,17 +16,11 @@
 #define FOP( x, y ) CORE_ALIGN(8) union { x p; struct { uint32_t h; uint32_t l; } o; } y
 
 
-namespace Scene {	
+namespace Scene {
+	class Renderer;
 
     //! Resource type idenetifier for Wobs
 	static const uint32_t WobType = RESOURCE_NAME('W','O','B','1');
-
-	struct WobBackEnd{ 
-		virtual ~WobBackEnd(){}; 
-
-		std::vector<std::unique_ptr<PipelineDataStore>>	pipelineDataStores;
-	};
-
 
 	//! defines a vertex element, consists of a usage and a format
 	struct WobVertexElement {
@@ -144,6 +138,7 @@ namespace Scene {
 		uint16_t uiNumMaterials;		//!< number of different materials used
 
 		uint32_t uiFlags;				//!< WFH_FLAGS for this mesh
+		FOP( const char*, pName );		//!< name of this Wob
 
 		float	minAABB[3];				//!< minimum coord of AABB (xyz)
 		float	maxAABB[3];				//!< maximum coord of AABB (xyz)
@@ -160,27 +155,33 @@ namespace Scene {
 	};
 
 
-	static const uint16_t WobVersion = 6;
+	static const uint16_t WobVersion = 7;
 
 	//! Loads a wob file
-	std::shared_ptr<WobFileHeader> WobLoad( const char* pFilename );
+	WobFileHeader* WobLoad( const char* pFilename );
 
 	//! An actual wob resource, has a wob file headers and the materials
 	//! the file header is patched to point directly the the materials here
-	struct WobResource : public Core::Resource<WobType> {
-		struct CreationStruct {};
-		struct LoadStruct {};
+	class Wob : public Core::Resource<WobType> {
+	public:
+		Wob(){};
+		friend class ResourceLoader;
+		struct CreationStruct {
+			std::shared_ptr<WobFileHeader> header;
+		};
+		struct CreationInfo {};
 
 		std::shared_ptr<WobFileHeader>							header;
-		boost::scoped_ptr<WobBackEnd>							backEnd;
-
-//		Core::scoped_ptr<Core::BVH>			m_bvh;
+		std::vector<std::unique_ptr<PipelineDataStore>>			pipelineDataStores;
+	protected:
+		static const void* internalPreCreate( const char* name, const Wob::CreationInfo *loader );
+		static Wob* internalCreate( Renderer* renderer, const void* data );
 	};
 
-	typedef std::shared_ptr<WobResource> WobResourcePtr;
+	typedef std::shared_ptr<Wob> WobPtr;
 	//! A wob file resource handle typedef
-	typedef const Core::ResourceHandle<WobType, WobResource> WobResourceHandle;
-	typedef WobResourceHandle* WobResourceHandlePtr;
+	typedef const Core::ResourceHandle<WobType, Wob> WobHandle;
+	typedef WobHandle* WobHandlePtr;
 }
 
 #undef FOP

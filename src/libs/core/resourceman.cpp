@@ -91,12 +91,15 @@ public:
 	typedef tbb::concurrent_vector<ResourceData*>								ListResourceData;
 	typedef tbb::concurrent_hash_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
 	typedef tbb::concurrent_hash_map<std::string, ResourceData*>				CacheIndex;
+	typedef tbb::concurrent_vector<ResourceData*>								ListResourceData;
 	typedef tbb::concurrent_hash_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
+	typedef tbb::concurrent_vector<ResourceMan::AcquirePumpCallback>			AcquirePumps;
 
 	ListResourceData	listResourceHandlePtrs;
 	PtrIndex			resourceHandleBaseMap;
 	CacheIndex			cacheMap;
 	ResourceTypeMap		resourceTypeMap;
+	AcquirePumps		acquirePumps;
 
 	~ResourceManImpl() {
 		bool anyValidLeft = false;
@@ -154,9 +157,7 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 		actualName = pName;
 	}
 
-	std::stringstream flagString;
-	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
-	const std::string cacheName( actualName + flagString.str() );
+	const std::string& cacheName = actualName;
 
 	ResourceManImpl::CacheIndex::const_accessor rcacheIt;
 	if( impl.cacheMap.find( rcacheIt, cacheName ) ) {
@@ -264,10 +265,7 @@ void ResourceMan::implFlushResource( const char* pName, uint32_t type, RESOURCE_
 		actualName = pName;
 	}
 
-	std::string cacheName;
-	std::stringstream flagString;
-	flagString << (flags & ~RMRF_PRELOAD); // used to unique name and flags together remove some we don't care about
-	cacheName = actualName + flagString.str();
+	const std::string& cacheName = actualName;
 
 	// cache entry are actually optional so check for valitity before erasing
 	ResourceManImpl::CacheIndex::accessor cacheIt;
@@ -299,6 +297,14 @@ void ResourceMan::registerResourceType (	uint32_t type,
 	if( impl.resourceTypeMap.insert( rtmIt, type ) == true ) {
 //	LOG(INFO) << "Registering Resource Type : " << GetResourceTypeAsString(type) << " (" << type << ")" << "\n";
 		rtmIt->second = ResourceTypeData( pCreate, pDestroy, pChange, pDestroyHandle, dir, resourceHandleSize );
+	}
+}
+void ResourceMan::registerAcquirePump( AcquirePumpCallback pump ) {
+	impl.acquirePumps.push_back( pump );
+}
+void ResourceMan::internalPumpAcquirePump() {
+	for( auto it = impl.acquirePumps.cbegin(); it != impl.acquirePumps.cend(); ++it ) {
+		(*it)();
 	}
 }
 
@@ -350,7 +356,7 @@ void ResourceMan::internalAcquireComplete( const ResourceHandleBase* _handle, st
 
 	ResourceData* pRD = rdIt->second;
 	pRD->resource = res;
-	pRD->flags = (RESOURCE_FLAGS) (pRD->flags & ~(RMRF_PRELOAD ));
+	pRD->flags = (RESOURCE_FLAGS) pRD->flags;
 
 	pHandle->resourceBase = res;
 
@@ -364,7 +370,7 @@ void ResourceMan::internalProcessManifest( uint16_t numEntries, ManifestEntry* e
 		entries[i].name.p = fixupPointer<const char>( entries, entries[i].name.o.l );
 
 		const char* pFileName = entries[i].name.p;
-		entries[i].handle.p = implOpenResource( pFileName, NULL, 0, type, (RESOURCE_FLAGS)(RMRF_LOADOFFDISK | RMRF_PRELOAD) );
+		entries[i].handle.p = implOpenResource( pFileName, NULL, 0, type, RMRF_LOADOFFDISK );
 	}
 }
 

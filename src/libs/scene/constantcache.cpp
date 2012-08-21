@@ -6,9 +6,9 @@
 //!-----------------------------------------------------
 
 #include "scene.h"
-//#include "databuffer.h"
+#include "databuffer.h"
 #include "gpu_constants.h"
-//#include "program.h"
+#include "program.h"
 //#include "cl/platform.h"
 #include "constantcache.h"
 
@@ -42,7 +42,7 @@ const int varFreq[Scene::CVN_NUM_CONSTANTS] = {
 	Scene::CF_PER_PIPELINE,	//	FOV
 };
 
-const uint32_t varsPerBlock[ Scene::CF_USER_BLOCKS ] = {
+const uint32_t varsPerBlock[ Scene::CF_NUM_BLOCKS ] = {
 	1,		// CF_STATIC,
 	1,		// CF_PER_FRAME
 	5,		// CF_PER_PIPELINE
@@ -51,7 +51,7 @@ const uint32_t varsPerBlock[ Scene::CF_USER_BLOCKS ] = {
 	10,		// CF_STD_OBJECT
 };
 
-const Scene::ConstantCache::CachedBitFlags varBitsPerBlock[ Scene::CF_USER_BLOCKS ] = {
+const Scene::ConstantCache::CachedBitFlags varBitsPerBlock[ Scene::CF_NUM_BLOCKS ] = {
 	BIT64(Scene::CVN_DUMMY),
 	BIT64(Scene::CVN_FRAMECOUNT),
 	BIT64(Scene::CVN_PROJ) | BIT64(Scene::CVN_PROJ_INVERSE) | BIT64(Scene::CVN_PROJ_IT) | BIT64(Scene::CVN_ZPLANES) | BIT64(Scene::CVN_FOV),
@@ -131,12 +131,12 @@ ConstantCache::ConstantCache() :
 	cachedFlags( 0 ),
 	gpuHasBlocks(0) {
 
-	blockHandles.reset( CORE_NEW_ARRAY DataBufferHandlePtr[CF_USER_BLOCKS] );
-	//clBlockHandles.reset( CORE_NEW_ARRAY Cl::BufferHandlePtr[CF_USER_BLOCKS] );
+	blockHandles.reset( CORE_NEW_ARRAY DataBufferHandlePtr[CF_NUM_BLOCKS] );
+	//clBlockHandles.reset( CORE_NEW_ARRAY Cl::BufferHandlePtr[CF_NUM_BLOCKS] );
 
 //	auto contextCl = Cl::Platform::get()->getPrimaryContext().get();
 
-	size_t blockSizes[ CF_USER_BLOCKS ] = {
+	size_t blockSizes[ CF_NUM_BLOCKS ] = {
 		sizeof(Scene::GPUConstants::Static),
 		sizeof(Scene::GPUConstants::PerFrame),
 		sizeof(Scene::GPUConstants::PerPipeline),
@@ -146,11 +146,10 @@ ConstantCache::ConstantCache() :
 	};
 
 	char resourceName[256];
-	for( int i = 0; i < CF_USER_BLOCKS; ++i ) {
-		DataBuffer::CreationStruct cbcs = {
-			DBCF_CPU_UPDATES, DBT_CONSTANTS, 
-			blockSizes[i]
-		};
+	for( int i = 0; i < CF_NUM_BLOCKS; ++i ) {
+		DataBuffer::CreationInfo cbcs ( Resource::BufferCtor(
+			RCF_BUF_CONSTANT | RCF_ACE_CPU_WRITE , (uint32_t) blockSizes[i]
+		) );
 		sprintf( resourceName, "_constantCache%i_%i", i, s_cacheCount );
 		blockHandles[i] = DataBufferHandle::create( resourceName, &cbcs );
 /*		Cl::Buffer::CreationStruct clfbcs = {
@@ -166,7 +165,7 @@ ConstantCache::ConstantCache() :
 }
 
 ConstantCache::~ConstantCache() {
-	for( int i = 0; i < CF_USER_BLOCKS; ++i ) {
+	for( int i = 0; i < CF_NUM_BLOCKS; ++i ) {
 //		clBlockHandles[i]->close();
 		blockHandles[i]->close();
 	}
@@ -294,35 +293,37 @@ void ConstantCache::setUIVector( CONSTANT_VAR_NAME type, const uint32_t* in4 ) {
 	}
 }
 
-void ConstantCache::updateGPUBlock( CONSTANT_FREQ_BLOCKS block ) const {
+void ConstantCache::updateGPUBlock( Scene::RenderContext* context, CONSTANT_FREQ_BLOCKS block ) const {
 	DataBufferPtr db = blockHandles[block]->acquire();
-	void* buffer = db->map( DBMA_WRITE_ONLY, DBMF_DISCARD, 0, 0 );
 	int varsToSet = varsPerBlock[block];
 	int count = 0;
-	while( varsToSet > 0 ) {
-		// TODO better than naive bit checking
-		if( varBitsPerBlock[block] & BIT64(count) ) {
-			if( count < CVN_NUM_MATRICES ) {
-				Math::Matrix4x4 mat = getMatrix((CONSTANT_VAR_NAME)count); // compute if required
-				memcpy( ((char*)buffer) + offsetInBlocks[ count ], 
-						&mat, 
-						sizeofInBlock[ count ] );
-			} else {
-				uint32_t uiArray[4];
-				getUIVector( (CONSTANT_VAR_NAME)count, uiArray );
-				memcpy( ((char*)buffer) + offsetInBlocks[ count ], 
-						uiArray, 
-						sizeofInBlock[ count ] );
+	if( varsToSet > 0 ) {
+		void* buffer = db->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD, 0, 0 );
+		while( varsToSet > 0 ) {
+			// TODO better than naive bit checking
+			if( varBitsPerBlock[block] & BIT64(count) ) {
+				if( count < CVN_NUM_MATRICES ) {
+					Math::Matrix4x4 mat = getMatrix((CONSTANT_VAR_NAME)count); // compute if required
+					memcpy( ((char*)buffer) + offsetInBlocks[ count ], 
+							&mat, 
+							sizeofInBlock[ count ] );
+				} else {
+					uint32_t uiArray[4];
+					getUIVector( (CONSTANT_VAR_NAME)count, uiArray );
+					memcpy( ((char*)buffer) + offsetInBlocks[ count ], 
+							uiArray, 
+							sizeofInBlock[ count ] );
+				}
+				--varsToSet;
 			}
-			--varsToSet;
+			count++;
 		}
-		count++;
+		db->unmap( context );
 	}
-	db->unmap();
 	gpuHasBlocks |= BIT(block);
 }
 
-void ConstantCache::updateGPU( const ProgramPtr prg ) {
+void ConstantCache::updateGPU( Scene::RenderContext* context, const ProgramPtr prg ) {
 	if( camera && camera->getCounter() != s_cacheCount ) {
 
 		s_cacheCount = camera->getCounter();
@@ -342,7 +343,7 @@ void ConstantCache::updateGPU( const ProgramPtr prg ) {
 		cachedFlags |= BIT64(CVN_VIEW) | BIT64(CVN_PROJ) | BIT64(CVN_ZPLANES);
 		gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_VIEW ]) | BIT(varFreq[ CVN_PROJ ]) | BIT(CF_STD_OBJECT) );
 	}
-
+	
 	if( prg && (gpuHasBlocks & prg->getUsedBuffers()) == prg->getUsedBuffers() ) {
 		// upto date, nothing to do
 		return;
@@ -351,14 +352,11 @@ void ConstantCache::updateGPU( const ProgramPtr prg ) {
 	// what needs updating?
 	uint32_t needsUpdating = (~gpuHasBlocks) & (prg ? prg->getUsedBuffers() : ~0);
 
-	for( int i = 0; i < CF_USER_BLOCKS; ++i ) {
+	for( int i = 0; i < CF_NUM_BLOCKS; ++i ) {
 		if( needsUpdating & BIT(i) ) {
-			updateGPUBlock( (CONSTANT_FREQ_BLOCKS)i );
+			updateGPUBlock( context, (CONSTANT_FREQ_BLOCKS)i );
 		}
 	}
-}
-void ConstantCache::updateGPUObjectOnly() {
-	updateGPUBlock( CF_STD_OBJECT );
 }
 const DataBufferHandlePtr ConstantCache::getBlock( CONSTANT_FREQ_BLOCKS block ) const { 
 	return blockHandles[ block ]; 

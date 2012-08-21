@@ -15,6 +15,8 @@
 #if !defined( YOLK_SCENE_SCREEN_H_ )
 #define YOLK_SCENE_SCREEN_H_
 
+#include "texture.h"
+
 namespace Scene {
 	class DebugPrims;
 	class ImageComposer;
@@ -33,8 +35,13 @@ namespace Scene {
 		unsigned int getHeight() const { return height; }
 		bool isStereo() const { return !!(flags & SCRF_STEREO); }
 		bool hasOverlay() const { return !!(flags & SCRF_OVERLAY); }
+		bool hasDebugPrims() const { return !!(flags & SCRF_DEBUGPRIMS); }
 
-		ImageComposer* getComposer() const { return imageComposer.get(); }
+		virtual void display( TextureHandlePtr toDisplay ) = 0;
+
+		// only valid if the screen has an overlay plane
+		ImageComposer* 	getComposer() const { return imageComposer.get(); }
+		DebugPrims* 	getDebugPrims() const { return debugPrims.get(); }
 		Renderer*		getRenderer() const { return renderer; }
 	protected:
 		unsigned int width;

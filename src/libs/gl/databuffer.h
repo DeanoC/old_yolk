@@ -17,7 +17,10 @@ namespace Gl {
 	public:	
 
 		// default maps entire buffer;
-		void* map( Scene::DATA_BUFFER_MAP_ACCESS access, Scene::DATA_BUFFER_MAP_FLAGS flags = Scene::DBMF_NONE, size_t offset = 0, size_t bytes = 0 ) override;
+		void* map( 	Scene::RenderContext* context, 
+					Scene::DATA_BUFFER_MAP_ACCESS access, 
+					Scene::DATA_BUFFER_MAP_FLAGS flags = Scene::DBMF_NONE, 
+					size_t offset = 0, size_t bytes = 0 ) override;
 
 		void unmap() override;
 

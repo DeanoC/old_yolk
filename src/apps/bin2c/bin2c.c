@@ -44,6 +44,13 @@ int main (int argc, char **argv) {
              *ptr = replacechar;
         ptr++;
     }
+	// remove extension part of name
+    while (*ptr != '_') {
+        --ptr;
+    }
+	if( *ptr == '_' ) {
+		*ptr = '\0';
+	}
 
 	fprintf( outFile, "const unsigned char binary_data_%s_data[] = {", argv[3] );
 	i = 0;

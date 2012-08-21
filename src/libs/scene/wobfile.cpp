@@ -9,12 +9,14 @@
 #include "scene.h"
 #include <iostream>
 #include <fstream>
-#include "wobfile.h"
 #include "core/file_path.h"
+#include "renderer.h"
+
+#include "wobfile.h"
 
 namespace Scene {
 
-	std::shared_ptr<WobFileHeader> WobLoad( const char* pFilename ) {
+	WobFileHeader* WobLoad( const char* pFilename ) {
 		using namespace Core;
 		WobFileHeader header;
 
@@ -31,8 +33,8 @@ namespace Scene {
 		if( header.uiMagic == WobType && header.uiVersion == WobVersion ) {
 			// we now allocate the main block and header which is what we
 			// pass back to the callee
-			std::shared_ptr<WobFileHeader> spHeader( (WobFileHeader*) CORE_NEW char[sizeof(header) + header.ls.uiSizeOfMainBlock] ); 
-			WobFileHeader* pHeader = spHeader.get();
+			WobFileHeader* spHeader( (WobFileHeader*) CORE_NEW char[sizeof(header) + header.ls.uiSizeOfMainBlock] ); 
+			WobFileHeader* pHeader = spHeader;
 			memcpy( pHeader, &header, sizeof(header) );
 
 			// load the main block (materials and parameters string table)
@@ -43,6 +45,7 @@ namespace Scene {
 			pHeader->pDiscardable.p = pDiscard;
 
 			// fixup header
+			pHeader->pName.p = fixupPointer<const char>( pHeader, pHeader->pName.o.l );
 			pHeader->pMaterials.p = fixupPointer<WobMaterial>( pHeader, pHeader->pMaterials.o.l );
 
 			// fixup materials
@@ -71,9 +74,33 @@ namespace Scene {
 			if(header.uiVersion != WobVersion) {
 				LOG(ERROR) << "This wob file is the wrong version\n";
 			}
-			assert( false );
 		}
 
-		return std::shared_ptr<WobFileHeader>();
+		return nullptr;
 	}
+
+const void* Wob::internalPreCreate( const char* name, const Wob::CreationInfo *loader ) {
+	return WobLoad( name );
+}
+Wob* Wob::internalCreate( Renderer* renderer, const void* data ) {
+	using namespace Scene;
+	WobFileHeader* header = (WobFileHeader*) data;
+
+	Wob* wob( CORE_NEW Wob );
+	wob->header.reset( header );
+	wob->pipelineDataStores.resize( (int) renderer->getNumPipelines() );
+
+	for( size_t i = 0; i < renderer->getNumPipelines(); ++i ) {
+		Scene::Pipeline* pipe = renderer->getPipeline( i );
+		pipe->conditionWob( wob );
+	}
+
+//		ResourceLoaderImpl::ioStrand->post( [header]() {	
+//			CORE_DELETE_ARRAY header->pDiscardable.p;
+//			header->pDiscardable.p = 0;
+//		});
+	return wob;	
+}
+
+
 } // end namespace Scene

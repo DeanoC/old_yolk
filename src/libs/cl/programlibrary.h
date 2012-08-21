@@ -23,12 +23,11 @@ namespace Cl {
 
 	class ProgramLibrary :	public Core::Resource<ProgramLibraryRType> {
 	public:	
-		struct CreationStruct {
+		struct CreationInfo {
 			Context*					context;	//<! which contex is the kernel for
 			PROGRAMLIB_CREATION_FLAGS	flags;		//<! flags about whats okay and whats not
 			DEVICE_EXTENSIONS_FLAGS		required;	//!< which extensions are required
 		};
-		struct LoadStruct {};
 
 	protected:
 		friend class ProgramMan;

@@ -5,9 +5,8 @@
 //!   deano@rattie.demon.co.uk                                              
 //!
 //!-----------------------------------------------------
-#ifndef WIERD_CORE_RESOURCEHANDLE_H
-#define WIERD_CORE_RESOURCEHANDLE_H
-
+#ifndef YOLK_CORE_RESOURCEBASE_H_
+#define YOLK_CORE_RESOURCEBASE_H_
 #pragma once
 
 namespace Core {
@@ -18,10 +17,12 @@ enum RESOURCE_FLAGS
 	RMRF_LOADOFFDISK		= BIT(1),	//! this is a off disk resource
 	RMRF_INMEMORYCREATE		= BIT(2),	//! this is an in memory resource
 	RMRF_DONTCACHE			= BIT(3),	//! never re-use/cache this resource
-	RMRF_PRELOAD			= BIT(4),	//! start loading the resource before acquire is called in the background
-	RMRF_DONTFLUSH			= BIT(5),	//! once acquired don't flush until all resource handles are also flushed 
+	RMRF_DONTFLUSH			= BIT(4),	//! once acquired don't flush until all resource handles are also flushed 
 										// NOTE currently DONTFLUSH is ignored as this behavriour is always true 
 										// but for forward compat this should be set when this behavior is required
+
+
+	RMRF_SCENE_DEFINED		= BIT(31),	// flags that the scene resource loader uses to mark loader thread phases 
 };
 
 //! all resource derive off this

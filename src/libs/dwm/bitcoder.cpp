@@ -306,7 +306,7 @@ std::string BitCoder::assemble( const int type, const Core::FilePath& filepath )
 std::string BitCoder::assemble( const int type, Core::InOutInterface& inny ) {
 	using namespace Core;
 	using namespace llvm;
-	using boost::scoped_ptr;
+	using std::unique_ptr;
 
 	uint64_t asmLen = inny.bytesLeft();
 
@@ -321,19 +321,19 @@ std::string BitCoder::assemble( const int type, Core::InOutInterface& inny ) {
 	raw_string_ostream os(output);
     formatted_raw_ostream fos(os);
 
-	scoped_ptr<MCObjectFileInfo> mcofi( CORE_NEW MCObjectFileInfo() );
+	unique_ptr<MCObjectFileInfo> mcofi( CORE_NEW MCObjectFileInfo() );
 	MCContext ctx(*mcai[type], *mcri[type], mcofi.get(), &srcMgr);
 	mcofi->InitMCObjectFileInfo( tm[type]->getTargetTriple(), Reloc::Static, CodeModel::Small, ctx );
 	MCCodeEmitter* mcce( tm[type]->getTarget().createMCCodeEmitter( *mcii[type], *mcri[type], *mcsti[type], ctx ) );
 
-	scoped_ptr<MCStreamer> streamer( tm[type]->getTarget().createMCObjectStreamer(	
+	unique_ptr<MCStreamer> streamer( tm[type]->getTarget().createMCObjectStreamer(	
 										tm[type]->getTargetTriple(), ctx, 
 										*mcab[type], fos, mcce, true, true ) );
-	scoped_ptr<MCAsmParser> parser( createMCAsmParser(	srcMgr, 
+	unique_ptr<MCAsmParser> parser( createMCAsmParser(	srcMgr, 
 														ctx, 
 														*streamer, 
 														*tm[type]->getMCAsmInfo() ) );
-	scoped_ptr<MCTargetAsmParser> tap( tm[type]->getTarget().createMCAsmParser( *mcsti[type], *parser ) );
+	unique_ptr<MCTargetAsmParser> tap( tm[type]->getTarget().createMCAsmParser( *mcsti[type], *parser ) );
 
 	parser->setTargetParser( *tap.get() );
 

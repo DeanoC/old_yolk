@@ -13,7 +13,79 @@
 #include "cl/programman.h"
 
 #include "shaderman.h"
+void ShaderMan::preprocessPatchSource( std::string& src ) {
+	using namespace Core;
+	std::string::size_type index = 0;
+	while( (index = src.find( "//#version" )) != std::string::npos ) {
+		src[index+0] = ' ';
+		src[index+1] = ' ';
+	}
+	index = 0;
+	while( (index = src.find( "//#extension" )) != std::string::npos ) {
+		src[index+0] = ' ';
+		src[index+1] = ' ';
+	}
+	while( (index = src.find( "#include" )) != std::string::npos ) {
+		src[index+0] = '/';
+		src[index+1] = '/';
+	}
 
+}
+/*
+			Memory::Name shaderName = glCreateShader( shaderType[i] );
+			GL_CHECK
+			glShaderSource( shaderName, count, glsrc, NULL );
+			GL_CHECK
+			glCompileShader( shaderName );
+			GL_CHECK
+
+			GLint validStatus = GL_FALSE;
+			glGetShaderiv( shaderName, GL_COMPILE_STATUS, &validStatus);
+			if(validStatus == GL_FALSE) {
+				int logLength = 0;
+				glGetShaderiv(shaderName, GL_INFO_LOG_LENGTH, &logLength);
+				if( logLength > 0 ) {
+					char* log = CORE_STACK_NEW_ARRAY( char, logLength  + 1);
+					glGetShaderInfoLog(shaderName, logLength, &logLength, log);
+					LOG(FATAL) << "Compile shader :  " << programName << " ( " << wholeProgramShaders[i] << " ) :\n" << log;
+				} else {
+					LOG(FATAL) << "Compile shader :  " << programName << " ( " << wholeProgramShaders[i] << " ) :\n No Log from GL\n";
+				}
+				return NULL;
+			}
+
+			glAttachShader( prg->getName(), shaderName );
+			GL_CHECK
+			prg->wholeProgramShaders[i] = shaderName;
+			*/
+/*	if( creation && creation->numTransformFeedbackItems > 0 ) {
+		glTransformFeedbackVaryings( prg->getName(), 
+										creation->numTransformFeedbackItems, 
+										(const char**) creation->transformFeedbackItemNames,
+										creation->interleavedItems ? GL_INTERLEAVED_ATTRIBS : GL_SEPARATE_ATTRIBS );
+		GL_CHECK
+	}
+*/
+
+
+/*	glLinkProgram( prg->getName() );
+	GLint validStatus = GL_FALSE;
+	glGetProgramiv( prg->getName(), GL_LINK_STATUS, &validStatus);
+	if(validStatus == GL_FALSE) {
+        int logLength = 0;
+        glGetProgramiv(prg->name, GL_INFO_LOG_LENGTH, &logLength);
+		if( logLength > 0 ) {
+	        char* log = CORE_STACK_NEW_ARRAY( char, logLength + 1 );
+	        glGetProgramInfoLog(prg->name, logLength, NULL, log);
+	        LOG(FATAL) << "Link program :  " << programName << " :\n" << log << "\n";
+	    } else {
+			LOG(FATAL) << "Link program :  " << programName << " :\n No Log from GL\n";
+		}
+		return NULL;
+	}
+//	glValidateProgram( prg->getName() );
+//	GL_CHECK
+*/
 // outside namespace
 DECLARE_SHARED_WITH_CL( shared_structs );
 DECLARE_SHARED_WITH_CL( constant_blocks );

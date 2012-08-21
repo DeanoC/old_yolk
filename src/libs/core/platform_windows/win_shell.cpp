@@ -174,7 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		Core::MouseWin::get()->processMouseMessages( message, wParam, lParam );
 	}
 
-	Core::KeyboardWinProcessKeyMessages( message, wParam, lParam );
+	Core::KeyboardWinProcessKeyMessages( message, (uint16_t)wParam, (uint32_t)lParam );
 
 	switch (message) 
 	{

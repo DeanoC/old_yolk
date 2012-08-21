@@ -186,7 +186,7 @@ FaceIndex Mesh::addPolygon(		const VertexIndexContainer& indices,
 	// doesn't triangulate added polygons directly (triangulation is done later, if you require)
 	// should always be convex simple polygons!!
 
-	const FaceIndex polyNum = face->size();
+	const FaceIndex polyNum = (const FaceIndex) face->size();
 
 	FaceData::Face t0;
 	// index of this polygon first edge

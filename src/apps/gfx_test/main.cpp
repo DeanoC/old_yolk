@@ -2,9 +2,9 @@
 #include "dwm_client/client.h"
 #include "scene/hie.h"
 
-#include "boost/program_options.hpp"
-#include "json_spirit/json_spirit_reader.h"
-
+//#include "boost/program_options.hpp"
+//#include "json_spirit/json_spirit_reader.h"
+/*
 void readConfig( std::string& hostname, int& port ) {
    std::ifstream is( "./config.json" );
    if( is.bad() || !is.is_open() )
@@ -20,7 +20,7 @@ void readConfig( std::string& hostname, int& port ) {
    for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
    }
 }
-
+*/
 #include "dwm/trustedregion.h"
 void World::InstallApiFuncs( class TrustedRegion* trustedRegion ) {
 }
@@ -31,7 +31,7 @@ uint8_t* TrustedRegion::encodeFunc( void* ) {
 
 int Main() {
 	using namespace Core;
-	namespace po = boost::program_options;
+/*	namespace po = boost::program_options;
 
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
@@ -46,13 +46,13 @@ int Main() {
 		LOG(INFO) << desc << "\n";
 		return 1;
 	}
-
+	*/
 
 	DwmClient client;
 	client.start();
 	ClientWorldPtr world = client.getClientWorld();
 
-	Scene::HiePtr land = std::make_shared<Scene::Hie>( "tutlvl1.hie" );
+	Scene::HierPtr land = std::make_shared<Scene::Hier>( "dynamics_test1.hie" );
 	world->addRenderable( land );
 	client.run();
 	client.end();

@@ -7,6 +7,8 @@
 #if !defined( MESH_MOD_PROPERTY_H_ )
 #define MESH_MOD_PROPERTY_H_
 
+#include <boost/any.hpp>
+
 namespace MeshMod {
 
 	class Property {

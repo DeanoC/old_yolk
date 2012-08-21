@@ -19,7 +19,9 @@
 #include "DynamicsMasterPlugin.h"
 #include "LWSceneLoader.h"
 
+#if !defined( UNREFERENCED_PARAMETER )
 #define UNREFERENCED_PARAMETER(x) (void)x
+#endif
 
 using namespace LightWave;
 

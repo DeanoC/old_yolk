@@ -27,7 +27,7 @@ namespace Scene {
 			LOG(INFO) << "Hie File " << pFilename << " not found\n";
 			return std::shared_ptr<HierarchyFileHeader>();
 		}
-		if( header.uiMagic == HierType ) {
+		if( header.uiMagic == HieType ) {
 			if( header.version != HierVersion ) {
 				LOG(INFO) << "Hie File " << pFilename << " version incorrect\n";
 				return std::shared_ptr<HierarchyFileHeader>();
@@ -58,4 +58,16 @@ namespace Scene {
 		}
 		return std::shared_ptr<HierarchyFileHeader>();
 	}
+
+const void* Hie::internalPreCreate( const char* name, const Hie::CreationInfo * ) {
+	auto ret = HierLoad( name );
+	if( ret ) {
+		auto hie = CORE_NEW Hie();
+		hie->header = ret;
+		return hie;
+	} else {
+		return nullptr;
+	}
+}
+
 } // end namespace Scene

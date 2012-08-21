@@ -32,11 +32,9 @@ struct TextureAtlasFileHeader {
 	// padding so that properties start on a 64 bit alignment 
 };
 
-TextureAtlas* TextureAtlas::internalLoad( 	const Core::ResourceHandleBase* baseHandle, 
-											const char* pTextureAtlasFileName, 
-											bool preload ) {
+const void* TextureAtlas::internalPreCreate( const char* name, const TextureAtlas::CreationInfo *loader ) {
 
-	Core::FilePath path( pTextureAtlasFileName );
+	Core::FilePath path( name );
 	path = path.ReplaceExtension( ".tat" );
 
 	Core::MemFile fio( path.value().c_str() );

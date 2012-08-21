@@ -17,7 +17,7 @@ namespace Scene {
 	// forward decl
 	struct HierarchyTree;
 
-	static const uint32_t HierType = RESOURCE_NAME('H','I','E','R');
+	static const uint32_t HieType = RESOURCE_NAME('H','I','E','R');
 	static const uint8_t HierVersion = 2;
 
 	enum HierarchyNodeType {
@@ -69,16 +69,23 @@ namespace Scene {
 	std::shared_ptr<HierarchyFileHeader> HierLoad( const char* pFilename );
 
 	// resource wrarpper for Hier loading
-	struct HierResource : public Core::Resource<HierType> {
-		struct CreationStruct {};
-		struct LoadStruct {};
+	class Hie : public Core::Resource<HieType> {
+	public:
+		friend class ResourceLoader;
+		struct CreationInfo {
+			HierarchyFileHeader* header;
+		};
+
 		std::shared_ptr<HierarchyFileHeader>	header;
+	protected:
+
+		static const void* internalPreCreate( const char* name, const CreationInfo *loader );
 	};
 
-	typedef std::shared_ptr<HierResource> HierResourcePtr;
+	typedef std::shared_ptr<Hie> HiePtr;
 	//! A wob file resource handle typedef
-	typedef const Core::ResourceHandle<HierType, HierResource> HierResourceHandle;
-	typedef HierResourceHandle* HierResourceHandlePtr;
+	typedef const Core::ResourceHandle<HieType, Hie> HieHandle;
+	typedef HieHandle* HieHandlePtr;
 
 } // end namespace Scene
 

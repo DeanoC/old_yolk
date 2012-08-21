@@ -63,17 +63,14 @@ public:
 	// note this are rendered in this order. i.e. NORMAL first, then alpha test then blend etc.
 	enum RENDER_STATES {
 		NORMAL = 0,			//!< res.argb = tex.argb * iterator.argb
-		COLOUR_MASK,		//!< res.argb = tex.rgb * iterator.rgb
+		COLOUR_MASK,		//!< res.rgb = tex.rgb * iterator.rgb
 		ALPHA_MASK,			//!< res.a = tex.a * iterator.a
 		ALPHA_BLEND,		//!< res.argb = OVER( tex.argb * iterator.argb, res.argb, (tex.a * iterator.a) )
 		PM_OVER,			//!< Porter/Duff Over with pre-multiplied alpha
+		MAX_RENDER_STATES,
 	};
 
 	ImageComposer( int iMaxSpritesPerLayer = 64 );
-	~ImageComposer();
-
-	//! clear the entire thing is faster than filling, so its provided here
-	void clearImage();
 
 	//!-----------------------------------------------------
 	//! Places a solid colour rectangle on to the screen at a 
@@ -208,35 +205,23 @@ private:
 		};
 
 		struct Page {
-			Page() : vertexBufferHandle(nullptr), vertexBuffer( nullptr ),
-						numVertices(0), mapped(nullptr) {}
+			Page() : vertexBufferHandle(nullptr), numVertices(0) {}
 
 			Page( DataBufferHandlePtr a, VertexInputHandlePtr b, ProgramHandlePtr c ) :
-				vertexBufferHandle(a), vaoHandle(b), programHandle(c), 
-				vertexBuffer( nullptr ), numVertices(0), 
-				mapped(nullptr) {}
+				vertexBufferHandle(a), vaoHandle(b), programHandle(c), numVertices(0) {}
 
+			// neither function is used for actual memory mapping with the system memory 
+			// backed implementation
 			void map() {
-				if( vertexBuffer == nullptr ) {
-					vertexBuffer = vertexBufferHandle->acquire();
-				}
-				mapped = (void*) vertexBuffer->map( Scene::DBMA_WRITE_ONLY, Scene::DBMF_DISCARD );
 				numVertices = 0;
 			}
+			void unmap() {}
 
-			void unmap() {
-				CORE_ASSERT( mapped != nullptr );
-				CORE_ASSERT( vertexBuffer != nullptr );
-				vertexBuffer->unmap();
-				mapped = nullptr;
-			}
-
-			DataBufferHandlePtr		vertexBufferHandle;
-			VertexInputHandlePtr 	vaoHandle;
-			ProgramHandlePtr			programHandle;
-			DataBufferPtr 			vertexBuffer;
-			uint32_t				numVertices;
-			void*					mapped;
+			DataBufferHandlePtr					vertexBufferHandle;
+			VertexInputHandlePtr 				vaoHandle;
+			ProgramHandlePtr					programHandle;
+			uint32_t							numVertices;
+			std::shared_ptr<uint8_t>			mapped;
 		};
 
 		typedef std::map<PageKey, Page>				PageMap;
@@ -244,11 +229,13 @@ private:
 		int 										layerNum;
 	} layers[MAX_LAYERS];
 
-	ProgramHandlePtr	program[MAX_RENDER_TYPE];			//!< programs
+	Core::ScopedResourceHandle<ProgramHandle>					program[MAX_RENDER_TYPE];
+	Core::ScopedResourceHandle<SamplerStateHandle>				linearClampSampler;
+	Core::ScopedResourceHandle<RenderTargetStatesHandle>		blendState[MAX_RENDER_STATES];
 
 	const unsigned int maxSpritesPerLayer;				//! how many sprites per layer can this composer support
 	static const uint32_t SizeOfRenderType[MAX_RENDER_TYPE];
-	static const VertexInput::CreationStruct VaoCS[MAX_RENDER_TYPE];
+	static const VertexInput::CreationInfo VaoCS[MAX_RENDER_TYPE];
 	Layer::Page& findOrCreatePage( Layer& layer, Layer::PageKey& key );
 
 

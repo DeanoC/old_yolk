@@ -25,19 +25,17 @@ DebugPrims::DebugPrims() {
 	numLineVertices = 0;
 	numLineWorldVertices = 0;
 
-	DataBuffer::CreationStruct vbcs = {
-		DBCF_CPU_UPDATES, DBT_VERTEX, 
+	DataBuffer::CreationInfo vbcs ( Resource::BufferCtor(
+		RCF_BUF_VERTEX | RCF_ACE_CPU_WRITE, 
 		MAX_DEBUG_VERTICES * sizeof(Vertex) * NUM_TYPES_OF_DEBUG_PRIM
-	};
+	) );
 	vertexBufferHandle = DataBufferHandle::create( "_debugPrimVertexBuffer", &vbcs );
 
-	VertexInput::CreationStruct vocs = {
-		2,
-		{
+	VertexInput::CreationInfo vocs = {
+		2, {
 			{ VE_POSITION, VT_FLOAT3 },
 			{ VE_COLOUR0, VT_BYTEARGB },
-		},
-		{
+		}, {
 			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0,
 			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0,
 		}
@@ -45,17 +43,12 @@ DebugPrims::DebugPrims() {
 
 	const std::string vaoName = "_debugPrimVao_" + VertexInput::genEleString(vocs.elementCount, vocs.elements );
 	vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vocs );
-
-	vertexBuffer = vertexBufferHandle->acquire();
-	pVertices = (Vertex*) vertexBuffer->map( DBMA_WRITE_ONLY, DBMF_DISCARD );
-
-	debugProgramHandle = Scene::ProgramHandle::create( "2dcolour" );
+	debugProgramHandle = Scene::ProgramHandle::load( "2dcolour" );
 }
 
 DebugPrims::~DebugPrims() {
 	debugProgramHandle->close();
 	vaoHandle->close();
-	vertexBuffer->unmap();
 	vertexBufferHandle->close();
 	Core::g_pDebugRender = pPrevDRI;
 }
@@ -63,8 +56,8 @@ DebugPrims::~DebugPrims() {
 void DebugPrims::ndcLine( const Core::Colour& colour, const Math::Vector2& a, const Math::Vector2& b ) {
 	int nlv = numLineVertices.fetch_add( 2 );
 	if( nlv+2 > MAX_DEBUG_VERTICES) {
-		// TODO as drawing can occur on any thread, we can't flush like we used to (as uses GL context)
-		// so for now drop it, TODO queue up flushes
+		// TODO as drawing can occur on any thread, we can't flush like we used to (as uses render context)
+		// so for now drop it, TODO queue buffers
 //		flush();
 		numLineVertices.fetch_add( -2 );
 		return;
@@ -72,10 +65,10 @@ void DebugPrims::ndcLine( const Core::Colour& colour, const Math::Vector2& a, co
 
 	const uint32_t packCol = Core::RGBAColour::packARGB( colour.getRGBAColour() );
 
-	pVertices[ NDC_LINE_START_INDEX + nlv + 0 ].pos = Math::Vector3( a[0], a[1], 0.f );
-	pVertices[ NDC_LINE_START_INDEX + nlv + 0 ].colour =  packCol;
-	pVertices[ NDC_LINE_START_INDEX + nlv + 1 ].pos = Math::Vector3( b[0], b[1], 0.f );
-	pVertices[ NDC_LINE_START_INDEX + nlv + 1 ].colour = packCol;
+	vertices[ NDC_LINE_START_INDEX + nlv + 0 ].pos = Math::Vector3( a[0], a[1], 0.f );
+	vertices[ NDC_LINE_START_INDEX + nlv + 0 ].colour =  packCol;
+	vertices[ NDC_LINE_START_INDEX + nlv + 1 ].pos = Math::Vector3( b[0], b[1], 0.f );
+	vertices[ NDC_LINE_START_INDEX + nlv + 1 ].colour = packCol;
 }
 
 void DebugPrims::worldLine( const Core::Colour& colour, 
@@ -94,10 +87,10 @@ void DebugPrims::worldLine( const Core::Colour& colour,
 
 	const uint32_t packCol = Core::RGBAColour::packARGB( colour.getRGBAColour() );
 
-	pVertices[ WORLD_LINE_START_INDEX + nwv + 0 ].pos = a;
-	pVertices[ WORLD_LINE_START_INDEX + nwv + 0 ].colour = packCol;
-	pVertices[ WORLD_LINE_START_INDEX + nwv + 1 ].pos = b;
-	pVertices[ WORLD_LINE_START_INDEX + nwv + 1 ].colour = packCol;
+	vertices[ WORLD_LINE_START_INDEX + nwv + 0 ].pos = a;
+	vertices[ WORLD_LINE_START_INDEX + nwv + 0 ].colour = packCol;
+	vertices[ WORLD_LINE_START_INDEX + nwv + 1 ].pos = b;
+	vertices[ WORLD_LINE_START_INDEX + nwv + 1 ].colour = packCol;
 }
 
 //! print some text onto some form of screen console
@@ -222,7 +215,7 @@ void DebugPrims::worldSphere( const Core::Colour& colour, const Math::Vector3& p
 
 }
 
-void DebugPrims::flush( RenderContext* context ) {
+void DebugPrims::render( RenderContext* context ) {
 	if( numLineWorldVertices + numLineVertices == 0 )
 		return;
 	context->pushDebugMarker( "Debug Render Flush" );
@@ -233,20 +226,23 @@ void DebugPrims::flush( RenderContext* context ) {
 		numLineWorldVertices = 0;
 		return;
 	}
+	// TODO only copy required
+	DataBufferPtr vertexBuffer = vertexBufferHandle->acquire();
+	Vertex* gpuVerts = (Vertex*) vertexBuffer->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD );
+	memcpy( gpuVerts, vertices, (MAX_DEBUG_VERTICES * 2) * sizeof(Vertex) );
+	vertexBuffer->unmap( context );
 
 /*	glEnable( GL_BLEND );
 	glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
 	glBlendFuncSeparate( GL_ONE, GL_ONE, GL_ONE, GL_ONE );*/
 
-	vertexBuffer->unmap();
 
 //	glBindVertexArray( vao->getName() );
 //	GL_CHECK
 
 	auto debugProgram = debugProgramHandle->acquire();
-	context->bindProgram( debugProgram );
-	context->getConstantCache().updateGPU( debugProgram );
-	context->bindConstants();
+	context->getConstantCache().updateGPU( context, debugProgram );
+	context->bind( debugProgram );
 
 	if( numLineWorldVertices != 0 ) {
 //		glDrawArrays( GL_LINES, WORLD_LINE_START_INDEX, numLineWorldVertices );
@@ -254,15 +250,13 @@ void DebugPrims::flush( RenderContext* context ) {
 	}
 	if( numLineVertices != 0 ) {
 		context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
-		context->getConstantCache().updateGPU( debugProgram );
+		context->getConstantCache().updateGPU( context, debugProgram );
 //		glDrawArrays( GL_LINES, NDC_LINE_START_INDEX, numLineVertices );
 //		GL_CHECK;
 	}
-	pVertices = (Vertex*) vertexBuffer->map( DBMA_WRITE_ONLY, DBMF_DISCARD );
 
 	numLineVertices = 0;
 	numLineWorldVertices = 0;
-
 	context->getConstantCache().invalidCacheOfType( CVN_VIEW_PROJ );
 	context->popDebugMarker();
 

@@ -7,7 +7,8 @@ file( GLOB header_files *.h *.inl *.hpp *.hxx )
 
 file( GLOB shader_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 								programs/*.hlsl 
-								programs/*.glsl 
+								programs/programs/*.hlsl 
+								programs/shaders/*.hlsl 
 								)
 
 

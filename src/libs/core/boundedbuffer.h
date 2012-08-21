@@ -17,7 +17,7 @@ template <class T>
       explicit BoundedBuffer(size_type capacity) : unread(0), container(capacity) {}
 
       void push_front(const value_type& item) {
-         Core::mutex::scoped_lock lock(mutx);
+         std::unique_lock<std::mutex> lock(mutx);
          notFull.wait(lock, boost::bind(&BoundedBuffer<value_type>::isNotFull, this));
          container.push_front(item);
          ++unread;
@@ -26,7 +26,7 @@ template <class T>
       }
 
       void pop_back(value_type* pItem) {
-         Core::mutex::scoped_lock lock(mutx);
+         std::unique_lock<std::mutex> lock(mutx);
          notEmpty.wait(lock, boost::bind(&BoundedBuffer<value_type>::isNotEmpty, this));
          *pItem = container[--unread];
          lock.unlock();

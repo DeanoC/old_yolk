@@ -19,7 +19,7 @@ public:
 	WorldPtr getWorld() const { return dwm.getWorld(); }
 private:
 	Dwm&										dwm;
-	boost::scoped_ptr<IsolatedExecEngine>		execEngine;
+	std::unique_ptr<IsolatedExecEngine>			execEngine;
 };
 
 #endif

@@ -7,11 +7,18 @@
 #if !defined( YOLK_SCENE_VERTEXINPUT_H_ )
 #define YOLK_SCENE_VERTEXINPUT_H_
 
-#include "core/resources.h"
-#include "databuffer.h"
+#if !defined( YOLK_CORE_RESOURCES_H_ )
+#	include "core/resources.h"
+#endif
+#if !defined( YOLK_CORE_DATABUFFER_H_ )
+#	include "databuffer.h"
+#endif
+#if !defined( YOLK_CORE_PROGRAM_H_ )
+#	include "program.h"
+#endif
 
 namespace Scene {
-	static const uint32_t VinRType = RESOURCE_NAME('G','V','I','N');
+	static const uint32_t VertexInputType = RESOURCE_NAME('G','V','I','N');
 
 	//! what this vertex type is for
 	enum VIN_ELEMENT {
@@ -57,11 +64,14 @@ namespace Scene {
 	static const size_t VI_AUTO_OFFSET = ~0;
 	static const uint32_t VI_AUTO_STRIDE = 0xFFFFFF;
 
-	class VertexInput : public Core::Resource<VinRType> {
+	class RenderContext;
+
+	class VertexInput : public Core::Resource<VertexInputType> {
 	public:
+		friend class ResourceLoader;
 		static const int MAX_ELEMENT_COUNT = 16;
 
-		struct CreationStruct {
+		struct CreationInfo {
 			int								elementCount;			//<! how many vertex elements
 			VinElement						elements[MAX_ELEMENT_COUNT];
 			struct {
@@ -71,20 +81,23 @@ namespace Scene {
 				uint32_t						stream : 8;			//!< stream number
 			} data[MAX_ELEMENT_COUNT];
 		};
-		struct LoadStruct {};
-		static VertexInput* internalCreate(	const Core::ResourceHandleBase* baseHandle, 
-											const char* pName, const CreationStruct* creation );
 
 		static uint32_t getElementItemCount( const VinElement& element );
 		static size_t getElementSize( const VinElement& element );
 		static size_t getVertexSize( int numElements, const VinElement *type );
 		static std::string genEleString( int numElements, const VinElement *type );
 
+		// each vertex input must be validated once with a shader that uses it
+		virtual void validate( Scene::ProgramPtr program ) = 0;
+		bool isValid() { return valid; }
+
 	protected:
-		VertexInput(){};
+		bool valid;
+		VertexInput() : valid( false ) {};
+		static const void* internalPreCreate( const char* name, const CreationInfo *loader ) { return loader; };
 	};
 
-	typedef const Core::ResourceHandle<VinRType, VertexInput> VertexInputHandle;
+	typedef const Core::ResourceHandle<VertexInputType, VertexInput> VertexInputHandle;
 	typedef VertexInputHandle* VertexInputHandlePtr;
 	typedef std::shared_ptr<VertexInput> VertexInputPtr;
 

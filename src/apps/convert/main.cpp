@@ -28,10 +28,10 @@ void DoTextureAtlas( const Core::FilePath& inPath, const Core::FilePath& outPath
 // Entry point to the program.
 //--------------------------------------------------------------------------------------
 int Main() {
-	namespace po = boost::program_options;
 	using namespace Core;
 
 	// Declare the supported options.
+	namespace po = boost::program_options;
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "Show the usage of the program")
@@ -116,13 +116,15 @@ int Main() {
 		DoTextureAtlas( inPath, outPath );
 	} else
 	{
-/*		std::shared_ptr<ImportInterface> importer;
+#if 0
+	std::shared_ptr<ImportInterface> importer;
 		importer = std::make_shared<AssImp>( inPath.BaseName().value() );
 		if( importer->loadedOk() == false ) {
 			LOG(INFO) << "Input file <" << inPath.BaseName().value() <<"> not found or unable to be loaded\n";
 			return 1;
 		}
-		OutputScene( outPath, importer );*/
+		OutputScene( outPath, importer );
+#endif
 		LOG(INFO) << "Input file <" << inPath.BaseName().value() <<"> can not be covnerted\n";
 
 	}

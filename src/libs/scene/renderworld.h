@@ -37,7 +37,8 @@ namespace Scene {
 		void setActiveCamera( std::shared_ptr<Scene::Camera> cam ) { activeCamera = cam; }
 		std::shared_ptr<Scene::Camera> getActiveCamera() { return activeCamera; }
 
-		virtual void render( const ScreenPtr screen, RenderContext* context );
+		virtual void render( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context );
+		virtual void displayRenderResults( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context );
 
 		Core::mutex* getUpdateMutex() { return &updateMutex; }
 

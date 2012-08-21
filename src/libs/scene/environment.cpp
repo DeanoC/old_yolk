@@ -25,7 +25,7 @@ Environment::~Environment() {
 
 Math::Vector3 Environment::getGravity() const {
 	if( gravityPtr == nullptr ) {
-		return Math::Vector3(0,-9.8,0);
+		return Math::Vector3(0,-9.8f,0);
 	} else {
 		return Math::Vector3( gravityPtr );
 	}

@@ -8,13 +8,18 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_RESOURCES_H
-#define WIERD_CORE_RESOURCES_H
+#ifndef YOLK_CORE_RESOURCES_H_
+#define YOLK_CORE_RESOURCES_H_
 
-
-#include "core_utils.h"
-#include "resourcebase.h"
-#include "resourceman.h"
+#ifndef YOLK_CORE_UTILS_H_
+#	include "core_utils.h"
+#endif
+#ifndef YOLK_CORE_RESOURCEBASE_H_
+#	include "resourcebase.h"
+#endif
+#ifndef YOLK_CORE_RESOURCEMAN_H_
+#	include "resourceman.h"
+#endif
 
 //! helper macro for resource names
 #define RESOURCE_NAME(a,b,c,d) Core::GenerateID<a,b,c,d>::value
@@ -40,15 +45,15 @@ public:
 	  return std::static_pointer_cast<ResourceClass>( ResourceHandleBase::baseTryAcquire<_type>() );
 	}
 
-	static ThisConstType* load( const char* _name, const struct ResourceClass::LoadStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	static ThisConstType* load( const char* _name, const struct ResourceClass::CreationInfo* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE) {
 	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
 	}
 
-	static ThisConstType* create( const char* _name, const struct ResourceClass::CreationStruct* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	static ThisConstType* create( const char* _name, const struct ResourceClass::CreationInfo* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE ) {
 	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
 	}
 
-	static void flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_PRELOAD ) {
+	static void flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE ) {
 	  Core::ResourceMan::get()->flushResource<Type>( _name, _flags );
 	}
 

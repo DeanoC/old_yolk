@@ -85,11 +85,11 @@ void IsolatedExecEngine::sandboxFree( void* ptr ) {
 }
 
 void IsolatedExecEngine::terminate() {
-	untrustedThread->interrupt();
-	try {
-		boost::this_thread::interruption_point();
-	} catch( ... ) {
-	};
+//	untrustedThread->interrupt();
+//	try {
+//		boost::this_thread::interruption_point();
+//	} catch( ... ) {
+//	};
 
 	CORE_DELETE untrustedThread;
 	untrustedThread = nullptr;

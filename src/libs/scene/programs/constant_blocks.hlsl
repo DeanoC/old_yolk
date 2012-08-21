@@ -5,6 +5,19 @@
 #define CF_PER_TARGETS		4
 #define CF_STD_OBJECT		5
 
+#if defined(D3D_SM5)
+#define VE_POSITION			POSITION
+#define VE_NORMAL			NORMAL
+#define VE_BINORMAL			BINORMAL
+#define VE_TANGENT			TANGENT
+#define VE_TEXCOORD0		TEXCOORD0
+#define VE_TEXCOORD1		TEXCOORD1
+#define VE_TEXCOORD2		TEXCOORD2
+#define VE_TEXCOORD3		TEXCOORD3
+#define VE_COLOUR0			COLOR0
+#define VE_COLOUR1			COLOR1
+
+#else
 #define VE_POSITION			0
 #define VE_NORMAL			1
 #define VE_BINORMAL			2
@@ -15,18 +28,17 @@
 #define VE_TEXCOORD3		7
 #define VE_COLOUR0			8
 #define VE_COLOUR1			9
-#define VE_BONEINDICES		10
-#define VE_BONEWEIGHTS		11
+#endif
 
-binding( CF_STATIC ) struct Static {
+constant_buffer( Static, CF_STATIC )  {
 	float4		dummy;
 };
 
-binding( CF_PER_FRAME ) struct PerFrame {
+constant_buffer( PerFrame, CF_PER_FRAME ) {
 	uint4		frameCount;
 };
 
-binding( CF_PER_PIPELINE ) struct PerPipeline {
+constant_buffer( PerPipeline, CF_PER_PIPELINE )  {
 	float16		matrixProjection;
 	float16		matrixProjectionInverse;
 	float16		matrixProjectionIT;
@@ -34,7 +46,7 @@ binding( CF_PER_PIPELINE ) struct PerPipeline {
 	float4		fov;
 };
 
-binding( CF_PER_VIEWS ) struct PerViews {
+constant_buffer( PerViews, CF_PER_VIEWS )  {
 	float16		matrixView;
 	float16		matrixViewInverse;
 	float16		matrixViewIT;
@@ -43,11 +55,11 @@ binding( CF_PER_VIEWS ) struct PerViews {
 	float16		matrixViewProjectionIT;
 };
 
-binding( CF_PER_TARGETS ) struct PerTargets {
+constant_buffer( PerTargets, CF_PER_TARGETS ) {
 	uint4		targetDims;
 };
 
-binding( CF_STD_OBJECT ) struct StdObject {
+constant_buffer( StdObject, CF_STD_OBJECT ) {
 	float16		 matrixWorld;
 	float16		 matrixWorldInverse;
 	float16		 matrixWorldIT;

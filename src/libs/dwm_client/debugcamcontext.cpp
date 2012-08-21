@@ -102,7 +102,7 @@ void DebugCamContext::enable( bool on  ) {
 	if( on ) {
 		// this camera stuff sucked, needs a rewrite
 		owner->setActiveCamera( camera );
-		controlContext->setCamera( camera );
+//		controlContext->setCamera( camera );
 	}
 }
 

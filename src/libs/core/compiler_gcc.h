@@ -14,7 +14,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define CORE_ALIGN(x)			__attribute__ ((aligned (x)))
-#define CORE_STATIC_ASSERT(x)	BOOST_STATIC_ASSERT(x)
 
 #define CORE_INLINE				inline
 #define CORE_FORCE_INLINE		inline

@@ -15,7 +15,7 @@ ResHandle ResOpenText( _VT_PARAMS1( _VT_PTR( const char*, name ) ) ) {
 	using namespace Core;
 	const char* lfname = (const char*)UNTRUSTED_PTR_TO_TRUSTED( name );
 
-	Core::TextResourceHandlePtr res = Core::TextResourceHandle::load( lfname, 0, (RESOURCE_FLAGS)(RMRF_PRELOAD | RMRF_DONTFLUSH) );
+	Core::TextResourceHandlePtr res = Core::TextResourceHandle::load( lfname, 0, RMRF_DONTFLUSH );
 	uint32_t handle = threadCtx->owner->getTrustedRegion()->trustedAddressToHandle( (uintptr_t) res );
 	return handle;	
 }
@@ -24,7 +24,7 @@ ResHandle ResOpenBinProperty( _VT_PARAMS1( _VT_PTR( const char*, name ) ) ) {
 	using namespace Core;
 	const char* lfname = (const char*)UNTRUSTED_PTR_TO_TRUSTED( name );
 
-	Core::BinPropertyResourceHandlePtr res = Core::BinPropertyResourceHandle::load( lfname, 0, (RESOURCE_FLAGS)(RMRF_PRELOAD | RMRF_DONTFLUSH) );
+	Core::BinPropertyResourceHandlePtr res = Core::BinPropertyResourceHandle::load( lfname, 0, RMRF_DONTFLUSH );
 	uint32_t handle = threadCtx->owner->getTrustedRegion()->trustedAddressToHandle( (uintptr_t) res );
 	return handle;	
 }
@@ -82,7 +82,7 @@ uint32_t ResCopyTo( _VT_PARAMS2( ResHandle handle, _VT_PTR( char*, vtDest ) ) ) 
 
 	bool memChk = true;
 	// check buffer has size 0's (has been memset'ed)
-	for( auto i = 0;i < size; ++i ) {
+	for( uint32_t i = 0;i < size; ++i ) {
 		if( dest[i] != 0 ) {
 			memChk = false;
 			break;

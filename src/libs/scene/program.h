@@ -3,37 +3,53 @@
 //!-----------------------------------------------------
 //!
 //! \file program.h
-//! A Gl Program is a resource representing a compiled
-//! GPU shader
-//!
+//! A Program is a resource made of a set of GPU shaders
+//! for the different parts of the GPU
 //!-----------------------------------------------------
 #if !defined( YOLK_SCENE_PROGRAM_H_ )
 #define YOLK_SCENE_PROGRAM_H_
 
 #include <core/resources.h>
-#include "memory.h"
 
 namespace Scene {
-	static const uint32_t ProgramRType = RESOURCE_NAME('G','P','R','G');
+	static const uint32_t ProgramType = RESOURCE_NAME('G','P','R','G');
 
-	class Program : public Core::Resource<ProgramRType> {
+	enum SHADER_TYPES {
+		ST_VERTEX,
+		ST_FRAGMENT,
+		ST_GEOMETRY,
+		ST_HULL,
+		ST_DOMAIN,
+		ST_COMPUTE,
+		MAX_SHADER_TYPES
+	};
+
+	class Program : public Core::Resource<ProgramType> {
 	public:
-		struct CreationStruct {
-			int				numTransformFeedbackItems;
-			bool			interleavedItems;
-			const char*		transformFeedbackItemNames[ 16 ]; // max items
+		friend class ProgramMan;
+		friend class ResourceLoader;
+		struct CreationInfo {
+			void* data[MAX_SHADER_TYPES]; //platform specific partial compile from loader
 		};
-		struct LoadStruct {};
 
 		// bit flags of CONSTANT_FREQ tell which buffer are used by this program
 		uint32_t getUsedBuffers() const { return usedBuffers; }
 
+		virtual bool usesConstantBuffer( const Scene::SHADER_TYPES type, const uint32_t bufferIndex ) = 0; 
+		virtual bool usesConstantBuffer( const uint32_t bufferIndex ) = 0;	
+		// a program will have a specific 'offset' for each variable this gets it
+		// not fast use at init time
+		virtual uint32_t getVariableOffset( const uint32_t bufferIndex, const char* name ) = 0;
+
 	protected:
+		static const void* internalPreCreate( const char* pName, const CreationInfo* creation );
+		static Program* internalCreate( const void* creation );
+
 		Program(){};
 		uint32_t			usedBuffers;
 	};
 
-	typedef const Core::ResourceHandle<ProgramRType, Program> ProgramHandle;
+	typedef const Core::ResourceHandle<ProgramType, Program> ProgramHandle;
 	typedef ProgramHandle* ProgramHandlePtr;
 	typedef std::shared_ptr<Program> ProgramPtr;
 

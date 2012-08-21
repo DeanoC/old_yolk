@@ -26,7 +26,7 @@ HierHandle HierCreateMesh( _VT_PARAMS2( MeshType type, _VT_PTR( const MeshCreate
 
 	switch( type ) {
 		case MeshType::Sphere: {
-			auto sphere = std::make_shared<Scene::Hie>( "sphere_1" );
+			auto sphere = std::make_shared<Scene::Hier>( "sphere_1" );
 			sphere->getTransformNode()->setLocalScale( Math::Vector3(safeParams.radius, safeParams.radius, safeParams.radius) );
 			uint32_t handle = threadCtx->owner->getTrustedRegion()->trustedAddressToHandle( (uintptr_t) sphere.get() );
 			threadCtx->owner->world->addRenderable( sphere );
@@ -44,7 +44,7 @@ HierHandle HierCreateMesh( _VT_PARAMS2( MeshType type, _VT_PTR( const MeshCreate
 
 HierHandle HierLoadHier( _VT_PARAMS1( _VT_PTR( const char*, fname ) ) ) {
 	const char* lfname = (const char*)UNTRUSTED_PTR_TO_TRUSTED( fname );
-	auto mesh = std::make_shared<Scene::Hie>( lfname );
+	auto mesh = std::make_shared<Scene::Hier>( lfname );
 	uint32_t handle = threadCtx->owner->getTrustedRegion()->trustedAddressToHandle( (uintptr_t) mesh.get() );
 	threadCtx->owner->world->addRenderable( mesh );
 	return (HierHandle) handle;
@@ -56,7 +56,7 @@ HierHandle HierLoadHier( _VT_PARAMS1( _VT_PTR( const char*, fname ) ) ) {
 
 // returns RES_ERROR if has no environment
 ResHandle HierOpenEnvironmentBinProperty( _VT_PARAMS1( HierHandle handle ) )  {
-	auto hie = (Scene::Hie*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
+	auto hie = (Scene::Hier*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
 	if( hie->getEnvironment() ) {
 		auto phandle = hie->getEnvironment()->getPropertiesResourceHandle();
 		uint32_t propHandle = threadCtx->owner->getTrustedRegion()->trustedAddressToHandle( (uintptr_t) phandle );
@@ -71,7 +71,7 @@ ResHandle HierOpenEnvironmentBinProperty( _VT_PARAMS1( HierHandle handle ) )  {
 //--------------
 
 int HierGetNodeCount( _VT_PARAMS1( HierHandle handle ) ) {
-	auto hie = (Scene::Hie*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
+	auto hie = (Scene::Hier*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
 	return hie->getNodeCount();
 }
 
@@ -81,7 +81,7 @@ void HierSetLocalTransform( _VT_PARAMS3( HierHandle handle, _VT_PTR( const HierT
 	HierTransformParams safeParams;
 	memcpy( &safeParams, (void*) UNTRUSTED_PTR_TO_TRUSTED(params), sizeof( HierTransformParams ) );
 
-	auto hie = (Scene::Hie*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
+	auto hie = (Scene::Hier*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
 
 	Core::lock_guard<Core::mutex> updateGuard( *world->getUpdateMutex() );
 	hie->getTransformNode( nodeId )->setLocalPosition( Math::Vector3(	safeParams.localPos[0], 
@@ -97,7 +97,7 @@ void HierGetLocalTransform( _VT_PARAMS3( HierHandle handle, _VT_PTR( const HierT
 
 	HierTransformParams safeParams;
 
-	auto hie = (Scene::Hie*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
+	auto hie = (Scene::Hier*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
 
 	auto pos = hie->getTransformNode( nodeId )->getLocalPosition();
 	auto rot = hie->getTransformNode( nodeId )->getLocalOrientation();
@@ -117,7 +117,7 @@ void HierGetLocalTransform( _VT_PARAMS3( HierHandle handle, _VT_PTR( const HierT
 
 // returns RES_ERROR if has no environment
 ResHandle HierOpenNodeBinProperty( _VT_PARAMS2( HierHandle handle, int nodeId ) )  {
-	auto hie = (Scene::Hie*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
+	auto hie = (Scene::Hier*) threadCtx->owner->getTrustedRegion()->handleToTrustedAddress( (uintptr_t) handle );
 	if( !hie->getProperties( nodeId ) ) {
 		return RES_ERROR;
 	}

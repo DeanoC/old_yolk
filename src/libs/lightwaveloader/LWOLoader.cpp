@@ -18,7 +18,9 @@
 
 using namespace LightWave;
 
+#if !defined( UNREFERENCED_PARAMETER )
 #define UNREFERENCED_PARAMETER(x) (void)x
+#endif
 namespace
 {
 //---------------------------------------------------------------------------

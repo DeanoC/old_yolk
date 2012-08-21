@@ -55,10 +55,10 @@ inline bool isnormal( double a )
 } // namespace Core
 #endif // def _MSC_VER
 
-#if defined( USE_DX11 )
-#	include "vector_math_dx10.h"
-#else
-#endif //end USE_DX11
+//#if defined( USE_DX11 )
+//#	include "vector_math_dx10.h"
+//#else
+//#endif //end USE_DX11
 
 #else
 

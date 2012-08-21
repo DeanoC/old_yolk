@@ -14,12 +14,12 @@
 namespace Scene
 {
 
-Hie::Hie( const char* pFilename ) :
+Hier::Hier( const char* pFilename ) :
 	Renderable( nullptr )
 {
-	hierHandle.reset(  HierResourceHandle::load( pFilename ) );
-	hier = hierHandle.acquire();
-	HierarchyFileHeader* header = hier->header.get();
+	hieHandle.reset( HieHandle::load( pFilename ) );
+	hie = hieHandle.acquire();
+	HierarchyFileHeader* header = hie->header.get();
 
 	if( header->flags & HFF_ENVIRONMENT ) {
 		environment = std::make_shared<Environment>( Core::BinPropertyResourceHandle::load( pFilename ) );
@@ -79,13 +79,13 @@ Hie::Hie( const char* pFilename ) :
 	}
 }
 
-Hie::~Hie() {
+Hier::~Hier() {
 	for( uint16_t i=0;i < numNodes;++i ) {
 		nodeArray[i].~TransformNode();
 	}
 }
 
-void Hie::render( RenderContext* context, Pipeline* pipeline ) {
+void Hier::render( RenderContext* context, Pipeline* pipeline ) {
 	OwnedMeshes::const_iterator it = ownedMeshes.begin();
 	while( it != ownedMeshes.end() ) {
 		(*it)->render( context, pipeline );

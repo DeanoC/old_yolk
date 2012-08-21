@@ -23,7 +23,7 @@ const uint32_t ImageComposer::SizeOfRenderType[ImageComposer::MAX_RENDER_TYPE] =
 	sizeof( ImageComposer::SOLID_COLOUR ),
 };
 
-const VertexInput::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] = {
+const VertexInput::CreationInfo ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] = {
 	{
 		3, 
 		{	{ Scene::VE_POSITION, 	Scene::VT_FLOAT2 },
@@ -45,21 +45,19 @@ const VertexInput::CreationStruct ImageComposer::VaoCS[ImageComposer::MAX_RENDER
 ImageComposer::ImageComposer( int _maxSpritesPerLayer ) :
 	maxSpritesPerLayer( _maxSpritesPerLayer )
 {
-	program[ SIMPLE_SPRITE ] = ProgramHandle::create( "basicsprite" );
-	program[ SOLID_COLOUR ] = ProgramHandle::create( "2dcolour" );
+	program[ SIMPLE_SPRITE ].reset( ProgramHandle::load( "sprite_basic" ) );
+	program[ SOLID_COLOUR ].reset( ProgramHandle::load( "2dcolour" ) );
 
+	linearClampSampler.reset( SamplerStateHandle::create( "Linear_Clamp" ) );
 	for( int i = 0; i < MAX_LAYERS; ++i ) {
 		layers[i].layerNum = i;
 	}
-}
 
-ImageComposer::~ImageComposer() {
-	program[ SIMPLE_SPRITE ]->close();
-	program[ SOLID_COLOUR ]->close();
-}
-
-void ImageComposer::clearImage() {
-//	Graphics::Gfx::Get()->GetDevice()->Clear(0,0, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0);
+	blendState[ NORMAL ].reset( RenderTargetStatesHandle::create( "NoBlend_WriteAll" ) );
+	blendState[ COLOUR_MASK ].reset( RenderTargetStatesHandle::create( "NoBlend_WriteColour" ) );
+	blendState[ ALPHA_MASK ].reset( RenderTargetStatesHandle::create( "NoBlend_WriteAlpha" ) );
+	blendState[ ALPHA_BLEND ].reset( RenderTargetStatesHandle::create( "Over_WriteAll" ) );
+	blendState[ PM_OVER ].reset( RenderTargetStatesHandle::create( "PMOver_WriteAll" ) );
 }
 
 ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Layer& layer, ImageComposer::Layer::PageKey& key ) {
@@ -68,18 +66,21 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 	if( pmIt == layer.pageMap.end() ) {
 		// insert a new page
 
+		const size_t sizeInBytes = maxSpritesPerLayer * 6 * SizeOfRenderType[ key.type ];
 		// allocate vertex buffer
-		DataBuffer::CreationStruct vbcs = {
-			DBCF_CPU_UPDATES, DBT_VERTEX, 
-			maxSpritesPerLayer * 6 * SizeOfRenderType[ key.type ]
-		};
+		DataBuffer::CreationInfo vbcs( Resource::BufferCtor(
+			RCF_BUF_VERTEX | RCF_ACE_CPU_WRITE, 
+			sizeInBytes
+		) );
 		std::stringstream nam;
 		nam << "_imagecompPage" << layer.pageMap.size() << "_" << layer.layerNum;
 		const std::string name = nam.str();
 		DataBufferHandlePtr vertexBufferHandle = DataBufferHandle::create( name.c_str(), &vbcs );
 
+		uint8_t* sysBuffer = CORE_NEW_ARRAY uint8_t[ sizeInBytes ];
+
 		// copy vao creation struct template
-		VertexInput::CreationStruct vcs = VaoCS[ key.type ];
+		VertexInput::CreationInfo vcs = VaoCS[ key.type ];
 		// fill in this vertex buffer
 		for( int i = 0;i < vcs.elementCount; ++i ) {
 			vcs.data[i].buffer =  vertexBufferHandle;
@@ -87,9 +88,10 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 		const std::string vaoName = name + VertexInput::genEleString( vcs.elementCount, vcs.elements );
 		VertexInputHandlePtr vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vcs );
 
-		layer.pageMap[ key ] = Layer::Page( vertexBufferHandle, vaoHandle, program[ key.type ] );
+		layer.pageMap[ key ] = Layer::Page( vertexBufferHandle, vaoHandle, program[ key.type ].get() );
 		Layer::Page& page = layer.pageMap[ key ];
 
+		page.mapped.reset( sysBuffer );
 		page.map();
 
 		return page;
@@ -119,27 +121,27 @@ void ImageComposer::putTexture(	const Scene::TextureHandlePtr&	pTexture,
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
 
-	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*)page.mapped;
+	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*)page.mapped.get();
 
 	// fill in the vertex data
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2( pos.x-size.x, -(pos.y+size.y) );
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(0, 1);
 	pVertexData[ page.numVertices + 0 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(1, 1);
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(0, 0);
 	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(0, 0);
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(1, 1);
 	pVertexData[ page.numVertices + 2 ].colour = colour.packARGB();
 	page.numVertices += 3;
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(0, 0);
 	pVertexData[ page.numVertices + 0 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(1, 1);
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y-size.y) );
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(1, 0);
 	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y-size.y) );
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(1, 0);
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(1, 1);
 	pVertexData[ page.numVertices + 2 ].colour = colour.packARGB();
 	page.numVertices += 3;
 
@@ -172,26 +174,26 @@ void ImageComposer::putSprite(	const TextureAtlasHandlePtr&	atlasHandle,
 
 	Math::Vector2 size = fullsize;
 
-	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*) page.mapped;
+	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*) page.mapped.get();
 	// fill in the vertex data
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2( pos.x-size.x, -(pos.y+size.y) );
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(sprite.u0, sprite.v1);
 	pVertexData[ page.numVertices + 0 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(sprite.u1, sprite.v1);
-	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(sprite.u0, sprite.v0);
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(sprite.u1, sprite.v1);
 	pVertexData[ page.numVertices + 2 ].colour = colour.packARGB();
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(sprite.u0, sprite.v0);
+	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
 	page.numVertices += 3;
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(sprite.u0, sprite.v0);
 	pVertexData[ page.numVertices + 0 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(sprite.u1, sprite.v1);
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y-size.y) );
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(sprite.u1, sprite.v0);
 	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y-size.y) );
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(sprite.u1, sprite.v0);
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(sprite.u1, sprite.v1);
 	pVertexData[ page.numVertices + 2 ].colour = colour.packARGB();
 	page.numVertices += 3;
 
@@ -227,7 +229,7 @@ void ImageComposer::putSubSprite(
 
 	Math::Vector2			size = fullsize;
 
-	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*) page.mapped;
+	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*) page.mapped.get();
 	float uSize = sprite.u1-sprite.u0;
 	float vSize = sprite.v1-sprite.v0;
 
@@ -240,21 +242,21 @@ void ImageComposer::putSubSprite(
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2( pos.x-size.x, -(pos.y+size.y) );
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(u0, v1);
 	pVertexData[ page.numVertices + 0 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(u1, v1);
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(u0, v0);
 	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(u0, v0);
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(u1, v1);
 	pVertexData[ page.numVertices + 2 ].colour = colour.packARGB();
 	page.numVertices += 3;
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2( pos.x-size.x, -(pos.y-size.y) );
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(u0, v0);
 	pVertexData[ page.numVertices + 0 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(u1, v1);
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2( pos.x+size.x, -(pos.y-size.y) );
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(u1, v0);
 	pVertexData[ page.numVertices + 1 ].colour = colour.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y-size.y) );
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(u1, v0);
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2( pos.x+size.x, -(pos.y+size.y) );
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(u1, v1);
 	pVertexData[ page.numVertices + 2 ].colour = colour.packARGB();
 	page.numVertices += 3;
 
@@ -300,21 +302,21 @@ void ImageComposer::filledQuad( unsigned int					renderStates,
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
 
-	SolidColourVertex* pVertexData = (SolidColourVertex*) page.mapped;
+	SolidColourVertex* pVertexData = (SolidColourVertex*) page.mapped.get();
 	// fill in the vertex data
-	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2(tl.x,-tl.y);
-	pVertexData[ page.numVertices + 0 ].colour = tlcol.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2(tr.x,-tr.y);
-	pVertexData[ page.numVertices + 1 ].colour = trcol.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(br.x,-br.y);
-	pVertexData[ page.numVertices + 2 ].colour = brcol.packARGB();
-	page.numVertices += 3;
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2(tl.x,-tl.y);
 	pVertexData[ page.numVertices + 0 ].colour = tlcol.packARGB();
 	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2(br.x,-br.y);
 	pVertexData[ page.numVertices + 1 ].colour = brcol.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(bl.x,-bl.y);
-	pVertexData[ page.numVertices + 2 ].colour = blcol.packARGB();
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(tr.x,-tr.y);
+	pVertexData[ page.numVertices + 2 ].colour = trcol.packARGB();
+	page.numVertices += 3;
+	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2(tl.x,-tl.y);
+	pVertexData[ page.numVertices + 0 ].colour = tlcol.packARGB();
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2(bl.x,-bl.y);
+	pVertexData[ page.numVertices + 1 ].colour = blcol.packARGB();
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(br.x,-br.y);
+	pVertexData[ page.numVertices + 2 ].colour = brcol.packARGB();
 	page.numVertices += 3;
 
 }
@@ -369,28 +371,28 @@ void ImageComposer::texturedQuad( const Scene::TextureHandlePtr&		pTexture,
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
 
-	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*) page.mapped;
+	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*) page.mapped.get();
 
 	// fill in the vertex data
-	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2(tl.x,-tl.y);
-	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(uvtl.x,1.0f-uvtl.y);
-	pVertexData[ page.numVertices + 0 ].colour = tlcol.packARGB();
-	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2(tr.x,-tr.y);
-	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2( uvbr.x, 1.0f-uvtl.y );
-	pVertexData[ page.numVertices + 1 ].colour = trcol.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(br.x,-br.y);
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(uvbr.x,1.0f-uvbr.y);
-	pVertexData[ page.numVertices + 2 ].colour = brcol.packARGB();
-	page.numVertices += 3;
 	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2(tl.x,-tl.y);
 	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(uvtl.x,1.0f-uvtl.y);
 	pVertexData[ page.numVertices + 0 ].colour = tlcol.packARGB();
 	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2(br.x,-br.y);
 	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(uvbr.x,1.0f-uvbr.y);
 	pVertexData[ page.numVertices + 1 ].colour = brcol.packARGB();
-	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(bl.x,-bl.y);
-	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(uvtl.x,1.0f-uvbr.y);
-	pVertexData[ page.numVertices + 2 ].colour = blcol.packARGB();
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(tr.x,-tr.y);
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2( uvbr.x, 1.0f-uvtl.y );
+	pVertexData[ page.numVertices + 2 ].colour = trcol.packARGB();
+	page.numVertices += 3;
+	pVertexData[ page.numVertices + 0 ].pos = Math::Vector2(tl.x,-tl.y);
+	pVertexData[ page.numVertices + 0 ].uv = Math::Vector2(uvtl.x,1.0f-uvtl.y);
+	pVertexData[ page.numVertices + 0 ].colour = tlcol.packARGB();
+	pVertexData[ page.numVertices + 1 ].pos = Math::Vector2(bl.x,-bl.y);
+	pVertexData[ page.numVertices + 1 ].uv = Math::Vector2(uvtl.x,1.0f-uvbr.y);
+	pVertexData[ page.numVertices + 1 ].colour = blcol.packARGB();
+	pVertexData[ page.numVertices + 2 ].pos = Math::Vector2(br.x,-br.y);
+	pVertexData[ page.numVertices + 2 ].uv = Math::Vector2(uvbr.x,1.0f-uvbr.y);
+	pVertexData[ page.numVertices + 2 ].colour = brcol.packARGB();
 	page.numVertices += 3;
 
 }
@@ -402,71 +404,47 @@ void ImageComposer::render( RenderContext* context ) {
 //	glDisable( GL_CULL_FACE );
 //	glDisable( GL_DEPTH_TEST );
 
+	auto samplerState = linearClampSampler.acquire();
+
 	for( unsigned int i=0;i < MAX_LAYERS;++i) {
 		Layer::PageMap::iterator pmIt = layers[i].pageMap.begin();
 		while( pmIt != layers[i].pageMap.end() ) {
 			const Layer::PageKey& pagekey = pmIt->first;
 			Layer::Page& page = pmIt->second;
-			if( page.mapped == nullptr ) {
+			if( page.numVertices == 0 ) {
 				++pmIt;
 				continue;
 			}
 
 			page.unmap();
-
+			DataBufferPtr db = page.vertexBufferHandle->acquire();
+			if( !db ) { ++pmIt; continue; }
+			void* gpuVerts = (void*) db->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD );
+			memcpy( gpuVerts, page.mapped.get(), page.numVertices * 6 * SizeOfRenderType[ pagekey.type ] );
+			db->unmap( context );
+			auto icProgram = program[ pagekey.type ].acquire();
 			auto vao = page.vaoHandle->tryAcquire();
-			if( !vao ) {
-				++pmIt;
-				continue;
-			}
-//			glBindVertexArray( vao->getName() );
-//			GL_CHECK
+			if( !vao ) { ++pmIt; continue; }
+			vao->validate( icProgram );
+
+			context->bind( vao );
+
 			if( pagekey.texture0 ) {
 				auto tex = pagekey.texture0->tryAcquire();
 				if( tex ) {
-//					glActiveTexture( GL_TEXTURE0 );
-//					glBindTexture( GL_TEXTURE_2D, tex->getName() );
-//					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f );
-//					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f );
+					context->bind( ST_FRAGMENT, 0, samplerState );
+					context->bind( ST_FRAGMENT, 0, tex );
 				}
 			}
 
-			auto icProgram = program[ pagekey.type ]->acquire();
-			context->bindProgram( icProgram );
 			context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
-			context->getConstantCache().updateGPU( icProgram );
-			context->bindConstants();
+			context->getConstantCache().updateGPU( context, icProgram );
+			context->bind( icProgram );
 
-			switch( pagekey.renderStates ) {
-			default:
-				case NORMAL:
-//				glDisable( GL_BLEND );
-//				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
-				break;
-/*			case COLOUR_MASK:
-				glDisable( GL_BLEND );
-//				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
-			break;
-			case ALPHA_MASK:
-				glDisable( GL_BLEND );
-//				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA );
-			break;
-			case ALPHA_BLEND:
-				glEnable( GL_BLEND );
-				glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
-				glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-//				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
-				break;
-			case PM_OVER:
-				glEnable( GL_BLEND );
-				glBlendEquationSeparate( GL_FUNC_ADD, GL_FUNC_ADD );
-				glBlendFuncSeparate( GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,  GL_ONE_MINUS_SRC_ALPHA );
-//				Gfx::Get()->GetDevice()->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE );
-				break;*/
-			}
-//			glDrawArrays( GL_TRIANGLES, 0, page.numVertices );
-//			GL_CHECK;
-
+			auto blender = blendState[ pagekey.renderStates ].acquire();
+			context->bind( blender );
+			context->draw( PT_TRIANGLE_LIST, page.numVertices );
+			page.numVertices = 0;
 			++pmIt;
 		}
 	}

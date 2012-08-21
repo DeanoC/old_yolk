@@ -22,7 +22,7 @@ void InputHandlerContext::enable( bool on ) {
 	if( on ) {
 		activeCamera = owner->getActiveCamera();
 		if( activeCamera ) {
-			controlContext->setCamera( activeCamera );	
+//			controlContext->setCamera( activeCamera );	
 		}
 	}
 }
@@ -36,7 +36,7 @@ void InputHandlerContext::update( float fTimeInSecs ) {
 	if( owner->getActiveCamera() != activeCamera ) {
 		activeCamera = owner->getActiveCamera();
 		if( activeCamera ) {
-			controlContext->setCamera( activeCamera );	
+//			controlContext->setCamera( activeCamera );	
 		}
 	}
 

@@ -4,28 +4,188 @@
 		"selected_items":
 		[
 			[
-				"sc",
-				"scratchInit"
+				"der",
+				"derivedOnly"
 			],
 			[
-				"scr",
-				"scratchIntCount"
+				"rende",
+				"renderThreadId"
 			],
 			[
-				"binH",
-				"binHeight"
+				"Thr",
+				"thread_id"
 			],
 			[
-				"de",
-				"debugCamera"
+				"ren",
+				"renderLoaderImpl"
+			],
+			[
+				"loaderThrea",
+				"loaderThreadId"
+			],
+			[
+				"this",
+				"this_thread"
 			],
 			[
 				"ac",
-				"activeCamera"
+				"acquirePumps"
+			],
+			[
+				"internal",
+				"internalPumpAcquirePump"
+			],
+			[
+				"pu",
+				"push_back"
+			],
+			[
+				"Ac",
+				"AcquirePumpCallback"
+			],
+			[
+				"C",
+				"CreationStruct"
+			],
+			[
+				"Te",
+				"TextureAtlas"
+			],
+			[
+				"in",
+				"internalPreCreate"
+			],
+			[
+				"sh",
+				"shared_ptr"
+			],
+			[
+				"Res",
+				"ResourceLoader"
+			],
+			[
+				"USE_",
+				"USE_DX11"
+			],
+			[
+				"Get",
+				"GetBufferPointer"
+			],
+			[
+				"tmp",
+				"tmpFragments"
+			],
+			[
+				"out",
+				"outsrc"
+			],
+			[
+				"hea",
+				"headerStack"
+			],
+			[
+				"ref",
+				"referenceTex"
+			],
+			[
+				"pre",
+				"prefillPitch"
+			],
+			[
+				"samp",
+				"sampleCount"
+			],
+			[
+				"pref",
+				"prefillData"
+			],
+			[
+				"view",
+				"viewType"
+			],
+			[
+				"GTF_DEPTH",
+				"GTF_DEPTH_COMPONENT32F"
+			],
+			[
+				"mip",
+				"mipLevels"
+			],
+			[
+				"sl",
+				"slices"
+			],
+			[
+				"CPU",
+				"CPUAccessFlags"
+			],
+			[
+				"RESOU",
+				"RESOURCE_CREATION_FLAGS"
+			],
+			[
+				"sam",
+				"sampleCount"
+			],
+			[
+				"D3D11_CP",
+				"D3D11_CPU_ACCESS_WRITE"
+			],
+			[
+				"cpu",
+				"cpuAccess"
+			],
+			[
+				"D3DD",
+				"D3D11_USAGE_DYNAMIC"
+			],
+			[
+				"D3",
+				"D3D11_MAP_WRITE_NO_OVERWRITE"
+			],
+			[
+				"D3D11",
+				"D3D11_MAP_WRITE"
+			],
+			[
+				"render",
+				"renderer"
+			],
+			[
+				"START_F",
+				"START_FLAGS"
+			],
+			[
+				"Scre",
+				"ScreenPtr"
+			],
+			[
+				"SCRF_",
+				"SCRF_DEPTH"
+			],
+			[
+				"GL_",
+				"GL_BGRA"
+			],
+			[
+				"GL_M",
+				"GL_MAP_READ_BIT"
+			],
+			[
+				"blo",
+				"blockHandles"
 			],
 			[
 				"cu",
 				"curWinHeight"
+			],
+			[
+				"sc",
+				"scrHeight"
+			],
+			[
+				"scr",
+				"scrWidth"
 			],
 			[
 				"debug",
@@ -92,10 +252,6 @@
 				"resourceLoaderIo"
 			],
 			[
-				"Res",
-				"ResourceLoader"
-			],
-			[
 				"RE",
 				"ResourceLoaderImpl"
 			],
@@ -108,16 +264,8 @@
 				"FatalX11"
 			],
 			[
-				"render",
-				"renderContexts"
-			],
-			[
 				"pO",
 				"pOutFilename"
-			],
-			[
-				"out",
-				"outStream"
 			],
 			[
 				"Mes",
@@ -252,10 +400,6 @@
 				"membase"
 			],
 			[
-				"sl",
-				"slabAllocator"
-			],
-			[
 				"Memo",
 				"MemoryBuffer"
 			],
@@ -348,52 +492,116 @@
 	"buffers":
 	[
 		{
-			"file": "src/libs/gl/vtpipeline_capture.cpp",
+			"file": "src/libs/scene/resourceloader.h",
 			"settings":
 			{
-				"buffer_size": 5098,
-				"line_ending": "Unix",
-				"name": "vtpipeline_capture.cpp"
-			}
-		},
-		{
-			"file": "src/libs/gl/programs/programs/alloc32.glsl",
-			"settings":
-			{
-				"buffer_size": 12,
-				"line_ending": "Unix",
-				"name": "alloc32.glsl"
-			}
-		},
-		{
-			"file": "src/libs/gl/programs/programs/resolve8msaa.glsl",
-			"settings":
-			{
-				"buffer_size": 170,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/gl/vtpipeline.h",
-			"settings":
-			{
-				"buffer_size": 3572,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/libs/gl/scenecapturepipeline.cpp",
-			"settings":
-			{
-				"buffer_size": 19967,
+				"buffer_size": 1893,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gl/scenecapturepipeline.h",
+			"file": "src/libs/scene/resourceloader.cpp",
 			"settings":
 			{
-				"buffer_size": 3925,
+				"buffer_size": 9011,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/singleton.h",
+			"settings":
+			{
+				"buffer_size": 1231,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/scene/programman.h",
+			"settings":
+			{
+				"buffer_size": 1734,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/dx11/resourceloader.cpp",
+			"settings":
+			{
+				"buffer_size": 1480,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/dx11/vertexinput.h",
+			"settings":
+			{
+				"buffer_size": 794,
+				"line_ending": "Windows",
+				"name": "vertexinput.h"
+			}
+		},
+		{
+			"file": "src/libs/dx11/vertexinput.cpp",
+			"settings":
+			{
+				"buffer_size": 3268,
+				"line_ending": "Windows",
+				"name": "vertexinput.cpp"
+			}
+		},
+		{
+			"file": "src/libs/scene/vertexinput.h",
+			"settings":
+			{
+				"buffer_size": 2686,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/resources.h",
+			"settings":
+			{
+				"buffer_size": 3931,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/core_utils.h",
+			"settings":
+			{
+				"buffer_size": 9575,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/resourcebase.h",
+			"settings":
+			{
+				"buffer_size": 3080,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/dx11/texture.cpp",
+			"settings":
+			{
+				"buffer_size": 8437,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yolk_setup.cmake",
+			"settings":
+			{
+				"buffer_size": 3248,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "cmake_modules/FindWierdBoost.cmake",
+			"settings":
+			{
+				"buffer_size": 1400,
 				"line_ending": "Windows"
 			}
 		}
@@ -413,7 +621,7 @@
 				"Bookmarks: Clear All"
 			]
 		],
-		"width": 404.0
+		"width": 449.0
 	},
 	"console":
 	{
@@ -430,134 +638,134 @@
 	},
 	"file_history":
 	[
-		"/home/deano/projects/yolk/src/libs/cl/buffer.h",
-		"/home/deano/projects/yolk/src/libs/gl/vtpipeline.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/programs/fragments/gs_makefullscreen.glsl",
-		"/home/deano/projects/yolk/src/libs/gl/texture.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/texture.h",
-		"/home/deano/projects/yolk/src/libs/gl/glformat_cracker.h",
-		"/home/deano/projects/yolk/src/libs/gl/databuffer.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/databuffer.h",
-		"/home/deano/projects/yolk/src/libs/cl/buffer.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/rendercontext.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/programs/fragments/fs_resolve8msaa.glsl",
-		"/home/deano/projects/yolk/src/libs/gl/shaderman.cpp",
-		"/home/deano/projects/yolk/yolk.sublime-project",
-		"/home/deano/projects/yolk/src/libs/gl/gfx.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/fbo.cpp",
-		"/home/deano/projects/yolk/src/libs/cl/programman.cpp",
-		"/home/deano/projects/yolk/src/libs/cl/kernel.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/programs/fragments/fs_constant_1.glsl",
-		"/home/deano/projects/yolk/src/libs/gl/programs/programs/adder.glsl",
-		"/home/deano/projects/yolk/src/libs/gl/programs/fragments/fs_const_1.glsl",
-		"/media/truecrypt1/Projects/dx11test/Content/Shaders/FullScreenPorterDuffMS.fx",
-		"/media/truecrypt1/Projects/dx11test/Content/Shaders/blinn_DepthAndReproject.fxh",
-		"/media/truecrypt1/Projects/dx11test/Content/Shaders/SolidWire.fx",
-		"/home/deano/projects/yolk/src/libs/gl/rendercontext.h",
-		"/home/deano/projects/yolk/src/libs/scene/rendercontext.h",
-		"/home/deano/projects/yolk/src/libs/scene/renderworld.h",
-		"/home/deano/projects/yolk/src/libs/scene/renderworld.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/constantcache.cpp",
-		"/media/truecrypt1/Projects/dx11test/Content/Shaders/dl_lightcomputer.fx",
-		"/home/deano/projects/yolk/src/libs/dwm_client/client.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/apis/resources.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/vmthreads.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/apis/vm.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/posix/gfx.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/glew.c",
-		"/home/deano/projects/yolk/src/libs/gl/gl.h",
-		"/home/deano/projects/yolk/src/libs/gl/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/libs/cl/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/libs/cl/kernels/helloworld.cl",
-		"/home/deano/projects/yolk/src/libs/gl/imagecomposer.cpp",
-		"/home/deano/projects/yolk/src/libs/core/transform_node.cpp",
-		"/home/deano/projects/yolk/src/libs/scene/hie.cpp",
-		"/home/deano/projects/yolk/src/libs/cl/kernels/dummy.c",
-		"/home/deano/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
-		"/home/deano/projects/yolk/src/libs/gl/glload/source/glxl_ext.c",
-		"/home/deano/projects/yolk/src/libs/gl/glew.h",
-		"/home/deano/projects/yolk/src/libs/gl/glxew.h",
-		"/home/deano/projects/yolk/src/libs/gl/wglew.h",
-		"/home/deano/projects/glew-1.7.0/src/glewinfo.c",
-		"/home/deano/projects/glew-1.7.0/src/visualinfo.c",
-		"/home/deano/projects/yolk/src/libs/dwm/vmapi.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/gl.cpp",
-		"/home/deano/projects/yolk/src/libs/core/sysmsg.h",
-		"/home/deano/projects/yolk/src/libs/core/platform_posix/events_x11.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/gfx.h",
-		"/home/deano/projects/yolk/src/libs/dwm_client/debugcamcontext.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm_client/debugcamcontext.h",
-		"/home/deano/projects/yolk/src/libs/render/camera.h",
-		"/home/deano/projects/yolk/src/libs/gl/forwardpipeline.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/glload/include/glload/_int_gl_1_1.h",
-		"/home/deano/projects/yolk/src/libs/gl/forwardpipeline.h",
-		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.h",
-		"/home/deano/projects/yolk/src/libs/gl/scenecapturepipeline.cpp",
-		"/home/deano/projects/yolk/src/libs/render/pipeline.h",
-		"/home/deano/projects/yolk/src/libs/dwm_client/client.h",
-		"/home/deano/projects/yolk/src/libs/dwm_client/clientworld.h",
-		"/home/deano/projects/yolk/src/libs/core/resource_dir.cpp",
-		"/home/deano/projects/yolk/src/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/libs/gl/debugprims.h",
-		"/home/deano/projects/yolk/src/libs/gl/debugprims.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/resourceloader.cpp",
-		"/home/deano/projects/yolk/src/libs/gl/resourceloader.h",
-		"/home/deano/projects/yolk/src/libs/gl/vao.cpp",
-		"/home/deano/projects/yolk/src/libs/core/resourceman.h",
-		"/home/deano/projects/yolk/src/libs/core/resourceman.cpp",
-		"/home/deano/projects/yolk/src/libs/core/resourcebase.h",
-		"/home/deano/projects/yolk/src/libs/core/coreresources.cpp",
-		"/home/deano/projects/yolk/src/libs/cl/platform.cpp",
-		"/home/deano/projects/yolk/src/libs/core/resources.h",
-		"/home/deano/projects/yolk/src/libs/dwm/dwm.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.h",
-		"/home/deano/projects/yolk/src/libs/dwm/vmthreads.h",
-		"/home/deano/projects/yolk/src/libs/dwm/dwm.h",
-		"/home/deano/projects/yolk/src/libs/dwm/isolatedexecengine.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/world.h",
-		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/main.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm/trustedregion.h",
-		"/home/deano/projects/yolk/src/libs/render/hie.h",
-		"/home/deano/projects/yolk/src/libs/render/hie.cpp",
-		"/home/deano/projects/yolk/src/libs/render/renderable.h",
-		"/home/deano/projects/yolk/src/libs/dwm/vmthread.cpp",
-		"/home/deano/projects/yolk/src/libs/dwm_client/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/libs/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/apps/dvm_owned_dedi/CMakeLists.txt",
-		"/home/deano/projects/yolk/src/libs/dvm_client/client.h",
-		"/home/deano/projects/yolk/src/libs/dvm_client/client.cpp",
-		"/home/deano/projects/yolk/src/libs/render/renderworld.h",
-		"/home/deano/projects/yolk/src/libs/render/renderworld.cpp",
-		"/home/deano/.spectrwm.conf",
-		"/home/deano/projects/yolk/src/libs/render/wobfile.cpp",
-		"/home/deano/projects/yolk/src/libs/render/wobfile.h",
-		"/home/deano/projects/yolk/src/libs/render/mesh.cpp",
-		"/home/deano/projects/yolk/src/libs/core/cmdline_shell.cpp",
-		"/home/deano/.conkyrc",
-		"/home/deano/.cache/.fr-4IOxYX/conky-dlab/conkyrc-1600/conkyrc-nopanel-0",
-		"/home/deano/.cache/.fr-pzQgk5/conky-dlab/conkyrc-1600/conkyrc-panel-2",
-		"/etc/X11/xorg.conf",
-		"/home/deano/projects/yolk/src/libs/gl/memory.cpp",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWOLoader.cpp",
-		"/home/deano/projects/yolk/src/apps/convertmesh/main.cpp",
-		"/home/deano/rpg.sh/live/Hie/starfire.hietxt",
-		"/home/deano/projects/yolk/src/libs/meshimport/LWObject2GO.cpp",
-		"/home/deano/rpg.sh/live/Meshes/starfire_LW Mesh.wobtxt",
-		"/home/deano/projects/yolk/src/libs/meshexport/wobexp.cpp",
-		"/home/deano/projects/yolk/src/libs/meshmod/vertex.cpp",
-		"/home/deano/projects/yolk/src/libs/meshops/basicmeshops.cpp",
-		"/home/deano/projects/yolk/src/libs/meshmod/edge.cpp",
-		"/home/deano/rpg.sh/live/Manifests/starfire.mantxt",
-		"/home/deano/projects/yolk/src/libs/meshimport/assimp.cpp",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWSceneLoader.cpp",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWSceneLoader.h",
-		"/home/deano/projects/yolk/src/libs/meshimport/LWScene2GO.cpp",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWTypes.h",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWLayer.h",
-		"/home/deano/projects/yolk/submodules/assimp/code/LWOFileData.h",
-		"/home/deano/projects/yolk/src/libs/meshimport/meshimport.cpp",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWChannelGroup.cpp",
-		"/home/deano/projects/yolk/src/libs/lightwaveloader/LWEnvelope.cpp"
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/resourcebase.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/gtfcracker.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/resourceman.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/resourceman.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/programman.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/dx11.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/screen.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dwm_client/clientworld.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dwm_client/client.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/rendercontext.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/rendercontext.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/rendercontext.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugpipeline.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugpipeline.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/wobfile.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/resourceloader.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/texture.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hierfile.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/textureatlas.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/program.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/program.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/databuffer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/texture.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resource.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/texture.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/texture.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/vertexinput.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resourceloader.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resourceloader.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/databuffer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/databuffer.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/wobfile.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/textureatlas.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hierfile.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programman.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programman.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/programman.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderloader.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/builtin_programs.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/program.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/program.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/debug.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programs/shared_structs.hlsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/gfx.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resource.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/gfx.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/screen.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/ogl.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/shaderman.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/shaderman.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/preprocessor.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/preprocessor.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/apps/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resource.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/databuffer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/dxgiformat_cracker.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/generictextureformat.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/gfx.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/gfx.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/windows/gfx.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugprims.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugprims.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/debugpipeline.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/imagecomposer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/imagecomposer.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/glformat_cracker.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dwm_client/client.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderworld.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderworld.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderable.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/mesh.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/mesh.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/pipeline.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hie.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hie.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/debugpipeline.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/screen.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/imagecomposer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/rendercontext.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/rendercontext.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/vao.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/databuffer.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/constantcache.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/gfx_debug_render.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/shared_structs.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programs/constant_blocks.hlsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/programs/2dcolour.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/vs_ndcpos_col.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/program.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/memory.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/vdeclmanager.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/vdeclmanager.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/vao.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/vertexinput.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/texture.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/texture.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/scene.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/constantcache.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/constantcache.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/gpu_constants.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/gpu_constants.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/constant_blocks.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/constant_blocks.hlsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/shared_structs.hlsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/clforgl.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/debugprims.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/imagecomposer.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/constantcache.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/programs/basic.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/fs_basic.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/fs_flat_basic.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/programs/flat_basic.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/gs_makefullscreen.glsl",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/submodules/json-spirit/json_spirit/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/yolk.sublime-project",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/submodules/json-spirit/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/DeferredLightGBuffers11.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/dx11.cpp"
 	],
 	"find":
 	{
@@ -565,7 +773,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 96.0,
 		"where_history":
 		[
 			"",
@@ -582,7 +790,35 @@
 		"case_sensitive": true,
 		"find_history":
 		[
-			"s_cacheCount",
+			"GL_",
+			"YOLK_SCENE_PROGRAM_MAN_H_",
+			"TextureCtor",
+			"swapChain",
+			"YOLK_GL_VALIDATE_PRG_OFFSETS",
+			"Gl::MAX_PROGRAM_TYPE",
+			"DECLARE_FRAGMENT",
+			";",
+			":",
+			"GL_",
+			"RENDER_BACKEND",
+			"VaoElement",
+			"CF_STATIC",
+			"CONSTANT_FREQ_BLOCKS",
+			"WIERD_GL_GET_SIZEOF_PRG_VAR",
+			"WIERD_GL_GET_OFFSET_IN_BLOCK",
+			"WIERD_GL_VALIDATE_PRG_OFFSETS",
+			"WIERD_GL_GET_OFFSET_IN_BLOCK",
+			"Gl",
+			"GLEWAPIENTRY",
+			"add_custom_command",
+			"obj",
+			"asm",
+			"obj",
+			"asm",
+			"<?",
+			"LLVM_PREPROCESSOR",
+			"LLVM_ASM",
+			"asm",
 			"glxew",
 			"glXGetProcAddressARB",
 			"GL_LINEAR",
@@ -681,42 +917,26 @@
 			"BUNDLE_ALIGN_START",
 			"Invalid Switch Record",
 			"CXX_FLAGS",
-			"C_FLAGS",
-			"LLVM_REQUIRES_",
-			"RTTI",
-			"cpuid",
-			"python",
-			"PythonInter",
-			"EmitBundleAlignEnd",
-			"naclcall",
-			"SegOvrMask",
-			"GS",
-			"hasFSGSBase",
-			"GS",
-			"GF",
-			"NaClThreadIdxAllocate",
-			"NaClTlsAllocate",
-			"NaClAppThreadAllocSegCtor",
-			"NaClSyscallCSegHook",
-			"NaClStackSafetyNowOnUntrustedStack",
-			"NaClStartThreadInApp",
-			"NaClSwitchSSE",
-			"NaClAddSyscall",
-			"NaClSyscallTableEntry",
-			"NaClCopyOutToUser",
-			"./b2",
-			"LDT_ENTRIES",
-			"modify_ldt",
-			"NaClLdtAllocateSelector",
-			"NaCl_page_alloc",
-			"NaClJITMemoryManagerX"
+			"C_FLAGS"
 		],
 		"highlight": true,
-		"in_selection": false,
+		"in_selection": true,
 		"preserve_case": false,
 		"regex": false,
 		"replace_history":
 		[
+			"GTF_",
+			"YOLK_VALIDATE_PRG_OFFSETS",
+			"MAX_SHADER_TYPES",
+			"DECLARE_SHADER",
+			":",
+			";",
+			"GTF_",
+			"VinElement&",
+			"YOLK_GL_GET_SIZEOF_PRG_VAR",
+			"YOLK_GL_GET_OFFSET_IN_BLOCK",
+			"YOLK_GL_VALIDATE_PRG_OFFSETS",
+			"Scene",
 			"Math::Matrix4x4",
 			"LOG(INFO)",
 			"Cloud Pixies Ltd",
@@ -738,137 +958,131 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 11,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/gl/vtpipeline_capture.cpp",
+					"file": "src/libs/scene/resourceloader.h",
 					"settings":
 					{
-						"buffer_size": 5098,
+						"buffer_size": 1893,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5098,
-								5098
+								428,
+								428
 							]
 						],
 						"settings":
 						{
-							"auto_name": "vtpipeline_capture.cpp",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2713.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/gl/programs/programs/alloc32.glsl",
+					"file": "src/libs/scene/resourceloader.cpp",
 					"settings":
 					{
-						"buffer_size": 12,
+						"buffer_size": 9011,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12,
-								12
+								122,
+								122
 							]
 						],
 						"settings":
 						{
-							"auto_name": "alloc32.glsl",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 480.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/gl/programs/programs/resolve8msaa.glsl",
+					"file": "src/libs/core/singleton.h",
 					"settings":
 					{
-						"buffer_size": 170,
+						"buffer_size": 1231,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								113,
-								113
+								212,
+								243
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 145.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/libs/scene/programman.h",
+					"settings":
+					{
+						"buffer_size": 1734,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								573,
+								573
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 1,
-			"sheets":
-			[
-				{
-					"buffer": 3,
-					"file": "src/libs/gl/vtpipeline.h",
-					"settings":
-					{
-						"buffer_size": 3572,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2204,
-								2204
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 34.0,
-						"translation.y": 1758.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "src/libs/gl/scenecapturepipeline.cpp",
+					"file": "src/libs/dx11/resourceloader.cpp",
 					"settings":
 					{
-						"buffer_size": 19967,
+						"buffer_size": 1480,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12770,
-								12770
+								1065,
+								1065
 							]
 						],
 						"settings":
@@ -877,25 +1091,81 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 6449.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "src/libs/gl/scenecapturepipeline.h",
+					"file": "src/libs/dx11/vertexinput.h",
 					"settings":
 					{
-						"buffer_size": 3925,
+						"buffer_size": 794,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2766,
-								2766
+								638,
+								638
+							]
+						],
+						"settings":
+						{
+							"auto_name": "vertexinput.h",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/libs/dx11/vertexinput.cpp",
+					"settings":
+					{
+						"buffer_size": 3268,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								719,
+								730
+							]
+						],
+						"settings":
+						{
+							"auto_name": "vertexinput.cpp",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/libs/scene/vertexinput.h",
+					"settings":
+					{
+						"buffer_size": 2686,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2415,
+								2415
 							]
 						],
 						"settings":
@@ -904,7 +1174,169 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1242.0,
+						"translation.y": 1025.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/libs/core/resources.h",
+					"settings":
+					{
+						"buffer_size": 3931,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								538,
+								538
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/libs/core/core_utils.h",
+					"settings":
+					{
+						"buffer_size": 9575,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								405,
+								405
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "src/libs/core/resourcebase.h",
+					"settings":
+					{
+						"buffer_size": 3080,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								334,
+								334
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "src/libs/dx11/texture.cpp",
+					"settings":
+					{
+						"buffer_size": 8437,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								507,
+								507
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "yolk_setup.cmake",
+					"settings":
+					{
+						"buffer_size": 3248,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1328,
+								1328
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1020.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "cmake_modules/FindWierdBoost.cmake",
+					"settings":
+					{
+						"buffer_size": 1400,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								867,
+								867
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -929,18 +1361,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.5,
 			1.0
 		],
 		"rows":
@@ -950,6 +1375,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 130.0
+	},
 	"replace":
 	{
 		"height": 70.0
@@ -1047,6 +1476,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 206.0,
+	"side_bar_width": 309.0,
 	"status_bar_visible": true
 }

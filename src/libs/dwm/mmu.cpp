@@ -61,14 +61,14 @@ MMU::MMU() {
 	// grew the internal ldt table to max
 	err = (*set_information_process)(GetCurrentProcess(), 10, (void*)&info, sizeof(LdtInfo) );
 
-	ldtTable[0].present = 1; // ignore the first entry as windows does
+/*	ldtTable[0].present = 1; // ignore the first entry as windows does
 	for (auto index = 1; index < LDT_ENTRIES; ++index) {
 		DWORD len;
 		info.byte_offset = index << 3;
-		/* TODO(sehr): change parameters to allow only one call to query_info... */
+		// TODO(sehr): change parameters to allow only one call to query_info...
 		err = query_information_process(GetCurrentProcess(), 10, (void*)&info, sizeof(LdtInfo), &len);
 		memcpy( &ldtTable[index], info.entries, info.size );
-	}
+	}*/
 #	endif
 
 #else

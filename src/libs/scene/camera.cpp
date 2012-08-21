@@ -14,8 +14,8 @@ Camera::Camera() :
 	ortho( false ),
 	yScale( 1.0f ),
 	xScale( 1.0f ),
-	zNear( 0.1 ),
-	zFar( 4000 ) {
+	zNear( 0.1f ),
+	zFar( 4000.0f ) {
 }
 
 void Camera::setProjection( float fov, float aspect, float znear, float zfar ) {

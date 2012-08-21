@@ -8,50 +8,81 @@
 #if !defined(YOLK_SCENE_RENDERCONTEXT_H_)
 #define YOLK_SCENE_RENDERCONTEXT_H_
 
-#include "scene/camera.h"
-#include "scene/program.h"
-#include "scene/constantcache.h"
-#include "scene/texture.h"
+#if !defined(YOLK_SCENE_PROGRAM_H_)
+#	include "scene/program.h"
+#endif
+#if !defined(YOLK_SCENE_CONSTANTCACHE_H_)
+#	include "scene/constantcache.h"
+#endif
+#if !defined(YOLK_SCENE_TEXTURE_H_)
+#	include "scene/texture.h"
+#endif
+#if !defined(YOLK_SCENE_RENDERSTATES_H_)
+#	include "scene/renderstates.h"
+#endif
+#if !defined(YOLK_SCENE_VERTEXINPUT_H_)
+#	include "scene/vertexinput.h"
+#endif
 
 namespace Scene {
+	enum PRIMITIVE_TOPOLOGY {
+		PT_POINT_LIST,
+		PT_LINE_LIST,
+		PT_LINE_STRIP,
+		PT_TRIANGLE_LIST,
+		PT_TRIANGLE_STRIP,
+		PT_LINE_LIST_ADJ,
+		PT_LINE_STRIP_ADJ,
+		PT_TRIANGLE_LIST_ADJ,
+		PT_TRIANGLE_STRIP_ADJ,
+	};
+
+	struct Viewport {
+		float tlX;
+		float tlY;
+		float width;
+		float height;
+		float minDepth;
+		float maxDepth;
+	};
 
 	class RenderContext {
 	public:
 		virtual void pushDebugMarker( const char* ) const = 0;
 		virtual void popDebugMarker() const = 0;		
 
-		virtual void setCamera( const CameraPtr& _cam ) = 0;
-		virtual void threadActivate() = 0; 	// must be called once, before this context is used on a particular thread
-		virtual void prepToRender() = 0; // used to indicate this render context is used for rendering versus loading/non visual render stuff
+		virtual void clear( const TexturePtr& target, const Core::Colour& colour ) = 0;
+		virtual void clearDepthStencil( const TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) = 0; 
 
-		virtual void bindConstants() = 0;
+		virtual void bindRenderTargets( const TexturePtr& target, const TexturePtr& depthTarget ) = 0;
+		virtual void bindRenderTarget( const TexturePtr& target ) = 0;
+		virtual void bindDepthOnlyRenderTarget( const TexturePtr& depthTarget ) = 0;
+		virtual void bindRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets, const TexturePtr& depthTarget ) = 0;
+		virtual void bindRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets ) = 0;
 
-		virtual void swapBuffers() = 0;
-		virtual void reset() = 0;
-		virtual void bindProgram( const Scene::ProgramPtr& prg ) = 0;
-		virtual void unbindProgram() = 0;
-
-		virtual void useAsRenderTargets( const TexturePtr& pTarget, const TexturePtr& pDepthTarget ) = 0;
-		virtual void useAsRenderTarget( TexturePtr pTarget ) = 0;
-		virtual void useAsDepthOnlyRenderTargets( TexturePtr pDepthTarget ) = 0;
-		virtual void useAsRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets, const TexturePtr& pDepthTarget ) = 0;
-		virtual void useAsRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets ) = 0;
-		virtual void useNoRenderTargets() = 0;
-
-
-		Scene::ConstantCache& getConstantCache() { return *constantCache; }
-		const Scene::ConstantCache& getConstantCache() const { return *constantCache; }
+		// todo proper viewports
+		virtual void bind( const Viewport& viewport ) = 0;
 	
-		const Scene::CameraPtr getCamera() { return constantCache->getCamera(); }
-		const Core::Frustum* getFrustum() { return viewFrustum; }
+		virtual void bind( const ProgramPtr& prg ) = 0;
+		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const TexturePtr& tex ) = 0;
+		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const SamplerStatePtr sampler ) = 0;
+		virtual void bind( const RenderTargetStatesPtr targetStates ) = 0;
+		virtual void bind( const DepthStencilStatePtr dsStates ) = 0;
+		virtual void bind( const RasteriserStatePtr rasteriser ) = 0;
+		virtual void bind( const VertexInputPtr vertexInput ) = 0;
+
+		virtual void bindIndexBuffer( const DataBufferPtr ib ) = 0;
+
+		virtual void draw( PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) = 0;
+		virtual void drawIndexed( PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) = 0;
+
+
+		virtual void unbindRenderTargets() = 0;
+
+		Scene::ConstantCache& getConstantCache() { return constantCache; }
 
 	protected:
-		boost::scoped_ptr<Scene::ConstantCache>		constantCache;
-		// note in most cases frustum and camera match, but in some debug cases they
-		// might not (to allow you see how frustum culling is working or not)
-		const Core::Frustum*						viewFrustum;
-		boost::scoped_array<Scene::ProgramPtr>		boundPrograms;
-
+		Scene::ConstantCache					constantCache;
 	};
 }
 

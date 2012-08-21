@@ -29,21 +29,21 @@ namespace Scene {
 	class RenderContext;
 	class Pipeline;
 
-	class Hie : public Renderable {
+	class Hier : public Renderable {
 	public:
-		Hie( Core::TransformNode* pRootNode );
+		Hier( Core::TransformNode* pRootNode );
 		
 		// from a Hie resource file
-		Hie( const char* pFilename );
+		Hier( const char* pFilename );
 
 		//! dtor
-		virtual ~Hie();
+		virtual ~Hier();
 
 		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
 
 		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const override {
 			if( _type == R_MESH ) {
-				int numMeshes = Math::Min<int>(ownedMeshes.size(), arraySize );
+				int numMeshes = Math::Min<int>( (int)ownedMeshes.size(), arraySize );
 				for( int i=0;i < numMeshes;++i ) {
 					outArray[i] = ownedMeshes[i].get();
 				}
@@ -79,8 +79,8 @@ namespace Scene {
 		boost::scoped_array<uint8_t>					nodeArrayMem;
 		Core::TransformNode*							nodeArray;
 		boost::scoped_array<Math::Matrix4x4>			matrixArray;
-		Core::ScopedResourceHandle<HierResourceHandle> 	hierHandle;
-		HierResourcePtr									hier;
+		Core::ScopedResourceHandle<HieHandle> 			hieHandle;
+		HiePtr											hie;
 
 		typedef std::vector< std::shared_ptr< Mesh > >	OwnedMeshes;
 		OwnedMeshes										ownedMeshes;
@@ -91,7 +91,7 @@ namespace Scene {
 
 	};
 
-	typedef std::shared_ptr<Hie>						HiePtr;
+	typedef std::shared_ptr<Hier>						HierPtr;
 	
 }; // end namespace Scene
 
