@@ -33,11 +33,7 @@ namespace Scene {
 		virtual const CameraPtr getCamera( uint32_t index ) const { return cameras[index]; }
 		virtual CameraPtr getCamera( uint32_t index ) { return cameras[index]; }
 
-		// TODO multiple screens/views etc.
-		void setActiveCamera( std::shared_ptr<Scene::Camera> cam ) { activeCamera = cam; }
-		std::shared_ptr<Scene::Camera> getActiveCamera() { return activeCamera; }
-
-		virtual void render( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context );
+		virtual void render( const ScreenPtr screen, const std::string& pipelineName, std::shared_ptr<Scene::Camera> camera, RenderContext* context );
 		virtual void displayRenderResults( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context );
 
 		Core::mutex* getUpdateMutex() { return &updateMutex; }
@@ -45,19 +41,18 @@ namespace Scene {
 	protected:
 		typedef tbb::concurrent_vector< RenderablePtr > RenderableContainer;
 		typedef tbb::concurrent_vector< CameraPtr > 	CameraContainer;
-		typedef std::vector< uint32_t > 				STIndexContainer;
+		typedef std::vector< Renderable* > 			STIndexContainer;
 
-		void determineVisibles();
-		void renderRenderables(  RenderContext* context, Pipeline* pipeline );
+		void determineVisibles( const std::shared_ptr<Scene::Camera>& camera );
+		void renderRenderables( RenderContext* context, Pipeline* pipeline );
 
 		RenderableContainer				renderables;
-		STIndexContainer				visibleRenderables;
-
 		CameraContainer					cameras;
 
-		std::shared_ptr<Scene::Camera>	activeCamera;
+
 		Core::mutex 					updateMutex;
-		std::shared_ptr<Scene::Camera> 	renderCamera;
+		STIndexContainer				visibleRenderables;
+		std::shared_ptr<Scene::Camera>	renderCamera;
 	};
 }
 

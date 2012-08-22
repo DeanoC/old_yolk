@@ -6,16 +6,11 @@
 #include <core/development_context.h>
 #include "dwm_client/inputframe.h"
 
-namespace Scene {
-	class Camera;
-	class RenderContext;
-}
-
 class ClientWorld;
 
 class InputHandlerContext : public Core::DevelopmentContextInterface {
 public:
-	InputHandlerContext( ClientWorld* _owner, Scene::RenderContext* _controlContext );
+	InputHandlerContext( ClientWorld* _owner );
 
 	/// called every frame that the context is active for x movement
 	virtual void padXAxisMovement( unsigned int padNum, float x ) { curFrame.pad[padNum].XAxisMovement += x; }
@@ -44,9 +39,6 @@ public:
 	//! called every frame this context is active
 	virtual void update( float fTimeInSecs );
 
-	//! Context will call for your to display you debug info.
-	virtual void display();
-
 	virtual void debugButton1( unsigned int padNum ) { curFrame.pad[padNum].debugButton1 = true; }
 	virtual void debugButton2( unsigned int padNum ) { curFrame.pad[padNum].debugButton2 = true; }
 	virtual void debugButton3( unsigned int padNum ) { curFrame.pad[padNum].debugButton3 = true; }
@@ -54,12 +46,8 @@ public:
 	virtual void debugButton5( unsigned int padNum ) { curFrame.pad[padNum].debugButton5 = true; }
 
 protected:
-	std::shared_ptr<Scene::Camera> 	activeCamera;
-
-	ClientWorld* 	owner;
-	Scene::RenderContext* 	controlContext;
-
-	InputFrame		curFrame;
+	ClientWorld* 					owner;
+	InputFrame						curFrame;
 };
 
 

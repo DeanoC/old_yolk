@@ -54,7 +54,7 @@ void CamSetActive( _VT_PARAMS1( CamHandle handle ) ) {
 	ClientWorld* clientWorld = (ClientWorld*) threadCtx->owner->world;
 	auto cam = clientWorld->getCamera( handle );
 
-	return clientWorld->setActiveCamera( cam );
+	TODO_ASSERT( false );
 }
 
 void InstallCamApiFuncs( TrustedRegion* trustedRegion ) {

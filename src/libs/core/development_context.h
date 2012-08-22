@@ -10,12 +10,15 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_DEVELOPMENT_CONTEXT_H
-#define WIERD_CORE_DEVELOPMENT_CONTEXT_H
+#ifndef YOLK_CORE_DEVELOPMENT_CONTEXT_H_
+#define YOLK_CORE_DEVELOPMENT_CONTEXT_H_
 
 
 #include "input_listener.h"
 
+namespace Scene {
+	class Camera;
+}
 namespace Core {
 
 //! interface class that each context fills in
@@ -30,7 +33,10 @@ public:
 	virtual void update( float fTimeInSecs ) = 0;
 
 	//! Context will call for your to display you debug info.
-	virtual void display() = 0;
+	virtual void display() {};
+	
+	//! allows a context to return a scene camera for use with a renderer (optional, if not returns nullptr)
+	virtual std::shared_ptr<Scene::Camera> getCamera() const { return std::shared_ptr<Scene::Camera>(); }
 };
 
 

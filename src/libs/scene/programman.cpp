@@ -23,11 +23,16 @@ namespace {
 const char* shaderTypeStrings[ Scene::MAX_SHADER_TYPES ] = { "vs_",		"fs_", 			"gs_", 			"hs_", 		"ds_", 		"cs_" 		};
 const char* shaderSrcTag[ Scene::MAX_SHADER_TYPES ] 	 = { "vertex()", "fragment()", 	"geometry()", 	"hull()" , 	"domain()", "compute()" };
 
-#define YOLK_VALIDATE_PRG_OFFSETS( p, b, c, v ) {								\
-	uint32_t offset = 0xFFFFFFFE;												\
-	static const char* name( #v );												\
-	offset = prg->getVariableOffset( b, name );							\
-	CORE_ASSERT( offset == ~0 || offsetof( Scene::GPUConstants:: c, v ) == offset );			\
+#define YOLK_VALIDATE_PRG_OFFSETS( p, c, v ) {										\
+	uint32_t offset = ~0;																\
+	offset = GetOffsetFromProgram( #c, prg, #v );										\
+	CORE_ASSERT( offset == ~0 || offsetof( Scene::GPUConstants:: c, v ) == offset );	\
+	used |= (offset != ~0);																\
+}
+
+// will return ~0(aka -1) if not used, or offset it used
+uint32_t GetOffsetFromProgram( const char* block, const Scene::Program* prg, const char* name ) {
+	return prg->getVariableOffset( block, name );
 }
 
 }
@@ -155,46 +160,70 @@ void ProgramMan::buildConstantTables( Program* prg ) {
 	using namespace Scene;
 
 	prg->usedBuffers = 0;
-	prg->usedBuffers |= prg->usesConstantBuffer( CF_STATIC ) 		? BIT( CF_STATIC ) 			: 0;
-	prg->usedBuffers |= prg->usesConstantBuffer( CF_PER_FRAME )		? BIT( CF_PER_FRAME ) 		: 0;
-	prg->usedBuffers |= prg->usesConstantBuffer( CF_PER_PIPELINE ) 	? BIT( CF_PER_PIPELINE )	: 0;
-	prg->usedBuffers |= prg->usesConstantBuffer( CF_PER_VIEWS ) 	? BIT( CF_PER_VIEWS ) 		: 0;
-	prg->usedBuffers |= prg->usesConstantBuffer( CF_PER_TARGETS ) 	? BIT( CF_PER_TARGETS ) 	: 0;
-	prg->usedBuffers |= prg->usesConstantBuffer( CF_STD_OBJECT ) 	? BIT( CF_STD_OBJECT ) 		: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "Static" ) 		? BIT( CF_STATIC ) 			: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "PerFrame" )		? BIT( CF_PER_FRAME ) 		: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "PerPipeline" ) 	? BIT( CF_PER_PIPELINE )	: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "PerViews" ) 		? BIT( CF_PER_VIEWS ) 		: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "PerTargets" ) 	? BIT( CF_PER_TARGETS ) 	: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "StdObject" ) 		? BIT( CF_STD_OBJECT ) 		: 0;
 
 	if( prg->usedBuffers & BIT( CF_STATIC ) ) {
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STATIC, Static, dummy ); 
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, Static, dummy );
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_STATIC );
+		}
 	}
 	if( prg->usedBuffers & BIT( CF_PER_FRAME ) ) {
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_FRAME, PerFrame, frameCount ); 
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerFrame, frameCount ); 
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_PER_FRAME );
+		}
 	}
 	if( prg->usedBuffers & BIT( CF_PER_PIPELINE ) ) {
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_PIPELINE, PerPipeline, matrixProjection ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_PIPELINE, PerPipeline, matrixProjectionInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_PIPELINE, PerPipeline, matrixProjectionIT ); 
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerPipeline, matrixProjection ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerPipeline, matrixProjectionInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerPipeline, matrixProjectionIT ); 
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_PER_PIPELINE );
+		}
 	}
 	if( prg->usedBuffers & BIT( CF_PER_VIEWS ) ) {
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_VIEWS, PerViews, matrixView ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_VIEWS, PerViews, matrixViewInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_VIEWS, PerViews, matrixViewIT ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_VIEWS, PerViews, matrixViewProjection ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_VIEWS, PerViews, matrixViewProjectionInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_VIEWS, PerViews, matrixViewProjectionIT ); 
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixView ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewIT ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewProjection ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewProjectionInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewProjectionIT ); 
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_PER_VIEWS );
+		}
 	}
 	if( prg->usedBuffers & BIT( CF_PER_TARGETS ) ) {
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_PER_TARGETS, PerTargets, targetDims ); 
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerTargets, targetDims ); 
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_PER_TARGETS );
+		}
 	}
 	if( prg->usedBuffers & BIT( CF_STD_OBJECT ) ) {
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorld ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldIT ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldView ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldViewInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldViewIT ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldViewProjection ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldViewProjectionInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixWorldViewProjectionIT ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, CF_STD_OBJECT, StdObject, matrixPreviousWorldViewProjection ); 
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorld ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldIT ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldView ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldViewInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldViewIT ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldViewProjection ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldViewProjectionInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixWorldViewProjectionIT ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixPreviousWorldViewProjection ); 
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_STD_OBJECT );
+		}
 	}
 }
 

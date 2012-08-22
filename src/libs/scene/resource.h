@@ -77,10 +77,8 @@ namespace Scene {
 		static CreationInfo ViewCtor( 	uint32_t flags, uint32_t width, uint32_t height = 0, uint32_t depth = 0, uint32_t slices = 0, 
 											uint32_t mipLevels = 0, uint32_t sampleCount = 0, GENERIC_TEXTURE_FORMAT fmt = GTF_UNKNOWN );
 
-		RESOURCE_CREATION_FLAGS getCreationFlags() const { return creationFlags; }
-	protected:
-		Resource() : creationFlags( (RESOURCE_CREATION_FLAGS)0 ) {};
-		RESOURCE_CREATION_FLAGS creationFlags;
+	private:
+		Resource();
 	};
 
 	inline Resource::CreationInfo Resource::BufferCtor( 	uint32_t flags, uint32_t width, const void* prefillData ) {

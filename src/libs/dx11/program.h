@@ -18,9 +18,9 @@ namespace Dx11 {
 		friend class VertexInput;
 		friend class RenderContext;
 
-		virtual bool usesConstantBuffer( const Scene::SHADER_TYPES type, const uint32_t bufferIndex ) override; 
-		virtual bool usesConstantBuffer( const uint32_t bufferIndex ) override;	
-		virtual uint32_t getVariableOffset( const uint32_t bufferIndex, const char* name ) override;
+		virtual bool usesConstantBuffer( const Scene::SHADER_TYPES type, const char* bufferName ) const override; 
+		virtual bool usesConstantBuffer( const char* bufferName ) const override;	
+		virtual uint32_t getVariableOffset( const char* bufferName, const char* name ) const override;
 
 	protected:
 		D3DDeviceChildPtr			shader[ Scene::MAX_SHADER_TYPES ];

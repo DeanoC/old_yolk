@@ -16,6 +16,8 @@
 #define YOLK_SCENE_SCREEN_H_
 
 #include "texture.h"
+#include "debugprims.h"
+#include "imagecomposer.h"
 
 namespace Scene {
 	class DebugPrims;
@@ -31,6 +33,8 @@ namespace Scene {
 
 	class Screen {
 	public:
+		virtual ~Screen(){}
+
 		unsigned int getWidth() const { return width; }
 		unsigned int getHeight() const { return height; }
 		bool isStereo() const { return !!(flags & SCRF_STEREO); }

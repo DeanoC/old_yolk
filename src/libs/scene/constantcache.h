@@ -87,8 +87,8 @@ namespace Scene {
 		void changeObject(	const Math::Matrix4x4& prevWVPMatrix = Math::IdentityMatrix(),
 							const Math::Matrix4x4& worldMatrix  = Math::IdentityMatrix() );
 
-		void setCamera( const Scene::CameraPtr& _camera ) { camera = _camera; };
-		Scene::CameraPtr getCamera() { return camera; }
+		// set the camera currently used by the renderer
+		void setCamera( const Scene::CameraPtr& _camera );
 
 		// updates GPU shared uniform blocks to ensure the needs of the given program
 		// callers responsability for user (non shared) blocks, passing null (default)
@@ -111,9 +111,6 @@ namespace Scene {
 
 		boost::scoped_array<DataBufferHandlePtr>	blockHandles;
 //		boost::scoped_array<Cl::BufferHandlePtr>	clBlockHandles;
-
-		Scene::CameraPtr				camera;
-		static int 						s_cacheCount;
 	};
 
 }

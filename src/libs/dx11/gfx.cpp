@@ -70,37 +70,43 @@ Gfx::Gfx() {
 	SamplerState::CreationInfo pcsci = {
 		FM_MIN_MAG_MIP_POINT, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
 	};
-	SamplerStateHandle::create( "Point_Clamp", &pcsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( "_SS_Point_Clamp", &pcsci, Core::RMRF_DONTFLUSH );
 	SamplerState::CreationInfo lcsci = {
 		FM_MIN_MAG_MIP_LINEAR, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
 	};
-	SamplerStateHandle::create( "Linear_Clamp", &lcsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( "_SS_Linear_Clamp", &lcsci, Core::RMRF_DONTFLUSH );
 	SamplerState::CreationInfo acsci = {
 		FM_ANISOTROPIC, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 8
 	};
-	SamplerStateHandle::create( "Aniso8_Clamp", &acsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( "_SS_Aniso8_Clamp", &acsci, Core::RMRF_DONTFLUSH );
 	RasteriserState::CreationInfo nrsci = {
 		(RasteriserState::CreationInfo::FLAGS)0, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
-	RasteriserStateHandle::create( "Normal", &nrsci, Core::RMRF_DONTFLUSH );
+	RasteriserStateHandle::create( "_RS_Normal", &nrsci, Core::RMRF_DONTFLUSH );
 	RenderTargetStates::CreationInfo nrtci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1, 
 		{ (TargetState::FLAGS)0, TWE_ALL }
 	};
-	RenderTargetStatesHandle::create( "NoBlend_WriteAll", &nrtci );
+	DepthStencilState::CreationInfo ndsci = {
+		(DepthStencilState::CreationInfo::FLAGS)(DepthStencilState::CreationInfo::DEPTH_ENABLE | DepthStencilState::CreationInfo::DEPTH_WRITE), 
+		CF_LESS
+	};
+	DepthStencilStateHandle::create( "_DSS_Normal", &ndsci );
+
+	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll", &nrtci );
 	RenderTargetStates::CreationInfo nwcrtci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1, 
 		{ (TargetState::FLAGS)0, TWE_COLOUR }
 	};
-	RenderTargetStatesHandle::create( "NoBlend_WriteColour", &nwcrtci );
+	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteColour", &nwcrtci );
 	RenderTargetStates::CreationInfo nwartci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1, 
 		{ (TargetState::FLAGS)0, TWE_ALPHA }
 	};
-	RenderTargetStatesHandle::create( "NoBlend_WriteAlpha", &nwartci );
+	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAlpha", &nwartci );
 
 	RenderTargetStates::CreationInfo artci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
@@ -110,7 +116,7 @@ Gfx::Gfx() {
 				BM_SRC_ALPHA, BM_INV_SRC_ALPHA, BO_ADD,		// alpha blend
 		}
 	};
-	RenderTargetStatesHandle::create( "Over_WriteAll", &artci );
+	RenderTargetStatesHandle::create( "_RTS_Over_WriteAll", &artci );
 	RenderTargetStates::CreationInfo pmartci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1, 
@@ -119,8 +125,18 @@ Gfx::Gfx() {
 				BM_ONE, BM_INV_SRC_ALPHA, BO_ADD,		// alpha blend
 		}
 	};
-	RenderTargetStatesHandle::create( "PMOver_WriteAll", &pmartci );
+	RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll", &pmartci );
 
+}
+
+Gfx::~Gfx() {
+	hashPipeline.clear();
+	pipelines.clear();
+	renderContexts.clear();
+	screens.clear();
+	device.reset();
+	adapter.reset();
+	adapters.clear();
 }
 
 Scene::ScreenPtr Gfx::createScreen( uint32_t width, uint32_t height, uint32_t flags ) {
@@ -169,8 +185,11 @@ Scene::ScreenPtr Gfx::createScreen( uint32_t width, uint32_t height, uint32_t fl
 	screen->swapChain = swapChain;
 	screen->renderer = this;
 	screen->backHandle.reset( backHandle );
-	screen->pointClampSamplerHandle.reset( 	SamplerStateHandle::create( "Point_Clamp" ) );
+	screen->pointClampSamplerHandle.reset( 	SamplerStateHandle::create( "_SS_Point_Clamp" ) );
+	screen->renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
 	screen->copyProgramHandle.reset( ProgramHandle::load( "rendertarget_copy" ) );
+
+
 	if( flags & SCRF_OVERLAY ) {
 		screen->imageComposer.reset( CORE_NEW ImageComposer() );
 	}
@@ -199,6 +218,8 @@ void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 	auto sampler = pointClampSamplerHandle.acquire();
 	auto tex = toDisplay->acquire();
 	auto prg = copyProgramHandle.acquire();
+	auto rtw = renderTargetWriteHandle.acquire();
+
 	Scene::Viewport viewport = {
 		0.0f, 0.0f, 1024.0f, 1024.0f, 0.0f, 1.0f
 	};
@@ -209,6 +230,7 @@ void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 		ctx->bind( Scene::ST_FRAGMENT, 0, sampler );
 		ctx->bind( Scene::ST_FRAGMENT, 0, tex );
 		ctx->bind( prg );
+		ctx->bind( rtw );
 		ctx->draw( Scene::PT_POINT_LIST, 1 );
 	} else {
 		// TODO Resolve

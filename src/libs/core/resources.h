@@ -79,7 +79,7 @@ public:
 	~ScopedResourceHandle() { if( handle ) handle->close(); }
 
 	// pass ownership to this, any previous handle will be closed
-	void reset( const arh* _handle ) { 
+	void reset( const arh* _handle = nullptr ) { 
 		if( handle ) handle->close();
 		handle = _handle; 
 	}
@@ -108,6 +108,7 @@ template< typename T >
 void SimpleResourceDestroyer( std::shared_ptr<Core::ResourceBase>& spBase ) {
 	std::shared_ptr<T> spActual = std::static_pointer_cast<T>(spBase);
 	spBase.reset(); // the order of these two reset is vital for correct
+	CORE_ASSERT( spActual.unique() ); // if this fires something has gone wrong with ref-counting :(:(
 	spActual.reset(); // destruction
 }
 

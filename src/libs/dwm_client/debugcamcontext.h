@@ -7,13 +7,11 @@
 
 namespace Scene {
 	class Camera;
-	class RenderContext;
 }
-class ClientWorld;
 
 class DebugCamContext : public Core::DevelopmentContextInterface {
 public:
-	DebugCamContext( ClientWorld* _owner, Scene::RenderContext* _controlContext, int scrWidth, int scrHeight, float degFov, float znear, float zfar );
+	DebugCamContext( int scrWidth, int scrHeight, float degFov, float znear, float zfar );
 	~DebugCamContext();
 
 	/// called every frame that the context is active for x movement
@@ -46,6 +44,8 @@ public:
 	//! Context will call for your to display you debug info.
 	virtual void display();
 
+	virtual std::shared_ptr<Scene::Camera> getCamera() const { return camera; }
+
 	virtual void debugButton1( unsigned int padNum );
 	virtual void debugButton2( unsigned int padNum );
 	virtual void debugButton3( unsigned int padNum );
@@ -71,10 +71,6 @@ protected:
 	float curSideMotion;
 
 	bool	lockedFrustum;
-
-	ClientWorld* 			owner;
-	Scene::RenderContext* 	controlContext;
-
 };
 
 

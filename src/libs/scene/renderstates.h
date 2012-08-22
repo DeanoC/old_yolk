@@ -23,6 +23,7 @@ namespace Scene {
 	class SamplerState : public Core::Resource<SamplerStateType> {
 	public:
 		friend class ResourceLoader;
+		virtual ~SamplerState(){}
 		struct CreationInfo {
 			FILTER_MODE 		filter;
 			ADDRESS_MODE 		addressU;
@@ -68,6 +69,7 @@ namespace Scene {
 	class RenderTargetStates : public Core::Resource<RenderTargetStatesType> {
 	public:
 		friend class ResourceLoader;
+		virtual ~RenderTargetStates(){}
 		static const int MAX_RENDER_TARGETS = 8;
 		struct CreationInfo {
 			enum FLAGS {
@@ -87,6 +89,8 @@ namespace Scene {
 	class DepthStencilState : public Core::Resource<DepthStencilStateType> {
 	public:
 		friend class ResourceLoader;
+		virtual ~DepthStencilState(){}
+
 		struct CreationInfo {
 			enum FLAGS {
 				DEPTH_ENABLE	= BIT(0),
@@ -120,6 +124,7 @@ namespace Scene {
 	class RasteriserState : public Core::Resource<RasteriserStateType> {
 	public:
 		friend class ResourceLoader;
+		virtual ~RasteriserState(){}
 		struct CreationInfo {
 			enum FLAGS {
 				FRONT_CCW		= BIT(0),

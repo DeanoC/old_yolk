@@ -48,16 +48,16 @@ ImageComposer::ImageComposer( int _maxSpritesPerLayer ) :
 	program[ SIMPLE_SPRITE ].reset( ProgramHandle::load( "sprite_basic" ) );
 	program[ SOLID_COLOUR ].reset( ProgramHandle::load( "2dcolour" ) );
 
-	linearClampSampler.reset( SamplerStateHandle::create( "Linear_Clamp" ) );
+	linearClampSampler.reset( SamplerStateHandle::create( "_SS_Linear_Clamp" ) );
 	for( int i = 0; i < MAX_LAYERS; ++i ) {
 		layers[i].layerNum = i;
 	}
 
-	blendState[ NORMAL ].reset( RenderTargetStatesHandle::create( "NoBlend_WriteAll" ) );
-	blendState[ COLOUR_MASK ].reset( RenderTargetStatesHandle::create( "NoBlend_WriteColour" ) );
-	blendState[ ALPHA_MASK ].reset( RenderTargetStatesHandle::create( "NoBlend_WriteAlpha" ) );
-	blendState[ ALPHA_BLEND ].reset( RenderTargetStatesHandle::create( "Over_WriteAll" ) );
-	blendState[ PM_OVER ].reset( RenderTargetStatesHandle::create( "PMOver_WriteAll" ) );
+	blendState[ NORMAL ].reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
+	blendState[ COLOUR_MASK ].reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteColour" ) );
+	blendState[ ALPHA_MASK ].reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAlpha" ) );
+	blendState[ ALPHA_BLEND ].reset( RenderTargetStatesHandle::create( "_RTS_Over_WriteAll" ) );
+	blendState[ PM_OVER ].reset( RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll" ) );
 }
 
 ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Layer& layer, ImageComposer::Layer::PageKey& key ) {

@@ -26,6 +26,7 @@ namespace Dx11 {
 
 	protected:
 		Core::ScopedResourceHandle<Scene::SamplerStateHandle>		pointClampSamplerHandle;
+		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>	renderTargetWriteHandle;
 		Core::ScopedResourceHandle<Scene::ProgramHandle>			copyProgramHandle;
 		Core::ScopedResourceHandle<Scene::ProgramHandle>			msaaResolveProgramHandle;
 

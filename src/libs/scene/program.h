@@ -32,14 +32,16 @@ namespace Scene {
 			void* data[MAX_SHADER_TYPES]; //platform specific partial compile from loader
 		};
 
+		virtual ~Program(){};
+
 		// bit flags of CONSTANT_FREQ tell which buffer are used by this program
 		uint32_t getUsedBuffers() const { return usedBuffers; }
 
-		virtual bool usesConstantBuffer( const Scene::SHADER_TYPES type, const uint32_t bufferIndex ) = 0; 
-		virtual bool usesConstantBuffer( const uint32_t bufferIndex ) = 0;	
+		virtual bool usesConstantBuffer( const Scene::SHADER_TYPES type, const char* bufferName ) const = 0; 
+		virtual bool usesConstantBuffer( const char* bufferName ) const = 0;	
 		// a program will have a specific 'offset' for each variable this gets it
 		// not fast use at init time
-		virtual uint32_t getVariableOffset( const uint32_t bufferIndex, const char* name ) = 0;
+		virtual uint32_t getVariableOffset( const char* bufferName, const char* name ) const = 0;
 
 	protected:
 		static const void* internalPreCreate( const char* pName, const CreationInfo* creation );

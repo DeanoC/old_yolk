@@ -16,8 +16,7 @@
 
 namespace Scene {
 
-RenderWorld::RenderWorld() :
-	activeCamera( nullptr ) {
+RenderWorld::RenderWorld() {
 	renderCamera = std::make_shared<Scene::Camera>();
 }
 
@@ -74,14 +73,12 @@ void RenderWorld::removeCamera( uint32_t index ) {
 	*enIt = nullptr;
 }
 
-void RenderWorld::determineVisibles() {
+void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camera ) {
 	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
 
 	// *copy* over the active camera, so if the game thread runs faster than the render one
 	// we don't get screwed up graphics due to camera changing mid frame
-	if( activeCamera ) {
-		*renderCamera.get() = *activeCamera.get();
-	}
+	*renderCamera.get() = *camera.get();
 
 	// go through and cull renderables, also copy matrixes under
 	// a lock to ensure other thread updates of renderables transform
@@ -89,19 +86,17 @@ void RenderWorld::determineVisibles() {
 	visibleRenderables.clear();
 	Core::AABB waabb;
 
+	Scene::Renderable* gatherArray[100];
+	// get all meshes
 	RenderableContainer::const_iterator it = renderables.cbegin();
 	while( it != renderables.cend() ) {
-		const size_t index = std::distance( renderables.cbegin(), it );
-
-		(*it)->getTransformNode()->setRenderMatrix();
-		(*it)->getWorldAABB( waabb );
-//			if( activeCamera &&
-//				activeCamera->getFrustum().cullAABB( waabb ) != 
-//								Core::Frustum::OUTSIDE ) 
-		{
-			visibleRenderables.push_back( (uint32_t) index );
+		auto meshCount = (*it)->getActualRenderablesOfType( Renderable::R_MESH, 100, gatherArray );
+		for( auto i = 0;i < meshCount; ++i ) {
+			gatherArray[i]->getTransformNode()->setRenderMatrix();
+			gatherArray[i]->getWorldAABB( waabb );
+			// TODO cull
+			visibleRenderables.push_back( gatherArray[i] );
 		}
-
 		++it;
 	}
 }
@@ -110,7 +105,7 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 
 	pipeline->bind( context );
 
-//	context->setCamera( renderCamera );
+	context->getConstantCache().setCamera( renderCamera );
 
 	for( auto i = 0; i < pipeline->getGeomPassCount(); ++i ) {
 		pipeline->startGeomPass( context, i );
@@ -118,7 +113,7 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 		// output geometry
 		STIndexContainer::const_iterator rmit = visibleRenderables.cbegin();
 		while( rmit != visibleRenderables.cend() ) {
-			renderables[(*rmit)]->render( context, pipeline );
+			(*rmit)->render( context, pipeline );
 			++rmit;
 		}
 
@@ -128,10 +123,10 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 	pipeline->unbind( context );
 }
 
-void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context ) {
+void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, const std::shared_ptr<Scene::Camera> camera, RenderContext* context ) {
 	Pipeline* pipeline = screen->getRenderer()->getPipeline( pipelineName );
 
-	determineVisibles();
+	determineVisibles( camera );
 
 	renderRenderables( context, pipeline );
 }

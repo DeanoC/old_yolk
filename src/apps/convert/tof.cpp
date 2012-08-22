@@ -161,8 +161,8 @@ Tof loadTof( const Core::FilePath& inPath ) {
 
 	} else {
 		tof.files.push_back( inPath.value() );
-		return tof;
 	}
+	return tof;
 }
 
 void loadTao( const Core::FilePath& inPath, std::vector<std::string>& outFilenames, 

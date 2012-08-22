@@ -41,8 +41,8 @@ namespace Scene {
 
 		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
 
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const override {
-			if( _type == R_MESH ) {
+		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const override {
+			if( _type == R_MESH || _type == R_ALL) {
 				int numMeshes = Math::Min<int>( (int)ownedMeshes.size(), arraySize );
 				for( int i=0;i < numMeshes;++i ) {
 					outArray[i] = ownedMeshes[i].get();

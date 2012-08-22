@@ -121,6 +121,16 @@ void TransformNode::dirtyTransforms() {
 	}
 }
 
+void TransformNode::setRenderMatrix() { 
+	renderMatrix = getWorldMatrix();
+
+	NodeContainer::const_iterator chIt = children.begin();
+	while( chIt != children.end() ) {
+		(*chIt)->setRenderMatrix();
+		++chIt;
+	}
+}
+
 void TransformNode::debugDisplay() const {
 	// draw local axis
 	float axislength = 1.0f;

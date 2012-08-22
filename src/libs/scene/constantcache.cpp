@@ -125,8 +125,6 @@ const int NUM_MATRIX_BITS = (1ULL << Scene::CVN_NUM_MATRICES);
 
 namespace Scene {
 
-int ConstantCache::s_cacheCount = 0;
-
 ConstantCache::ConstantCache() :
 	cachedFlags( 0 ),
 	gpuHasBlocks(0) {
@@ -150,7 +148,7 @@ ConstantCache::ConstantCache() :
 		DataBuffer::CreationInfo cbcs ( Resource::BufferCtor(
 			RCF_BUF_CONSTANT | RCF_ACE_CPU_WRITE , (uint32_t) blockSizes[i]
 		) );
-		sprintf( resourceName, "_constantCache%i_%i", i, s_cacheCount );
+		sprintf( resourceName, "_constantCache%i", i );
 		blockHandles[i] = DataBufferHandle::create( resourceName, &cbcs );
 /*		Cl::Buffer::CreationStruct clfbcs = {
 			contextCl,
@@ -161,7 +159,6 @@ ConstantCache::ConstantCache() :
 		clBlockHandles[i] = Cl::BufferHandle::create( resourceName, &clfbcs );*/
 
 	}
-	s_cacheCount++;
 }
 
 ConstantCache::~ConstantCache() {
@@ -303,7 +300,7 @@ void ConstantCache::updateGPUBlock( Scene::RenderContext* context, CONSTANT_FREQ
 			// TODO better than naive bit checking
 			if( varBitsPerBlock[block] & BIT64(count) ) {
 				if( count < CVN_NUM_MATRICES ) {
-					Math::Matrix4x4 mat = getMatrix((CONSTANT_VAR_NAME)count); // compute if required
+					Math::Matrix4x4 mat = Math::TransposeMatrix( getMatrix((CONSTANT_VAR_NAME)count) ); // compute if required
 					memcpy( ((char*)buffer) + offsetInBlocks[ count ], 
 							&mat, 
 							sizeofInBlock[ count ] );
@@ -323,26 +320,24 @@ void ConstantCache::updateGPUBlock( Scene::RenderContext* context, CONSTANT_FREQ
 	gpuHasBlocks |= BIT(block);
 }
 
+void ConstantCache::setCamera( const CameraPtr& camera ) {
+	matrixCache[ CVN_VIEW ] = camera->getView();
+	matrixCache[ CVN_PROJ ] = camera->getProjection();
+	float zPlanes[4] = { camera->getZNear(), camera->getZFar(), 0, 0 };
+	setUIVector( CVN_ZPLANES, (const uint32_t*) zPlanes );
+	float fov[4] = { camera->getXScale(), camera->getYScale(), 0, 0 };
+	setUIVector( CVN_FOV, (const uint32_t*) fov );
+
+	// reset cached flags
+	cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_VIEW ] ] );
+	cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_PROJ ] ] );
+	cachedFlags &= ~(varBitsPerBlock [ CF_STD_OBJECT ] );
+
+	cachedFlags |= BIT64(CVN_VIEW) | BIT64(CVN_PROJ) | BIT64(CVN_ZPLANES);
+	gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_VIEW ]) | BIT(varFreq[ CVN_PROJ ]) | BIT(CF_STD_OBJECT) );
+}
+
 void ConstantCache::updateGPU( Scene::RenderContext* context, const ProgramPtr prg ) {
-	if( camera && camera->getCounter() != s_cacheCount ) {
-
-		s_cacheCount = camera->getCounter();
-
-		matrixCache[ CVN_VIEW ] = camera->getView();
-		matrixCache[ CVN_PROJ ] = camera->getProjection();
-		float zPlanes[4] = { camera->getZNear(), camera->getZFar(), 0, 0 };
-		setUIVector( CVN_ZPLANES, (const uint32_t*) zPlanes );
-		float fov[4] = { camera->getXScale(), camera->getYScale(), 0, 0 };
-		setUIVector( CVN_FOV, (const uint32_t*) fov );
-
-		// reset cached flags
-		cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_VIEW ] ] );
-		cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_PROJ ] ] );
-		cachedFlags &= ~(varBitsPerBlock [ CF_STD_OBJECT ] );
-
-		cachedFlags |= BIT64(CVN_VIEW) | BIT64(CVN_PROJ) | BIT64(CVN_ZPLANES);
-		gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_VIEW ]) | BIT(varFreq[ CVN_PROJ ]) | BIT(CF_STD_OBJECT) );
-	}
 	
 	if( prg && (gpuHasBlocks & prg->getUsedBuffers()) == prg->getUsedBuffers() ) {
 		// upto date, nothing to do

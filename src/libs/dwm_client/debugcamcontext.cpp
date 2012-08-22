@@ -10,12 +10,9 @@
 #include "scene/rendercontext.h"
 #include "clientworld.h"
 #include "debugcamcontext.h"
-//#include <core/platform_windows/mouse_win.h>
 
-DebugCamContext::DebugCamContext( ClientWorld* _owner, Scene::RenderContext* _controlContext, int scrWidth, int scrHeight, float degFov, float znear, float zfar ) :
-	camera( CORE_NEW Scene::Camera() ),
-	owner( _owner ),
-	controlContext( _controlContext )
+DebugCamContext::DebugCamContext( int scrWidth, int scrHeight, float degFov, float znear, float zfar ) :
+	camera( CORE_NEW Scene::Camera() )
 {
 	float aspect = (float)scrWidth / (float)scrHeight;
 	fovRads = Math::degree_to_radian<float>() * degFov;
@@ -101,7 +98,7 @@ void DebugCamContext::mouseRightButton() {
 void DebugCamContext::enable( bool on  ) {
 	if( on ) {
 		// this camera stuff sucked, needs a rewrite
-		owner->setActiveCamera( camera );
+//		owner->setActiveCamera( camera );
 //		controlContext->setCamera( camera );
 	}
 }

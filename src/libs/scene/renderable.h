@@ -28,11 +28,13 @@ namespace Scene {
 	//! Base 3D renderable class
 	//!
 	//!-----------------------------------------------------
-	class Renderable {
+	class Renderable : public std::enable_shared_from_this<Renderable> {
 	public:
 		enum R_TYPE {
 			R_MESH,
 			R_HEIGHTFIELD,
+
+			R_ALL = 0xFFFFFFFF,
 		};
 
 		Renderable( Core::TransformNode* transNode ) :
@@ -78,7 +80,7 @@ namespace Scene {
 		// by type
 		// return upto arraySize actual renderables of R_TYPE in outArray,
 		// returns number inf array
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, const Renderable** outArray ) const = 0;
+		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const = 0;
 
 	protected:
 		Core::TransformNode*		transformNode;

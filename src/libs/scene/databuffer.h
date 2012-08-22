@@ -26,12 +26,18 @@ namespace Scene {
 		DBMF_UNSYNC,
 	};
 
-	class DataBuffer : public Scene::Resource, public Core::Resource<DataBufferType> {
+	class DataBuffer : public Core::Resource<DataBufferType> {
 	public:	
 		friend class ResourceLoader;
 		static const int MIN_BUFFER_SIZE = 256; // all buffer will be increased to this size in bytes if less
-		using Scene::Resource::CreationInfo;
+		struct CreationInfo : public Scene::Resource::CreationInfo {
+			CreationInfo(){};
+			CreationInfo( const Scene::Resource::CreationInfo& rhs ) {
+				memcpy( this, &rhs, sizeof(Scene::Resource::CreationInfo) );
+			}
+		};
 
+		virtual ~DataBuffer(){};
 		// default maps entire buffer;
 		virtual void* map( 	Scene::RenderContext* context,
 							DATA_BUFFER_MAP_ACCESS access, DATA_BUFFER_MAP_FLAGS flags = DBMF_NONE, 

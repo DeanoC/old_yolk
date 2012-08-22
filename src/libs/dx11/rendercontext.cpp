@@ -95,24 +95,23 @@ void RenderContext::bind( const Scene::Viewport& viewport ) {
 	ctx->RSSetViewports( 1, (D3D11_VIEWPORT*) &viewport );
 }
 
-
 void RenderContext::bind( const Scene::ProgramPtr& sprg ) {
 	auto prg = std::static_pointer_cast<Dx11::Program>( sprg );
 	// TODO optimise this rather than a double loop and function calls and lots of evil!
 	for( int i = 0; i < Scene::MAX_SHADER_TYPES;++i ) {	
 		if( prg->shader[i] ) {
 			for( int j = 0; j < Scene::CF_NUM_BLOCKS; ++j ) {
-				if( prg->usesConstantBuffer( (Scene::SHADER_TYPES)i, j ) ) {
+				if( prg->usedBuffers & BIT(j) ) {
 					auto cb = std::static_pointer_cast<Dx11::DataBuffer>( constantCache.getBlock((Scene::CONSTANT_FREQ_BLOCKS)j)->acquire() );
 					auto buf = (ID3D11Buffer*) cb->get().get();
 					// TODO cache which are set
 					switch( i ) {
-					case Scene::ST_VERTEX: ctx->VSSetConstantBuffers( 0, 1, &buf ); break;
-					case Scene::ST_FRAGMENT: ctx->PSSetConstantBuffers( 0, 1, &buf ); break;
-					case Scene::ST_GEOMETRY: ctx->GSSetConstantBuffers( 0, 1, &buf ); break;
-					case Scene::ST_HULL: ctx->HSSetConstantBuffers( 0, 1, &buf ); break;
-					case Scene::ST_DOMAIN: ctx->DSSetConstantBuffers( 0, 1, &buf ); break;
-					case Scene::ST_COMPUTE: ctx->CSSetConstantBuffers( 0, 1, &buf ); break;
+					case Scene::ST_VERTEX: ctx->VSSetConstantBuffers( j, 1, &buf ); break;
+					case Scene::ST_FRAGMENT: ctx->PSSetConstantBuffers( j, 1, &buf ); break;
+					case Scene::ST_GEOMETRY: ctx->GSSetConstantBuffers( j, 1, &buf ); break;
+					case Scene::ST_HULL: ctx->HSSetConstantBuffers( j, 1, &buf ); break;
+					case Scene::ST_DOMAIN: ctx->DSSetConstantBuffers( j, 1, &buf ); break;
+					case Scene::ST_COMPUTE: ctx->CSSetConstantBuffers( j, 1, &buf ); break;
 					default:;
 					}
 				}

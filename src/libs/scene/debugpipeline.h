@@ -41,10 +41,11 @@ namespace Scene {
 		//setup
 		virtual void conditionWob( class Scene::Wob* wob ) override;
 	protected:
-		Core::ScopedResourceHandle<TextureHandle>			depthTargetHandle;
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetHandle;
+		Core::ScopedResourceHandle<TextureHandle>			depthTargetHandle;
 		Core::ScopedResourceHandle<ProgramHandle>			programHandle;
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
+		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
 	};
 
 	class DebugPipelineDataStore : public PipelineDataStore {

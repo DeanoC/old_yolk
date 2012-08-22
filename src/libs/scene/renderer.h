@@ -26,7 +26,7 @@ namespace Scene {
 	//! The main singleton for the gfx subject
 	class Renderer {
 	public:		
-
+		virtual ~Renderer(){};
 		//! Create the screen can return nullptr if not possible
 		virtual ScreenPtr createScreen( uint32_t width, uint32_t height, uint32_t flags ) = 0;
 		virtual void destroyScreen( ScreenPtr screen ) = 0;

@@ -94,7 +94,7 @@ void DwmClient::run() {
 	// camera stuff is stuffed needs refactor
 //	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
 //	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
-	auto debugCam = std::make_shared<DebugCamContext>( world.get(), ctx, s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
+	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 45.0f, 0.1f, 5000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
 
 	DevelopmentContext::get()->activateContext( "DebugCam" );
@@ -109,7 +109,13 @@ void DwmClient::run() {
 
 		DevelopmentContext::get()->update( deltaT );
 
-		world->render( screen, "debug", ctx );
+		auto camera = DevelopmentContext::getr().getContext()->getCamera();
+		if( camera ) {
+			world->render( screen, "debug", camera, ctx );
+		} else {
+			// TODO here goes advanced camera systems
+			TODO_ASSERT( camera );
+		}
 
 		DevelopmentContext::get()->display();
 		world->displayRenderResults( screen, "debug", ctx );

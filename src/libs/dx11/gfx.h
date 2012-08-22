@@ -26,6 +26,7 @@ namespace Dx11 {
 	//! The main singleton for the gfx subject
 	class Gfx : public Scene::Renderer, public Core::Singleton<Gfx> {
 	public:
+		~Gfx();
 		Scene::ScreenPtr createScreen( uint32_t width, uint32_t height, uint32_t flags ) override;
 		void destroyScreen( Scene::ScreenPtr screen ) override;
 		void houseKeep() override;

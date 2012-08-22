@@ -211,16 +211,16 @@ void ResourceMan::baseCloseResource( ResourceHandleBase* pHandle ) {
 				CORE_ASSERT( false && "Resource type not registered" );
 			}
 
-			const ResourceTypeData& rtd = roRTM->second;
-			if( auto res = pHandle->resourceBase.lock() ) {
-				// the callback does the reset DO NOT do it yourself
-				rtd.destroyCallback( res );
-			}
-
 			// cache entry are actually optional so check for valitity before erasing
 			ResourceManImpl::CacheIndex::accessor cacheIt;
 			if( impl.cacheMap.find( cacheIt, pRD->cacheName ) ) {
 				impl.cacheMap.erase( cacheIt );
+			}
+
+			const ResourceTypeData& rtd = roRTM->second;
+			// the callback does the reset DO NOT do it yourself
+			if( pRD->resource ) {
+				rtd.destroyCallback( pRD->resource );
 			}
 
 			// currently the vector just grows, null entries and releasing memory but not actually
@@ -231,8 +231,9 @@ void ResourceMan::baseCloseResource( ResourceHandleBase* pHandle ) {
 			impl.resourceHandleBaseMap.erase( acc );
 			
 			rtd.destroyResourceHandleCallback( pRD->handle );
+			pRD->handle = nullptr;
 			CORE_DELETE pRD;
-
+				
 		}
 	} else {
 		CORE_ASSERT( false && "TypedResourceHandle does not exist\n" );

@@ -39,10 +39,16 @@ DebugPipeline::DebugPipeline( ) {
 	static const std::string depthTargetName = "DebugPipe_DepthTarget";
 	depthTargetHandle.reset( TextureHandle::create( depthTargetName.c_str(), &dcs ) );
 
-	rasterStateHandle.reset( RasteriserStateHandle::create( "Normal" ) );
+	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
+	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
 }
 	
 DebugPipeline::~DebugPipeline() {
+	depthStencilStateHandle.reset();
+	rasterStateHandle.reset();
+	programHandle.reset();
+	depthTargetHandle.reset();
+	colourTargetHandle.reset();
 }
 
 void DebugPipeline::bind( Scene::RenderContext* ctx ) {
@@ -50,23 +56,19 @@ void DebugPipeline::bind( Scene::RenderContext* ctx ) {
 
 	auto colourTarget = colourTargetHandle.acquire();
 	auto depthTarget = depthTargetHandle.acquire();
+	auto program = programHandle.acquire();
+	auto rasterState = rasterStateHandle.acquire();
+	auto depthStencilState = depthStencilStateHandle.acquire();
 
 	ctx->clear( colourTarget, Core::RGBAColour(0,0,0,0) );
 	ctx->clearDepthStencil( depthTarget, true, 1.0f, true, 0 );
 
 	ctx->bindRenderTargets( colourTarget, depthTarget );
 
-	auto program = programHandle.acquire();
 	ctx->getConstantCache().updateGPU( ctx, program );
 	ctx->bind( program );
-
-	auto rasterState = rasterStateHandle.acquire();
 	ctx->bind( rasterState );
-
-//	glEnable( GL_DEPTH_TEST );
-//	glDepthMask(GL_TRUE);
-//	glEnable(GL_CULL_FACE);
-//	glCullFace(GL_FRONT);
+	ctx->bind( depthStencilState );
 }
 
 void DebugPipeline::unbind( Scene::RenderContext* ctx) {

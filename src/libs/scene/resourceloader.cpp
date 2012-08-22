@@ -16,6 +16,7 @@
 #include "databuffer.h"
 #include "vertexinput.h"
 #include "renderstates.h"
+#include "debugprims.h"
 #include "programman.h"
 
 #include <boost/asio.hpp>
@@ -194,6 +195,13 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 	renderIo->poll();
 
 	if( composer != nullptr ) {
+		composer->putSprite( loadTextureAtlas, 1, 
+						ImageComposer::ALPHA_BLEND, 
+						Math::Vector2( 0.85f, 0.95f ),
+						Math::Vector2( 0.15f, 0.05f ),
+						Core::RGBAColour::unpackARGB(0x80FFFFFF),
+						1 );
+
 		if( ResourceLoaderImpl::workCounter > 0) {
 			composer->putSprite( loadTextureAtlas, 0, 
 							ImageComposer::ALPHA_BLEND, 
@@ -202,22 +210,7 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 							Core::RGBAColour::unpackARGB(0xFFFFFFFF),
 							0 );
 		}
-		composer->putSprite( loadTextureAtlas, 1, 
-						ImageComposer::ALPHA_BLEND, 
-						Math::Vector2( 0.85f, 0.95f ),
-						Math::Vector2( 0.15f, 0.05f ),
-						Core::RGBAColour::unpackARGB(0x80FFFFFF),
-						1 );
 
-		auto texAtlas = loadTextureAtlas->acquire();
-		composer->texturedRect( texAtlas->getPackedTexture(0), 
-						ImageComposer::ALPHA_BLEND, 
-						Math::Vector2( 0.0f, 0.0f ),
-						Math::Vector2( 0.5f, 0.5f ),
-						Core::RGBAColour::unpackARGB(0xFFFFFFFF),
-						Math::Vector2( 0.0f, 0.0f ),
-						Math::Vector2( 1.0f, 1.0f ),
-						1 );
 	}
 
 }

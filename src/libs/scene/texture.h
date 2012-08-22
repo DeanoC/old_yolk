@@ -18,21 +18,20 @@ namespace Scene {
 	//! Texture Type
 	static const uint32_t TextureType = RESOURCE_NAME('T','X','T','R');
 
-	class Texture : public Resource, public Core::Resource<TextureType> {
+	class Texture : public Core::Resource<TextureType> {
 	public:
 		friend class ResourceLoader;
-		// using Resource::CreationInfo, on vc11 using doesn't work with type overloads, not sure if bug or standard but this is a workaround
-		struct CreationInfo : public Resource::CreationInfo {
+		struct CreationInfo : public Scene::Resource::CreationInfo {
 			CreationInfo(){};
-			CreationInfo( const Resource::CreationInfo& rhs ) {
-				memcpy( this, &rhs, sizeof(Resource::CreationInfo) );
+			CreationInfo( const Scene::Resource::CreationInfo& rhs ) {
+				memcpy( this, &rhs, sizeof(Scene::Resource::CreationInfo) );
 			}
 		};
 
 		Texture() : width( 0 ), height( 0 ), depth( 0 ), slices( 0 ), mipLevels ( 0 ), samples( 1 ) {}
 
 		//! dtor
-		~Texture(){};
+		virtual ~Texture(){};
 
 		uint32_t getWidth() const { return width; }
 		uint32_t getHeight() const { return height; }

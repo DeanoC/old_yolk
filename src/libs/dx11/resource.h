@@ -24,7 +24,10 @@ namespace Dx11 {
 
 		Resource( D3DResourcePtr _resource ) : resource(_resource) {}
 
-		virtual ~Resource() {}
+		virtual ~Resource() {
+			views.clear();
+			resource.reset();
+		}
 
 		D3DResourcePtr get() const { return resource; }
 

@@ -69,6 +69,9 @@ namespace Scene {
 	class VertexInput : public Core::Resource<VertexInputType> {
 	public:
 		friend class ResourceLoader;
+		virtual ~VertexInput(){}
+
+
 		static const int MAX_ELEMENT_COUNT = 16;
 
 		struct CreationInfo {

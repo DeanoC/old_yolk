@@ -79,8 +79,8 @@ public:
 	// draws using debug lines the node axis and its children
 	void debugDisplay() const;
 
-	const Math::Matrix4x4& getRenderMatrix() { return renderMatrix; }
-	void setRenderMatrix() { renderMatrix = getWorldMatrix(); }
+	const Math::Matrix4x4& getRenderMatrix() const { return renderMatrix; }
+	void setRenderMatrix();
 
 protected:
 	void setParent( TransformNode* parent );
