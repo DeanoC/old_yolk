@@ -134,6 +134,8 @@ Gfx::~Gfx() {
 	pipelines.clear();
 	renderContexts.clear();
 	screens.clear();
+	ProgramMan::shutdown();
+	ResourceLoader::shutdown();
 	device.reset();
 	adapter.reset();
 	adapters.clear();
@@ -205,7 +207,9 @@ Scene::ScreenPtr Gfx::createScreen( uint32_t width, uint32_t height, uint32_t fl
 }
 
 void Gfx::destroyScreen( Scene::ScreenPtr screen ) {
+	screens.erase( std::find( screens.cbegin(), screens.cend(), screen ) );
 }
+
 void Gfx::houseKeep() {
 }
 

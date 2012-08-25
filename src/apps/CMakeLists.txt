@@ -6,3 +6,5 @@ add_subdirectory( gfx_test )
 #add_subdirectory( dvm_owned_dedi )
 #add_subdirectory( dummy_client )
 add_subdirectory( convert )
+
+add_subdirectory( vtdfh )

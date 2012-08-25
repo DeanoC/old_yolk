@@ -22,6 +22,7 @@ namespace Scene {
 		void doSim( float delta );
 
 		void addPhysical( const std::shared_ptr<Physical>& physical );
+		void removePhysical( const std::shared_ptr<Physical>& physical );
 
 		btDynamicsWorld* getDynamicsWorld() const;
 		void nextPhysicsDebugMode();

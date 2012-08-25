@@ -17,7 +17,7 @@ class Thing {
 public:
 	explicit Thing( Scene::HierPtr hier, const ThingId _id = NewThingId() );
 	explicit Thing( const ThingId _id = NewThingId() ) : id( _id ) {}
-
+	~Thing();
 	void updateTransform( int nodeId = 0, ThingUpdateType uptype = ThingUpdateType::FROM_USER );
 
 	int getPhysicalCount() const { return preps.size(); }

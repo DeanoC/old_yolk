@@ -19,7 +19,7 @@ public:
 	bool dequeueInputFrame( InputFrame* frame ); 	//!< return false if no input to dequeue
 
 	void add( ThingPtr _thing );
-
+	void remove( ThingPtr _thing );
 	void update( float delta );
 protected:
 

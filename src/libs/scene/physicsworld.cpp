@@ -53,7 +53,7 @@ private:
 		if( colour[0] <= 1.0f && colour[0] > 0.0f)
 			adjCol[0] = colour[0] * 255.0f;
 		if( colour[1] <= 1.0f && colour[1] > 0.0f)
-			adjCol[1] = colour[1] * 255.0;
+			adjCol[1] = colour[1] * 255.0f;
 		if( colour[2] <= 1.0f && colour[2] > 0.0f )
 			adjCol[2] = colour[2] * 255.0f;
 
@@ -170,6 +170,10 @@ void PhysicsWorld::nextPhysicsDebugMode() {
 }
 void PhysicsWorld::addPhysical( const std::shared_ptr<Physical>& physical ) {
 	getDynamicsWorld()->addRigidBody( physical->getRigidBody() );
+}
+
+void PhysicsWorld::removePhysical( const std::shared_ptr<Physical>& physical ) {
+	getDynamicsWorld()->removeRigidBody( physical->getRigidBody() );
 }
 
 }

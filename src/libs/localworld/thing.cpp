@@ -123,6 +123,11 @@ Thing::Thing( Scene::HierPtr hier, const ThingId _id ) :
 		}
 	}
 }
+Thing::~Thing() {
+	preps.clear();
+	vreps.clear();
+}
+
 void Thing::setPhysical( int nodeId, Scene::PhysicalPtr prep ) {
 	preps.resize( std::max( nodeId+1, (int)preps.size() ) );
 	preps[nodeId] = prep;

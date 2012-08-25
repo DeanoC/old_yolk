@@ -41,6 +41,25 @@ void SceneWorld::add( ThingPtr _thing ) {
 	things.push_back( _thing );
 }
 
+void SceneWorld::remove( ThingPtr _thing ) {
+
+	for( int i = 0;i < _thing->getPhysicalCount(); ++i ) {
+		auto physical = _thing->getPhysical(i);
+		if( physical->getMass() <= 0 ) {
+			staticPhysicals.erase( std::find( staticPhysicals.cbegin(), staticPhysicals.cend(), physical ) );
+		} else {
+			dynamicPhysicals.erase( std::find( dynamicPhysicals.cbegin(), dynamicPhysicals.cend(), physical ) );
+		}
+		physicsWorld->removePhysical( physical );
+	}
+	for( int i = 0;i < _thing->getRenderableCount(); ++i ) {
+		removeRenderable( _thing->getRenderable( i ) );
+	}
+
+	things.erase( std::find( things.cbegin(), things.cend(), _thing ) );
+
+}
+
 void SceneWorld::update( float delta ) {
 	physicsWorld->doSim( delta );
 }

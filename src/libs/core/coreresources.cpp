@@ -153,7 +153,7 @@ namespace Core
 		ResourceMan::get()->registerResourceType( ManifestType, ManifestCreateResource, 
 		                               	&ManifestResourceDestroyer, sizeof(ManifestResourceHandle), 0, 0, "Manifests/" );
 		ResourceMan::get()->registerResourceType( BinPropertyType, BinPropertyCreateResource, 
-		                               	&SimpleResourceDestroyer<TextResource>, sizeof(BinPropertyResourceHandle), 0, 0, "Properties/" );
+		                               	&SimpleResourceDestroyer<BinPropertyResource>, sizeof(BinPropertyResourceHandle), 0, 0, "Properties/" );
 
 	}
 }

@@ -44,8 +44,9 @@ public:
 	static Core::thread::id 							renderThreadId;
 	static Core::thread::id 							loaderThreadId;
 
-	std::shared_ptr<Core::thread>						loaderThread;
+	Core::thread*										loaderThread;
 	Scene::TextureAtlasHandlePtr 						loadTextureAtlas;
+	std::unique_ptr<boost::asio::io_service::work>		workUnit;
 };
 
 std::shared_ptr<boost::asio::io_service> 			ResourceLoaderImpl::loaderIo;
@@ -178,10 +179,10 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 
 	// loaderIo happens on a seperate thread (can be made multiple threads)
 	// as doesn't call anything that requires the primary render thread
-	loaderThread = std::make_shared<Core::thread>( 
+	loaderThread = CORE_NEW Core::thread( 
 		[&] {
 			loaderThreadId = std::this_thread::get_id();
-			boost::asio::io_service::work w( *loaderIo );
+			workUnit = std::unique_ptr<boost::asio::io_service::work>( CORE_NEW boost::asio::io_service::work( *loaderIo ) );
 			loaderIo->run();
 		}
 	);
@@ -216,6 +217,8 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 }
 
 ResourceLoaderImpl::~ResourceLoaderImpl() {
+	loadTextureAtlas->close();
+	workUnit.reset();
 	loaderIo.reset();
 	renderIo.reset();
 }

@@ -80,9 +80,14 @@ Hier::Hier( const char* pFilename ) :
 }
 
 Hier::~Hier() {
+	propertyArray.reset();
+	environment.reset();
+	hie.reset();
+	ownedMeshes.clear();
+
 	for( uint16_t i=0;i < numNodes;++i ) {
 		nodeArray[i].~TransformNode();
-	}
+	}	
 }
 
 void Hier::render( RenderContext* context, Pipeline* pipeline ) {

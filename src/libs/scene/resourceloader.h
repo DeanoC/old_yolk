@@ -37,6 +37,7 @@ class Renderer;
 // it keeps the thread id for acquire pumping, so better make sure its right
 class ResourceLoader : public Core::Singleton< ResourceLoader, true > {
 public:
+	friend class Core::Singleton<ResourceLoader,true>;
 	// should be called near the end of the frame, also will print a loading graohic
 	void renderThreadUpdate(ImageComposer* composer );
 
@@ -69,7 +70,7 @@ public:
 
 protected:
 	ResourceLoader();
-	~ResourceLoader();
+	virtual ~ResourceLoader();
 
 	void installResourceTypes();
 	ResourceLoaderImpl& impl;
