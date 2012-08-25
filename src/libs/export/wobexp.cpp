@@ -489,11 +489,12 @@ void WobbyWriter::WriteVerticesAndIndices(	unsigned int matNum,
 	outStream << "0, 0 \t\t //place for backEndData ptr after load\n";
 }
 
-bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath pOutFilename ) {
+bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath outFilename ) {
 	using namespace MeshMod;
 	using namespace Scene;
 	assert( goMesh != 0 );
-	std::string baseName = pOutFilename.BaseName().value();
+	std::string baseName = outFilename.BaseName().value();
+	std::replace( baseName.begin(), baseName.end(), ' ', '_' );
 	std::ostringstream outStream;
 
 	// out a text binify format wob file for
@@ -616,9 +617,9 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath pOutFilena
 	outStream << "(u16)" << numMaterials << "\t//numMaterials\n";		// number of materials
 	outStream << "(u32)" << uiFlags << flagComment.str();				// flags
 	//-- wob name
-	m_stringTable[ pOutFilename.BaseName().value()  + ":" ] = pOutFilename.BaseName().value();
+	m_stringTable[ baseName  + ":" ] = baseName;
 	outStream << ".align 8\n";
-	outStream << "0, " << pOutFilename.BaseName().value() << "// " << pOutFilename.BaseName().value() << "\n";
+	outStream << "0, " << baseName << "// " << baseName << "\n";
 
 	float minAABB[3], maxAABB[3];
 	CalcMeshAAB( minAABB, maxAABB );
@@ -695,9 +696,12 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath pOutFilena
 
 
 	// add a Manifest folder to the path
-	auto filedir = pOutFilename.DirName();
+	auto filedir = outFilename.DirName();
 	filedir = filedir.Append( "Meshes" );
-	filedir = filedir.Append( pOutFilename.BaseName() );
+	std::string fileName( outFilename.BaseName().value() );
+	std::replace( fileName.begin(), fileName.end(), ' ', '_' );
+
+	filedir = filedir.Append( baseName );
 
 //#if defined(_DEBUG)
 	std::ofstream foutStream;

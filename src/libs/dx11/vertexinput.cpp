@@ -69,7 +69,7 @@ Scene::VertexInput* VertexInput::internalCreate( const Scene::VertexInput::Creat
 		case VT_FLOAT3:		d3dtype->Format = DXGI_FORMAT_R32G32B32_FLOAT;break;
 		case VT_FLOAT2:		d3dtype->Format = DXGI_FORMAT_R32G32_FLOAT;break;
 		case VT_FLOAT1:		d3dtype->Format = DXGI_FORMAT_R32_FLOAT;break;
-		case VT_BYTEARGB:	d3dtype->Format = DXGI_FORMAT_R8G8B8A8_UNORM;break;
+		case VT_BYTEARGB:	d3dtype->Format = DXGI_FORMAT_B8G8R8A8_UNORM;break;
 		case VT_SHORT2:		d3dtype->Format = DXGI_FORMAT_R16G16_UINT;break;
 		default:			CORE_ASSERT( false && "Inknown vertex type" );
 		}

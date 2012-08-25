@@ -13,4 +13,4 @@ add_library( meshimport ${src_files} ${header_files} )
 target_link_libraries( meshimport lightwaveloader )
 
 # make a nice hierachy
-set_target_properties( meshimport PROPERTIES FOLDER "meshimport")
+set_target_properties( meshimport PROPERTIES FOLDER "Libs")

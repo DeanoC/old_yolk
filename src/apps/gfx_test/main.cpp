@@ -1,6 +1,8 @@
 #include "core/core.h"
-#include "dwm_client/client.h"
-#include "scene/hie.h"
+#include "shell3d.h"
+#include "scene/hier.h"
+#include "localworld/sceneworld.h"
+#include "localworld/thing.h"
 
 //#include "boost/program_options.hpp"
 //#include "json_spirit/json_spirit_reader.h"
@@ -21,13 +23,6 @@ void readConfig( std::string& hostname, int& port ) {
    }
 }
 */
-#include "dwm/trustedregion.h"
-void World::InstallApiFuncs( class TrustedRegion* trustedRegion ) {
-}
-
-uint8_t* TrustedRegion::encodeFunc( void* ) {
-	return 0;
-}
 
 int Main() {
 	using namespace Core;
@@ -40,7 +35,7 @@ int Main() {
 	;
 	po::variables_map vm;
 	po::store(po::parse_command_line(Core::g_argc, Core::g_argv, desc), vm);
-	po::notify(vm);    
+	po::notify(vm); 
 
 	if (vm.count("help")) {
 		LOG(INFO) << desc << "\n";
@@ -48,14 +43,16 @@ int Main() {
 	}
 	*/
 
-	DwmClient client;
-	client.start();
-	ClientWorldPtr world = client.getClientWorld();
+	Shell3D shell;
+	shell.start();
+	SceneWorldPtr world = shell.getSceneWorld();
 
-	Scene::HierPtr land = std::make_shared<Scene::Hier>( "dynamics_test1.hie" );
-	world->addRenderable( land );
-	client.run();
-	client.end();
+
+	Scene::HierPtr land = std::make_shared<Scene::Hier>( "dynamics_test1" );
+	ThingPtr tng = std::make_shared<Thing>( land );
+	world->add( tng );
+	shell.run();
+	shell.end();
 
 //	auto gfxThread = std::make_shared<Core::thread>( 
 //			boost::bind( &DwmClient::run, &client ) 

@@ -11,6 +11,7 @@ file( GLOB shader_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 								programs/shaders/*.hlsl 
 								)
 
+include_directories(${CMAKE_SOURCE_DIR}/src/libs/bullet/src/ )
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 	
@@ -28,6 +29,10 @@ endforeach( sc ${shader_files} )
 
 ADD_MSVC_PRECOMPILED_HEADER( "scene.h" "${cpp_src_files}" )
 add_library( scene ${src_files} ${header_files}  ${shader_files} )
+
+target_link_libraries( 	scene
+						BulletCollision
+						BulletDynamics )
 
 # make a nice hierachy
 set_target_properties( scene PROPERTIES FOLDER "Libs")

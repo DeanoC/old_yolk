@@ -221,7 +221,7 @@ void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 	auto rtw = renderTargetWriteHandle.acquire();
 
 	Scene::Viewport viewport = {
-		0.0f, 0.0f, 1024.0f, 1024.0f, 0.0f, 1.0f
+		0.0f, 0.0f, width, height, 0.0f, 1.0f
 	};
 
 	if( tex->getSamples() <= 1 ) {
@@ -236,14 +236,16 @@ void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 		// TODO Resolve
 	}
 
-	if( hasOverlay() ) {
-		ResourceLoader::getr().renderThreadUpdate( getComposer() );
-		getComposer()->render( ctx );
-	}
-
 	if( hasDebugPrims() ) {
 		getDebugPrims()->render( ctx );
 	}
+
+	ResourceLoader::getr().renderThreadUpdate( getComposer() );
+
+	if( hasOverlay() ) {
+		getComposer()->render( ctx );
+	}
+
 
 	ctx->unbindRenderTargets();
 	swapChain->Present( 0, 0 );

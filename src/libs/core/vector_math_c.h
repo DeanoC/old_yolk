@@ -317,19 +317,27 @@ namespace Math {
 	CALL inline Vector3 ComponentMultiply( const Vector3& vecA, const Vector3& vecB ){ return Math::Vector3( vecA[0]*vecB[0], vecA[1]*vecB[1], vecA[2]*vecB[2] ); } 
 	CALL inline Vector4 ComponentMultiply( const Vector4& vecA, const Vector4& vecB ){ return Math::Vector4( vecA[0]*vecB[0], vecA[1]*vecB[1], vecA[2]*vecB[2], vecA[3]*vecB[3] ); } 
 
+	CALL inline float	Reciprocal( const float& a ) { return 1.0f / a; }
 	CALL inline Vector2 Reciprocal( const Vector2& vecA ){ return Math::Vector2( 1.0f / vecA[0], 1.0f / vecA[1] ); } 
 	CALL inline Vector3 Reciprocal( const Vector3& vecA ){ return Math::Vector3( 1.0f / vecA[0], 1.0f / vecA[1], 1.0f / vecA[2] ); } 
 	CALL inline Vector4 Reciprocal( const Vector4& vecA ){ return Math::Vector4( 1.0f / vecA[0], 1.0f / vecA[1], 1.0f / vecA[2], 1.0f / vecA[3] ); } 
 
+	CALL inline float LengthSquared( const float& a ){ return a * a; }  			//!< Length^2 of a !D Vector
 	CALL inline float LengthSquared( const Vector2& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 2D Vector
 	CALL inline float LengthSquared( const Vector3& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 3D Vector
 	CALL inline float LengthSquared( const Vector4& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 4D Vector
 	CALL inline float LengthSquared( const Quaternion& q ){ return Dot(q,q); }  	//!< Length^2 of a 4D Vector
 
+	CALL inline float Length( const float& a ){ return sqrtf(LengthSquared(a)); } 	//!< Length of a 1D Vector
 	CALL inline float Length( const Vector2& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 2D Vector
 	CALL inline float Length( const Vector3& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 3D Vector
 	CALL inline float Length( const Vector4& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 4D Vector
 	
+	CALL inline float ReciprocalSqrt( const float& a ) { return 1.0f / Length(a); }
+	CALL inline float ReciprocalSqrt( const Vector2& vecA ){ return 1.0f / Length(vecA); } 
+	CALL inline float ReciprocalSqrt( const Vector3& vecA ){ return 1.0f / Length(vecA); } 
+	CALL inline float ReciprocalSqrt( const Vector4& vecA ){ return 1.0f / Length(vecA); } 
+
 	CALL inline float Cross( const Vector2& vecA, const Vector2& vecB ){ return vecA.x*vecB.y - vecA.y*vecB.x; }   //!< Cross product of 2 2D Vectors (CCW this is actually vecA(x,y,0) cross vecB(x,y,0) )
 	CALL inline Vector3 Cross( const Vector3& vecA, const Vector3& vecB ) { 
 		return Vector3(	vecA.y*vecB.z - vecA.z*vecB.y, vecA.z*vecB.x - vecA.x*vecB.z, vecA.x*vecB.y - vecA.y*vecB.x );
@@ -491,9 +499,136 @@ namespace Math {
 							0,							0,							0,							1 );
 	}
 #endif
+	CALL inline Quaternion CreateRotationQuat( const Matrix4x4& m ){ 
+		float t, s;
+		Quaternion q;
 
+		t = m._11 + m._22 + m._33;
+		if (t > 0.0f) {
+			s = sqrtf(t + 1.0f);
+			q.w = s * 0.5f;
+			s = 0.5f / s;
 
-//	inline Quaternion CreateRotationQuat( const Matrix4x4& mat ){ Quaternion quat; D3DXQuaternionRotationMatrix(&quat,&mat); return quat; }
+			q.x = (m._32 - m._23) * s;
+			q.y = (m._13 - m._31) * s;
+			q.z = (m._21 - m._12) * s;
+		} else {
+			int biggest;
+			if (m._11 > m._22) {
+				if (m._33 > m._11)
+					biggest = 2;//I;	
+				else
+					biggest = 0;//A;
+			} else {
+				if (m._33 > m._11)
+					biggest = 2;//I;
+				else
+					biggest = 1;//E;
+			}
+
+			switch (biggest) {
+				case 0:
+					s = sqrtf(m._11 - (m._22 + m._33) + 1.0f);
+					if (s > 1e-8f) {
+
+						q.x = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._32 - m._23) * s;
+						q.y = (m._12 + m._21) * s;
+						q.z = (m._13 + m._31) * s;
+						break;
+					}
+					// I
+					s = sqrtf(m._33 - (m._11 + m._22) + 1.0f);
+					if (s > 1e-8f) {
+						q.z = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._21 - m._12) * s;
+						q.x = (m._31 + m._13) * s;
+						q.y = (m._32 + m._23) * s;
+						break;
+					}
+					// E
+					s = sqrtf(m._22 - (m._33 + m._11) + 1.0f);
+					if (s > 1e-8f) {
+						q.y = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._13 - m._31) * s;
+						q.z = (m._23 + m._32) * s;
+						q.x = (m._21 + m._12) * s;
+						break;
+					}
+					break;
+
+				case 1:
+					s = sqrtf(m._22 - (m._33 + m._11) + 1.0f);
+					if (s > 1e-8f) {
+						q.y = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._13 - m._31) * s;
+						q.z = (m._23 + m._32) * s;
+						q.x = (m._21 + m._12) * s;
+						break;
+					}
+					// I
+					s = sqrtf(m._33 - (m._11 + m._22) + 1.0f);
+					if (s > 1e-8f) {
+						q.z = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._21 - m._12) * s;
+						q.x = (m._31 + m._13) * s;
+						q.y = (m._32 + m._23) * s;
+						break;
+					}
+					// A
+					s = sqrtf(m._11 - (m._22 + m._33) + 1.0f);
+					if (s > 1e-8f) {
+						q.x = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._32 - m._23) * s;
+						q.y = (m._12 + m._21) * s;
+						q.z = (m._13 + m._31) * s;
+						break;
+					}
+					break;
+
+				case 2:
+					s = sqrtf(m._33 - (m._11 + m._22) + 1.0f);
+					if (s > 1e-8f) {
+						q.z = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._21 - m._12) * s;
+						q.x = (m._31 + m._13) * s;
+						q.y = (m._32 + m._23) * s;
+						break;
+					}
+					// A
+					s = sqrtf(m._11 - (m._22 + m._33) + 1.0f);
+					if (s > 1e-8f) {
+						q.x = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._32 - m._23) * s;
+						q.y = (m._12 + m._21) * s;
+						q.z = (m._13 + m._31) * s;
+						break;
+					}
+					// E
+					s = sqrtf(m._22 - (m._33 + m._11) + 1.0f);
+					if (s > 1e-8f) {
+						q.y = s * 0.5f;
+						s = 0.5f / s;
+						q.w = (m._13 - m._31) * s;
+						q.z = (m._23 + m._32) * s;
+						q.x = (m._21 + m._12) * s;
+						break;
+					}
+					break;
+				default:
+					CORE_ASSERT(false);
+			}
+		}
+		return q;
+	}
 	CALL inline Quaternion CreateRotationQuat( const Vector3& axis, float angle ) {
 		return Quaternion( sinf(angle/2) * axis.x, sinf(angle/2) * axis.y, sinf(angle/2) * axis.z, cosf(angle/2) );
 	}

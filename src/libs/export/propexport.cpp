@@ -259,7 +259,11 @@ void SavePropList( const std::vector< MeshMod::PropertyPtr >& props, const Core:
 	// add a Manifest folder to the path
 	auto filedir = outFilename.DirName();
 	filedir = filedir.Append( "Properties" );
-	filedir = filedir.Append( outFilename.BaseName() );
+
+	std::string fileName( outFilename.BaseName().value() );
+	std::replace( fileName.begin(), fileName.end(), ' ', '_' );
+
+	filedir = filedir.Append( fileName );
 
 //#if defined(_DEBUG)
 	auto mantextpath = filedir.ReplaceExtension( ".prptxt" );

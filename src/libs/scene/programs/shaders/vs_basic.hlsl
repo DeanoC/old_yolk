@@ -14,7 +14,8 @@ struct VS_OUT {
 VS_OUT main( VS_IN input ) {
 	VS_OUT output;
 	static const vec3 fakeDir = float3( 0.707, 0.707, 0.0 );
-	output.colour = float4( dot( input.normal, fakeDir ).xxx, 1);
+	float c = abs( dot( input.normal, fakeDir ) ) + 0.1f;
+	output.colour = float4( c, c, c, 1);
 	output.position = mul( input.position, matrixWorldViewProjection );
 	return output;
 }

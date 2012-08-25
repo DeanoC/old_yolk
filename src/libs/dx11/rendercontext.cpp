@@ -218,6 +218,8 @@ void RenderContext::bind( const Scene::RasteriserStatePtr sraster ) {
 void RenderContext::bind( const Scene::VertexInputPtr svertexInput ) {
 	auto vin = std::static_pointer_cast<Dx11::VertexInput>( svertexInput );
 
+	CORE_ASSERT( vin->inputLayout );
+
 	std::shared_ptr<DataBuffer> buffers[ Scene::VertexInput::MAX_ELEMENT_COUNT ];
 	ID3D11Buffer* d3dBuffers[ Scene::VertexInput::MAX_ELEMENT_COUNT ];
 	UINT offsets[ Scene::VertexInput::MAX_ELEMENT_COUNT ] ;

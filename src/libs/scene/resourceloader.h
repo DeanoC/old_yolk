@@ -5,8 +5,8 @@
 #ifndef YOLK_CORE_SINGLE_H_
 #	include "core/singleton.h"
 #endif
-#ifndef YOLK_SCENE_HIE_H_
-#include "scene/hie.h"
+#ifndef YOLK_SCENE_HIER_H_
+#include "scene/hier.h"
 #endif
 #ifndef YOLK_SCENE_PROGRAM_H_
 #include "scene/program.h"

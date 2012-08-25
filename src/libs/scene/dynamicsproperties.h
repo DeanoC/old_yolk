@@ -1,5 +1,5 @@
-#ifndef _YOLK_SCENE_DYNAMICS_PROPERTIES_H_
-#define _YOLK_SCENE_DYNAMICS_PROPERTIES_H_ 1
+#ifndef YOLK_SCENE_DYNAMICS_PROPERTIES_H_
+#define YOLK_SCENE_DYNAMICS_PROPERTIES_H_ 1
 
 #define DYNAMICS_TYPE 				"dynamics_type"
 #define DYNAMICS_SHAPE 				"dynamics_shape"
@@ -26,7 +26,7 @@
 #define DYNAMICS_MAX_MESH_VERTICES	(65535)
 #define DYNAMICS_MAX_MESH_INDICES	(65535)
 #define DYNAMICS_MESH_VERTICES		"dynamics_mesh_vertices"
-#define DYNAMICS_MESH_INDICIES		"dynamics_mesh_indices"
+#define DYNAMICS_MESH_INDICES		"dynamics_mesh_indices"
 
 #define DYNAMICS_MASSMETHOD_DENSITY 0
 #define DYNAMICS_MASSMETHOD_MASS	1

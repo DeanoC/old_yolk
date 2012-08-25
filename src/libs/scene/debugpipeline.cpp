@@ -26,7 +26,7 @@ DebugPipeline::DebugPipeline( ) {
 	Texture::CreationInfo ccs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET |RCF_PRG_READ,
 			GTF_RGBA8,
-			1024, 1024
+			1280, 960
 		);
 	static const std::string colTargetName = "DebugPipe_ColourTarget";
 	colourTargetHandle.reset( TextureHandle::create( colTargetName.c_str(), &ccs ) );
@@ -34,7 +34,7 @@ DebugPipeline::DebugPipeline( ) {
 	Texture::CreationInfo dcs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
 			GTF_DEPTH24_STENCIL8,
-			1024, 1024
+			1280, 960
 		);
 	static const std::string depthTargetName = "DebugPipe_DepthTarget";
 	depthTargetHandle.reset( TextureHandle::create( depthTargetName.c_str(), &dcs ) );

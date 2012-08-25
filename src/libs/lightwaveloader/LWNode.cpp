@@ -36,22 +36,25 @@ calculates a rotation matrix from LW style heading, pitch and bank angles
 void Node::evaluateHPBAngles( const float heading , const float pitch, const float bank,
 								 Math::Matrix4x4& out )
 {
-	Math::Matrix4x4 headingMat = Math::CreateYRotationMatrix( heading );
-	Math::Matrix4x4 pitchMat = Math::CreateXRotationMatrix( pitch );
-	Math::Matrix4x4 bankMat = Math::CreateZRotationMatrix( bank );
+	Math::Matrix4x4 headingMat = Math::CreateYRotationMatrix( -heading );
+	Math::Matrix4x4 pitchMat = Math::CreateXRotationMatrix( -pitch );
+	Math::Matrix4x4 bankMat = Math::CreateZRotationMatrix( -bank );
 
-	out = (bankMat * pitchMat) * headingMat;
+	out = bankMat * (headingMat * pitchMat);
+
 }
 /*
 calculates a Quaternion from LW style heading, pitch and bank angles
 */
 void Node::evaluateHPBAngles( const float heading , const float pitch, const float bank,
 								 Math::Quaternion& out ) {
-	Math::Quaternion headingQuat = Math::CreateRotationQuat( Math::Vector3(0,1,0), heading );
-	Math::Quaternion pitchQuat = Math::CreateRotationQuat( Math::Vector3(1,0,0), pitch );
-	Math::Quaternion bankQuat = Math::CreateRotationQuat( Math::Vector3(0,0,1), bank );
+	Math::Matrix4x4 headingMat = Math::CreateYRotationMatrix( -heading );
+	Math::Matrix4x4 pitchMat = Math::CreateXRotationMatrix( -pitch );
+	Math::Matrix4x4 bankMat = Math::CreateZRotationMatrix( -bank );
 
-	out = (bankQuat * pitchQuat) * headingQuat;
+	Math::Matrix4x4 mout = bankMat * (headingMat * pitchMat);
+
+	out = Math::CreateRotationQuat(mout);
 }
 
 void Node::evaluateLWChannelGroup( const unsigned int numChannels, const float* channels, 

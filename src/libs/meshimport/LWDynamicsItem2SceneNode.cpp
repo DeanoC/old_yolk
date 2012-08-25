@@ -40,7 +40,7 @@ void LWDynamicsItem2SceneNode( LightWave::DynamicsItemPlugin* dip, MeshMod::Scen
 			bool ok = ExtractCollisionMesh( scnNode,  verts,  indices );
 			if( ok ) {
 				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_MESH_VERTICES, verts ) );
-				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_MESH_INDICIES, indices ) );
+				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_MESH_INDICES, indices ) );
 			}
 		} break;
 		default: shape = DYNAMICS_SHAPE_SPHERE; break;

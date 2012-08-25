@@ -43,7 +43,8 @@ DebugPrims::DebugPrims() {
 
 	const std::string vaoName = "_debugPrimVao_" + VertexInput::genEleString(vocs.elementCount, vocs.elements );
 	vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vocs );
-	debugProgramHandle = Scene::ProgramHandle::load( "2dcolour" );
+	debugProgramHandle = Scene::ProgramHandle::load( "debugline" );
+
 }
 
 DebugPrims::~DebugPrims() {
@@ -237,22 +238,20 @@ void DebugPrims::render( RenderContext* context ) {
 	glBlendFuncSeparate( GL_ONE, GL_ONE, GL_ONE, GL_ONE );*/
 
 
-//	glBindVertexArray( vao->getName() );
-//	GL_CHECK
-
 	auto debugProgram = debugProgramHandle->acquire();
+	vao->validate( debugProgram );
+	context->bind( vao );
+
 	context->getConstantCache().updateGPU( context, debugProgram );
 	context->bind( debugProgram );
 
 	if( numLineWorldVertices != 0 ) {
-//		glDrawArrays( GL_LINES, WORLD_LINE_START_INDEX, numLineWorldVertices );
-//		GL_CHECK;
+		context->draw( PT_LINE_LIST,numLineWorldVertices, WORLD_LINE_START_INDEX );
 	}
 	if( numLineVertices != 0 ) {
 		context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
 		context->getConstantCache().updateGPU( context, debugProgram );
-//		glDrawArrays( GL_LINES, NDC_LINE_START_INDEX, numLineVertices );
-//		GL_CHECK;
+		context->draw( PT_LINE_LIST,numLineVertices, NDC_LINE_START_INDEX );
 	}
 
 	numLineVertices = 0;

@@ -37,6 +37,11 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 		linkStream << "//------------------------------------------\n";
 		MeshMod::SceneNodePtr node = *it;
 		int nodeIndex = (int) std::distance<std::vector< MeshMod::SceneNodePtr >::const_iterator>( nodeArray.begin(), it );
+		std::string nodeName = Core::FilePath( node->name ).RemoveExtension().value();
+		std::replace( nodeName.begin(), nodeName.end(), ' ', '_' );
+
+		std::ostringstream emitName;
+		emitName <<  "NodeName" << nodeIndex << "Str";
 
 		if( node->type == "Joint" ) {
 			TODO_ASSERT( false && "Bones and joints" );
@@ -64,7 +69,8 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 						nodeStream << "(u16) " << 0 << "\t\t\t\t\t // flags\n";
 					}
 					nodeStream << ".type float\n";
-					if( objNum > 0 ) {
+					// this isn't right for flat hierachy lw scenes, object split need more work
+					if( true ) { //objNum > 0 ) {
 						nodeStream	<<  (float) node->transform.position[0] << ", "
 									<<  (float) node->transform.position[1] << ", "
 									<<  (float) node->transform.position[2] << "\t\t\t\t\t// Node Position\n";
@@ -88,6 +94,7 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 						nodeStream << "0, " << meshLabName.str() << " - beginLab" << "\t\t\t\t\t// node parameters\n";
 						auto baseName = pOutFilename.RemoveExtension().BaseName().value();
 						auto meshName = Core::FilePath( baseName + "_" + mesh->getName()).RemoveExtension().value();
+						std::replace( meshName.begin(), meshName.end(), ' ', '_' );
 						stringTable[ meshLabName.str() + ":" ] = meshName;
 					} else {
 						nodeStream << "0,0" << "\t\t\t\t\t// node parameters \n";
@@ -130,10 +137,8 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 						nodeStream << "0,0" << "\t\t\t\t\t// no child linkage\n";
 					}
 
-					std::ostringstream emitName;
-					emitName <<  "NodeName" << nodeIndex << "_" << objNum << "Str";
 					nodeStream << "0, " << emitName.str() << " - beginLab\n";
-					stringTable[ emitName.str() + ":" ] = Core::FilePath( node->name ).RemoveExtension().value();
+					stringTable[ emitName.str() + ":" ] = nodeName;
 					if( objNum > 0 ) {
 						nodeStream << "Node_"  << nodeIndex << "_" << objNum << "_end: \t\t\t\t\t // node End\n";
 					} else {
@@ -190,10 +195,8 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 					nodeStream << "0,0" << "\t\t\t\t\t// no linkage\n";
 				}
 
-				std::ostringstream emitName;
-				emitName <<  "NodeName" << nodeIndex << "Str";
 				nodeStream << "0, " << emitName.str() << " - beginLab\n";
-				stringTable[ emitName.str() + ":" ] = Core::FilePath( node->name ).RemoveExtension().value();
+				stringTable[ emitName.str() + ":" ] = nodeName;
 				nodeCounter++;
 			}
 		}	
