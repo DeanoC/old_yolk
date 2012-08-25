@@ -47,10 +47,16 @@ int Main() {
 	shell.start();
 	SceneWorldPtr world = shell.getSceneWorld();
 
-
-	Scene::HierPtr land = std::make_shared<Scene::Hier>( "dynamics_test1" );
+	Scene::HierPtr land = std::make_shared<Scene::Hier>( "basic" );
 	ThingPtr tng = std::make_shared<Thing>( land );
 	world->add( tng );
+/*	Scene::HierPtr stinger = std::make_shared<Scene::Hier>( "stinger" );
+	ThingPtr stingr = std::make_shared<Thing>( stinger );
+//	world->add( stingr );
+	Scene::HierPtr mechh = std::make_shared<Scene::Hier>( "ogremech" );
+	ThingPtr mech = std::make_shared<Thing>( mechh );
+	world->add( mech );*/
+
 	shell.run();
 	shell.end();
 

@@ -142,14 +142,8 @@ void DebugPipelineDataStore::render( Scene::RenderContext* rc ) {
 		auto ib = mds->indexBuffer->tryAcquire();
 		if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 		ctx->bind( vao );
-		ctx->bindIndexBuffer( ib );
+		ctx->bindIndexBuffer( ib, mds->indexSize );
 		ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
-//		glBindVertexArray( vao->getName() );
-//		GL_CHECK
-//		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ib->getName() );
-//		GL_CHECK
-//		glDrawElements( GL_TRIANGLES, mds->numIndices, mds->indexType, 0 );
-//		GL_CHECK
 	}
 
 }

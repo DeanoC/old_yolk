@@ -233,10 +233,10 @@ void RenderContext::bind( const Scene::VertexInputPtr svertexInput ) {
 	ctx->IASetInputLayout( vin->inputLayout.get() );
 }
 
-void RenderContext::bindIndexBuffer( const Scene::DataBufferPtr sib ) {
+void RenderContext::bindIndexBuffer( const Scene::DataBufferPtr sib, int indexBytes ) {
 	auto ib = std::static_pointer_cast<Dx11::DataBuffer>( sib );
 	auto buf = (ID3D11Buffer* const)ib->get().get();
-	ctx->IASetIndexBuffer( buf, DXGI_FORMAT_R16_UINT, 0 );
+	ctx->IASetIndexBuffer( buf, (indexBytes == 2) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0 );
 }
 
 

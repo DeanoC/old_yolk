@@ -71,7 +71,7 @@ namespace Scene {
 		virtual void bind( const RasteriserStatePtr rasteriser ) = 0;
 		virtual void bind( const VertexInputPtr vertexInput ) = 0;
 
-		virtual void bindIndexBuffer( const DataBufferPtr ib ) = 0;
+		virtual void bindIndexBuffer( const DataBufferPtr ib, int indexBytes ) = 0;
 
 		virtual void draw( PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) = 0;
 		virtual void drawIndexed( PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) = 0;

@@ -53,7 +53,7 @@ namespace Dx11 {
 		virtual void bind( const Scene::RasteriserStatePtr rasteriser ) override;
 		virtual void bind( const Scene::VertexInputPtr vertexInput ) override;
 
-		virtual void bindIndexBuffer( const Scene::DataBufferPtr ib ) override;
+		virtual void bindIndexBuffer( const Scene::DataBufferPtr ib, int indexBytes ) override;
 
 		virtual void draw( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) override;
 		virtual void drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) override;
