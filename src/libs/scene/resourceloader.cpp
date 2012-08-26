@@ -219,6 +219,8 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 ResourceLoaderImpl::~ResourceLoaderImpl() {
 	loadTextureAtlas->close();
 	workUnit.reset();
+	loaderThread->join();
+	CORE_DELETE loaderThread;
 	loaderIo.reset();
 	renderIo.reset();
 }

@@ -25,17 +25,16 @@ struct InputFrame {
 		bool debugButton5;
 	} pad[ MAX_PADS ];
 
-	/// movement along the mouse X axis.
-	float mouseDeltaX;
-	/// movement along the mouse Y axis.
-	float mouseDeltaY;
+	/// position of a mouse X axis.
+	float mouseX;
+	/// position of a mouns Y axis.
+	float mouseY;
 	/// Left Mouse Button is down.
 	bool mouseLeftButton;
 	/// Right Mouse Button is down.
 	bool mouseRightButton;
 
-
-	float deltaTime; // simple last frame
+	float deltaTime; // time since last input frame
 };
 
 #endif

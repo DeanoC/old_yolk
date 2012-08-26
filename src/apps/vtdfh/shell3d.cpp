@@ -14,11 +14,9 @@
 #include "scene/camera.h"
 #include "scene/rendercontext.h"
 #include "scene/debugpipeline.h"
-#include "core/clock.h"
 #include "core/sysmsg.h"
 #include "core/development_context.h"
 #include "localworld/debugcamcontext.h"
-#include "localworld/inputhandlercontext.h"
 #include "localworld/sceneworld.h"
 #include "shell3d.h"
 
@@ -26,18 +24,20 @@
 #define START_WIDTH			1280
 #define START_HEIGHT		960
 
+bool g_quitFlag = false;
+
 namespace {
 	int s_screenWidth = START_WIDTH;
 	int s_screenHeight = START_HEIGHT;
 	int curWinWidth = s_screenWidth;
 	int curWinHeight = s_screenHeight;
 
-	bool s_quitFlag = false;
+
 	int s_debugMode = 0;
 }
 
 void QuitCallback() {
-	s_quitFlag = true;
+	g_quitFlag = true;
 }
 
 void DebugModeCallback( int debugMode ) {
@@ -83,38 +83,24 @@ void Shell3D::start() {
 
 	renderer->addPipeline( std::make_shared<Scene::DebugPipeline>() );
 
+	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
+	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
 }
 
 void Shell3D::run() {
 	using namespace Core;
 	using namespace Scene;
 
-	RenderContext* ctx = renderer->getPrimaryContext();
 	// render context has been setup to use this thread by the same thread that created teh screen 
-
-	// camera stuff is stuffed needs refactor
-//	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
-//	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
-	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
-	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
-
-	DevelopmentContext::get()->activateContext( "DebugCam" );
-
-	// flush 'load' time from first time update
-	Clock::get()->update();
+	RenderContext* ctx = renderer->getPrimaryContext();
 
 	// Main loop
-	while( !s_quitFlag ) {
-
-		float deltaT = Clock::get()->update();
-
-		DevelopmentContext::get()->update( deltaT );
-		world->update( deltaT );
+	while( !g_quitFlag ) {
 		auto camera = DevelopmentContext::getr().getContext()->getCamera();
 		if( camera ) {
 			world->render( screen, "debug", camera, ctx );
 		} else {
-			// TODO here goes advanced camera systems
+			// TODO fall back or etc? camera systems
 			TODO_ASSERT( camera );
 		}
 

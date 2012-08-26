@@ -14,23 +14,12 @@ public:
 	BulletDebugDraw() : mode(DBG_NoDebug) {}
 
 	void drawLine(const btVector3& from, const btVector3& to, const btVector3& colour) override {
-//		DbgWorldLine( 	(const float*) &from[0],
-//						(const float*) &to[0],
-//						convertColour( colour ) );
-		using namespace Core;
-		using namespace Math;
-		g_pDebugRender->worldLine( RGBAColour(colour[0],colour[1],colour[2],1), Vector3(from[0],from[1],from[2]), Vector3(to[0],to[1],to[2]) );	
+		Core::g_pDebugRender->worldLine( Core::RGBAColour(colour[0],colour[1],colour[2],1), Math::Vector3(from[0],from[1],from[2]), Math::Vector3(to[0],to[1],to[2]) );	
 	}
 
 	void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& colour) override {
 		const btVector3 to(PointOnB + normalOnB*distance);
-
-//		DbgWorldLine( 	(const float*) &PointOnB[0],
-//						(const float*) &to[0],
-//						convertColour( colour ) );
-		using namespace Core;
-		using namespace Math;
-		g_pDebugRender->worldLine( RGBAColour(colour[0],colour[1],colour[2],1), Vector3(PointOnB[0],PointOnB[1],PointOnB[2]), Vector3(to[0],to[1],to[2]) );	
+		Core::g_pDebugRender->worldLine( Core::RGBAColour(colour[0],colour[1],colour[2],1), Math::Vector3(PointOnB[0],PointOnB[1],PointOnB[2]), Math::Vector3(to[0],to[1],to[2]) );	
 	}
 
 	void reportErrorWarning(const char* text) override {
@@ -42,26 +31,9 @@ public:
 	}
 
 	void setDebugMode(int mode) override { this->mode = mode; }
-
 	int getDebugMode() const override { return this->mode; }
 
 private:
-	uint32_t convertColour( const btVector3& colour ) {
-		//workaround to bullet's inconsistent debug colors which are either from 0.0 - 1.0 or from 0.0 - 255.0
-		// from irrelict post by randomMesh http://irrlicht.sourceforge.net/forum/viewtopic.php?t=38289 
-		btVector3 adjCol = colour;
-		if( colour[0] <= 1.0f && colour[0] > 0.0f)
-			adjCol[0] = colour[0] * 255.0f;
-		if( colour[1] <= 1.0f && colour[1] > 0.0f)
-			adjCol[1] = colour[1] * 255.0f;
-		if( colour[2] <= 1.0f && colour[2] > 0.0f )
-			adjCol[2] = colour[2] * 255.0f;
-
-		// TODO clamp
-
-		return (uint32_t)( ((uint32_t)adjCol[0] << 16) | ((uint32_t)adjCol[1] << 8) | (uint32_t)adjCol[2] );
-	}
-
 	int mode;
 };
 
@@ -84,15 +56,9 @@ PhysicsWorld::PhysicsWorld() :
 
 	debugDraw  = CORE_NEW BulletDebugDraw();
 	debugDraw->setDebugMode( 0 );
-	nextPhysicsDebugMode();
 	dynamicsWorld->setDebugDrawer( debugDraw );
 
 	dynamicsWorld->setGravity(btVector3(0,-9.8f,0));
-
-//	timeval tv;
-//	gettimeofday( &tv, nullptr );
-//	curTime = tv.tv_sec  + ((double)tv.tv_usec / 1e6);
-
 }
 
 PhysicsWorld::~PhysicsWorld() {
@@ -129,15 +95,6 @@ PhysicsWorld::~PhysicsWorld() {
 }
 
 void PhysicsWorld::doSim( float delta ) {
-
-//	double lastTime = curTime;
-//	timeval tv;
-//	gettimeofday( &tv, nullptr );
-//	curTime = tv.tv_sec  + ((double)tv.tv_usec / 1e6);
-//	float delta = (float)(curTime - lastTime);
-
-//	printf( "delta - %f\n", delta );
-
 	dynamicsWorld->stepSimulation( delta );
 	dynamicsWorld->debugDrawWorld();
 }

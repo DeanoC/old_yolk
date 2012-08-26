@@ -11,7 +11,7 @@
 #undef NOMINMAX
 #define NOMINMAX
 #undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0500		// Windows XP or greater
+#define _WIN32_WINNT 0x0600		// Windows VISTA or greater
 #include <windows.h>
 #undef ERROR
 
@@ -19,7 +19,3 @@
 #include <cstdlib>
 #include <tchar.h>
 #include <cassert>
-
-#if defined( USE_DX11 )
-#	define USE_DINPUT
-#endif

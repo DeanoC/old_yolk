@@ -41,9 +41,9 @@ public:
 	virtual void debugButton5( unsigned int padNum ) {}
 
 	/// movement along the mouse X axis.
-	virtual void mouseDeltaX( float x ) {}
+	virtual void mouseX( float x ) {}
 	/// movement along the mouse Y axis.
-	virtual void mouseDeltaY( float y ) {}
+	virtual void mouseY( float y ) {}
 	/// Left Mouse Button is down.
 	virtual void mouseLeftButton() {}
 	/// Right Mouse Button is down.

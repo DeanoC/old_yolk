@@ -19,9 +19,10 @@ DebugCamContext::DebugCamContext( int scrWidth, int scrHeight, float degFov, flo
 
 	// default
 	xRot = yRot = zRot = 0;
+	dxRot = dyRot = dzRot = 0;
 	curSideMotion = curForwardMotion = 0;
 	speed = 50.0f;
-	angularSpeed = 90.f; // degrees per second
+	angularSpeed = 9000.f;
 	position = Math::Vector3(0,0,-10);
 	camera->setView( Math::IdentityMatrix() );
 
@@ -81,11 +82,11 @@ void DebugCamContext::debugButton5( unsigned int padNum ) {
 
 
 void DebugCamContext::mouseDeltaX( float x ) {
-	yRot += x * angularSpeed;
+	dyRot += x;
 }
 
 void DebugCamContext::mouseDeltaY( float y ) {
-	xRot  += y * angularSpeed;
+	dxRot  += y;
 }
 
 void DebugCamContext::mouseLeftButton() {
@@ -104,6 +105,11 @@ void DebugCamContext::enable( bool on  ) {
 
 void DebugCamContext::update( float fTimeInSecs ) {
 	using namespace Math;
+
+
+	xRot = dxRot * angularSpeed * fTimeInSecs;
+	yRot = dyRot * angularSpeed * fTimeInSecs;
+	zRot = dzRot * angularSpeed * fTimeInSecs;
 
 	Matrix4x4 mat,xrot,yrot,zrot;
 	xrot = CreateXRotationMatrix( degree_to_radian<float>() * xRot );

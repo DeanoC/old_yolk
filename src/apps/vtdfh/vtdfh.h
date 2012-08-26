@@ -5,5 +5,6 @@
 #include "scene/hier.h"
 #include "localworld/sceneworld.h"
 #include "localworld/thing.h"
+#include "localworld/updatable.h"
 
 #endif

@@ -95,7 +95,10 @@ void Shutdown( void ) {
 	ResourceMan::shutdown();
 	SystemMessage::shutdown();
 	Clock::shutdown();
+	Keyboard::shutdown();
 #if PLATFORM == WINDOWS 
+	MouseWin::shutdown();
+
 	_CrtSetReportHook( NULL );
 	_CrtSetDbgFlag( 0 );
 #endif
@@ -113,10 +116,6 @@ void HouseKeep( void ) {
 #endif
 
 #if PLATFORM == WINDOWS
-	if( MouseWin::exists() ) {
-		Core::MouseWin::get()->update();
-	}
-
 	WinGetMessages();
 #elif PLATFORM == POSIX
 	extern void X11PumpEvents();
@@ -141,7 +140,7 @@ bool InitWindow( int width, int height, bool bFullscreen ) {
 	bool ret = WinInitWindow( width, height, bFullscreen );
 	if( ret ) {
 		Keyboard::init();
-//		MouseWin::init();
+		MouseWin::init();
 	}
 
 	return ret;

@@ -8,7 +8,7 @@
 #include "development_context.h"
 #include "sysmsg.h"
 #include "keyboard.h"
-//#include "platform_windows/mouse_win.h"
+#include "platform_windows/mouse_win.h"
 
 namespace Core
 {
@@ -123,23 +123,26 @@ void DevelopmentContext::update( float fTimeInSecs ) {
 			dy += Keyboard::get()->keyDown(KT_UP) ? 0.005f : 0.f;
 			dy += Keyboard::get()->keyDown(KT_DOWN) ? -0.005f : 0.f;
 		}
-/*
+
 		//-=-=-=-=-=-=-=-=-=-=-=-=-
 		// update the mouse input
-		if( Mouse::exists() ) {
-			dx += Mouse::get()->getDeltaXAxis();
-			dy += Mouse::get()->getDeltaYAxis();
+		if( MouseWin::exists() ) {
+			MouseWin::get()->update();
 
-			if( Mouse::get()->getLeftMouseButton() )
+			dx += MouseWin::get()->getXPos();
+			dy += MouseWin::get()->getYPos();
+
+			if( MouseWin::get()->getLeftMouseButton() )
 				pInterface->mouseLeftButton( );
-			if( Mouse::get()->getRightMouseButton() )
+			if( MouseWin::get()->getRightMouseButton() )
 				pInterface->mouseRightButton( );
+			
 		}
-*/
+
 		if( fabsf(dx) > 1e-5f )
-			pInterface->mouseDeltaX( dx );
+			pInterface->mouseX( dx );
 		if( fabsf(dy) > 1e-5f )
-			pInterface->mouseDeltaY( dy );
+			pInterface->mouseY( dy );
 
 		pInterface->update( fTimeInSecs );
 	}

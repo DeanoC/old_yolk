@@ -1,12 +1,12 @@
 //!-----------------------------------------------------
 //!
-//! \file development_context.cpp
+//! \file mouse_win.cpp
 //!
 //!-----------------------------------------------------
 
 #include "core/core.h"
+#include "core/clock.h"
 #include "mouse_win.h"
-
 extern HWND g_hWnd;
 
 namespace Core {
@@ -14,39 +14,37 @@ namespace Core {
 /**
 MouseWin
 */
-MouseWin::MouseWin()
-{
+MouseWin::MouseWin() : numSamples(0) {
+	update();
+	lastTime = Clock::time( Clock::get()->getInstantTicks() );
+
+	lockToWindow();
+	hideCursor();
+
+	POINT pt;
+	GetPhysicalCursorPos( &pt );
+	midX = pt.x;
+	midY = pt.y;
+	xPos = midX;
+	yPos = midY;		
+	
 }
 
 MouseWin::~MouseWin() {
 }
 
 void MouseWin::update() {
-//	lastXPos = xPos;
-//	lastYPos = yPos;
+	averageSamples();
 }
-/*
-   
-	// Consolidate the keyboard messages and pass them to the app's keyboard callback
-	if( uMsg == WM_KEYDOWN ||
-		uMsg == WM_SYSKEYDOWN ||
-		uMsg == WM_KEYUP ||
-		uMsg == WM_SYSKEYUP )
-	{
-		bool bKeyDown = ( uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN );
-		DWORD dwMask = ( 1 << 29 );
-		bool bAltDown = ( ( lParam & dwMask ) != 0 );
 
-		bool* bKeys = GetDXUTState().GetKeys();
-		bKeys[ ( BYTE )( wParam & 0xFF ) ] = bKeyDown;
-
-		LPDXUTCALLBACKKEYBOARD pCallbackKeyboard = GetDXUTState().GetKeyboardFunc();
-		if( pCallbackKeyboard )
-			pCallbackKeyboard( ( UINT )wParam, bKeyDown, bAltDown, GetDXUTState().GetKeyboardFuncUserContext() );
-	}*/
 void MouseWin::processMouseMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
+	bLeftButton = false;
+	bRightButton = false;
+	bMiddleButton = false;
+	bSideButton1 = false;
+	bSideButton2 = false;
 	// Consolidate the mouse button messages and pass them to the app's mouse callback
-/*	if( uMsg == WM_LBUTTONDOWN ||
+	if( uMsg == WM_LBUTTONDOWN ||
 		uMsg == WM_LBUTTONUP ||
 		uMsg == WM_LBUTTONDBLCLK ||
 		uMsg == WM_MBUTTONDOWN ||
@@ -61,34 +59,33 @@ void MouseWin::processMouseMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 		uMsg == WM_MOUSEWHEEL ||
 		uMsg == WM_MOUSEMOVE ) {
 
-		xPos = ( short )LOWORD( lParam );
-		yPos = ( short )HIWORD( lParam );
-		nMouseWheelDelta = 0;
 
-		if( uMsg == WM_MOUSEWHEEL ) {
+		if( uMsg == WM_MOUSEMOVE ) {
+		} else {	
 			// WM_MOUSEWHEEL passes screen mouse coords
-			// so convert them to client coords
-			POINT pt;
-			pt.x = xPos; pt.y = yPos;
-			ScreenToClient( g_hWnd, &pt );
-			xPos = pt.x; yPos = pt.y;
-			nMouseWheelDelta = ( short )HIWORD( wParam );
+			nMouseWheelDelta += ( short )HIWORD( wParam );
 		}
-
+	
+		// positive vote (no button looses)
 		int nMouseButtonState = LOWORD( wParam );
-		bLeftButton = ( ( nMouseButtonState & MK_LBUTTON ) != 0 );
-		bRightButton = ( ( nMouseButtonState & MK_RBUTTON ) != 0 );
-		bMiddleButton = ( ( nMouseButtonState & MK_MBUTTON ) != 0 );
-		bSideButton1 = ( ( nMouseButtonState & MK_XBUTTON1 ) != 0 );
-		bSideButton2 = ( ( nMouseButtonState & MK_XBUTTON2 ) != 0 );
-	}
-	*/
+		bLeftButton |= ( ( nMouseButtonState & MK_LBUTTON ) != 0 );
+		bRightButton |= ( ( nMouseButtonState & MK_RBUTTON ) != 0 );
+		bMiddleButton |= ( ( nMouseButtonState & MK_MBUTTON ) != 0 );
+		bSideButton1 |= ( ( nMouseButtonState & MK_XBUTTON1 ) != 0 );
+		bSideButton2 |= ( ( nMouseButtonState & MK_XBUTTON2 ) != 0 );
+		numSamples++;
+	} 
+
 };
 
 void MouseWin::lockToWindow() {
-	RECT clientRect;
-	GetWindowRect(g_hWnd,&clientRect);
-	ClipCursor(&clientRect);
+	RECT screenRect;
+	GetWindowRect(g_hWnd,&screenRect);
+	ClipCursor(&screenRect);
+	POINT pt;
+	pt.x = (screenRect.right - screenRect.left) / 2;
+	pt.y = (screenRect.bottom - screenRect.top) / 2;
+	SetCursorPos( pt.x, pt.y );
 }
 void MouseWin::unlockFromWindow() {
 	ClipCursor(NULL);
@@ -99,5 +96,14 @@ void MouseWin::showCursor() {
 void MouseWin::hideCursor() {
 	ShowCursor( 0 );
 }
+void MouseWin::averageSamples() {
+	POINT pt;
+	GetPhysicalCursorPos( &pt );
+	avgXPos = pt.x - midX;// / timeDelta;		
+	avgYPos = pt.y - midY;// / timeDelta;
+			
+	SetPhysicalCursorPos( midX, midY );
+}
+
 
 }

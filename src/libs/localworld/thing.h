@@ -18,7 +18,6 @@ public:
 	explicit Thing( Scene::HierPtr hier, const ThingId _id = NewThingId() );
 	explicit Thing( const ThingId _id = NewThingId() ) : id( _id ) {}
 	~Thing();
-	void updateTransform( int nodeId = 0, ThingUpdateType uptype = ThingUpdateType::FROM_USER );
 
 	int getPhysicalCount() const { return preps.size(); }
 	int getRenderableCount() const { return vreps.size(); }
@@ -28,10 +27,18 @@ public:
 		return preps[nodeId];		
 	}
 
-
 	Scene::RenderablePtr getRenderable( int nodeId = 0 ) const {
 		CORE_ASSERT( nodeId >= 0 && nodeId < getRenderableCount() );
 		return vreps[nodeId];		
+	}
+	Core::TransformNode* getTransform() const {
+		if( vreps[0] ) {
+			return vreps[0]->getTransformNode();
+		} else if( preps[0] ) {
+			return preps[0]->getTransformNode();
+		} else {
+			return nullptr;
+		}
 	}
 	const ThingId getId() const { return id; }
 

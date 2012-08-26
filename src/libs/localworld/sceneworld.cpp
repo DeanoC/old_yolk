@@ -7,22 +7,16 @@
 #include "scene/physicsworld.h"
 #include "sceneworld.h"
 
-SceneWorld::SceneWorld() :
-	inputQueue( 3 ) {
+SceneWorld::SceneWorld() {
 	physicsWorld.reset( CORE_NEW Scene::PhysicsWorld() );
 }
 
-void SceneWorld::queueInputFrame( const InputFrame& frame ) {
-	inputQueue.push_front( frame );
-}
-
-bool SceneWorld::dequeueInputFrame( InputFrame* frame ) {
-	if( inputQueue.isNotEmpty() ) {
-		inputQueue.pop_back( frame );
-		return true;
-	} else {
-		return false;
-	}
+void SceneWorld::reset() {
+	// things and there physics should have bee rmoved when this is called
+	staticPhysicals.clear();
+	dynamicPhysicals.clear();
+	updatables.clear();
+	things.clear();
 }
 
 void SceneWorld::add( ThingPtr _thing ) {
@@ -41,14 +35,28 @@ void SceneWorld::add( ThingPtr _thing ) {
 	things.push_back( _thing );
 }
 
+void SceneWorld::add( Updatable* _updatable ) {
+	updatables.push_back( _updatable );
+}
+
+void SceneWorld::remove( Updatable* _updatable ) {
+	auto u = std::find( updatables.begin(), updatables.end(), _updatable );
+	CORE_ASSERT( (u != updatables.end()) && "updatable is not in this  world");
+	*u = nullptr; // concurrent vector doesn't shrink until a clear
+}
+
 void SceneWorld::remove( ThingPtr _thing ) {
 
 	for( int i = 0;i < _thing->getPhysicalCount(); ++i ) {
 		auto physical = _thing->getPhysical(i);
 		if( physical->getMass() <= 0 ) {
-			staticPhysicals.erase( std::find( staticPhysicals.cbegin(), staticPhysicals.cend(), physical ) );
+			auto f = std::find( staticPhysicals.begin(), staticPhysicals.end(), physical );
+			assert( (f != staticPhysicals.end()) && "Physics is not in this physics world");
+			*f = nullptr; // concurrent vector doesn't shrink until a clear
 		} else {
-			dynamicPhysicals.erase( std::find( dynamicPhysicals.cbegin(), dynamicPhysicals.cend(), physical ) );
+			auto f = std::find( dynamicPhysicals.begin(), dynamicPhysicals.end(), physical );
+			CORE_ASSERT( (f != dynamicPhysicals.end()) && "Physics is not in this physics world");
+			*f = nullptr; // concurrent vector doesn't shrink until a clear
 		}
 		physicsWorld->removePhysical( physical );
 	}
@@ -56,10 +64,16 @@ void SceneWorld::remove( ThingPtr _thing ) {
 		removeRenderable( _thing->getRenderable( i ) );
 	}
 
-	things.erase( std::find( things.cbegin(), things.cend(), _thing ) );
-
+	auto t = std::find( things.begin(), things.end(), _thing );
+	CORE_ASSERT( (t != things.end()) && "thing is not in this  world");
+	*t = nullptr; // concurrent vector doesn't shrink until a clear
 }
 
 void SceneWorld::update( float delta ) {
+	for( auto it : updatables ) {
+		if( it ) {
+			it->update( delta );
+		}
+	}
 	physicsWorld->doSim( delta );
 }

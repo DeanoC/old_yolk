@@ -60,6 +60,10 @@ protected:
 	std::shared_ptr<Scene::Camera> camera;
 	float fovRads; 
 
+	float dxRot;
+	float dyRot;
+	float dzRot;
+
 	float xRot;
 	float yRot;
 	float zRot;

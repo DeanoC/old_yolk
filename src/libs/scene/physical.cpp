@@ -47,10 +47,6 @@ Physical::~Physical() {
 	CORE_DELETE body;
 }
 
-void Physical::updateTransform() {
-	// TODO wake Bullet? let it know the transform has changed
-}
-
 void Physical::getWorldTransform( btTransform& worldTrans ) const {
 	const Math::Matrix4x4& matrix = transform->getWorldMatrix();
 

@@ -179,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	switch (message) 
 	{
 	case WM_DESTROY:
-//		Core::SystemMessage::get()->Quit();
+		Core::SystemMessage::get()->quit();
 		PostQuitMessage(0);
 		break;
 	default:
@@ -216,13 +216,13 @@ bool WinInitWindow( int width, int height, bool bFullscreen ) {
 	}
 	g_hWnd = CreateWindow( "Wierd", "Wierd", 
 							WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-							CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, g_hInstance,
+							0, 0, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, g_hInstance,
 						   NULL );
 	if( !g_hWnd )
 		return false;
-
+	WinGetMessages();
 	ShowWindow( g_hWnd, g_nCmdShow );
-
+	WinGetMessages();
 	return true;
 }
 
