@@ -49,6 +49,8 @@ enum CHUNK_ENUM
 	CHUNK_VMAP = CHUNK_NAME('V','M','A','P'),
 	CHUNK_VMAD = CHUNK_NAME('V','M','A','D'),
 
+	CHUNK_BBOX = CHUNK_NAME('B','B','O','X'),
+
 // Clip sub chunks
 		CHUNK_STIL = CHUNK_NAME('S','T','I','L'),
 // Surface sub chunks
@@ -190,6 +192,8 @@ CHUNK_DATA ChunkNames[] = {
 	{CHUNK_CLIP,	&LightWave::LWO_Loader::SkipReader, &LightWave::LWO_Loader::CLIPReader2 },  // Clip chunk
 	{CHUNK_VMAP,	&LightWave::LWO_Loader::SkipReader, &LightWave::LWO_Loader::VMAPReader2 },	// VMAP chunk
 	{CHUNK_VMAD,	&LightWave::LWO_Loader::SkipReader, &LightWave::LWO_Loader::VMADReader2 },	// VMAD chunk
+	{CHUNK_BBOX,	&LightWave::LWO_Loader::SkipReader, &LightWave::LWO_Loader::BBOXReader2 },	// BBOX chunk
+
 };
 
 // LWO sub chunks
@@ -335,7 +339,9 @@ LWO_Loader::LWO_Loader( const std::string& filename ) :
 	lwoVersion(1),
 	curLayer(0),
 	curClip(0),
-	curSurface(0)
+	curSurface(0),
+	bboxMin( FLT_MAX, FLT_MAX, FLT_MAX ),
+	bboxMax( -FLT_MAX, -FLT_MAX, -FLT_MAX )
 {
 	FILE *f;
 	int p;
@@ -735,6 +741,24 @@ void LWO_Loader::PNTSReader2(FILE *f, long p, long maxSize)
 		/// adds a new vertex position to the array
 		curLayer->points.push_back( temp );
 	}
+}
+
+/**
+BBOX Chunk V2.
+Stores the V2 BoundingBox
+@param f file handle
+@param currentPos current position
+@param maxSize the end of this chunk
+*/
+void LWO_Loader::BBOXReader2(FILE *f, long p, long maxSize)
+{
+	UNREFERENCED_PARAMETER( p );
+
+	VEC12 p0 = read(f,p0);
+	VEC12 p1 = read(f,p1);
+
+	bboxMin = p0;
+	bboxMax = p1;
 }
 
 /**

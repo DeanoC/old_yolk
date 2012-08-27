@@ -12,6 +12,8 @@
 #include "scene/dynamicsproperties.h"
 #include "scene/meshcolshape.h"
 #include "scene/spherecolshape.h"
+#include "scene/boxcolshape.h"
+#include "scene/cylindercolshape.h"
 #include "scene/dynamicphysical.h"
 #include "thing.h"
 
@@ -63,18 +65,35 @@ Thing::Thing( Scene::HierPtr hier, const ThingId _id ) :
 					case DYNAMICS_SHAPE_MESH: {
 						colShape = CORE_NEW MeshColShape( binProp );
 					}	break;
-					default:
-						LOG(INFO) << "Unknown dynamics_shape " << dshape << "\n";
-						// intentional fall through to give something collidable in the error case
-					case DYNAMICS_SHAPE_BOX: break;
-					case DYNAMICS_SHAPE_CONVEXHULL: break;
+					case DYNAMICS_SHAPE_BOX: // intentional fall throw
+					case DYNAMICS_SHAPE_CYLINDER: {
+						Math::Vector3 minAABB = Math::Vector3(0,0,0);
+						Math::Vector3 maxAABB = Math::Vector3(0,0,0);
+						if( nameMap.find( DYNAMICS_AABB_MIN ) != nameMap.cend() ) {
+							auto mif = binProp->getAs<float>( nameMap[DYNAMICS_AABB_MIN] );
+							minAABB = Math::Vector3( mif );
+						}
+						if( nameMap.find( DYNAMICS_AABB_MAX ) != nameMap.cend() ) {
+							auto maf = binProp->getAs<float>( nameMap[DYNAMICS_AABB_MAX] );
+							maxAABB = Math::Vector3( maf );
+						}
+						Core::AABB aabb( minAABB, maxAABB );
+						if( dshape == DYNAMICS_SHAPE_BOX ) {
+							colShape = CORE_NEW BoxColShape( aabb );
+						} else if( dshape == DYNAMICS_SHAPE_CYLINDER ) {
+							colShape = CORE_NEW CylinderColShape( aabb );
+						}
+					} break;
 					case DYNAMICS_SHAPE_SPHERE: {
 						float radius = 1.0f;
 						if( nameMap.find( DYNAMICS_SPHERE_RADIUS ) != nameMap.cend() ) {
 							radius = *binProp->getAs<float>( nameMap[DYNAMICS_SPHERE_RADIUS] );
 						}
 						colShape = CORE_NEW SphereColShape( radius );
-					}
+					} break;
+					default:
+						LOG(INFO) << "Unknown dynamics_shape " << dshape << "\n";
+						colShape = CORE_NEW SphereColShape( 1.0f );
 					break;
 				}
 
@@ -97,7 +116,7 @@ Thing::Thing( Scene::HierPtr hier, const ThingId _id ) :
 						float mass = 1.0f;
 						if( nameMap.find( DYNAMICS_MASSMETHOD ) != nameMap.cend() ) {
 							assert( binProp->getType( nameMap[ DYNAMICS_MASSMETHOD ] ) == BinProperty::BPT_INT32 );
-							auto massMethod = *binProp->getAs<int32_t>( nameMap[DYNAMICS_SHAPE] );
+							auto massMethod = *binProp->getAs<int32_t>( nameMap[DYNAMICS_MASSMETHOD] );
 
 							if( massMethod == DYNAMICS_MASSMETHOD_MASS ) {
 								assert( binProp->getType( nameMap[ DYNAMICS_MASS ] ) == BinProperty::BPT_FLOAT );

@@ -71,10 +71,11 @@ void PlayerShip::update( float timeMS ) {
 	float height = 0;
 	if( findHeightBelow( height ) ) {
 		const auto wpos = ship->getRenderable()->getTransformNode()->getLocalPosition();
-		ship->getRenderable()->getTransformNode()->setLocalPosition( Math::Vector3(wpos.x, height+5, wpos.z) );
+//		ship->getRenderable()->getTransformNode()->setLocalPosition( Math::Vector3(wpos.x, height+5, wpos.z) );
 	}
 	InputFrame input;
 	if( inputContext->dequeueInputFrame( &input ) ) {
+
 		curSideMotion *= 0.1f * input.deltaTime;
 		curForwardMotion *= 0.1f * input.deltaTime;
 
@@ -88,10 +89,19 @@ void PlayerShip::update( float timeMS ) {
 
 		if( fabsf( input.mouseX ) > 1e-8f ) {
 		//	LOG(INFO) << " x " <<input.mouseX << "\n";
-			yRot += (input.mouseX / 1.0f) * angularSpeed  * input.deltaTime;
+			zRot += (input.mouseX / 1.0f) * angularSpeed  * input.deltaTime;
 		}
+		if( fabsf( input.mouseY ) > 1e-8f ) {
+		//	LOG(INFO) << " x " <<input.mouseX << "\n";
+			xRot += (input.mouseY / 1.0f) * angularSpeed  * input.deltaTime;
+		}
+		
+		while( xRot > 360.0f ) xRot -= 360.0f;
+		while( xRot < 0.0f ) xRot += 360.0f;
 		while( yRot > 360.0f ) yRot -= 360.0f;
 		while( yRot < 0.0f ) yRot += 360.0f;
+		while( zRot > 360.0f ) zRot -= 360.0f;
+		while( zRot < 0.0f ) zRot += 360.0f;
 
 		auto xrot = Math::degree_to_radian<float>() * xRot;
 		auto yrot = Math::degree_to_radian<float>() * yRot;

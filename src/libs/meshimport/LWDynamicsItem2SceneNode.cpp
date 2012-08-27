@@ -5,9 +5,12 @@
 #include "meshmod/property.h"
 #include "meshmod/scenenode.h"
 #include "meshops/basicmeshops.h"
+#include "core/aabb.h"
 
 #include "scene/dynamicsproperties.h" // usually meshmod doesn't use scene files but this just makes it easier to keep everything shared
 
+float ExtractSphereShape( MeshMod::SceneNodePtr node );
+bool ExtractAABB( MeshMod::SceneNodePtr node, Core::AABB& aabb );
 bool ExtractCollisionMesh( MeshMod::SceneNodePtr node, std::vector<float>& verts, std::vector<uint32_t>& indices );
 
 void LWDynamicsItem2SceneNode( LightWave::DynamicsItemPlugin* dip, MeshMod::SceneNodePtr scnNode ) {
@@ -20,18 +23,42 @@ void LWDynamicsItem2SceneNode( LightWave::DynamicsItemPlugin* dip, MeshMod::Scen
 	switch( dip->type ) {
 		case 0: type = DYNAMICS_TYPE_DYNAMICS; break;
 		case 1: type = DYNAMICS_TYPE_STATIC; break;
-		// TODO kinematic & parts
-		case 2: type = DYNAMICS_TYPE_DYNAMICS; break; // kinematics
-		case 3: type = DYNAMICS_TYPE_DYNAMICS; break; // parts
+		case 2: type = DYNAMICS_TYPE_KINEMATICS; break; // kinematics
+		case 3: type = DYNAMICS_TYPE_DYNAMICS; break; // TODO parts
 		default: type = DYNAMICS_TYPE_DYNAMICS; break;
 	}
 
 	scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_TYPE, type ) ); 
 	switch( dip->shape ) {
-		case 1: shape = DYNAMICS_SHAPE_SPHERE; break;
-		case 4: shape = DYNAMICS_SHAPE_CONVEXHULL; break;
-		case 5: {
-			shape = DYNAMICS_SHAPE_MESH; 
+		case 0: shape = DYNAMICS_SHAPE_BOX; {
+			Core::AABB aabb;
+			bool ok = ExtractAABB( scnNode, aabb );
+			if( ok ) {
+				const Math::Vector3 minAABB = aabb.getMinExtent();
+				const Math::Vector3 maxAABB = aabb.getMaxExtent();
+
+				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_AABB_MIN, minAABB ) );
+				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_AABB_MAX, maxAABB ) );
+			}
+		} break;	
+		case 1: shape = DYNAMICS_SHAPE_SPHERE; {
+			float radius = ExtractSphereShape( scnNode );
+			scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_SPHERE_RADIUS, radius ) );
+		} break;
+		case 2: shape = DYNAMICS_SHAPE_CYLINDER; {
+			Core::AABB aabb;
+			bool ok = ExtractAABB( scnNode, aabb );
+			if( ok ) {
+				const Math::Vector3 minAABB = aabb.getMinExtent();
+				const Math::Vector3 maxAABB = aabb.getMaxExtent();
+
+				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_AABB_MIN, minAABB ) );
+				scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_AABB_MAX, maxAABB ) );
+			}
+		} break;
+	
+		case 4: shape = DYNAMICS_SHAPE_CONVEXHULL; break; // TODO
+		case 5: shape = DYNAMICS_SHAPE_MESH; {
 			// extract vertices and indices from visual mesh (TODO? collision mesh overrides?)
 			// we (as of yet at least) don't try and construct a collision mesh if an LWO wasn't
 			// backing it
@@ -61,6 +88,54 @@ void LWDynamicsItem2SceneNode( LightWave::DynamicsItemPlugin* dip, MeshMod::Scen
 	scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_RESTITUTION, dip->restitution ) );
 	scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_LINEARDAMPING, dip->linearDamping ) );
 	scnNode->properties.push_back( std::make_shared<Property>( DYNAMICS_ANGULARDAMPING, dip->angularDamping ) );
+}
+
+
+float ExtractSphereShape( MeshMod::SceneNodePtr node ) {
+	using namespace MeshMod;
+	if( node->getObjectCount() == 0)
+		return false;
+
+	Core::AABB aabb;
+	for( unsigned int j=0; j < node->getObjectCount(); ++j ) {
+		SceneObjectPtr sobj = node->getObject(j);
+
+		if( sobj->getType() == "mesh" || sobj->getType() == "Mesh" ) {
+			MeshPtr omesh = std::dynamic_pointer_cast<Mesh>(sobj);
+			Core::AABB localAABB;
+			MeshOps::BasicMeshOps ops( omesh );
+			ops.computeAABB( localAABB );
+			aabb.expandBy( localAABB );
+		}
+	}
+	if( aabb.isValid() ) {
+		return Math::Length( aabb.getHalfLength() );
+	} else {
+		return 1.0f;
+	}
+}
+
+bool ExtractAABB( MeshMod::SceneNodePtr node, Core::AABB& aabb ) {
+	using namespace MeshMod;
+	if( node->getObjectCount() == 0)
+		return false;
+
+	for( unsigned int j=0; j < node->getObjectCount(); ++j ) {
+		SceneObjectPtr sobj = node->getObject(j);
+
+		if( sobj->getType() == "mesh" || sobj->getType() == "Mesh" ) {
+			MeshPtr omesh = std::dynamic_pointer_cast<Mesh>(sobj);
+			Core::AABB localAABB;
+			MeshOps::BasicMeshOps ops( omesh );
+			ops.computeAABB( localAABB );
+			aabb.expandBy( localAABB );
+		}
+	}
+	if( aabb.isValid() ) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool ExtractCollisionMesh( MeshMod::SceneNodePtr node, std::vector<float>& verts, std::vector<uint32_t>& indices ) {

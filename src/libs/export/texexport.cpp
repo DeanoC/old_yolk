@@ -54,7 +54,7 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 			for( auto x = 0;x < in.width; ++x ) {
 				// make channel mismatch obvious
 				memset( expandedData, 0xFF, sizeof(uint32_t) * 4 );
-				for( auto c = 0; c < in.channels; ++c ) {
+				for( uint32_t c = 0; c < in.channels; ++c ) {
 					switch( dataSize ) {
 						case 4: expandedData[c] = Up1chan32bit( data++ ); break;
 						case 2: expandedData[c] = Up1chan16bit( data++ ); break;
@@ -87,7 +87,7 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 				int accumCount = 32;
 				uint32_t payload;
 				// now cut back down to out precision and channels
-				for( auto c = 0; c < outChannels; ++c ) {
+				for( unsigned int c = 0; c < outChannels; ++c ) {
 					const auto chanBits = GtfFormat::getChannelBits( outFmt, c );
 					expandedData[c] >>= (32 - chanBits);
 					expandedData[c] &= ((1 << chanBits) - 1);
@@ -144,7 +144,7 @@ void SaveTexture( const TextureExport& tex, const Core::FilePath outFilename ) {
 	outStream << "//---------------------------------------------\n";
 	outStream << "beginLabel:\n";
 
-	for( int i = 0; i < tex.bitmaps.size(); ++i ) {
+	for( size_t i = 0; i < tex.bitmaps.size(); ++i ) {
 		WriteTexture( tex.bitmaps[i], tex.outFormat, outStream );
 	}
 

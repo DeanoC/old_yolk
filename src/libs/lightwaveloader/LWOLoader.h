@@ -51,7 +51,8 @@ namespace LightWave
 		std::vector<Layer>				layers;			///< layer table
 		std::vector<Clip>				clip;				///< Clip table
 		std::map<unsigned int, Surface*> surfaceMap;
-
+		VEC12							bboxMin;
+		VEC12							bboxMax;
 	private:
 		Layer*				curLayer;		///< current layer
 		Clip*				curClip;		///< current clip
@@ -82,6 +83,7 @@ namespace LightWave
 		void TAGSReader2(FILE *f, long p, long maxSize);
 		void LAYRReader2(FILE *f, long p, long maxSize);
 		void PNTSReader2(FILE *f, long p, long maxSize);
+		void BBOXReader2(FILE *f, long p, long maxSize);
 
 		// vertex maps
 		void VMAPReader2(FILE *f, long p, long maxSize);

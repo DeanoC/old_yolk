@@ -19,6 +19,7 @@
 #include <meshmod/halfedgevertex.h>
 #include <meshmod/pointrepvertex.h>
 #include <meshmod/halfedge.h>
+#include <core/aabb.h>
 #include "basicmeshops.h"
 
 namespace MeshOps {
@@ -110,7 +111,6 @@ void BasicMeshOps::computeFacePlaneEquations( bool replaceExisting, bool zeroBad
 	}
 }
 
-
 /**
 Computes and store per vertex normals.
 If the object already has vertex normals they will be kept if replaceExising == false.
@@ -183,6 +183,22 @@ void BasicMeshOps::computeVertexNormals( bool replaceExisting ) {
 		++normIt;
 	}
 
+}
+/**
+Computes and returns the axis aligned box from the meshes position
+*/
+void BasicMeshOps::computeAABB( Core::AABB& aabb ) {
+	using namespace MeshMod;
+	const VertexElementsContainer& vertCon = mesh->getVertexContainer();
+	const PositionVertexElements* posEle = vertCon.getElements<PositionVertexElements>();
+
+	aabb = Core::AABB(); // reset aabb
+	// now normalise all normals
+	PositionVertexElements::const_iterator posIt = posEle->cbegin();
+	while( posIt != posEle->cend() ) {
+		aabb.expandBy( Math::Vector3( (*posIt).x,  (*posIt).y,  (*posIt).z ) );
+		++posIt;
+	}
 }
 
 /**

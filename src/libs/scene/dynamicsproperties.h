@@ -14,14 +14,18 @@
 
 #define DYNAMICS_TYPE_STATIC		0
 #define DYNAMICS_TYPE_DYNAMICS		1
+#define DYNAMICS_TYPE_KINEMATICS	2
 
 #define DYNAMICS_SHAPE_SPHERE		0
 #define DYNAMICS_SHAPE_BOX			1
 #define DYNAMICS_SHAPE_CONVEXHULL	2
 #define DYNAMICS_SHAPE_MESH			3
+#define DYNAMICS_SHAPE_CYLINDER		4
 
 #define DYNAMICS_SPHERE_RADIUS		"dynamics_sphere_radius"
-#define DYNAMICS_BOX_EXTENTS		"dynamics_box_extents"
+#define DYNAMICS_AABB_MIN			"dynamics_aabb_min"
+#define DYNAMICS_AABB_MAX			"dynamics_aabb_max"
+
 // convex hull TODO
 #define DYNAMICS_MAX_MESH_VERTICES	(65535)
 #define DYNAMICS_MAX_MESH_INDICES	(65535)

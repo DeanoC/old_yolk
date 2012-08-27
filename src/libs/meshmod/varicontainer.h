@@ -76,8 +76,8 @@ namespace MeshMod {
 
 		iterator begin() { return elements.begin(); }
 		iterator end() { return elements.end(); }
-		const_iterator cbegin() { return elements.cbegin(); }
-		const_iterator cend() { return elements.cend(); }
+		const_iterator cbegin() const { return elements.cbegin(); }
+		const_iterator cend() const { return elements.cend(); }
 
 		void push_back( const DataType& data ) {
 			elements.push_back( data );

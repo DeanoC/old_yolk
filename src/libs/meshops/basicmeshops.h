@@ -6,6 +6,9 @@
 #if !defined( GOOPERATIONS_BASICMESHOPS_H_ )
 #define GOOPERATIONS_BASICMESHOPS_H_
 
+namespace Core {
+	class AABB;
+}
 namespace MeshOps {
 	/**
 		Basic Mesh Ops performs a bunch of common simple operations a mesh
@@ -28,6 +31,9 @@ namespace MeshOps {
 	
 		//! runs a simple n-gon to triangles, leaving others (inlcuding quads) alone
 		void quadOrTriangulate();
+
+		//! computes and returns the axis aligned bounding box from the meshes positions
+		void computeAABB( Core::AABB& aabb );
 
 	private:
 		MeshMod::MeshPtr	mesh;

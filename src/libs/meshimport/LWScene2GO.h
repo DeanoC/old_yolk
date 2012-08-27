@@ -19,7 +19,7 @@
 
 namespace LightWave {
 	class SceneLoader;
-	class Node;
+	struct Node;
 }
 
 namespace MeshImport
@@ -47,7 +47,7 @@ namespace MeshImport
 		bool LWNodeHasAnimation( const LightWave::Node* node );
 		void ConvertChannelGroup( const LightWave::Node* in, MeshMod::SceneNodePtr out );
 
-		std::map<const LightWave::Node*, class TempNode*> nodeMap;
+		std::map<const LightWave::Node*, struct TempNode*> nodeMap;
 
 		LightWave::SceneLoader*	scene;
 	};
