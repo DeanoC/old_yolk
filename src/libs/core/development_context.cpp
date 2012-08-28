@@ -75,8 +75,8 @@ void DevelopmentContext::update( float fTimeInSecs ) {
 		// simulate pad input on keyboard for windows
 		float x = 0.f, y = 0.f;
 		if( Keyboard::exists() ) {
-			x += Keyboard::get()->keyDown(KT_A) ? 1.f : 0.f;
-			x += Keyboard::get()->keyDown(KT_D) ? -1.f : 0.f;
+			x += Keyboard::get()->keyDown(KT_A) ? -1.f : 0.f;
+			x += Keyboard::get()->keyDown(KT_D) ? 1.f : 0.f;
 			y += Keyboard::get()->keyDown(KT_W) ? 1.f : 0.f;
 			y += Keyboard::get()->keyDown(KT_S) ? -1.f : 0.f;
 

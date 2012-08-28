@@ -61,5 +61,10 @@ void Physical::setWorldTransform(const btTransform& worldTrans) {
 	transform->setLocalPosition( Math::Vector3( origin[0], origin[1], origin[2] ) );
 	transform->setLocalOrientation( Math::Quaternion( orient[0], orient[1], orient[2], orient[3] ) );
 }
+void Physical::syncBulletTransform() {
+	btTransform bt;
+	getWorldTransform( bt );
+	body->setWorldTransform( bt );
+}
 
 }

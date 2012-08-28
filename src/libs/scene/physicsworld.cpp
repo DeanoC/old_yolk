@@ -57,7 +57,7 @@ PhysicsWorld::PhysicsWorld() :
 	debugDraw  = CORE_NEW BulletDebugDraw();
 	debugDraw->setDebugMode( 0 );
 	dynamicsWorld->setDebugDrawer( debugDraw );
-	nextPhysicsDebugMode();
+	//nextPhysicsDebugMode();
 
 	dynamicsWorld->setGravity(btVector3(0,-9.8f,0));
 }
@@ -96,7 +96,7 @@ PhysicsWorld::~PhysicsWorld() {
 }
 
 void PhysicsWorld::doSim( float delta ) {
-	dynamicsWorld->stepSimulation( delta );
+	dynamicsWorld->stepSimulation( delta, 7, btScalar(1.f)/btScalar(120.f) );
 	dynamicsWorld->debugDrawWorld();
 }
 

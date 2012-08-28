@@ -23,18 +23,8 @@ private:
 	std::shared_ptr<ZarchCam>				zarchCam;
 	std::shared_ptr<ObjectCam>				objectCam;
 
-	float lastMouseX;
-	float lastMouseY;
-
-	float xRot;
-	float yRot;
-	float zRot;
 	float speed;
 	float angularSpeed;
-	Math::Vector3 position;
-
-	float curForwardMotion;
-	float curSideMotion;
 };
 
 #endif

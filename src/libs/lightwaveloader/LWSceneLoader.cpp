@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "lightwaveloader.h"
 #include <stack>
+#include <boost/lexical_cast.hpp>
 #include "LWNode.h"
 #include "LWObject.h"
 #include "LWBone.h"
@@ -534,12 +535,19 @@ void SceneLoader::LoadObjectLayerKeyV5(FILE* f, const char* ValueText)
 
 	assert(curObject == 0);
 
+	// not ssure of number field but some part of the lower bits
+	// seem to be the coutn of this object LW shows it as name (number) in the name
+
 	objects.push_back( new Object() );
 	curObject = objects.back();
 	curObject->name = fileName;
 
+	int cloneNum = atoi(numberText);
+	cloneNum -= 10000000;
+
 	curObject->layer = layer;
 	curObject->type = Object::OBJECT;
+	curObject->cloneNum = cloneNum;
 	curChannelGroup = &curObject->channels;
 
 	subKeyReader( f, ObjectKey, EndSubKeyArray );
@@ -581,9 +589,13 @@ void SceneLoader::AddNullObjectKeyV5(FILE* f, const char* ValueText) {
 
 	objects.push_back( new Object() );
 	curObject = objects.back();
+	
+	int cloneNum = atoi(numberText);
+	cloneNum -= 10000000;
 
 	curObject->name = name;
 	curObject->type = Object::NULL_OBJECT;
+	curObject->cloneNum = cloneNum;
 	curChannelGroup = &curObject->channels;
 
 	subKeyReader( f, ObjectKey, EndSubKeyArray );

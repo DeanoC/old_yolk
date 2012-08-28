@@ -9,35 +9,48 @@
 #include "mouse_win.h"
 extern HWND g_hWnd;
 
+//#define GetOurCursorPos( x ) GetPhysicalCursorPos( x )
+//#define SetOurCursorPos( x, y ) SetPhysicalCursorPos( x, y )
+#define GetOurCursorPos( x ) GetCursorPos( x )
+#define SetOurCursorPos( x, y ) SetCursorPos( x, y )
+
 namespace Core {
 
 /**
 MouseWin
 */
-MouseWin::MouseWin() : numSamples(0) {
-	update();
-	lastTime = Clock::time( Clock::get()->getInstantTicks() );
-
-	lockToWindow();
+MouseWin::MouseWin() : cursorVisible( true ) {
+//	lockToWindow();
 	hideCursor();
 
 	POINT pt;
-	GetPhysicalCursorPos( &pt );
+	GetOurCursorPos( &pt );
 	midX = pt.x;
 	midY = pt.y;
-	xPos = midX;
-	yPos = midY;		
-	
+	hasFocus = true;
 }
 
 MouseWin::~MouseWin() {
 }
 
 void MouseWin::update() {
-	averageSamples();
+	if( hasFocus ) {
+		POINT pt;
+		GetOurCursorPos( &pt );
+		xPos = pt.x - midX;// / timeDelta;		
+		yPos = pt.y - midY;// / timeDelta;
+			
+		SetOurCursorPos( midX, midY );
+	}
 }
 
 void MouseWin::processMouseMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
+	hasFocus = (GetFocus() == g_hWnd);
+	if( hasFocus == false ) {
+		showCursor();
+	} else {
+		hideCursor();
+	}
 	bLeftButton = false;
 	bRightButton = false;
 	bMiddleButton = false;
@@ -56,12 +69,10 @@ void MouseWin::processMouseMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 		uMsg == WM_XBUTTONDOWN ||
 		uMsg == WM_XBUTTONUP ||
 		uMsg == WM_XBUTTONDBLCLK ||
-		uMsg == WM_MOUSEWHEEL ||
-		uMsg == WM_MOUSEMOVE ) {
+		uMsg == WM_MOUSEWHEEL ) {
 
 
-		if( uMsg == WM_MOUSEMOVE ) {
-		} else {	
+		if( uMsg == WM_MOUSEWHEEL ) {
 			// WM_MOUSEWHEEL passes screen mouse coords
 			nMouseWheelDelta += ( short )HIWORD( wParam );
 		}
@@ -73,7 +84,6 @@ void MouseWin::processMouseMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 		bMiddleButton |= ( ( nMouseButtonState & MK_MBUTTON ) != 0 );
 		bSideButton1 |= ( ( nMouseButtonState & MK_XBUTTON1 ) != 0 );
 		bSideButton2 |= ( ( nMouseButtonState & MK_XBUTTON2 ) != 0 );
-		numSamples++;
 	} 
 
 };
@@ -91,19 +101,16 @@ void MouseWin::unlockFromWindow() {
 	ClipCursor(NULL);
 }
 void MouseWin::showCursor() {
-	ShowCursor( 1 );
+	if( !cursorVisible ) {
+		ShowCursor( 1 );
+		cursorVisible = true;
+	}
 }
 void MouseWin::hideCursor() {
-	ShowCursor( 0 );
+	if( cursorVisible ) {
+		ShowCursor( 0 );
+		cursorVisible = false;
+	}
 }
-void MouseWin::averageSamples() {
-	POINT pt;
-	GetPhysicalCursorPos( &pt );
-	avgXPos = pt.x - midX;// / timeDelta;		
-	avgYPos = pt.y - midY;// / timeDelta;
-			
-	SetPhysicalCursorPos( midX, midY );
-}
-
 
 }

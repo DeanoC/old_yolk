@@ -317,6 +317,8 @@ namespace Math {
 	CALL inline Vector3 ComponentMultiply( const Vector3& vecA, const Vector3& vecB ){ return Math::Vector3( vecA[0]*vecB[0], vecA[1]*vecB[1], vecA[2]*vecB[2] ); } 
 	CALL inline Vector4 ComponentMultiply( const Vector4& vecA, const Vector4& vecB ){ return Math::Vector4( vecA[0]*vecB[0], vecA[1]*vecB[1], vecA[2]*vecB[2], vecA[3]*vecB[3] ); } 
 
+	template <typename T> int Sign(T val) { return (T(0) < val) - (val < T(0)); }
+
 	CALL inline float	Reciprocal( const float& a ) { return 1.0f / a; }
 	CALL inline Vector2 Reciprocal( const Vector2& vecA ){ return Math::Vector2( 1.0f / vecA[0], 1.0f / vecA[1] ); } 
 	CALL inline Vector3 Reciprocal( const Vector3& vecA ){ return Math::Vector3( 1.0f / vecA[0], 1.0f / vecA[1], 1.0f / vecA[2] ); } 

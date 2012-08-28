@@ -91,7 +91,7 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 	RenderableContainer::const_iterator it = renderables.cbegin();
 	while( it != renderables.cend() ) {
 		auto meshCount = (*it)->getActualRenderablesOfType( Renderable::R_MESH, 100, gatherArray );
-		for( auto i = 0;i < meshCount; ++i ) {
+		for( unsigned int i = 0;i < meshCount; ++i ) {
 			gatherArray[i]->getTransformNode()->setRenderMatrix();
 			gatherArray[i]->getWorldAABB( waabb );
 			// TODO cull

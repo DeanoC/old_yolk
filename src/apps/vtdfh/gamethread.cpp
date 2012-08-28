@@ -16,6 +16,7 @@ GameThread::GameThread( SceneWorldPtr _world ) {
 				float deltaT = Core::Clock::get()->update();
 				Core::DevelopmentContext::get()->update( deltaT );
 				world->update( deltaT );
+				Core::Clock::sleep( Math::Clamp(1.0f/120.0f - deltaT,0.0f,1.0f) );
 			}
 			shutdownFinished = true;
 	} );

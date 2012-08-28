@@ -42,6 +42,7 @@ namespace LightWave
 		}
 
 		unsigned int		layer;
+		unsigned int		cloneNum;
 		std::vector<Bone*>	bones;
 		BONE_FALLOFF		fallOffType;
 					
@@ -49,7 +50,9 @@ namespace LightWave
 
 		Object() :
 			fallOffType(INVERSE_DISTANCE_POW4),
-			loader( 0 ) {}
+			loader( 0 ),
+			layer( 0 ),
+			cloneNum( 0 ) {}
 		~Object() {
 			//delete m_loader;
 		}

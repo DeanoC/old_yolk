@@ -26,6 +26,8 @@ namespace Scene {
 		virtual float getMass() const { return 0.0f; }
 		virtual Math::Vector3 getLocalInertia() const { return Math::Vector3(0,0,0); }
 		Core::TransformNode* getTransformNode() const { return transform; }
+		// physical objects normally are driven by bullet, sometimes however its useful to force this transform node on bullet
+		void syncBulletTransform();
 
 		// btMotionState interface
 		virtual void    getWorldTransform( btTransform& worldTrans ) const override;

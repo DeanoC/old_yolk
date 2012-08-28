@@ -1,4 +1,5 @@
 #include "vtdfh.h"
+#include "core/debug_render.h"
 #include "core/development_context.h"
 #include "localworld/inputhandlercontext.h"
 #include "btBulletCollisionCommon.h"
@@ -9,20 +10,15 @@
 
 PlayerShip::PlayerShip( SceneWorldPtr _world, int _localPlayerNum ) :
 	world( _world ),
-	xRot( 0 ), yRot( 0 ), zRot( 0 ),
-	curSideMotion( 0 ), curForwardMotion( 0 ),
-	speed( 450.0f ),			// meters per second
-	angularSpeed( 2160.f ),		// degrees per second
+	speed( 1.0f * 1e8f ),		// newton second
+	angularSpeed( 3.0f * 1e7f ),		// newton second
 	localPlayerNum( _localPlayerNum ) {
-
-	lastMouseX = 0;
-	lastMouseY = 0;
 
 	ship = std::make_shared<Thing>( std::make_shared<Scene::Hier>( "stinger" ) );
 
 	zarchCam = std::make_shared<ZarchCam>();
 	zarchCam->setTrackingThing( ship );
-	zarchCam->setOffset( Math::Vector3(0,100,0) );
+	zarchCam->setOffset( Math::Vector3(0,50,0) );
 	world->add( static_cast<Updatable*>( zarchCam.get() ) );
 	objectCam = std::make_shared<ObjectCam>();
 	objectCam->setObject( ship );
@@ -36,7 +32,10 @@ PlayerShip::PlayerShip( SceneWorldPtr _world, int _localPlayerNum ) :
 
 	world->add( ship ); // render object
 	world->add( static_cast<Updatable*>( this ) ); // updateble interface
-
+	ship->getRenderable()->getTransformNode()->setLocalPosition( Math::Vector3(100,20,0) );
+	if( ship->getPhysicalCount() ) {
+		ship->getPhysical()->syncBulletTransform();
+	}
 }
 
 
@@ -68,59 +67,65 @@ bool PlayerShip::findHeightBelow( float& height ) {
 }
 
 void PlayerShip::update( float timeMS ) {
-	float height = 0;
-	if( findHeightBelow( height ) ) {
-		const auto wpos = ship->getRenderable()->getTransformNode()->getLocalPosition();
-//		ship->getRenderable()->getTransformNode()->setLocalPosition( Math::Vector3(wpos.x, height+5, wpos.z) );
-	}
+	if( !ship->getPhysicalCount() ) return;
+
+	auto p = ship->getPhysical();
+	auto r = ship->getRenderable();
+	auto rb = p->getRigidBody();
+
+	btVector3 colCenter;
+	float colRadius;
+	rb->getCollisionShape()->getBoundingSphere( colCenter, colRadius );
+
 	InputFrame input;
+	// anti-gravity
+	btVector3 force(0,(9.81f*ship->getPhysical()->getMass() ),0);
+	ship->getPhysical()->getRigidBody()->applyCentralImpulse( force * timeMS );
+
 	if( inputContext->dequeueInputFrame( &input ) ) {
+		rb->activate();
 
-		curSideMotion *= 0.1f * input.deltaTime;
-		curForwardMotion *= 0.1f * input.deltaTime;
-
-		if( fabs( input.pad[0].XAxisMovement ) > 1e-2f ) {
-			curSideMotion += input.pad[0].XAxisMovement * speed * input.deltaTime;
-//			yRot -= input.pad[0].XAxisMovement * angularSpeed  * input.deltaTime;
+		if( input.pad[0].debugButton1 ) {
+			auto& pw = world->getPhysicsWorld();
+			pw.nextPhysicsDebugMode();
 		}
-		if( fabs( input.pad[0].YAxisMovement ) > 1e-2f ) {
-			curForwardMotion += input.pad[0].YAxisMovement * speed * input.deltaTime;
+		if( input.pad[0].debugButton2 ) {
+			if( inputContext->getCamera() == objectCam ) {
+				inputContext->setCamera( zarchCam );
+			} else {
+				inputContext->setCamera( objectCam );
+			}
 		}
-
-		if( fabsf( input.mouseX ) > 1e-8f ) {
-		//	LOG(INFO) << " x " <<input.mouseX << "\n";
-			zRot += (input.mouseX / 1.0f) * angularSpeed  * input.deltaTime;
-		}
-		if( fabsf( input.mouseY ) > 1e-8f ) {
-		//	LOG(INFO) << " x " <<input.mouseX << "\n";
-			xRot += (input.mouseY / 1.0f) * angularSpeed  * input.deltaTime;
-		}
-		
-		while( xRot > 360.0f ) xRot -= 360.0f;
-		while( xRot < 0.0f ) xRot += 360.0f;
-		while( yRot > 360.0f ) yRot -= 360.0f;
-		while( yRot < 0.0f ) yRot += 360.0f;
-		while( zRot > 360.0f ) zRot -= 360.0f;
-		while( zRot < 0.0f ) zRot += 360.0f;
-
-		auto xrot = Math::degree_to_radian<float>() * xRot;
-		auto yrot = Math::degree_to_radian<float>() * yRot;
-		auto zrot = Math::degree_to_radian<float>() * zRot;
-
-		auto xq = CreateRotationQuat( Math::Vector3(1,0,0), xrot );
-		auto yq = CreateRotationQuat( Math::Vector3(0,1,0), yrot );
-		auto zq = CreateRotationQuat( Math::Vector3(0,0,1), zrot );
-		auto rq = xq * yq * zq;
-
-		Math::Matrix4x4 rm( Math::CreateRotationMatrix( rq ) );
+		Math::Matrix4x4 rm( r->getTransformNode()->getWorldMatrix() );
 		Math::Vector3 xvec = Math::GetXAxis( rm );
+		Math::Vector3 yvec = Math::GetYAxis( rm );
 		Math::Vector3 zvec = Math::GetZAxis( rm );
+		Math::Vector3 pos = Math::GetTranslation( rm );
 
-		// move along forward and side motion direction	
-		auto position = ship->getRenderable()->getTransformNode()->getLocalPosition();
-		position -= (xvec * curSideMotion);
-		position += (zvec * curForwardMotion);
-		ship->getRenderable()->getTransformNode()->setLocalPosition( position );
-		ship->getRenderable()->getTransformNode()->setLocalOrientation( rq );
+		if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
+			Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * speed;
+			btVector3 mainengine(fv[0],fv[1],fv[2]);
+			rb->applyCentralImpulse( mainengine * timeMS );
+		}
+		if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
+			Math::Vector3 sv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * speed;
+			btVector3 sidethruster(sv[0], sv[1], sv[2]);
+			rb->applyCentralImpulse( sidethruster * timeMS );
+		}
+
+		float mxdt = input.mouseX  * input.deltaTime;
+		if( fabsf(mxdt) > 0.0001f ) {
+			mxdt = Math::Clamp(mxdt, -0.001f, 0.001f );
+			Math::Vector3 sv = (-zvec * mxdt) * angularSpeed * 0.5f;
+			btVector3 banker(sv[0],sv[1],sv[2]);
+			rb->applyTorqueImpulse( banker * timeMS );
+		}
+		float mydt = input.mouseY  * input.deltaTime;
+		if( fabsf(mydt) > 0.0001f ) {
+			mydt = Math::Clamp(mydt, -0.001f, 0.001f );
+			Math::Vector3 sv = (xvec * mydt) * angularSpeed;
+			btVector3 banker(sv[0],sv[1],sv[2]);
+			rb->applyTorqueImpulse( banker * timeMS );
+		}
 	}
 }

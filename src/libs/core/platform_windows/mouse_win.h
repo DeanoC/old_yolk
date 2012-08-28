@@ -23,10 +23,10 @@ public:
 	void hideCursor();
 
 	float getXPos() {
-		return avgXPos;
+		return (float)xPos;
 	}
 	float getYPos() {
-		return avgYPos;
+		return (float)yPos;
 	}
 	bool getLeftMouseButton() {
 		return bLeftButton;
@@ -35,25 +35,19 @@ public:
 		return bRightButton;
 	}
 protected:
-	void averageSamples();
-
 	bool bLeftButton;
 	bool bRightButton;
 	bool bMiddleButton;
 	bool bSideButton1;
 	bool bSideButton2;
 
-	int numSamples;
 	int nMouseWheelDelta;
 	int midX;
 	int midY;
 	int xPos;
 	int yPos;
-	float time;
-	float lastTime;
-	int avgMouseWheelDelta;
-	int avgXPos;
-	int avgYPos;
+	bool hasFocus;
+	bool cursorVisible;
 
 };
 
