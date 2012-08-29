@@ -125,6 +125,10 @@ SceneLoader::SceneLoader() :
 {
 	registerMasterPlugin( ".DynamicsMaster", &SceneLoader::DynamicsMasterPluginCallback );
 	registerItemMotionPlugin( ".DynamicsMotion", &SceneLoader::DynamicsItemPluginCallback );
+	registerCustomObjPlugin( "VTDFH_Level", &SceneLoader::VtdfhLevelPluginCallback );
+	registerCustomObjPlugin( "VTDFH_Enemy", &SceneLoader::VtdfhEnemyPluginCallback );
+	registerCustomObjPlugin( "VTDFH_Marker", &SceneLoader::VtdfhMarkerPluginCallback );
+
 }
 
 SceneLoader::~SceneLoader() {
@@ -299,6 +303,10 @@ void SceneLoader::registerMasterPlugin( const std::string& name, PluginCallback 
 void SceneLoader::registerItemMotionPlugin( const std::string& name, PluginCallback pPlugin ) {
 	assert( itemMotionPluginRegistry.find( name ) == itemMotionPluginRegistry.end() );
 	itemMotionPluginRegistry[ name ] = pPlugin;
+}
+void SceneLoader::registerCustomObjPlugin( const std::string& name, PluginCallback pPlugin ) {
+	assert( customObjectPluginRegistry.find( name ) == customObjectPluginRegistry.end() );
+	customObjectPluginRegistry[ name ] = pPlugin;
 }
 
 
@@ -513,8 +521,12 @@ void SceneLoader::LoadObjectLayerKey(FILE* f, const char* ValueText)
 
 	subKeyReader( f, ObjectKey, EndSubKeyArray );
 
-	curObject->loader = CORE_NEW LightWave::LWO_Loader( curObject->name );
-
+	if( lwoLoaderCache.find( curObject->name ) == lwoLoaderCache.end() ) {
+		curObject->loader = CORE_NEW LightWave::LWO_Loader( curObject->name );
+		lwoLoaderCache[ curObject->name ] = curObject->loader;
+	} else {
+		curObject->loader = lwoLoaderCache[ curObject->name ];
+	}
 	curChannelGroup = 0;
 	curObject = 0;
 }
@@ -542,18 +554,19 @@ void SceneLoader::LoadObjectLayerKeyV5(FILE* f, const char* ValueText)
 	curObject = objects.back();
 	curObject->name = fileName;
 
-	int cloneNum = atoi(numberText);
-	cloneNum -= 10000000;
-
 	curObject->layer = layer;
 	curObject->type = Object::OBJECT;
-	curObject->cloneNum = cloneNum;
+	curObject->objNum = strtoul(numberText, nullptr, 16 );
 	curChannelGroup = &curObject->channels;
 
 	subKeyReader( f, ObjectKey, EndSubKeyArray );
 
-	curObject->loader = CORE_NEW LightWave::LWO_Loader( (std::string("../") + std::string(curObject->name)).c_str() );
-
+	if( lwoLoaderCache.find( curObject->name ) == lwoLoaderCache.end() ) {
+		curObject->loader = CORE_NEW LightWave::LWO_Loader( (std::string("../") + std::string(curObject->name)).c_str() );
+		lwoLoaderCache[ curObject->name ] = curObject->loader;
+	} else {
+		curObject->loader = lwoLoaderCache[ curObject->name ];
+	}
 	curChannelGroup = 0;
 	curObject = 0;
 }
@@ -590,12 +603,9 @@ void SceneLoader::AddNullObjectKeyV5(FILE* f, const char* ValueText) {
 	objects.push_back( new Object() );
 	curObject = objects.back();
 	
-	int cloneNum = atoi(numberText);
-	cloneNum -= 10000000;
-
 	curObject->name = name;
 	curObject->type = Object::NULL_OBJECT;
-	curObject->cloneNum = cloneNum;
+	curObject->objNum = strtoul(numberText, nullptr, 16 );
 	curChannelGroup = &curObject->channels;
 
 	subKeyReader( f, ObjectKey, EndSubKeyArray );
@@ -946,9 +956,17 @@ void SceneLoader::PluginKey(FILE* f, const char* ValueText)
 			(this->*func)( f );
 		}
 		curNodePlugin = nullptr;
+	} else if( strcmp( type, "CustomObjHandler" ) == 0 ) {
+		assert( curObject != 0 );
+
+		// custom object plugins
+		PlugInMap::const_iterator plIt = customObjectPluginRegistry.find( name );
+		if( plIt != customObjectPluginRegistry.end() ) {
+			auto func = plIt->second;
+			(this->*func)( f );
+		}
+		curNodePlugin = nullptr;
 	}
-
-
 }
 void SceneLoader::EndPluginKey(FILE* f, const char* ValueText) {
 	UNREFERENCED_PARAMETER( f );

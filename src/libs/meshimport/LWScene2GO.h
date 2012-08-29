@@ -20,6 +20,7 @@
 namespace LightWave {
 	class SceneLoader;
 	struct Node;
+	class LWO_Loader;
 }
 
 namespace MeshImport
@@ -50,6 +51,8 @@ namespace MeshImport
 		std::map<const LightWave::Node*, struct TempNode*> nodeMap;
 
 		LightWave::SceneLoader*	scene;
+		std::unordered_map< std::string, LightWave::LWO_Loader*> lwoLoaderCache;
+//		std::unordered_map< std::string, MeshMod::MeshPtr> meshCache;
 	};
 
 

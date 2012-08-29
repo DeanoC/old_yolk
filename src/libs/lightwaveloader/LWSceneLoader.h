@@ -24,6 +24,7 @@
 namespace LightWave
 {
 	class NodePlugin;
+	class LWO_Loader;
 
 	/**
 	object representing a light wave scene.
@@ -57,6 +58,7 @@ namespace LightWave
 		typedef void (SceneLoader::*PluginCallback)( FILE *f );
 		void registerMasterPlugin( const std::string& name, PluginCallback pPlugin );
 		void registerItemMotionPlugin( const std::string& name, PluginCallback pPlugin );
+		void registerCustomObjPlugin( const std::string& name, PluginCallback pPlugin );
 
 		void keyReader( FILE *f );
 		void subKeyReader(FILE *f, const KEY_DATA* subKeyArray, const KEY_DATA* exitKeyArray);
@@ -73,6 +75,7 @@ namespace LightWave
 		char				lineBuffer[255];
 		bool				ungetLastLine;
 		char				lastLineBuffer[255];
+		std::unordered_map< std::string, LightWave::LWO_Loader*> lwoLoaderCache;
 
 		Bone*				curBone;
 		Object*				curObject;
@@ -83,6 +86,7 @@ namespace LightWave
 		typedef std::map<std::string, PluginCallback > PlugInMap;
 		PlugInMap masterPluginRegistry;
 		PlugInMap itemMotionPluginRegistry;
+		PlugInMap customObjectPluginRegistry;
 	
 	public:
 		// keys
@@ -175,7 +179,19 @@ namespace LightWave
 		void DynamicsItemPositionSolverIterationsSubKey( FILE* f, const char* ValueText );
 		void DynamicsItemDriftSolverIterationsSubKey( FILE* f, const char* ValueText );
 		void DynamicsItemClusterSolverIterationsSubKey( FILE* f, const char* ValueText );
-
+		
+		// vtdfh (game) level plugin
+		void VtdfhLevelPluginCallback( FILE* f );
+		void VtdfhLevelNameSubKey( FILE* f, const char* ValueText );
+		void VtdfhLevelDescSubKey( FILE* f, const char* ValueText );
+		// vtdfh (game) enemy plugin
+		void VtdfhEnemyPluginCallback( FILE* f );
+		void VtdfhEnemySubKey( FILE* f, const char* ValueText );
+		void VtdfhEnemyTypeSubKey( FILE* f, const char* ValueText );
+		// vtdfh (game) marker plugin
+		void VtdfhMarkerPluginCallback( FILE* f );
+		void VtdfhMarkerSubKey( FILE* f, const char* ValueText );
+		void VtdfhMarkerTypeSubKey( FILE* f, const char* ValueText );
 
 	};
 }

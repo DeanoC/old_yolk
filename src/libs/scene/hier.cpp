@@ -61,8 +61,7 @@ Hier::Hier( const char* pFilename ) :
 			}
 
 			if( node->type == HNT_MESH ) {
-				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( 
-					node->meshName.p, &nodeArray[i] );
+				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( node->meshName.p, &nodeArray[i] );
 				ownedMeshes.push_back( mesh );
 				localAabb.expandBy( mesh->getLocalAabb() );
 			}			

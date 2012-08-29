@@ -22,11 +22,6 @@ Thing::Thing( Scene::HierPtr hier, const ThingId _id ) :
 {
 	using namespace Core;
 	using namespace Scene;
-	// does it have an environment settings
-	auto envProp = hier->getEnvironment();
-	if( envProp ) {
-		// TODO set global properities here?
-	}
 
 	auto nodeCount = hier->getNodeCount();
 

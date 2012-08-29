@@ -13,13 +13,16 @@
 //---------------------------------------------------------------------------
 #include "meshimport.h"
 #include "core/file_path.h"
-
+#include <boost/lexical_cast.hpp>
 #include "LWScene2GO.h"
 #include "LWObject2GO.h"
 #include "lightwaveloader/LWObject.h"
 #include "lightwaveloader/LWSceneLoader.h"
 #include "lightwaveloader/DynamicsMasterPlugin.h"
 #include "lightwaveloader/DynamicsItemPlugin.h"
+#include "lightwaveloader/VtdfhLevelCustomObjPlugin.h"
+#include "lightwaveloader/VtdfhEnemyCustomObjPlugin.h"
+#include "lightwaveloader/VtdfhMarkerCustomObjPlugin.h"
 #include "meshmod/mesh.h"
 #include "meshmod/scene.h"
 #include "meshmod/sceneobject.h"
@@ -31,6 +34,9 @@
 using namespace MeshMod;
 
 extern void LWDynamicsItem2SceneNode( LightWave::DynamicsItemPlugin* dip, MeshMod::SceneNodePtr scnNode );
+extern void VtdfhLevelCustomObj2Scene( LightWave::VtdfhLevelCustomObjPlugin* dip, MeshMod::ScenePtr scnNode );
+extern void VtdfhEnemyCustomObj2SceneNode( LightWave::VtdfhEnemyCustomObjPlugin* dip, MeshMod::SceneNodePtr scnNode );
+extern void VtdfhMarkerCustomObj2SceneNode( LightWave::VtdfhMarkerCustomObjPlugin* dip, MeshMod::SceneNodePtr scnNode );
 
 
 //---------------------------------------------------------------------------
@@ -157,6 +163,7 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 		LightWave::Node::evaluateLWChannelGroup( 9, objParams, objMatrix );
 		matrix = objMatrix * matrix;
 
+		// so far all lw nodes are objects
 		// add children with the correct matrix
 		std::list<TempNode*>::iterator childIt = node->children.begin();
 		while( childIt != node->children.end() ) {
@@ -175,17 +182,27 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 		if( node->dynamic == false && parent != 0) {
 			node->UnlinkNode();
 			if( node->LWNode->type == LightWave::Node::OBJECT ) {
-				LightWave::Object* obj = (LightWave::Object*) node->LWNode;
+				LightWave::Object* obj = (LightWave::Object*)( node->LWNode );
 				if( obj->loader == NULL ) {
-					obj->loader = CORE_NEW LightWave::LWO_Loader( obj->name );
+					if( lwoLoaderCache.find( obj->name ) == lwoLoaderCache.end() ) {
+						obj->loader = CORE_NEW LightWave::LWO_Loader( obj->name );
+						lwoLoaderCache[ obj->name ] = obj->loader;
+					} else {
+						obj->loader = lwoLoaderCache[ obj->name ];
+					}
 				}
 				parent->mesh = LightWaveObject2GoMesh( *obj, parent->mesh, obj->layer, matrix );
 			}
 		} else {
 			if( node->LWNode->type == LightWave::Node::OBJECT ) {
-				LightWave::Object* obj = (LightWave::Object*) node->LWNode;
+				LightWave::Object* obj = (LightWave::Object*)( node->LWNode );
 				if( obj->loader == NULL ) {
-					obj->loader = CORE_NEW LightWave::LWO_Loader( obj->name );
+					if( lwoLoaderCache.find( obj->name ) == lwoLoaderCache.end() ) {
+						obj->loader = CORE_NEW LightWave::LWO_Loader( obj->name );
+						lwoLoaderCache[ obj->name ] = obj->loader;
+					} else {
+						obj->loader = lwoLoaderCache[ obj->name ];
+					}
 				}
 				node->mesh = LightWaveObject2GoMesh( *obj, 0, obj->layer );
 			}
@@ -201,27 +218,32 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 		sceneNode->name = (*actIt)->LWNode->name;
 
 		switch( (*actIt)->LWNode->type ) {
+			case LightWave::Node::NULL_OBJECT: {
+				int a = 0;
+											   }
 			case LightWave::Node::OBJECT: {
-				sceneNode->addObject( (*actIt)->mesh );
-				sceneNode->name = Core::FilePath( (*actIt)->LWNode->name ).BaseName().value();
-
+				LightWave::Object* obj = (LightWave::Object*)( (*actIt)->LWNode );
+				if( (*actIt)->mesh ) {
+					sceneNode->addObject( (*actIt)->mesh );
+				}
+				sceneNode->name = Core::FilePath( (*actIt)->LWNode->name ).BaseName().RemoveExtension().value() + 
+															boost::lexical_cast<std::string>( obj->objNum & 0x0FFFFFFF);
 				break;
 			}
-			case LightWave::Node::BONE: {
-				SceneNodePtr sceneNodeR = std::make_shared<SceneNode>();  //new BoneNode();
-				(*actIt)->sceneNode = sceneNodeR;
-				break;
-			}
+			case LightWave::Node::BONE:
 			case LightWave::Node::LIGHT:
 			case LightWave::Node::CAMERA:
 			default:
-			case LightWave::Node::NULL_OBJECT:
 				break;
 
 		}
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), ' ', '-' );
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '\"', '-' );
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '.', '-' );
 		++actIt;
 	}
 
+	ScenePtr returner = std::make_shared<Scene>();
 	std::list<SceneNodePtr> ultimateParents;
 
 	// second pass build game herichay and make game envelopes
@@ -286,14 +308,25 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 				if( dip->enabled ) {
 					LWDynamicsItem2SceneNode( dip, scnNode );
 				}
+			} else if( (*npropIt)->pluginName == LightWave::VtdfhLevelCustomObjPlugin::PluginName ) {
+				// whilst this is a node plugin is should probably be a master plugin, move the data to the 
+				// global property pool
+				auto dip = (LightWave::VtdfhLevelCustomObjPlugin*) *npropIt;
+				VtdfhLevelCustomObj2Scene( dip, returner );
+			} else if( (*npropIt)->pluginName == LightWave::VtdfhEnemyCustomObjPlugin::PluginName ) {
+				auto dip = (LightWave::VtdfhEnemyCustomObjPlugin*) *npropIt;
+				VtdfhEnemyCustomObj2SceneNode( dip, scnNode );
+			} else if( (*npropIt)->pluginName == LightWave::VtdfhMarkerCustomObjPlugin::PluginName ) {
+				auto dip = (LightWave::VtdfhMarkerCustomObjPlugin*) *npropIt;
+				VtdfhMarkerCustomObj2SceneNode( dip, scnNode );
 			}
+
 
 			++npropIt;
 		}
 
 		++sceIt;
 	}
-	ScenePtr returner = std::make_shared<Scene>();
 	returner->sceneNodes.insert( returner->sceneNodes.end(), ultimateParents.begin(), ultimateParents.end() );
 
 	// add LW master plugins that we understand as Mesh Mod scene properties
