@@ -35,7 +35,7 @@ namespace LightWave
 			SPOT
 		};
 
-	
+		virtual ~VertexMap() {}
 		virtual TYPE getType() = 0;
 		virtual unsigned int getDimension() = 0;
 

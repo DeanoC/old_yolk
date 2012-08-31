@@ -48,7 +48,7 @@ namespace LightWave
 		int lwoVersion;
 
 		std::vector<std::string>		tags;				///< string tag table
-		std::vector<Layer>				layers;			///< layer table
+		std::vector<Layer*>				layers;			///< layer table
 		std::vector<Clip>				clip;				///< Clip table
 		std::map<unsigned int, Surface*> surfaceMap;
 		VEC12							bboxMin;

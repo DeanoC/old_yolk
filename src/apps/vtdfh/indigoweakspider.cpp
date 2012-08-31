@@ -13,7 +13,7 @@ IndigoWeakSpider::IndigoWeakSpider( SceneWorldPtr _world, Core::TransformNode* s
 
 	namespace arg = std::placeholders;
 
-	spider.reset(  ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "stinger" ) ) );
+	spider.reset(  ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "spider" ) ) );
 	updater.updateCallback = std::bind( & IndigoWeakSpider::update, this, arg::_1 );
 	spider->addComponent( &updater );
 

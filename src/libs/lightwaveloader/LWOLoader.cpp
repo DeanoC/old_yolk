@@ -697,8 +697,8 @@ void LWO_Loader::LAYRReader2(FILE *f, long p, long maxSize)
 	}
 	
 	// allocate a new layer and set it current
-	layers.push_back( Layer() );
-	curLayer = &layers.back();
+	layers.push_back( new Layer() );
+	curLayer = layers.back();
 
 	// copy data across
 	curLayer->number = number;
@@ -726,8 +726,8 @@ void LWO_Loader::PNTSReader2(FILE *f, long p, long maxSize)
 	if( curLayer == 0)
 	{
 		// allocate a new layer and set it current
-		layers.push_back( Layer() );
-		curLayer = &layers.back();
+		layers.push_back( new Layer() );
+		curLayer = layers.back();
 	}
 
 	unsigned int numPoints = maxSize/sizeof(VEC12);
@@ -842,6 +842,9 @@ void LWO_Loader::PTAGReader2(FILE *f, long p, long maxSize)
 			break;
 		case CHUNK_SMGP:
 			PTAG2Smgp(f,p,maxSize - 4);
+			break;
+		case CHUNK_COLR:
+			LOG(INFO) << "TODO per polygon colour data\n";
 			break;
 		default:
 			LOG(INFO) << "Unknown PolyTag Type : " << type[0] << type[1] << type[2] << type[3] << "\n";

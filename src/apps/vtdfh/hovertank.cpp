@@ -22,7 +22,7 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 
 	zarchCam = std::make_shared<ZarchCam>();
 	zarchCam->setTrackingThing( ship );
-	zarchCam->setOffset( Math::Vector3(0,50,0) );
+	zarchCam->setOffset( Math::Vector3(0,150,20) );
 	objectCam = std::make_shared<ObjectCam>();
 	objectCam->setObject( ship );
 

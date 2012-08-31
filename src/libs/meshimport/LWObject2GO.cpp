@@ -372,7 +372,7 @@ namespace LWObject2Go_Local
 						const unsigned int layer, 
 						const Math::Matrix4x4& transform )
 	{
-		std::vector<LightWave::Layer>::iterator layIt = in.loader->layers.begin();
+		std::vector<LightWave::Layer*>::iterator layIt = in.loader->layers.begin();
 		while( layIt != in.loader->layers.end() )
 		{
 			// skip if the layer is hidden
@@ -382,7 +382,7 @@ namespace LWObject2Go_Local
 //				continue;
 //			}
 			// if we are only converting 1 layer skip if different
-			if( layer != -1 && layer != (*layIt).number  )
+			if( layer != -1 && layer != (*layIt)->number  )
 			{
 				++layIt;
 				continue;
@@ -390,36 +390,36 @@ namespace LWObject2Go_Local
 
 
 			Math::Vector3 pivot( 0,0,0 );
-			std::vector<LightWave::Layer>::iterator layItCur = layIt;
+			std::vector<LightWave::Layer*>::iterator layItCur = layIt;
 
-			while( (*layItCur).parent != LightWave::Layer::NO_PARENT )
+			while( (*layItCur)->parent != LightWave::Layer::NO_PARENT )
 			{
-				std::vector<LightWave::Layer>::iterator layIt0 = in.loader->layers.begin();
+				std::vector<LightWave::Layer*>::iterator layIt0 = in.loader->layers.begin();
 				while( layIt0 != in.loader->layers.end() )
 				{
-					if( (*layIt0).number == (*layItCur).parent )
+					if( (*layIt0)->number == (*layItCur)->parent )
 					{
-						pivot += (*layIt0).pivot;
+						pivot += (*layIt0)->pivot;
 						layItCur = layIt0;
 						break;
 					}
 					++layIt0;
 				}
 			}
-			pivot += (*layItCur).pivot;
+			pivot += (*layItCur)->pivot;
 
 			const unsigned int baseVertex = out->getVertexContainer().size();
 			const unsigned int baseFace = out->getFaceContainer().size();
 
-			AddLWLayerVertices( *layIt, out, transform, pivot );
+			AddLWLayerVertices( *(*layIt), out, transform, pivot );
 			
-			AddLWLayerPolys( *layIt, out, baseVertex );
+			AddLWLayerPolys( *(*layIt), out, baseVertex );
 
-			AddLWLayerPolyTags( *layIt, out, baseFace );
+			AddLWLayerPolyTags( *(*layIt), out, baseFace );
 
-			AddLWLayerVMap( *layIt, out, baseVertex );
+			AddLWLayerVMap( *(*layIt), out, baseVertex );
 
-			AddLWLayerDVMap( *layIt, out, baseVertex, baseFace );
+			AddLWLayerDVMap( *(*layIt), out, baseVertex, baseFace );
 
 			AddLWOBones( in, out, baseVertex );
 

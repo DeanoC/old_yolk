@@ -237,9 +237,10 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 				break;
 
 		}
-		std::replace( sceneNode->name.begin(), sceneNode->name.end(), ' ', '-' );
-		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '\"', '-' );
-		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '.', '-' );
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), ' ', '_' );
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '\"', '_' );
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '.', '_' );
+		std::replace( sceneNode->name.begin(), sceneNode->name.end(), '-', '_' );
 		++actIt;
 	}
 
