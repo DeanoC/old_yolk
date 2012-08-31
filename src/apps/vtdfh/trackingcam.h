@@ -5,14 +5,14 @@
 #include "localworld/thing.h"
 #include "localworld/updatable.h"
 
-class TrackingCam : public Scene::Camera, public Updatable {
+class TrackingCam : public Scene::Camera {
 public:
 	TrackingCam();
 
 	void setTrackingThing( ThingPtr thing );
 
-	void update( float deltaS ) override;
 protected:
+	void update( float deltaS );
 	ThingPtr		thingy;
 };
 

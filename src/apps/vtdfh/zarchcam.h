@@ -3,16 +3,15 @@
 
 #include "scene/camera.h"
 #include "localworld/thing.h"
-#include "localworld/updatable.h"
 
-class ZarchCam : public Scene::Camera, public Updatable {
+class ZarchCam : public Scene::Camera {
 public:
 	ZarchCam();
 
 	void setTrackingThing( ThingPtr thing );
 	void setOffset( const Math::Vector3& _offset ) { offset = _offset; }
 
-	void update( float deltaS ) override;
+	void update( float deltaS );
 protected:
 	ThingPtr				thingy;
 	Math::Vector3			offset;

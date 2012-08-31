@@ -5,6 +5,8 @@
 //!-----------------------------------------------------
 #include "localworld.h"
 #include "scene/physicsworld.h"
+#include "updatable.h"
+#include "enemythingcomponent.h"
 #include "sceneworld.h"
 
 SceneWorld::SceneWorld() {
@@ -20,9 +22,15 @@ void SceneWorld::reset() {
 }
 
 void SceneWorld::add( ThingPtr _thing ) {
+	CORE_ASSERT( (std::find( things.cbegin(), things.cend(), _thing ) == things.cend()) && "thing added to world twice");
+
+	things.push_back( _thing );
+
+	// add renderables belonging to thing
 	for( int i = 0;i < _thing->getRenderableCount(); ++i ) {
 		addRenderable( _thing->getRenderable( i ) );
 	}
+	// add physics
 	for( int i = 0;i < _thing->getPhysicalCount(); ++i ) {
 		auto physical = _thing->getPhysical(i);
 		if( physical->getMass() <= 0 ) {
@@ -32,20 +40,20 @@ void SceneWorld::add( ThingPtr _thing ) {
 		}
 		physicsWorld->addPhysical( physical );
 	}
-	things.push_back( _thing );
-}
+	ThingComponent* component;
+	// add component fast lookup containers
+	if( (component = _thing->getComponent( Updatable::COMPONENT_ID )) != nullptr ) {
+		updatables.push_back( static_cast< Updatable* >( component ) );
+	}
+	if( (component = _thing->getComponent( EnemyThingComponent::COMPONENT_ID )) != nullptr ) {
+		enemies.push_back ( static_cast< EnemyThingComponent* >( component ) );
+	}
 
-void SceneWorld::add( Updatable* _updatable ) {
-	updatables.push_back( _updatable );
-}
-
-void SceneWorld::remove( Updatable* _updatable ) {
-	auto u = std::find( updatables.begin(), updatables.end(), _updatable );
-	CORE_ASSERT( (u != updatables.end()) && "updatable is not in this  world");
-	*u = nullptr; // concurrent vector doesn't shrink until a clear
 }
 
 void SceneWorld::remove( ThingPtr _thing ) {
+	auto t = std::find( things.begin(), things.end(), _thing );
+	CORE_ASSERT( (t != things.end()) && "thing is not in this world");
 
 	for( int i = 0;i < _thing->getPhysicalCount(); ++i ) {
 		auto physical = _thing->getPhysical(i);
@@ -63,16 +71,24 @@ void SceneWorld::remove( ThingPtr _thing ) {
 	for( int i = 0;i < _thing->getRenderableCount(); ++i ) {
 		removeRenderable( _thing->getRenderable( i ) );
 	}
+	ThingComponent* component;
+	// remove components fast lookup containers
+	if( (component = _thing->getComponent( Updatable::COMPONENT_ID )) != nullptr ) {
+		auto u = std::find( updatables.begin(), updatables.end(), static_cast< Updatable* >( component )  );
+		*u = nullptr; // concurrent vector doesn't shrink until a clear
+	}
+	if( (component = _thing->getComponent( EnemyThingComponent::COMPONENT_ID )) != nullptr ) {
+		auto u = std::find( enemies.begin(), enemies.end(), static_cast< EnemyThingComponent* >( component )  );
+		*u = nullptr; // concurrent vector doesn't shrink until a clear
+	}
 
-	auto t = std::find( things.begin(), things.end(), _thing );
-	CORE_ASSERT( (t != things.end()) && "thing is not in this  world");
 	*t = nullptr; // concurrent vector doesn't shrink until a clear
 }
 
 void SceneWorld::update( float delta ) {
 	for( auto it : updatables ) {
-		if( it ) {
-			it->update( delta );
+		if( it && it->updateCallback ) {
+			it->updateCallback( delta );
 		}
 	}
 	physicsWorld->doSim( delta );

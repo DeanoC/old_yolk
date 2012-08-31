@@ -9,16 +9,16 @@
 namespace Scene {
 	class Camera;
 }
+class EnemyThingComponent;
 
 class SceneWorld : public Scene::RenderWorld {
 public:
 	SceneWorld();
+	~SceneWorld() { reset(); }
 
 	void reset();
 	void add( ThingPtr _thing );
 	void remove( ThingPtr _thing );
-	void add( Updatable* _updatable );
-	void remove( Updatable* _updatable );
 
 	void update( float delta );
 
@@ -27,13 +27,20 @@ public:
 protected:
 	typedef tbb::concurrent_vector< ThingPtr > 				ThingContainer;
 	typedef tbb::concurrent_vector< Scene::PhysicalPtr > 	PhysicsContainer;
+
+	// container shortcuts (save iterating and getting component each frame
 	typedef tbb::concurrent_vector< Updatable* > 			UpdatableContainer; // lifetime of object must match its matching thing
+	typedef tbb::concurrent_vector< EnemyThingComponent* >	EnemyContainer; // lifetime of object must match its matching thing
 
 	std::unique_ptr<Scene::PhysicsWorld>		physicsWorld;
+
 	ThingContainer								things;
-	UpdatableContainer							updatables;
+
 	PhysicsContainer							staticPhysicals;
 	PhysicsContainer							dynamicPhysicals;
+
+	UpdatableContainer							updatables;
+	EnemyContainer								enemies;
 };
 
 typedef std::shared_ptr<SceneWorld> SceneWorldPtr;

@@ -6,5 +6,6 @@
 #include "localworld/sceneworld.h"
 #include "localworld/thing.h"
 #include "localworld/updatable.h"
+#include "localworld/thingfactory.h"
 
 #endif

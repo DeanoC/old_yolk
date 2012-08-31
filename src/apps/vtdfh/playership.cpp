@@ -14,15 +14,13 @@ PlayerShip::PlayerShip( SceneWorldPtr _world, int _localPlayerNum ) :
 	angularSpeed( 2.0f * 1e7f ),		// newton second
 	localPlayerNum( _localPlayerNum ) {
 
-	ship = std::make_shared<Thing>( std::make_shared<Scene::Hier>( "stinger" ) );
+	ship.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "stinger" ) ) );
 
 	zarchCam = std::make_shared<ZarchCam>();
 	zarchCam->setTrackingThing( ship );
 	zarchCam->setOffset( Math::Vector3(0,50,0) );
-	world->add( static_cast<Updatable*>( zarchCam.get() ) );
 	objectCam = std::make_shared<ObjectCam>();
 	objectCam->setObject( ship );
-	world->add( static_cast<Updatable*>( objectCam.get() ) );
 
 	inputContext = std::dynamic_pointer_cast<InputHandlerContext>( Core::DevelopmentContext::getr().getContext( "InputHandler" ) );
 //	inputContext->setCamera( zarchCam );
@@ -31,7 +29,6 @@ PlayerShip::PlayerShip( SceneWorldPtr _world, int _localPlayerNum ) :
 	Core::DevelopmentContext::get()->activateContext( "InputHandler" );
 
 	world->add( ship ); // render object
-	world->add( static_cast<Updatable*>( this ) ); // updateble interface
 	ship->getRenderable()->getTransformNode()->setLocalPosition( Math::Vector3(100,20,0) );
 	if( ship->getPhysicalCount() ) {
 		ship->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
@@ -41,10 +38,8 @@ PlayerShip::PlayerShip( SceneWorldPtr _world, int _localPlayerNum ) :
 
 
 PlayerShip::~PlayerShip() {
-	world->remove(  static_cast<Updatable*>( zarchCam.get() ) );
+	objectCam.reset();
 	zarchCam.reset();
-
-	world->remove( static_cast<Updatable*>( this ) );
 	world->remove( ship );
 }
 

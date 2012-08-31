@@ -7,13 +7,13 @@
 class ZarchCam;
 class ObjectCam;
 
-class PlayerShip : public Updatable {
+class PlayerShip {
 public:
 	PlayerShip( SceneWorldPtr _world, int _localPlayerNum );
 	~PlayerShip();
 	
-	virtual void update( float timeS ) override;
 private:
+	void update( float timeS );
 	bool findHeightBelow( float& height );
 
 	SceneWorldPtr 	world;

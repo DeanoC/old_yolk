@@ -6,17 +6,11 @@
 #include "scene/physical.h"
 #include "scene/renderable.h"
 #include "scene/hier.h"
-
-enum class ThingUpdateType {
-	FROM_PHYSICS = 0x1,
-	FROM_VISUALS = 0x2,
-	FROM_USER	 = FROM_PHYSICS | FROM_VISUALS,
-};
+#include "localworld/thingcomponent.h"
 
 class Thing {
 public:
-	explicit Thing( Scene::HierPtr hier, const ThingId _id = NewThingId() );
-	explicit Thing( const ThingId _id = NewThingId() ) : id( _id ) {}
+	friend class ThingFactory;
 	~Thing();
 
 	int getPhysicalCount() const { return preps.size(); }
@@ -42,9 +36,24 @@ public:
 	}
 	const ThingId getId() const { return id; }
 
+	// component interface 
+	ThingComponent* getComponent( const ThingComponentId id ) const { 
+		auto c = components.find(id);
+		return c == components.end() ? nullptr : c->second;
+	}
+	void addComponent( ThingComponent* _component ) {
+		CORE_ASSERT( components.find( _component->getComponentId() ) == components.end() );
+		components[ _component->getComponentId() ] = _component;
+	}
 protected:
-	void setPhysical( int nodeId, Scene::PhysicalPtr prep );
-	void setRenderable( int nodeId, Scene::RenderablePtr vrep );
+	explicit Thing( const ThingId _id ) : id( _id ) {}
+
+	typedef std::unordered_map< uint32_t, ThingComponent* > ComponentMap;
+
+	ComponentMap components;
+
+	size_t addPhysical( Scene::PhysicalPtr prep );
+	size_t addRenderable( Scene::RenderablePtr vrep );
 
 	const ThingId						id;
 	std::vector<Scene::PhysicalPtr>		preps;

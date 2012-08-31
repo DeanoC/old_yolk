@@ -3,6 +3,7 @@
 #include "scene/hier.h"
 #include "localworld/sceneworld.h"
 #include "localworld/thing.h"
+#include "localworld/thingfactory.h"
 
 //#include "boost/program_options.hpp"
 //#include "json_spirit/json_spirit_reader.h"
@@ -48,7 +49,7 @@ int Main() {
 	SceneWorldPtr world = shell.getSceneWorld();
 
 	Scene::HierPtr land = std::make_shared<Scene::Hier>( "basic" );
-	ThingPtr tng = std::make_shared<Thing>( land );
+	ThingPtr tng( ThingFactory::createThingFromHier( land ) );
 	world->add( tng );
 /*	Scene::HierPtr stinger = std::make_shared<Scene::Hier>( "stinger" );
 	ThingPtr stingr = std::make_shared<Thing>( stinger );

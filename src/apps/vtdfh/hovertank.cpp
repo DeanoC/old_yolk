@@ -8,21 +8,23 @@
 #include "objectcam.h"
 #include "hovertank.h"
 
-HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum ) :
+HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* startNode ) :
 	world( _world ),
 	speed( 1.0f * 1e7f ),		// newton second
 	angularSpeed( 2.0f * 1e7f ),		// newton second
 	localPlayerNum( _localPlayerNum ) {
 
-	ship = std::make_shared<Thing>( std::make_shared<Scene::Hier>( "stinger" ) );
+	namespace arg = std::placeholders;
+
+	ship.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "stinger" ) ) );
+	updater.updateCallback = std::bind( & HoverTank::update, this, arg::_1 );
+	ship->addComponent( &updater );
 
 	zarchCam = std::make_shared<ZarchCam>();
 	zarchCam->setTrackingThing( ship );
 	zarchCam->setOffset( Math::Vector3(0,50,0) );
-	world->add( static_cast<Updatable*>( zarchCam.get() ) );
 	objectCam = std::make_shared<ObjectCam>();
 	objectCam->setObject( ship );
-	world->add( static_cast<Updatable*>( objectCam.get() ) );
 
 	inputContext = std::dynamic_pointer_cast<InputHandlerContext>( Core::DevelopmentContext::getr().getContext( "InputHandler" ) );
 //	inputContext->setCamera( zarchCam );
@@ -31,8 +33,8 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum ) :
 	Core::DevelopmentContext::get()->activateContext( "InputHandler" );
 
 	world->add( ship ); // render object
-	world->add( static_cast<Updatable*>( this ) ); // updateble interface
-	ship->getRenderable()->getTransformNode()->setLocalPosition( Math::Vector3(100,20,0) );
+	ship->getRenderable()->getTransformNode()->setLocalPosition( startNode->getLocalPosition() );
+	ship->getRenderable()->getTransformNode()->setLocalOrientation( startNode->getLocalOrientation() );
 	if( ship->getPhysicalCount() ) {
 		ship->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
 		ship->getPhysical()->syncBulletTransform();
@@ -41,10 +43,8 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum ) :
 
 
 HoverTank::~HoverTank() {
-	world->remove(  static_cast<Updatable*>( zarchCam.get() ) );
+	objectCam.reset();
 	zarchCam.reset();
-
-	world->remove( static_cast<Updatable*>( this ) );
 	world->remove( ship );
 }
 
@@ -122,4 +122,8 @@ void HoverTank::update( float timeMS ) {
 			rb->applyTorqueImpulse( banker * timeMS );
 		}
 	}
+
+	// manually drive camera updates TODO add back to updatables/things list??
+	zarchCam->update( timeMS );
+	objectCam->update( timeMS );
 }

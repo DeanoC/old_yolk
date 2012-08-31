@@ -19,7 +19,7 @@ namespace Scene {
 	class RenderWorld {
 	public:
 		RenderWorld();
-		~RenderWorld();
+		virtual ~RenderWorld();
 
 		virtual uint32_t addRenderable( RenderablePtr renderable );	//!< add an Renderable to the world
 		virtual void removeRenderable( RenderablePtr renderable ); //!< remove this Renderable from the world

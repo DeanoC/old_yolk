@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+namespace {
 enum { 
 	ID_MARKERTYPE = 0x8001, 
 };
@@ -139,12 +140,13 @@ static LWError Load( LWInstance ins, const LWLoadState *ls ) {
 	LWID ident = 0;
 	// section up data, to avoid LW cross from one instance to the next!
 	if( LWLOAD_FIND(ls, &SectionIDs[0]) == MARK_SECTION ) {
-		do {
+		while( ident = LWLOAD_FIND( ls, BlockIDs ) ) {
 			switch( ident ) {
 			case MARK_TYPE: LWLOAD_I4(ls, &inst->type, true); break;
 			}
 			LWLOAD_END(ls);
-		} while( ident = LWLOAD_FIND( ls, BlockIDs ) );
+		};
+		LWLOAD_END(ls);
 	}
 
 	return NULL; 
@@ -246,6 +248,7 @@ static LWXPanelID XPanel( GlobalFunc *global, LWInstance ins ) {
 	}
 	return panID;
 }
+} // end private namespace
 /*
 ======================================================================
 MarkerHandler()

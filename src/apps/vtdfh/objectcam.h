@@ -3,15 +3,14 @@
 
 #include "scene/camera.h"
 #include "localworld/thing.h"
-#include "localworld/updatable.h"
 
-class ObjectCam : public Scene::Camera, public Updatable {
+class ObjectCam : public Scene::Camera {
 public:
 	ObjectCam();
 
 	void setObject( ThingPtr thing );
 
-	void update( float deltaS ) override;
+	void update( float deltaS );
 protected:
 	ThingPtr		thingy;
 };

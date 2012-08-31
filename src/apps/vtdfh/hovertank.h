@@ -7,14 +7,16 @@
 class ZarchCam;
 class ObjectCam;
 
-class HoverTank : public Updatable {
+class HoverTank {
 public:
-	HoverTank( SceneWorldPtr _world, int _localPlayerNum );
+	HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* startNode );
 	~HoverTank();
 	
-	virtual void update( float timeS ) override;
 private:
+	void update( float timeS );
 	bool findHeightBelow( float& height );
+
+	Updatable				updater;
 
 	SceneWorldPtr 	world;
 	ThingPtr  		ship;
