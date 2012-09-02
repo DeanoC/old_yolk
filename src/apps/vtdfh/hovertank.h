@@ -25,6 +25,7 @@ private:
 	std::shared_ptr<ZarchCam>				zarchCam;
 	std::shared_ptr<ObjectCam>				objectCam;
 
+	void debugCallback( void );
 	float speed;
 	float angularSpeed;
 };

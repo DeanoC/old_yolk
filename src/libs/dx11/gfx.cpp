@@ -225,7 +225,7 @@ void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 	auto rtw = renderTargetWriteHandle.acquire();
 
 	Scene::Viewport viewport = {
-		0.0f, 0.0f, width, height, 0.0f, 1.0f
+		0.0f, 0.0f, (float) width, (float) height, 0.0f, 1.0f
 	};
 
 	if( tex->getSamples() <= 1 ) {

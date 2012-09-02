@@ -88,7 +88,8 @@ const Math::Vector3 Camera::getPosition() const {
 }
 
 const Core::Frustum& Camera::getFrustum() const { 
-	if( frustumCache.getCounter() != getCounter() ) {
+	//if( frustumCache.getCounter() != getCounter() ) 
+	{
 		frustum = Core::Frustum( viewMatrix * projectionMatrix );
 		frustumCache.setCounter( getCounter() );
 	}

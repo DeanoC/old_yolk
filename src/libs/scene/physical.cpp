@@ -48,18 +48,36 @@ Physical::~Physical() {
 }
 
 void Physical::getWorldTransform( btTransform& worldTrans ) const {
-	const Math::Matrix4x4& matrix = transform->getWorldMatrix();
+	const Math::Matrix4x4 rm = transform->getWorldMatrix();
+	const Math::Vector3 xvec = Math::GetXAxis( rm );
+	const Math::Vector3 yvec = Math::GetYAxis( rm );
+	const Math::Vector3 zvec = Math::GetZAxis( rm );
+	const Math::Vector3 pos = Math::GetTranslation( rm );
 
-	worldTrans.setFromOpenGLMatrix( &matrix[0] );
+	btMatrix3x3 basis(	xvec.x, yvec.x, zvec.x,
+						xvec.y, yvec.y, zvec.y,
+						xvec.z, yvec.z, zvec.z );
+	worldTrans.setOrigin( btVector3(pos.x, pos.y, pos.z) );
+	worldTrans.setBasis( basis );
 }
 
 void Physical::setWorldTransform(const btTransform& worldTrans) {
+	// TODO flip?
 	auto& origin = worldTrans.getOrigin();
-	auto& orient = worldTrans.getRotation();
+	auto& basis = worldTrans.getBasis();
+	btVector3 xvec = basis.getRow(0);
+	btVector3 yvec = basis.getRow(1);
+	btVector3 zvec = basis.getRow(2);
+
+	Math::Matrix4x4 myBasis = Math::IdentityMatrix();
+	Math::SetXAxis( myBasis, Math::Vector3(xvec[0], xvec[1], xvec[2]) );
+	Math::SetYAxis( myBasis, Math::Vector3(yvec[0], yvec[1], yvec[2]) );
+	Math::SetZAxis( myBasis, Math::Vector3(zvec[0], zvec[1], zvec[2]) );
+
 	// TODO inverse parent (if any) to transform bullet transform
 	// to parent local space
 	transform->setLocalPosition( Math::Vector3( origin[0], origin[1], origin[2] ) );
-	transform->setLocalOrientation( Math::Quaternion( orient[0], orient[1], orient[2], orient[3] ) );
+	transform->setLocalOrientation( Math::CreateRotationQuat(myBasis) );
 }
 void Physical::syncBulletTransform() {
 	btTransform bt;

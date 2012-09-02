@@ -42,10 +42,15 @@ namespace Scene {
 		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
 
 		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const override {
+			if( !isEnabled() ) return 0;
 			if( _type == R_MESH || _type == R_ALL) {
-				int numMeshes = Math::Min<int>( (int)ownedMeshes.size(), arraySize );
-				for( int i=0;i < numMeshes;++i ) {
-					outArray[i] = ownedMeshes[i].get();
+				uint32_t numMeshes = 0;
+				for( uint32_t i=0;i < ownedMeshes.size();++i ) {
+					if( ownedMeshes[i]->isEnabled() ) {
+						outArray[i] = ownedMeshes[i].get();
+						numMeshes++;
+						if( numMeshes >= arraySize ) return numMeshes;
+					}
 				}
 				return numMeshes;
 			} else {

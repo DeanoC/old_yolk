@@ -13,7 +13,7 @@
 #include "core/coreresources.h"
 #include "scene/camera.h"
 #include "scene/rendercontext.h"
-#include "scene/debugpipeline.h"
+#include "scene/vtpipeline.h"
 #include "core/sysmsg.h"
 #include "core/development_context.h"
 #include "localworld/debugcamcontext.h"
@@ -81,7 +81,7 @@ void Shell3D::start() {
 		return;
 	}
 
-	renderer->addPipeline( std::make_shared<Scene::DebugPipeline>() );
+	renderer->addPipeline( std::make_shared<Scene::VtPipeline>() );
 
 	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );

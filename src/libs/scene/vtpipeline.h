@@ -1,6 +1,6 @@
 #pragma once
 ///-------------------------------------------------------------------------------------------------++
-/// \file	gl\debugpipeline.h
+/// \file	scene\vtpipeline.h
 ///
 /// \brief	Declares the controlling class for debug rendering.
 ///
@@ -9,8 +9,8 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if !defined( YOLK_SCENE_DEBUG_PIPELINE_H_ )
-#define YOLK_SCENE_DEBUG_PIPELINE_H_
+#if !defined( YOLK_SCENE_VT_PIPELINE_H_ )
+#define YOLK_SCENE_VT_PIPELINE_H_
 
 #include "core/resources.h"
 #include "scene/pipeline.h"
@@ -22,12 +22,12 @@ namespace Scene {
 
 namespace Scene {
 
-	class DebugPipeline : public Pipeline {
+	class VtPipeline : public Pipeline {
 	public:
-		DebugPipeline();
-		virtual ~DebugPipeline();
+		VtPipeline();
+		virtual ~VtPipeline();
 
-		virtual const char* getName() const override { return "debug"; };
+		virtual const char* getName() const override { return "VT"; };
 
 		virtual void bind( RenderContext* _context ) override;
 		virtual void unbind( RenderContext* _context ) override;
@@ -42,16 +42,20 @@ namespace Scene {
 		virtual void conditionWob( class Scene::Wob* wob ) override;
 	protected:
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetHandle;
-		Core::ScopedResourceHandle<TextureHandle>			depthTargetHandle;
-		Core::ScopedResourceHandle<ProgramHandle>			programHandle;
+		Core::ScopedResourceHandle<TextureHandle>			colourTargetMSHandle;
+		Core::ScopedResourceHandle<TextureHandle>			depthTargetMSHandle;
+
+		Core::ScopedResourceHandle<ProgramHandle>			solidWireFrameProgramHandle;
+		Core::ScopedResourceHandle<ProgramHandle>			resolveProgramHandle;
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
+		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetWriteHandle;
 	};
 
-	class DebugPipelineDataStore : public PipelineDataStore {
+	class VtPipelineDataStore : public PipelineDataStore {
 	public:
-		friend class DebugPipeline;
-		~DebugPipelineDataStore();
+		friend class VtPipeline;
+		~VtPipelineDataStore();
 
 		void render( Scene::RenderContext* context );
 	protected:

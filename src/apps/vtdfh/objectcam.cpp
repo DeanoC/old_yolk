@@ -4,7 +4,7 @@
 
 ObjectCam::ObjectCam() {
 	// TODO proper projection settings
-	setProjection( 90.0f * Math::degree_to_radian<float>(), 1.0, 1.0f, 200000.0f );
+	setProjection( 90.0f * Math::degree_to_radian<float>(), 1.0, 1.0f, 12000.0f );
 
 }
 

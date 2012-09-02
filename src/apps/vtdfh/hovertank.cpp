@@ -1,6 +1,7 @@
 #include "vtdfh.h"
 #include "core/debug_render.h"
 #include "core/development_context.h"
+#include "core/debug_render.h"
 #include "localworld/inputhandlercontext.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
@@ -29,6 +30,7 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 	inputContext = std::dynamic_pointer_cast<InputHandlerContext>( Core::DevelopmentContext::getr().getContext( "InputHandler" ) );
 //	inputContext->setCamera( zarchCam );
 	inputContext->setCamera( objectCam );
+	ship->getRenderable()->disable();
 
 	Core::DevelopmentContext::get()->activateContext( "InputHandler" );
 
@@ -39,6 +41,7 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 		ship->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
 		ship->getPhysical()->syncBulletTransform();
 	}
+	world->debugRenderCallback = std::bind( &HoverTank::debugCallback, this );
 }
 
 
@@ -93,8 +96,10 @@ void HoverTank::update( float timeMS ) {
 		if( input.pad[0].debugButton2 ) {
 			if( inputContext->getCamera() == objectCam ) {
 				inputContext->setCamera( zarchCam );
+				ship->getRenderable()->enable();
 			} else {
 				inputContext->setCamera( objectCam );
+				ship->getRenderable()->disable();
 			}
 		}
 		Math::Matrix4x4 rm( r->getTransformNode()->getWorldMatrix() );
@@ -124,6 +129,20 @@ void HoverTank::update( float timeMS ) {
 	}
 
 	// manually drive camera updates TODO add back to updatables/things list??
-	zarchCam->update( timeMS );
+//	zarchCam->update( timeMS );
 	objectCam->update( timeMS );
+}
+
+void HoverTank::debugCallback( void ) {
+	auto r = ship->getRenderable();
+
+	objectCam->getFrustum().debugDraw( Core::RGBAColour(1,0,0,1) );
+	
+	Math::Matrix4x4 rm( r->getTransformNode()->getRenderMatrix() );
+	Math::Vector3 xvec = Math::GetXAxis( rm );
+	Math::Vector3 yvec = Math::GetYAxis( rm );
+	Math::Vector3 zvec = Math::GetZAxis( rm );
+	Math::Vector3 pos = Math::GetTranslation( rm );
+	Core::g_pDebugRender->worldLine( Core::RGBAColour(1,1,0,0), pos, pos + zvec * 10 );
+
 }

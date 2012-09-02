@@ -348,7 +348,10 @@ namespace Math {
 	CALL inline Vector2 Normalise( const Vector2& vec )	{ return Vector2(vec/Length(vec)); }		//!< returns a normalise version of vec
 	CALL inline Vector3 Normalise( const Vector3& vec ){ return Vector3(vec/Length(vec)); }		//!< returns a normalise version of vec
 	CALL inline Vector4 Normalise( const Vector4& vec ){ return Vector4(vec/Length(vec)); }		//!< returns a normalise version of vec
-	CALL inline Plane Normalise( const Plane& plane ){ Vector3 norm(Normalise(Vector3(plane.a,plane.b,plane.c))); return Plane(); } //norm.x,norm.y,norm.x,plane.d); }		//!< returns a normalise version of vec
+	CALL inline Plane Normalise( const Plane& plane ) {
+		float len = Length( Vector3(plane.a, plane.b, plane.c) );
+		return Plane( plane.a / len, plane.b / len, plane.c / len, plane.d / len ); 
+	}
 
 	CALL inline Vector2 Lerp( const Vector2& vecA, const Vector2& vecB, float t){ return vecA + t*(vecB-vecA); } 
 	CALL inline Vector3 Lerp( const Vector3& vecA, const Vector3& vecB, float t){ return vecA + t*(vecB-vecA); } 

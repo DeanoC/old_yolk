@@ -160,7 +160,7 @@ public:
 		Math::Vector3 pts[8];
 		getWorldSpacePoints( pts );
 
-		g_pDebugRender->worldRect( colour, pts[0], pts[1], pts[2], pts[3] );
+		g_pDebugRender->worldRect( Core::RGBAColour(1,1,1,1), pts[0], pts[1], pts[2], pts[3] );
 		g_pDebugRender->worldRect( colour, pts[4], pts[5], pts[6], pts[7] );
 		g_pDebugRender->worldRect( colour, pts[0], pts[1], pts[5], pts[4] );
 		g_pDebugRender->worldRect( colour, pts[2], pts[3], pts[7], pts[6] );

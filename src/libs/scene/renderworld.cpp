@@ -79,6 +79,7 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 	// *copy* over the active camera, so if the game thread runs faster than the render one
 	// we don't get screwed up graphics due to camera changing mid frame
 	*renderCamera.get() = *camera.get();
+	renderCamera->invalidate();
 
 	// go through and cull renderables, also copy matrixes under
 	// a lock to ensure other thread updates of renderables transform
@@ -93,9 +94,12 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 		auto meshCount = (*it)->getActualRenderablesOfType( Renderable::R_MESH, 100, gatherArray );
 		for( unsigned int i = 0;i < meshCount; ++i ) {
 			gatherArray[i]->getTransformNode()->setRenderMatrix();
-			gatherArray[i]->getWorldAABB( waabb );
-			// TODO cull
-			visibleRenderables.push_back( gatherArray[i] );
+			gatherArray[i]->getRenderAABB( waabb );
+			if( renderCamera->getFrustum().cullAABB( waabb ) != Core::Frustum::OUTSIDE ) {
+				visibleRenderables.push_back( gatherArray[i] );
+			} else {
+				int a = 0;
+			}
 		}
 		++it;
 	}
@@ -129,10 +133,14 @@ void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineNam
 	determineVisibles( camera );
 
 	renderRenderables( context, pipeline );
+	if( debugRenderCallback ) {
+		debugRenderCallback();
+	}
 }
 
 void RenderWorld::displayRenderResults( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context ) {
 	Pipeline* pipeline = screen->getRenderer()->getPipeline( pipelineName );
+	context->getConstantCache().setCamera( renderCamera );
 	screen->display( pipeline->getResult() );
 }
 

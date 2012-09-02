@@ -82,11 +82,11 @@ void DebugCamContext::debugButton5( unsigned int padNum ) {
 
 
 void DebugCamContext::mouseDeltaX( float x ) {
-	dyRot += x;
+	dyRot += x * 1e6f;
 }
 
 void DebugCamContext::mouseDeltaY( float y ) {
-	dxRot  += y;
+	dxRot  += y * 1e6f;
 }
 
 void DebugCamContext::mouseLeftButton() {

@@ -39,7 +39,8 @@ namespace Scene {
 
 		Renderable( Core::TransformNode* transNode ) :
 		  	transformNode( transNode ),
-			localAabb() {
+			localAabb(),
+			enabled( true ) {
 		}
 
 		//! dtor
@@ -82,9 +83,13 @@ namespace Scene {
 		// returns number inf array
 		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const = 0;
 
+		void enable() { enabled = true; }
+		void disable() { enabled = false; }
+		bool isEnabled() const { return enabled; }
 	protected:
 		Core::TransformNode*		transformNode;
 		Core::AABB					localAabb;
+		bool						enabled;
 	};
 
 	typedef std::shared_ptr<Renderable>						RenderablePtr;

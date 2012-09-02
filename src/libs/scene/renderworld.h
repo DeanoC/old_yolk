@@ -36,7 +36,10 @@ namespace Scene {
 		virtual void render( const ScreenPtr screen, const std::string& pipelineName, std::shared_ptr<Scene::Camera> camera, RenderContext* context );
 		virtual void displayRenderResults( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context );
 
+
 		Core::mutex* getUpdateMutex() { return &updateMutex; }
+
+		std::function< void (void) >		debugRenderCallback; // set a function here that will get called every frame so you can use debug_render
 
 	protected:
 		typedef tbb::concurrent_vector< RenderablePtr > RenderableContainer;
