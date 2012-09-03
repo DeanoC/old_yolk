@@ -34,12 +34,13 @@ const int varFreq[Scene::CVN_NUM_CONSTANTS] = {
 	Scene::CF_STD_OBJECT,		//	WORLD_VIEW_PROJ_INVERSE,
 	Scene::CF_STD_OBJECT,		//	WORLD_VIEW_PROJ_IT,
 	Scene::CF_STD_OBJECT,		//	PREV_WORLD_VIEW_PROJ
-	0,						//	CVN_NUM_MATRICES
+	0,							//	CVN_NUM_MATRICES
 	Scene::CF_PER_FRAME,		//	FRAMECOUNT
 	Scene::CF_PER_TARGETS,		//	TARGET_DIMS
 	Scene::CF_STATIC,			//	DUMMY
-	Scene::CF_PER_PIPELINE,	//	ZPLANES
-	Scene::CF_PER_PIPELINE,	//	FOV
+	Scene::CF_PER_PIPELINE,		//	ZPLANES
+	Scene::CF_PER_PIPELINE,		//	FOV
+	Scene::CF_PER_MATERIAL,		//	MATERIAL_INDEX
 };
 
 const uint32_t varsPerBlock[ Scene::CF_NUM_BLOCKS ] = {
@@ -49,6 +50,7 @@ const uint32_t varsPerBlock[ Scene::CF_NUM_BLOCKS ] = {
 	6,		// CF_PER_VIEWS
 	1,		// CF_PER_TARGETS
 	10,		// CF_STD_OBJECT
+	1,		// CF_PER_MATERIAL
 };
 
 const Scene::ConstantCache::CachedBitFlags varBitsPerBlock[ Scene::CF_NUM_BLOCKS ] = {
@@ -59,6 +61,7 @@ const Scene::ConstantCache::CachedBitFlags varBitsPerBlock[ Scene::CF_NUM_BLOCKS
 	BIT64(Scene::CVN_TARGET_DIMS),
 	BIT64(Scene::CVN_WORLD) | BIT64(Scene::CVN_WORLD_INVERSE) | BIT64(Scene::CVN_WORLD_IT) | BIT64(Scene::CVN_WORLD_VIEW) | BIT64(Scene::CVN_WORLD_VIEW_INVERSE) | BIT64(Scene::CVN_WORLD_VIEW_IT) 
 		| BIT64(Scene::CVN_WORLD_VIEW_PROJ) | BIT64(Scene::CVN_WORLD_VIEW_PROJ_INVERSE) | BIT64(Scene::CVN_WORLD_VIEW_PROJ_IT) | BIT64(Scene::CVN_PREV_WORLD_VIEW_PROJ),
+	BIT64(Scene::CVN_MATERIAL_INDEX),
 };
 
 const size_t offsetInBlocks[ Scene::CVN_NUM_CONSTANTS ] = {
@@ -87,35 +90,37 @@ const size_t offsetInBlocks[ Scene::CVN_NUM_CONSTANTS ] = {
 	YOLK_GL_GET_OFFSET_IN_BLOCK( Static, dummy ),									// DUMMY 
 	YOLK_GL_GET_OFFSET_IN_BLOCK( PerPipeline, zPlanes ),							// ZPLANES
 	YOLK_GL_GET_OFFSET_IN_BLOCK( PerPipeline, fov ),								// FOV
+	YOLK_GL_GET_OFFSET_IN_BLOCK( PerMaterial, materialIndex ),						// MATERIAL_INDEX
 
 };
 
 const size_t sizeofInBlock[ Scene::CVN_NUM_CONSTANTS ] = {
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixView ),							// VIEW
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewInverse ),						// VIEW_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewIT ),							// VIEW_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, matrixProjection ),					// PROJ
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewInverse ),					// VIEW_INVERSE
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewIT ),						// VIEW_IT
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, matrixProjection ),				// PROJ
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, matrixProjectionInverse ),			// PROJ_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, matrixProjectionIT ),					// PROJ_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjection ),					// VIEW_PROJ
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionInverse ),			// VIEW_PROJ_INVERSE
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, matrixProjectionIT ),				// PROJ_IT
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjection ),				// VIEW_PROJ
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionInverse ),		// VIEW_PROJ_INVERSE
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionIT ),				// VIEW_PROJ_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorld ),							// WORLD
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldInverse ),					// WORLD_INVERSE
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorld ),						// WORLD
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldInverse ),				// WORLD_INVERSE
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldIT ),						// WORLD_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldView ),						// WORLD_VIEW
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewInverse ),				// WORLD_VIEW_INVERSE
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldView ),					// WORLD_VIEW
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewInverse ),			// WORLD_VIEW_INVERSE
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewIT ),					// WORLD_VIEW_IT
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjection ),			// WORLD_VIEW_PROJ
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionInverse ),		// WORLD_VIEW_PROJ_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionIT ),			// WORLD_VIEW_PROJ_IT
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionInverse ),	// WORLD_VIEW_PROJ_INVERSE
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionIT ),		// WORLD_VIEW_PROJ_IT
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
 	0,					//		CVN_NUM_MATRICES
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerFrame, frameCount ),							// FRAMERATE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerTargets, targetDims),							// TARGET_DIMS
-	YOLK_GL_GET_SIZEOF_PRG_VAR( Static, dummy ),									// DUMMY 
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerTargets, targetDims),						// TARGET_DIMS
+	YOLK_GL_GET_SIZEOF_PRG_VAR( Static, dummy ),								// DUMMY 
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, zPlanes ),							// ZPLANES
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, fov ),								// FOV
+	YOLK_GL_GET_SIZEOF_PRG_VAR( PerMaterial, materialIndex ),					// MATERIAL_INDEX
 
 };
 
@@ -130,17 +135,15 @@ ConstantCache::ConstantCache() :
 	gpuHasBlocks(0) {
 
 	blockHandles.reset( CORE_NEW_ARRAY DataBufferHandlePtr[CF_NUM_BLOCKS] );
-	//clBlockHandles.reset( CORE_NEW_ARRAY Cl::BufferHandlePtr[CF_NUM_BLOCKS] );
-
-//	auto contextCl = Cl::Platform::get()->getPrimaryContext().get();
 
 	size_t blockSizes[ CF_NUM_BLOCKS ] = {
-		sizeof(Scene::GPUConstants::Static),
-		sizeof(Scene::GPUConstants::PerFrame),
-		sizeof(Scene::GPUConstants::PerPipeline),
-		sizeof(Scene::GPUConstants::PerViews),
-		sizeof(Scene::GPUConstants::PerTargets),
-		sizeof(Scene::GPUConstants::StdObject),
+		sizeof(GPUConstants::Static),
+		sizeof(GPUConstants::PerFrame),
+		sizeof(GPUConstants::PerPipeline),
+		sizeof(GPUConstants::PerViews),
+		sizeof(GPUConstants::PerTargets),
+		sizeof(GPUConstants::StdObject),	
+		sizeof(GPUConstants::PerMaterial),
 	};
 
 	char resourceName[256];
@@ -150,20 +153,12 @@ ConstantCache::ConstantCache() :
 		) );
 		sprintf( resourceName, "_constantCache%i", i );
 		blockHandles[i] = DataBufferHandle::create( resourceName, &cbcs );
-/*		Cl::Buffer::CreationStruct clfbcs = {
-			contextCl,
-			(Cl::BUFFER_CREATION_FLAGS) (Cl::BCF_FROM_GL | Cl::BCF_KERNEL_WRITE | Cl::BCF_KERNEL_READ ),
-			0, (void*) blockHandles[i]
-		};
-		sprintf( resourceName, "_cl_constantCache%i_%i", i, s_cacheCount );
-		clBlockHandles[i] = Cl::BufferHandle::create( resourceName, &clfbcs );*/
 
 	}
 }
 
 ConstantCache::~ConstantCache() {
 	for( int i = 0; i < CF_NUM_BLOCKS; ++i ) {
-//		clBlockHandles[i]->close();
 		blockHandles[i]->close();
 	}
 }
@@ -256,6 +251,7 @@ void ConstantCache::getUIVector( CONSTANT_VAR_NAME type, uint32_t* out4 ) const 
 	case CVN_DUMMY: // though float you can access as uint32_t (makes uploader simplier...
 	case CVN_ZPLANES:
 	case CVN_FOV:
+	case CVN_MATERIAL_INDEX:
 		memcpy( out4, &vectorCache[(type-CVN_NUM_MATRICES)*16], 16 );
 		break;
 	default:
@@ -283,6 +279,7 @@ void ConstantCache::setUIVector( CONSTANT_VAR_NAME type, const uint32_t* in4 ) {
 	case CVN_DUMMY: // though float you can access as uint32_t (makes uploader simplier...
 	case CVN_ZPLANES:
 	case CVN_FOV:
+	case CVN_MATERIAL_INDEX:
 		memcpy( &vectorCache[(type-CVN_NUM_MATRICES)*16], in4, 16 );
 		break;
 	default:
@@ -356,12 +353,5 @@ void ConstantCache::updateGPU( Scene::RenderContext* context, const ProgramPtr p
 const DataBufferHandlePtr ConstantCache::getBlock( CONSTANT_FREQ_BLOCKS block ) const { 
 	return blockHandles[ block ]; 
 }
-
-/*
-const Cl::BufferHandlePtr ConstantCache::getClBlock( CONSTANT_FREQ_BLOCKS block ) const { 
-	updateGPUBlock( block );
-
-	return clBlockHandles[ block ]; 
-}*/
 
 } // end Scene namespace

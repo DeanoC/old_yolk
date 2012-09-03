@@ -12,6 +12,7 @@ namespace Scene {
 
 #include "programs/shared_structs.hlsl"
 #include "programs/constant_blocks.hlsl"
+#include "programs/vtstructs.hlsl"
 
 #undef CF_STATIC
 #undef CF_PER_FRAME
@@ -19,6 +20,7 @@ namespace Scene {
 #undef CF_PER_VIEWS
 #undef CF_PER_TARGETS
 #undef CF_STD_OBJECT
+#undef CF_PER_MATERIAL
 
 #undef VE_POSITION		
 #undef VE_NORMAL		

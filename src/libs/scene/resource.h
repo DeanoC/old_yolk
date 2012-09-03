@@ -18,8 +18,8 @@ namespace Scene {
 		RCF_BUF_VERTEX				= BIT(1),	//!< can be bound as vertex data buffer.
 		RCF_BUF_INDEX				= BIT(2),	//!< can be bound as index data buffer.
 		RCF_BUF_STREAMOUT			= BIT(3),	//!< can be bound as stream out data buffer.
-		RCF_BUF_GENERAL				= BIT(4),	//!< as general buffer (for GL)
-		RCF_TEX_1D					= BIT(5),	//<! texture is 1D
+		RCF_BUF_GENERAL				= BIT(5),	//!< As general buffer
+		RCF_TEX_1D					= BIT(5),	//<! texture is 1D or a buffer (depending on RCF_PRG_STRUCTURED)
 		RCF_TEX_2D					= BIT(6),	//!< 2D texture
 		RCF_TEX_3D					= BIT(7),	//<! texture is 3D
 		RCF_TEX_CUBE_MAP			= BIT(8),	//<! texture is a cube map
@@ -37,7 +37,7 @@ namespace Scene {
 		RCF_ACE_IMMUTABLE			= BIT(17),	//!< create a pre filled immutable buffer
 		RCF_ACE_CPU_WRITE			= BIT(18),	//!< CPU updates this buffer default=regularly
 		RCF_ACE_CPU_READ			= BIT(19),	//!< Direct CPU reading of this surface (probably very slow or even not allowed)
-		RCF_ACE_CPU_STAGING			= BIT(20),	//!< buffer is for CPU to read back GPU data
+		RCF_ACE_CPU_STAGING			= BIT(20),	//!< buffer is for CPU to transfer to/from GPU data
 		RCF_ACE_GPU_WRITE_ONLY		= BIT(21),	//!< GPU updates buffer via copy/renders etc only.
 		RCF_ACE_INTERMITANT			= BIT(22),	//!< updates/readbacks are irregular time wise
 		RCF_ACE_ONCE				= BIT(23),	//!< update/readbacks happens only once
@@ -69,7 +69,7 @@ namespace Scene {
 			const void*	referenceTex;			//!< A few creation modes needs to reference another texture, RCD_D3D_FROM_OS uses D3D11Texture*
 
 			void*		deleteWhenFinish;		//!< CORE_DELETE on this when its loaded, make async memory management a bit easier
-			uint32_t	structureSize;			//!< TODO size of a structure for structured buffers
+			uint32_t	structureSize;			//!< size of a structure for structured buffers, width is in bytes for RCF_PRG_STRUCTURED
 		};
 
 		static CreationInfo BufferCtor( 	uint32_t flags, uint32_t width, const void* prefillData = nullptr );

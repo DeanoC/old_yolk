@@ -14,11 +14,14 @@
 #include "rendercontext.h"
 #include "wobfile.h"
 #include "imagecomposer.h"
+#include "gpu_constants.h"
 #include "vtpipeline.h"
 
+#define FIXED_WIDTH 1280
+#define FIXED_HEIGHT 960
 namespace Scene {
 
-VtPipeline::VtPipeline( ) {
+VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ) {
 	// NOTE programs are loaded off disk even when from the internal default programs (which are actually bound in the code)
 	solidWireFrameProgramHandle.reset( Scene::ProgramHandle::load( "vtsolidwireframe" ) );
 	resolveProgramHandle.reset( Scene::ProgramHandle::load( "vtresolve" ) );
@@ -26,7 +29,7 @@ VtPipeline::VtPipeline( ) {
 	Texture::CreationInfo ccs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET |RCF_PRG_READ,
 			GTF_RGBA8,
-			1280, 960
+			FIXED_WIDTH, FIXED_HEIGHT
 		);
 	static const std::string colTargetName = "VtPipe_ColourTarget";
 	colourTargetHandle.reset( TextureHandle::create( colTargetName.c_str(), &ccs ) );
@@ -34,22 +37,29 @@ VtPipeline::VtPipeline( ) {
 	Texture::CreationInfo cmscs = Texture::TextureCtor(
 		RCF_TEX_2D | RCF_OUT_RENDER_TARGET |RCF_PRG_READ,
 		GTF_R11F_G11F_B10F,
-		1280, 960, 1, 1, 1, 8
+		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
 	);
 	static const std::string colTargetMSName = "VtPipe_ColourTargetMS";
 	colourTargetMSHandle.reset( TextureHandle::create( colTargetMSName.c_str(), &cmscs ) );
-
+	// depth
 	Texture::CreationInfo dmscs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
 			GTF_DEPTH24_STENCIL8,
-			1280, 960, 1, 1, 1, 8
+			FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
 		);
 	static const std::string depthTargetMSName = "VtPipe_DepthTargetMS";
 	depthTargetMSHandle.reset( TextureHandle::create( depthTargetMSName.c_str(), &dmscs ) );
+	// material index, edge alpha, coverage, 
+	Texture::CreationInfo gb0mscs = Texture::TextureCtor(
+		RCF_TEX_2D | RCF_OUT_RENDER_TARGET |RCF_PRG_READ,
+		GTF_RGBA16UI,
+		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
+	);
+	static const std::string gb0TargetMSName = "VtPipe_GBuffer0MS";
+	gBuffer0MSHandle.reset( TextureHandle::create( colTargetMSName.c_str(), &gb0mscs ) );
 
 	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
 	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
-
 	renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
 
 }
@@ -58,6 +68,9 @@ VtPipeline::~VtPipeline() {
 	renderTargetWriteHandle.reset();
 	rasterStateHandle.reset();
 	depthStencilStateHandle.reset();
+
+	materialStoreCPUHandle.reset();
+	materialStoreHandle.reset();
 
 	depthTargetMSHandle.reset();
 	colourTargetMSHandle.reset();
@@ -70,12 +83,40 @@ VtPipeline::~VtPipeline() {
 void VtPipeline::bind( Scene::RenderContext* ctx ) {
 	ctx->pushDebugMarker( getName() );
 
+	if( !gpuMaterialStoreOk ) {
+		// free existing resource
+		materialStoreHandle.reset();
+		materialStoreCPUHandle.reset();
+
+		// material data buffer
+		DataBuffer::CreationInfo mdcs = Resource::BufferCtor(
+				RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ,
+				sizeof( GPUConstants::VtMaterial ) * materialStoreSystemMem.size()
+			);
+		mdcs.structureSize = sizeof( GPUConstants::VtMaterial );
+		static const std::string materialDataName = "VtPipe_MaterialData";
+		materialStoreHandle.reset( DataBufferHandle::create( materialDataName.c_str(), &mdcs ) );
+		mdcs.flags = (Scene::RESOURCE_CREATION_FLAGS)( RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_ACE_CPU_STAGING | RCF_ACE_CPU_WRITE );
+		static const std::string materialDataCPUName = "VtPipe_MaterialDataCPU";
+		materialStoreCPUHandle.reset( DataBufferHandle::create( materialDataCPUName.c_str(), &mdcs ) );
+
+		// copy to GPU async
+		auto materialStore =  materialStoreHandle.acquire();
+		auto materialStoreCPU =  materialStoreCPUHandle.acquire();
+		void* dst = materialStoreCPU->map( ctx, DBMA_WRITE_ONLY, DBMF_NONE, 0, materialStoreSystemMem.size() * sizeof(GPUConstants::VtMaterial) );
+		memcpy( dst, &materialStoreSystemMem[0], materialStoreSystemMem.size() * sizeof(GPUConstants::VtMaterial) );
+		materialStoreCPU->unmap( ctx );
+		ctx->copy( materialStore, materialStoreCPU );
+		gpuMaterialStoreOk = true;
+	}
+
 	auto colourTarget = colourTargetMSHandle.acquire();
 	auto depthTarget = depthTargetMSHandle.acquire();
 	auto program = solidWireFrameProgramHandle.acquire();
 	auto rasterState = rasterStateHandle.acquire();
 	auto depthStencilState = depthStencilStateHandle.acquire();
 	auto rtw = renderTargetWriteHandle.acquire();
+	auto materialStore =  materialStoreHandle.acquire();
 
 	ctx->clear( colourTarget, Core::RGBAColour(0,0,0,0) );
 	ctx->clearDepthStencil( depthTarget, true, 1.0f, true, 0 );
@@ -87,7 +128,7 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 	ctx->bind( rasterState );
 	ctx->bind( depthStencilState );
 	ctx->bind( rtw );
-
+	ctx->bind( Scene::ST_FRAGMENT, 5, materialStore );
 }
 
 void VtPipeline::unbind( Scene::RenderContext* ctx ) {
@@ -153,6 +194,29 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 			mds->vacs.data[i].stream = 0;
 			mds->vacs.data[i].stride = VI_AUTO_STRIDE;
 		}
+		gpuMaterialStoreOk = false;
+		Math::Vector3 specular;
+		float specExp = 40.f;
+		GPUConstants::VtMaterial gpuMat;
+		for( uint8_t i = 0; i < mat->uiNumParameters; ++i ) {
+			if( std::string( mat->pParameters.p[i].pName.p ) == "DiffuseColour" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
+				gpuMat.diffuse = Math::Vector4( (const float*)mat->pParameters.p[i].pData.p );
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "SpecularColour" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
+				auto spec = (const float*)mat->pParameters.p[i].pData.p;
+				specular = Math::Vector3( spec[0], spec[1], spec[2] );
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "EmissiveColour" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
+				gpuMat.emissive = Math::Vector4( (const float*)mat->pParameters.p[i].pData.p );
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Shininess" ) {
+				specExp = *(const float*)mat->pParameters.p[i].pData.p;
+			}
+		}
+		// pack specular exponent and specular colour
+		gpuMat.specular = Math::Vector4( specular[0], specular[1], specular[2], specExp );
+		materialStoreSystemMem.push_back( gpuMat );
+		mds->materialIndex = (uint32_t) (materialStoreSystemMem.size() - 1);
 
 		mds->vaoHandle = VertexInputHandle::create( 
 				(mds->name + VertexInput::genEleString(mds->vacs.elementCount, mds->vacs.elements)).c_str(), &mds->vacs );
@@ -167,6 +231,10 @@ void VtPipelineDataStore::render( Scene::RenderContext* rc ) {
 
 	for( int i = 0;i < numMaterials; ++i ) {
 		const PerMaterial* mds = &materials[i];
+
+		const uint32_t materialIndex[4] = { mds->materialIndex, mds->materialIndex, mds->materialIndex, mds->materialIndex };
+		ctx->getConstantCache().setUIVector( CVN_MATERIAL_INDEX, materialIndex );
+		ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_PER_MATERIAL );
 
 		auto vao = mds->vaoHandle->tryAcquire();
 		if( !vao ) { /* LOG(INFO) << "vao not ready\n"; */ return; }

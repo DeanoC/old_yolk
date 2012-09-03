@@ -166,6 +166,7 @@ void ProgramMan::buildConstantTables( Program* prg ) {
 	prg->usedBuffers |= prg->usesConstantBuffer( "PerViews" ) 		? BIT( CF_PER_VIEWS ) 		: 0;
 	prg->usedBuffers |= prg->usesConstantBuffer( "PerTargets" ) 	? BIT( CF_PER_TARGETS ) 	: 0;
 	prg->usedBuffers |= prg->usesConstantBuffer( "StdObject" ) 		? BIT( CF_STD_OBJECT ) 		: 0;
+	prg->usedBuffers |= prg->usesConstantBuffer( "PerMaterial" ) 	? BIT( CF_PER_MATERIAL)		: 0;
 
 	if( prg->usedBuffers & BIT( CF_STATIC ) ) {
 		bool used = false;
@@ -223,6 +224,13 @@ void ProgramMan::buildConstantTables( Program* prg ) {
 		YOLK_VALIDATE_PRG_OFFSETS( prg, StdObject, matrixPreviousWorldViewProjection ); 
 		if( !used ) {
 			prg->usedBuffers &= ~ BIT( CF_STD_OBJECT );
+		}
+	}
+	if( prg->usedBuffers & BIT( CF_PER_MATERIAL ) ) {
+		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerMaterial, materialIndex ); 
+		if( !used ) {
+			prg->usedBuffers &= ~ BIT( CF_PER_MATERIAL );
 		}
 	}
 }

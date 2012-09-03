@@ -32,10 +32,6 @@ namespace Dx11 {
 		virtual void pushDebugMarker( const char* text ) const override;
 		virtual void popDebugMarker() const override;
 
-		virtual void clear( const Scene::TexturePtr& target, const Core::Colour& colour ) override;
-		virtual void clearDepthStencil( const Scene::TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) override; 
-
-
 		virtual void bindRenderTargets( const Scene::TexturePtr& target, const Scene::TexturePtr& depthTarget ) override;
 		virtual void bindRenderTarget( const Scene::TexturePtr& target ) override;
 		virtual void bindDepthOnlyRenderTarget( const Scene::TexturePtr& depthTarget ) override;
@@ -47,13 +43,21 @@ namespace Dx11 {
 	
 		virtual void bind( const Scene::ProgramPtr& prg ) override;
 		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::TexturePtr& tex ) override;
-		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr sampler ) override;
-		virtual void bind( const Scene::RenderTargetStatesPtr targetStates ) override;
-		virtual void bind( const Scene::DepthStencilStatePtr dsStates ) override;
-		virtual void bind( const Scene::RasteriserStatePtr rasteriser ) override;
-		virtual void bind( const Scene::VertexInputPtr vertexInput ) override;
+		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& sampler ) override;
+		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr& sampler ) override;
 
-		virtual void bindIndexBuffer( const Scene::DataBufferPtr ib, int indexBytes ) override;
+		virtual void bind( const Scene::RenderTargetStatesPtr& targetStates ) override;
+		virtual void bind( const Scene::DepthStencilStatePtr& dsStates ) override;
+		virtual void bind( const Scene::RasteriserStatePtr& rasteriser ) override;
+		virtual void bind( const Scene::VertexInputPtr& vertexInput ) override;
+
+		virtual void bindIndexBuffer( const Scene::DataBufferPtr& ib, int indexBytes ) override;
+
+		virtual void clear( const Scene::TexturePtr& target, const Core::Colour& colour ) override;
+		virtual void clearDepthStencil( const Scene::TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) override; 
+
+		virtual void copy( const Scene::DataBufferPtr& dst, const Scene::DataBufferPtr& src ) override;
+		virtual void copy( const Scene::TexturePtr& dst, const Scene::TexturePtr& src ) override;
 
 		virtual void draw( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) override;
 		virtual void drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) override;

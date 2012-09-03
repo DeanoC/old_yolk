@@ -1,8 +1,14 @@
+#include "shared_structs.hlsl"
+#include "constant_blocks.hlsl"
+#include "vtstructs.hlsl"
+
 struct FS_IN {
 	float4 position : SV_POSITION;
 	float4 colour 	: COLOR0;
 	float3 edgeH	: TEXCOORD0;
 };
+
+StructuredBuffer<VtMaterial> MaterialStore : register(t5);
 
 float evalMinDistanceToEdges(in float3 edgeH) {
     float dist;
@@ -26,7 +32,7 @@ float4 main( FS_IN input ) : SV_Target {
     // Compute the shortest distance between the fragment and the edges.
     float dist = evalMinDistanceToEdges( input.edgeH );
 
-    float4 col = input.colour;
+    float4 col = MaterialStore[ materialIndex.x ].diffuse;
 
     // Cull fragments too far from the edge.
     if (dist <= 0.5*LineWidth+1) {
@@ -40,7 +46,7 @@ float4 main( FS_IN input ) : SV_Target {
 		// Dividing by pos.w, the depth in view space
 		float fading = clamp(FadeDistance / input.position.w, 0, 1);
 
-		col.xyz = lerp( col.xyz, WireColour, alpha * fading ) + alpha.xxx;
+		col.xyz = col.xyz + ( col.xyz * alpha * fading );// + alpha.xxx;
 	}
 
 	return col;

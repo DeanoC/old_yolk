@@ -25,21 +25,6 @@ void RenderContext::pushDebugMarker( const char* text ) const {
 
 void RenderContext::popDebugMarker() const {
 }
-void RenderContext::clear( const Scene::TexturePtr& starget, const Core::Colour& colour ) {
-	const std::shared_ptr<Dx11::Texture> target = 
-				std::static_pointer_cast<Dx11::Texture>( starget );
-	ctx->ClearRenderTargetView( (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get(),
-								(float*) &colour.getRGBAColour()[0] );
-}
-
-void RenderContext::clearDepthStencil( const Scene::TexturePtr& starget, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) {
-	const std::shared_ptr<Dx11::Texture> target = 
-				std::static_pointer_cast<Dx11::Texture>( starget );
-	ctx->ClearDepthStencilView( (ID3D11DepthStencilView*)target->getView( Resource::DEPTH_STENCIL_VIEW ).get(),
-								(clearDepth ? D3D11_CLEAR_DEPTH : 0) | (clearStencil ? D3D11_CLEAR_STENCIL : 0),
-								depth, stencil );
-
-}
 
 void RenderContext::bindRenderTargets( const Scene::TexturePtr& starget, 
 										const Scene::TexturePtr& sdepthTarget ) {
@@ -86,9 +71,6 @@ void RenderContext::bindRenderTargets( unsigned int numTargets, const Scene::Tex
 		rtViews[i] = (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get();
 	};
 	ctx->OMSetRenderTargets( numTargets, rtViews, nullptr );
-}
-void RenderContext::unbindRenderTargets() {
-	ctx->OMSetRenderTargets( 0, nullptr, nullptr );
 }
 
 void RenderContext::bind( const Scene::Viewport& viewport ) {
@@ -183,7 +165,22 @@ void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, c
 	default:;
 	}
 }
-void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr ssampler ) {
+
+void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& stex ) {
+	auto buf = std::static_pointer_cast<Dx11::DataBuffer>( stex );
+	auto view = (ID3D11ShaderResourceView* const) buf->getView( buf->SHADER_RESOURCE_VIEW ).get();
+	switch( type ) {
+	case Scene::ST_VERTEX: ctx->VSSetShaderResources( unit,1, &view ); break;
+	case Scene::ST_FRAGMENT: ctx->PSSetShaderResources( unit,1, &view ); break;
+	case Scene::ST_GEOMETRY: ctx->GSSetShaderResources( unit,1, &view ); break;
+	case Scene::ST_HULL: ctx->HSSetShaderResources( unit,1, &view ); break;
+	case Scene::ST_DOMAIN: ctx->DSSetShaderResources( unit,1, &view ); break;
+	case Scene::ST_COMPUTE: ctx->CSSetShaderResources( unit,1, &view ); break;
+	default:;
+	}
+}
+
+void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr& ssampler ) {
 	auto sampler = std::static_pointer_cast<Dx11::SamplerState>( ssampler );
 	auto samp = query_interface<ID3D11SamplerState>( sampler->samplerState, IID_ID3D11SamplerState ).get();
 	switch( type ) {
@@ -197,25 +194,26 @@ void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, c
 	}
 }
 
-void RenderContext::bind( const Scene::RenderTargetStatesPtr stargetStates ) {
+
+void RenderContext::bind( const Scene::RenderTargetStatesPtr& stargetStates ) {
 	auto targetStates = std::static_pointer_cast<Dx11::RenderTargetStates>( stargetStates );
 	auto states = (ID3D11BlendState* const)targetStates->renderTargetState.get();
 	// TODO blend factor and sample mask
 	float todo[4] = { 1,1,1,1 };
 	ctx->OMSetBlendState( states, todo, 0xFFFFFFFF );
 }
-void RenderContext::bind( const Scene::DepthStencilStatePtr sdsState ) {
+void RenderContext::bind( const Scene::DepthStencilStatePtr& sdsState ) {
 	auto dsState = std::static_pointer_cast<Dx11::DepthStencilState>( sdsState );
 	auto state = (ID3D11DepthStencilState* const)dsState->depthStencilState.get();
 	// todo stencil ref
 	ctx->OMSetDepthStencilState( state, 0 );
 }
-void RenderContext::bind( const Scene::RasteriserStatePtr sraster ) {
+void RenderContext::bind( const Scene::RasteriserStatePtr& sraster ) {
 	auto raster = std::static_pointer_cast<Dx11::RasteriserState>( sraster );
 	auto state = (ID3D11RasterizerState* const)raster->rasteriserState.get();
 	ctx->RSSetState( state );
 }
-void RenderContext::bind( const Scene::VertexInputPtr svertexInput ) {
+void RenderContext::bind( const Scene::VertexInputPtr& svertexInput ) {
 	auto vin = std::static_pointer_cast<Dx11::VertexInput>( svertexInput );
 
 	CORE_ASSERT( vin->inputLayout );
@@ -233,14 +231,40 @@ void RenderContext::bind( const Scene::VertexInputPtr svertexInput ) {
 	ctx->IASetInputLayout( vin->inputLayout.get() );
 }
 
-void RenderContext::bindIndexBuffer( const Scene::DataBufferPtr sib, int indexBytes ) {
+void RenderContext::bindIndexBuffer( const Scene::DataBufferPtr& sib, int indexBytes ) {
 	auto ib = std::static_pointer_cast<Dx11::DataBuffer>( sib );
 	auto buf = (ID3D11Buffer* const)ib->get().get();
 	ctx->IASetIndexBuffer( buf, (indexBytes == 2) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0 );
 }
 
+void RenderContext::clear( const Scene::TexturePtr& starget, const Core::Colour& colour ) {
+	const std::shared_ptr<Dx11::Texture> target = 
+				std::static_pointer_cast<Dx11::Texture>( starget );
+	ctx->ClearRenderTargetView( (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get(),
+								(float*) &colour.getRGBAColour()[0] );
+}
 
-D3D11_PRIMITIVE_TOPOLOGY PT_Map[] = {
+void RenderContext::clearDepthStencil( const Scene::TexturePtr& starget, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) {
+	const std::shared_ptr<Dx11::Texture> target = 
+				std::static_pointer_cast<Dx11::Texture>( starget );
+	ctx->ClearDepthStencilView( (ID3D11DepthStencilView*)target->getView( Resource::DEPTH_STENCIL_VIEW ).get(),
+								(clearDepth ? D3D11_CLEAR_DEPTH : 0) | (clearStencil ? D3D11_CLEAR_STENCIL : 0),
+								depth, stencil );
+
+}
+
+void RenderContext::copy( const Scene::DataBufferPtr& sdst, const Scene::DataBufferPtr& ssrc ) {
+	auto db = std::static_pointer_cast<Dx11::DataBuffer>( sdst );
+	auto sb = std::static_pointer_cast<Dx11::DataBuffer>( ssrc );
+	ctx->CopyResource( db->get().get(), sb->get().get() );
+}
+void RenderContext::copy( const Scene::TexturePtr& sdst, const Scene::TexturePtr& ssrc ) {
+	auto dt = std::static_pointer_cast<Dx11::Texture>( sdst );
+	auto st = std::static_pointer_cast<Dx11::Texture>( ssrc );
+	ctx->CopyResource( dt->get().get(), st->get().get() );
+}
+
+static D3D11_PRIMITIVE_TOPOLOGY PT_Map[] = {
 		D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
 		D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 		D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP,
@@ -261,5 +285,9 @@ void RenderContext::drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexC
 	ctx->DrawIndexed( indexCount, startIndex, baseOffset );
 }
 
+
+void RenderContext::unbindRenderTargets() {
+	ctx->OMSetRenderTargets( 0, nullptr, nullptr );
+}
 
 }

@@ -4,6 +4,7 @@
 #define CF_PER_VIEWS		3
 #define CF_PER_TARGETS		4
 #define CF_STD_OBJECT		5
+#define CF_PER_MATERIAL		6
 
 #if defined(D3D_SM5)
 #define VE_POSITION			POSITION
@@ -60,15 +61,18 @@ constant_buffer( PerTargets, CF_PER_TARGETS ) {
 };
 
 constant_buffer( StdObject, CF_STD_OBJECT ) {
-	float16		 matrixWorld;
-	float16		 matrixWorldInverse;
-	float16		 matrixWorldIT;
-	float16		 matrixWorldView;
-	float16		 matrixWorldViewInverse;
-	float16		 matrixWorldViewIT;
-	float16		 matrixWorldViewProjection;
-	float16		 matrixWorldViewProjectionInverse;
-	float16		 matrixWorldViewProjectionIT;
-	float16		 matrixPreviousWorldViewProjection;
+	float16		matrixWorld;
+	float16		matrixWorldInverse;
+	float16		matrixWorldIT;
+	float16		matrixWorldView;
+	float16		matrixWorldViewInverse;
+	float16		matrixWorldViewIT;
+	float16		matrixWorldViewProjection;
+	float16		matrixWorldViewProjectionInverse;
+	float16		matrixWorldViewProjectionIT;
+	float16		matrixPreviousWorldViewProjection;
 };
 
+constant_buffer( PerMaterial, CF_PER_MATERIAL ) {
+	uint4 		materialIndex;	// x only
+};

@@ -24,6 +24,8 @@ namespace Scene {
 		CF_PER_TARGETS,
 		CF_STD_OBJECT,
 
+		CF_PER_MATERIAL, // TODO concanate materials via instancing hw
+
 		CF_NUM_BLOCKS,
 
 		CF_MAX_BLOCKS = 16,
@@ -58,6 +60,9 @@ namespace Scene {
 		CVN_DUMMY,				// float vec4 (for testing)
 		CVN_ZPLANES,			// float4 x=near y=far, far - near
 		CVN_FOV,				// float4 fov x and y scale, 
+
+		CVN_MATERIAL_INDEX,		
+
 		CVN_NUM_CONSTANTS
 	};
 
@@ -71,7 +76,6 @@ namespace Scene {
 
 		const Math::Matrix4x4& getMatrix( CONSTANT_VAR_NAME type ) const;
 		const Math::Vector4& getVector( CONSTANT_VAR_NAME type ) const;
-
 		void getUIVector( CONSTANT_VAR_NAME type, uint32_t* out4 ) const;
 
 		void setUIVector( CONSTANT_VAR_NAME type, const uint32_t* in4 );
@@ -95,12 +99,10 @@ namespace Scene {
 		// will update all the gpu blocks that need updating, regardless of whether its
 		// accessed by the current shader
 		void updateGPU( Scene::RenderContext* context, const ProgramPtr prg = nullptr  );
-
 		void updateGPUBlock( Scene::RenderContext* context, CONSTANT_FREQ_BLOCKS block ) const;
 
 		// ensure block is upto date first!
 		const DataBufferHandlePtr getBlock( CONSTANT_FREQ_BLOCKS block ) const;
-//		const Cl::BufferHandlePtr getClBlock( CONSTANT_FREQ_BLOCKS block ) const;
 
 	private:
 		mutable CachedBitFlags			cachedFlags;
@@ -110,7 +112,6 @@ namespace Scene {
 		boost::scoped_array<size_t>		offsets;
 
 		boost::scoped_array<DataBufferHandlePtr>	blockHandles;
-//		boost::scoped_array<Cl::BufferHandlePtr>	clBlockHandles;
 	};
 
 }

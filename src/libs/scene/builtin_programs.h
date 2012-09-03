@@ -1,6 +1,7 @@
 
 DECLARE_SHARED( shared_structs );
 DECLARE_SHARED( constant_blocks );
+DECLARE_SHARED( vtstructs );
 
 DECLARE_SHADER( vs_null );
 DECLARE_SHADER( vs_basic );

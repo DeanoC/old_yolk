@@ -34,12 +34,12 @@ namespace Dx11 {
 		D3DViewPtr getView( uint32_t viewType ) const { return views[viewType]; }
 
 		// for custom view or in CUSTOM_VIEW for type and it will create the view and return its index
-		uint32_t createView( uint32_t viewType, Scene::Resource::CreationInfo* creation );
+		uint32_t createView( uint32_t viewType, const Scene::Resource::CreationInfo* creation );
 	protected:
-		void createSRView( uint32_t index, Scene::Resource::CreationInfo* creation );
-		void createDSView( uint32_t index, Scene::Resource::CreationInfo* creation );
-		void createRTView( uint32_t index, Scene::Resource::CreationInfo* creation );
-		void createUAView( uint32_t index, Scene::Resource::CreationInfo* creation );
+		void createSRView( uint32_t index, const Scene::Resource::CreationInfo* creation );
+		void createDSView( uint32_t index, const Scene::Resource::CreationInfo* creation );
+		void createRTView( uint32_t index, const Scene::Resource::CreationInfo* creation );
+		void createUAView( uint32_t index, const Scene::Resource::CreationInfo* creation );
 
 		D3DResourcePtr			resource;
 		std::vector<D3DViewPtr>	views;

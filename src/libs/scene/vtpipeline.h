@@ -15,12 +15,10 @@
 #include "core/resources.h"
 #include "scene/pipeline.h"
 #include "scene/vertexinput.h"
+#include "scene/gpu_constants.h"
 
 namespace Scene {
 	class RenderContext;	
-}
-
-namespace Scene {
 
 	class VtPipeline : public Pipeline {
 	public:
@@ -44,12 +42,19 @@ namespace Scene {
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetHandle;
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetMSHandle;
 		Core::ScopedResourceHandle<TextureHandle>			depthTargetMSHandle;
+		Core::ScopedResourceHandle<TextureHandle>			gBuffer0MSHandle;
 
 		Core::ScopedResourceHandle<ProgramHandle>			solidWireFrameProgramHandle;
 		Core::ScopedResourceHandle<ProgramHandle>			resolveProgramHandle;
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
 		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetWriteHandle;
+
+		bool												gpuMaterialStoreOk;
+		Core::ScopedResourceHandle<DataBufferHandle>		materialStoreHandle;
+		Core::ScopedResourceHandle<DataBufferHandle>		materialStoreCPUHandle;
+		std::vector<GPUConstants::VtMaterial>				materialStoreSystemMem;
+		std::vector<GPUConstants::VtDirectionalLight>		directionalLightStoreSystemMem;
 	};
 
 	class VtPipelineDataStore : public PipelineDataStore {
@@ -66,6 +71,7 @@ namespace Scene {
 			size_t							numIndices;
 			int								indexSize;		// size 2 or 4
 			Scene::DataBufferHandlePtr		indexBuffer;
+			uint32_t						materialIndex;
 		};
 		int numMaterials;
 		boost::scoped_array<PerMaterial>	materials;

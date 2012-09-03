@@ -120,21 +120,36 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 	DXGI_FORMAT typelessFmt = DXGIFormat::getTypelessTextureFormat( fmt );
 
 	if( creation->flags & RCF_TEX_1D ) {
-		// no Multisample 1D textures
-		CORE_ASSERT( creation->samples <= 1 );
-		D3D11_TEXTURE1D_DESC texDesc;
-		texDesc.Width = creation->width;
-		texDesc.MipLevels = creation->mipLevels;
-		texDesc.ArraySize = creation->slices;
-		texDesc.Format = typelessFmt;
-		texDesc.BindFlags = bind;
-		texDesc.CPUAccessFlags = cpuAccess;
-		texDesc.MiscFlags = misc;
+		if( creation->flags & RCF_PRG_STRUCTURED ) {
+			// structured 1D textures are buffers
+			CORE_ASSERT( creation->samples <= 1 );
+			D3D11_BUFFER_DESC texDesc;
+			texDesc.ByteWidth = creation->width;
+			texDesc.StructureByteStride = creation->structureSize;
+			texDesc.BindFlags = bind;
+			texDesc.CPUAccessFlags = cpuAccess;
+			texDesc.MiscFlags = misc;
 
-		ID3D11Texture1D* texture;
-		DXFAIL( Gfx::getr()()->CreateTexture1D( &texDesc, initialData.get(), &texture ) );
-		resource = D3DResourcePtr( texture, false );
+			ID3D11Buffer* texture;
+			DXFAIL( Gfx::getr()()->CreateBuffer( &texDesc, initialData.get(), &texture ) );
+			resource = D3DResourcePtr( texture, false );
 
+		} else {
+			// no Multisample 1D textures
+			CORE_ASSERT( creation->samples <= 1 );
+			D3D11_TEXTURE1D_DESC texDesc;
+			texDesc.Width = creation->width;
+			texDesc.MipLevels = creation->mipLevels;
+			texDesc.ArraySize = creation->slices;
+			texDesc.Format = typelessFmt;
+			texDesc.BindFlags = bind;
+			texDesc.CPUAccessFlags = cpuAccess;
+			texDesc.MiscFlags = misc;
+
+			ID3D11Texture1D* texture;
+			DXFAIL( Gfx::getr()()->CreateTexture1D( &texDesc, initialData.get(), &texture ) );
+			resource = D3DResourcePtr( texture, false );
+		}
 	} else if( creation->flags & RCF_TEX_2D ) {
 
 		D3D11_TEXTURE2D_DESC texDesc;

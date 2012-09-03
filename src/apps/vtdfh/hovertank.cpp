@@ -41,7 +41,7 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 		ship->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
 		ship->getPhysical()->syncBulletTransform();
 	}
-	world->debugRenderCallback = std::bind( &HoverTank::debugCallback, this );
+	//world->debugRenderCallback = std::bind( &HoverTank::debugCallback, this );
 }
 
 
@@ -129,7 +129,7 @@ void HoverTank::update( float timeMS ) {
 	}
 
 	// manually drive camera updates TODO add back to updatables/things list??
-//	zarchCam->update( timeMS );
+	zarchCam->update( timeMS );
 	objectCam->update( timeMS );
 }
 

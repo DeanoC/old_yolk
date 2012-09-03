@@ -42,10 +42,9 @@ uint32_t WobbyWriter::WriteScalarParams(	const MeshMod::MaterialData::ParameterC
 			parameterString << "(u16)" << uiFlags << " // Flags: " << (pScalar.isAnimated ? "Animated " : "") << "\n";
 			// write the parameter name to the string table and insert the poitner in the parameter
 			m_stringTable[ paramBaseName + ":" ] = paramBaseName;
-			parameterString << "(u32)" << 0 << "\n" << paramBaseName << "\n";
-			// the pointer to the data (which is packed with other param data at the end of the 
-			// paramater array
-			parameterString << "(u32)" << 0 << "\n" << (txtBaseName + paramBaseName + "_Data") << "\n";
+			parameterString << ".align 8, (u32)0," << paramBaseName << "\n";
+			// the pointer to the data (which is packed with other param data at the end of the paramater array
+			parameterString << "(u32)0," << (txtBaseName + paramBaseName + "_Data") << "\n";
 			parameterDataString << (txtBaseName + paramBaseName + "_Data: \n");
 			parameterDataString << pScalar.x << "// " << paramBaseName << " = " << pScalar.x << "\n";
 
@@ -83,10 +82,9 @@ uint32_t WobbyWriter::WriteRGBParams(	const MeshMod::MaterialData::ParameterCont
 			parameterString << "(u16)" << uiFlags << " // Flags: " << (pRGB.isAnimated ? "Animated " : "") << "\n";
 			// write the parameter name to the string table and insert the poitner in the parameter
 			m_stringTable[ paramBaseName + ":" ] = paramBaseName;
-			parameterString << "(u32)" << 0 << "\n" << paramBaseName << "\n";
-			// the pointer to the data (which is packed with other param data at the end of the 
-			// paramater array
-			parameterString << "(u32)" << 0 << "\n" << (txtBaseName + paramBaseName + "_Data") << "\n";
+			parameterString << ".align 8, (u32)0," << paramBaseName << "\n";
+			// the pointer to the data (which is packed with other param data at the end of the paramater array
+			parameterString << "(u32)0," << (txtBaseName + paramBaseName + "_Data") << "\n";
 			parameterDataString << (txtBaseName + paramBaseName + "_Data: \n");
 			parameterDataString <<	pRGB.r << ", " << pRGB.g << ", " << pRGB.b << "\t// " << 
 									paramBaseName << " = " << pRGB.r << ", " << pRGB.g << ", " << pRGB.b << "\n";
@@ -137,11 +135,9 @@ uint32_t WobbyWriter::WriteTextureParams(	const MeshMod::MaterialData::Parameter
 			}
 			parameterString << "(u16)" << uiFlags << " // Flags: " << (texture.isAnimated ? "Animated " : "") << "\n";
 			// write the parameter name to the string table and insert the poitner in the parameter
-			m_stringTable[ paramBaseName + ":" ] = paramBaseName;
-			parameterString << "(u32)" << 0 << "\n" << paramBaseName << "\n";
-			// the pointer to the data (which is packed with other param data at the end of the 
-			// paramater array
-			parameterString << "(u32)" << 0 << "\n" << (txtBaseName + paramBaseName + "_Data") << "\n";
+			parameterString << ".align 8, (u32)0," << paramBaseName << "\n";
+			// the pointer to the data (which is packed with other param data at the end of the paramater array
+			parameterString << "(u32)0," << (txtBaseName + paramBaseName + "_Data") << "\n";
 			parameterDataString << (txtBaseName + paramBaseName + "_Data: \n");
 			parameterDataString << "\"" << texture.textureName.c_str() << "\\0\""  << " // " << paramBaseName << " = " << texture.textureName.c_str() << "\n";
 		} else
@@ -170,7 +166,7 @@ void WobbyWriter::ConvertLightParamsToMaterialParameters( 	MeshMod::MaterialElem
 		if( (*shaderEle)[ matIndex ].shaderName.empty() ) {
 			// no shader convert it from  light params
 			(*shaderEle)[ matIndex ] = std::string("blinn");
-			paramCon.pushBack<RGBElements>( "EmmisiveColour", RGBColour(params.luminosity[0], params.luminosity[1], params.luminosity[2] ) );
+			paramCon.pushBack<RGBElements>( "EmissiveColour", RGBColour(params.luminosity[0], params.luminosity[1], params.luminosity[2] ) );
 			paramCon.pushBack<RGBElements>( "DiffuseColour", RGBColour(params.diffuse[0], params.diffuse[1], params.diffuse[2] ) );
 			paramCon.pushBack<RGBElements>( "SpecularColour", RGBColour(params.specular[0], params.specular[1], params.specular[2] ) );
 			paramCon.pushBack<FloatScalarElements>( "Shininess", FloatScalar( params.specular_exponent ) );
@@ -310,9 +306,7 @@ void WobbyWriter::WriteMaterial( const unsigned int matNum, const unsigned int u
 	outStream << maxAABB[0] << ", " << maxAABB[1] << ", " << maxAABB[2] << "\t//maxAABB\n";
 	outStream << ".type u32\n";
 	outStream << ".align 8\n";
-
 	outStream << "0, " << vertexElementLabel.str() << "\n";
-	// store parameter label
 	outStream << "0, " << parameterLabel.str() << "\n";
 
 	WriteVerticesAndIndices( matNum, posEle,normEle,uvEle, boneEle, outStream );
@@ -634,6 +628,7 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath outFilenam
 	outStream << "DiscardBlockEnd-DiscardBlockStart" << "\n";			// calculated sizeof discard block
 	outStream << "//End Wob Header" << "\n";
 
+	outStream << ".align 8\n";
 	outStream <<"MainBlockStart:\n";
 	// output the material list state label
 	outStream << "MaterialListStart:" << "\n";
@@ -652,21 +647,21 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath outFilenam
 		}
 		++nameIt;
 	}
+	outStream << ".align 8// parameter table start\n";
+	std::map<std::string,std::string>::const_iterator ptIt = m_parameterDataTable.begin();
+	while( ptIt != m_parameterDataTable.end() )
+	{
+		outStream << ptIt->first << "\n" << ptIt->second << "\n";
+		++ptIt;
+	}
 
-	outStream << "// string table start\n";
+	outStream << ".align 8// string table start\n";
 	// now output the data tables
 	std::map<std::string,std::string>::const_iterator stIt = m_stringTable.begin();
 	while( stIt != m_stringTable.end() )
 	{
 		outStream << stIt->first << "\n" << "\"" << stIt->second << "\\0\"" << "\n";
 		++stIt;;
-	}
-	outStream << "// parameter table start\n";
-	std::map<std::string,std::string>::const_iterator ptIt = m_parameterDataTable.begin();
-	while( ptIt != m_parameterDataTable.end() )
-	{
-		outStream << ptIt->first << "\n" << ptIt->second << "\n";
-		++ptIt;
 	}
 	outStream <<"MainBlockEnd:\n";
 

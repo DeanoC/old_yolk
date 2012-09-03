@@ -15,7 +15,7 @@
 namespace Dx11
 {
 
-uint32_t Resource::createView( uint32_t viewType, Scene::Resource::CreationInfo* creation ) {
+uint32_t Resource::createView( uint32_t viewType, const Scene::Resource::CreationInfo* creation ) {
 
 	bool custom = !!(viewType & CUSTOM_VIEW);
 	viewType = viewType & ~CUSTOM_VIEW;
@@ -38,7 +38,7 @@ uint32_t Resource::createView( uint32_t viewType, Scene::Resource::CreationInfo*
 	return index;
 }
 
-void Resource::createSRView( uint32_t index, Scene::Resource::CreationInfo* creation ) {
+void Resource::createSRView( uint32_t index, const Scene::Resource::CreationInfo* creation ) {
 	using namespace Scene;
 	D3D11_SHADER_RESOURCE_VIEW_DESC srDesc;
 	srDesc.Format = DXGIFormat::getDXGIFormat( creation->format );
@@ -52,8 +52,11 @@ void Resource::createSRView( uint32_t index, Scene::Resource::CreationInfo* crea
 		srDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
 		if( creation->flags & RCF_PRG_STRUCTURED ) {
 			srDesc.Format = DXGI_FORMAT_UNKNOWN;
+			srDesc.BufferEx.NumElements = creation->width / creation->structureSize;
+		} else {
+			// TODO think I have divide width by size of format?
+			srDesc.BufferEx.NumElements = creation->width;
 		}
-		srDesc.BufferEx.NumElements = creation->width;
 		srDesc.BufferEx.FirstElement = 0;
 		if( creation->flags & RCF_PRG_BYTE_ACCESS ) {
 			srDesc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
@@ -130,7 +133,7 @@ void Resource::createSRView( uint32_t index, Scene::Resource::CreationInfo* crea
 	DXFAIL( Gfx::getr()()->CreateShaderResourceView( resource.get(), &srDesc, &view ) );
 	views[ index ] = D3DViewPtr( view, false );
 }
-void Resource::createDSView( uint32_t index, Scene::Resource::CreationInfo* creation ) {
+void Resource::createDSView( uint32_t index, const Scene::Resource::CreationInfo* creation ) {
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsDesc;
 	dsDesc.Flags = 0;
 	dsDesc.Format = DXGIFormat::getDXGIFormat( creation->format );
@@ -146,7 +149,7 @@ void Resource::createDSView( uint32_t index, Scene::Resource::CreationInfo* crea
 	views[ index ] = D3DViewPtr( view, false );
 
 }
-void Resource::createRTView( uint32_t index, Scene::Resource::CreationInfo* creation ) {
+void Resource::createRTView( uint32_t index, const Scene::Resource::CreationInfo* creation ) {
 	D3D11_RENDER_TARGET_VIEW_DESC rtDesc;
 	rtDesc.Format = DXGIFormat::getDXGIFormat( creation->format );
 	if( creation->samples > 1 ) {
@@ -162,7 +165,7 @@ void Resource::createRTView( uint32_t index, Scene::Resource::CreationInfo* crea
 
 }
 
-void Resource::createUAView( uint32_t index, Scene::Resource::CreationInfo* creation ) {
+void Resource::createUAView( uint32_t index, const Scene::Resource::CreationInfo* creation ) {
 	using namespace Scene;
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
 	uavDesc.Format = DXGIFormat::getDXGIFormat( creation->format );

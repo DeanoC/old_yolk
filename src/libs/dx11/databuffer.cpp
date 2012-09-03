@@ -58,8 +58,12 @@ DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	CORE_ASSERT( (( creation->flags & RCF_ACE_CPU_WRITE ) == false) || (( creation->flags & RCF_ACE_CPU_READ ) == false) );
 
 	if( creation->flags & RCF_ACE_CPU_STAGING ) {
-		usage = D3D11_USAGE_STAGING; // CPU read-backs
-		cpuAccess = D3D11_CPU_ACCESS_READ;
+		usage = D3D11_USAGE_STAGING; // CPU to GPU transfers
+		if( creation->flags & RCF_ACE_CPU_WRITE ) {
+			cpuAccess = D3D11_CPU_ACCESS_WRITE;
+		} else {
+			cpuAccess = D3D11_CPU_ACCESS_READ;
+		}
 	} else if( creation->flags & RCF_ACE_CPU_WRITE ) {
 		if( creation->flags & RCF_ACE_ONCE ) {
 			usage = D3D11_USAGE_DEFAULT;
@@ -78,8 +82,10 @@ DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	} else if( creation->flags & RCF_ACE_CPU_READ ) {	
 		usage = D3D11_USAGE_DYNAMIC;
 		cpuAccess = D3D11_CPU_ACCESS_READ;
+	}else {
+		usage = D3D11_USAGE_DEFAULT;
+		cpuAccess = 0;
 	}
-	CORE_ASSERT( usage != 0 );
 
 	uint32_t bind = 0;
 	uint32_t misc = 0;
@@ -106,6 +112,7 @@ DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	}
 	if( creation->flags & RCF_PRG_STRUCTURED ) {
 		misc |= D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		size = creation->width; // don't mess with structured buffers sizes
 	}
 	if( creation->flags & RCF_ACE_GPU_INDIRECT ) {
 		misc |= D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
@@ -118,6 +125,7 @@ DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	bufferDesc.BindFlags        = bind;
 	bufferDesc.CPUAccessFlags   = cpuAccess;
 	bufferDesc.MiscFlags        = misc;
+	bufferDesc.StructureByteStride = creation->structureSize;
 
 	HRESULT hr;
 	ID3D11Buffer* buffer;
@@ -126,6 +134,13 @@ DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	DataBuffer* dbuffer = CORE_NEW DataBuffer( D3DBufferPtr( buffer, false ) );
 	dbuffer->size = size;
 
+	// create default views for this buffer
+	if( bind & D3D11_BIND_SHADER_RESOURCE ) {
+		dbuffer->createView( SHADER_RESOURCE_VIEW, creation );
+	}
+	if( bind & RCF_OUT_UNORDERED_ACCESS ) {
+		dbuffer->createView( UNORDERED_ACCESS_VIEW, creation );
+	}
 	return dbuffer;
 }
 
