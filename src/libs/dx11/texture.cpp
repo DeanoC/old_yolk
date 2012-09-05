@@ -175,7 +175,7 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 			texDesc.ArraySize = creation->slices;
 			texDesc.Format = typelessFmt;
 			texDesc.SampleDesc.Count = creation->samples;
-			texDesc.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+			texDesc.SampleDesc.Quality = (creation->samples > 1) ? D3D11_STANDARD_MULTISAMPLE_PATTERN : 0;
 			texDesc.Usage = (D3D11_USAGE) usage;
 			texDesc.BindFlags = bind;
 			texDesc.CPUAccessFlags = cpuAccess;
@@ -232,7 +232,7 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 										tex->format );
 		tex->createView( DEPTH_STENCIL_VIEW, &vs );
 	}
-	if( bind & RCF_OUT_UNORDERED_ACCESS ) {
+	if( bind & D3D11_BIND_UNORDERED_ACCESS ) {
 		CreationInfo vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
 										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
 										tex->format );

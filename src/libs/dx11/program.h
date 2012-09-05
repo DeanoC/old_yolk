@@ -26,6 +26,11 @@ namespace Dx11 {
 		D3DDeviceChildPtr			shader[ Scene::MAX_SHADER_TYPES ];
 		D3DBlobPtr					src[ Scene::MAX_SHADER_TYPES ];
 		D3DShaderReflectionPtr		reflector[ Scene::MAX_SHADER_TYPES ];
+		// these three are specific to the compute shader, and allows displatch to be in threads and the shader
+		// determine how big each group should be
+		uint32_t					threadGroupXSize;
+		uint32_t					threadGroupYSize;
+		uint32_t					threadGroupZSize;
 	};
 }
 

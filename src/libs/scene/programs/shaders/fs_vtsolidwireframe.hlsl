@@ -3,12 +3,18 @@
 #include "vtstructs.hlsl"
 
 struct FS_IN {
-	float4 position : SV_POSITION;
-	float4 colour 	: COLOR0;
-	float3 edgeH	: TEXCOORD0;
+	float4 position		: SV_Position;
+	uint coverage 		: SV_Coverage;
+	float3 viewNormal 	: TEXCOORD0;
+	float3 edgeH		: TEXCOORD1;
 };
 
-StructuredBuffer<VtMaterial> MaterialStore : register(t5);
+// normal encoding and decoding function from Andrew Lauritzen Intel Deferred Shading Sample
+float2 encodeSphereMap(float3 n) {
+    float oneMinusZ = 1.0f - n.z;
+    float p = sqrt( (n.x * n.x) + (n.y * n.y) + (oneMinusZ * oneMinusZ) );
+    return (n.xy / p) * 0.5f + 0.5f;
+}
 
 float evalMinDistanceToEdges(in float3 edgeH) {
     float dist;
@@ -24,30 +30,21 @@ float evalMinDistanceToEdges(in float3 edgeH) {
     return dist;
 }
 
-static const float LineWidth = 1.5; // TODO add the cbuffer
-static const float3 WireColour = float3(0.6,0.6,1); // TODO add the cbuffer
-static const float FadeDistance = 50.f;
-
-float4 main( FS_IN input ) : SV_Target {
+void main( in FS_IN input, out uint4 og0 : SV_Target0, out float4 og1 : SV_Target1 ) {
     // Compute the shortest distance between the fragment and the edges.
     float dist = evalMinDistanceToEdges( input.edgeH );
 
-    float4 col = MaterialStore[ materialIndex.x ].diffuse;
+    // these are just used for readbility, will be removed by the compiler
+    // crap but HLSL can't handle target semantics on structure with decent names
+    VtGBuffer0 gb0;
+    VtGBuffer1 gb1;
 
-    // Cull fragments too far from the edge.
-    if (dist <= 0.5*LineWidth+1) {
-		// Map the computed distance to the [0,2] range on the border of the line
-		dist = clamp((dist - (0.5*LineWidth - 1)), 1e-5, 2);
+    og0.x = gb0.materialIndex = (uint) materialIndex.x;
+    og0.y = gb0.coverage = (uint)(input.coverage);
+    og1.xy = gb1.normal = encodeSphereMap( normalize( input.viewNormal ) );
+    og1.z = gb1.edgeDist = dist;
 
-		// Alpha is computed from the function exp2(-2(x)^2).
-		float alpha = exp2( -2 * (dist*dist) );
-
-		// Standard wire color but faded by distance
-		// Dividing by pos.w, the depth in view space
-		float fading = clamp(FadeDistance / input.position.w, 0, 1);
-
-		col.xyz = col.xyz + ( col.xyz * alpha * fading );// + alpha.xxx;
-	}
-
-	return col;
+    // spare fields
+    og0.zw = 0;
+    og1.w = 0;
 }

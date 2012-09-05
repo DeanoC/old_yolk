@@ -61,7 +61,8 @@ namespace Scene {
 		CVN_ZPLANES,			// float4 x=near y=far, far - near
 		CVN_FOV,				// float4 fov x and y scale, 
 
-		CVN_MATERIAL_INDEX,		
+		CVN_MATERIAL_INDEX,
+		CVN_LIGHT_COUNTS,		// uint4 numDirectionalLights, 
 
 		CVN_NUM_CONSTANTS
 	};
@@ -74,11 +75,13 @@ namespace Scene {
 		ConstantCache();
 		~ConstantCache();
 
+		void getVector( CONSTANT_VAR_NAME type, uint32_t* out4 ) const;
+		void getVector( CONSTANT_VAR_NAME type, float* out4 ) const;
+		void setVector( CONSTANT_VAR_NAME type, const uint32_t* in4 );
+		void setVector( CONSTANT_VAR_NAME type, const float* in4 );
+
 		const Math::Matrix4x4& getMatrix( CONSTANT_VAR_NAME type ) const;
 		const Math::Vector4& getVector( CONSTANT_VAR_NAME type ) const;
-		void getUIVector( CONSTANT_VAR_NAME type, uint32_t* out4 ) const;
-
-		void setUIVector( CONSTANT_VAR_NAME type, const uint32_t* in4 );
 		void setVector( CONSTANT_VAR_NAME type, const Math::Vector4& in );
 
 		// for specific times, you may wish to change a specific matrix, without anything else changing
@@ -105,6 +108,7 @@ namespace Scene {
 		const DataBufferHandlePtr getBlock( CONSTANT_FREQ_BLOCKS block ) const;
 
 	private:
+		void getRawVector( CONSTANT_VAR_NAME type, uint32_t* out4 ) const;
 		mutable CachedBitFlags			cachedFlags;
 		mutable uint32_t				gpuHasBlocks;
 		mutable Math::Matrix4x4			matrixCache[ CVN_NUM_MATRICES ];

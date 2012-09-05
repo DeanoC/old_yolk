@@ -83,8 +83,9 @@ Program* ProgramMan::linkProgram( const Program::CreationInfo* creation ) {
 				ID3D11ComputeShader* shadr;
 				DXFAIL( Gfx::getr()()->CreateComputeShader( codeBlob->GetBufferPointer(), codeBlob->GetBufferSize(), nullptr, &shadr ) );
 				prg->shader[ i ] = D3DDeviceChildPtr( shadr, false );
+				prg->reflector[i]->GetThreadGroupSize( &prg->threadGroupXSize, &prg->threadGroupYSize, &prg->threadGroupZSize );
 			} break;
-			default: CORE_ASSERT( false );
+		default: CORE_ASSERT( false );
 		};	
 		prg->src[i] = codeBlob;
 	}

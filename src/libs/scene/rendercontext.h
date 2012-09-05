@@ -56,6 +56,7 @@ namespace Scene {
 		virtual void bindDepthOnlyRenderTarget( const TexturePtr& depthTarget ) = 0;
 		virtual void bindRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets, const TexturePtr& depthTarget ) = 0;
 		virtual void bindRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets ) = 0;
+		virtual void bindUnorderedViews( unsigned int numViews, const Scene::TexturePtr* const sviews ) = 0;
 
 		// todo proper viewports
 		virtual void bind( const Viewport& viewport ) = 0;
@@ -79,10 +80,11 @@ namespace Scene {
 
 		virtual void draw( PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) = 0;
 		virtual void drawIndexed( PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) = 0;
-
+		virtual void dispatch( uint32_t xThreads, uint32_t yThreads, uint32_t zThreads ) = 0; // D3D11 NOTE: threads NOT thread groups
 
 		virtual void unbindRenderTargets() = 0;
-
+		virtual void unbindTexture( const SHADER_TYPES type, const uint32_t unit, const uint32_t count = 1 ) = 0; // not usually needed but shuts up d3d11 warnings
+		virtual void unbindUnorderedViews() = 0;
 		Scene::ConstantCache& getConstantCache() { return constantCache; }
 
 	protected:

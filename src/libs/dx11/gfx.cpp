@@ -76,11 +76,11 @@ Gfx::Gfx() {
 	};
 	SamplerStateHandle::create( "_SS_Linear_Clamp", &lcsci, Core::RMRF_DONTFLUSH );
 	SamplerState::CreationInfo acsci = {
-		FM_ANISOTROPIC, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 8
+		FM_ANISOTROPIC, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 16
 	};
-	SamplerStateHandle::create( "_SS_Aniso8_Clamp", &acsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( "_SS_Aniso16_Clamp", &acsci, Core::RMRF_DONTFLUSH );
 	RasteriserState::CreationInfo nrsci = {
-		(RasteriserState::CreationInfo::FLAGS)0, FIM_FILL, CUM_BACK, 0, 0, 0
+		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
 	RasteriserStateHandle::create( "_RS_Normal", &nrsci, Core::RMRF_DONTFLUSH );
 	RenderTargetStates::CreationInfo nrtci = {
@@ -217,6 +217,7 @@ void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 	Scene::RenderContext* ctx = getRenderer()->getPrimaryContext();
 
 	auto backBuffer = backHandle.acquire();
+
 	ctx->bindRenderTarget( backBuffer );
 
 	auto sampler = pointClampSamplerHandle.acquire();

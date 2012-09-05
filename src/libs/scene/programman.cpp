@@ -170,7 +170,6 @@ void ProgramMan::buildConstantTables( Program* prg ) {
 
 	if( prg->usedBuffers & BIT( CF_STATIC ) ) {
 		bool used = false;
-		YOLK_VALIDATE_PRG_OFFSETS( prg, Static, dummy );
 		if( !used ) {
 			prg->usedBuffers &= ~ BIT( CF_STATIC );
 		}
@@ -184,15 +183,15 @@ void ProgramMan::buildConstantTables( Program* prg ) {
 	}
 	if( prg->usedBuffers & BIT( CF_PER_PIPELINE ) ) {
 		bool used = false;
-		YOLK_VALIDATE_PRG_OFFSETS( prg, PerPipeline, matrixProjection ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, PerPipeline, matrixProjectionInverse ); 
-		YOLK_VALIDATE_PRG_OFFSETS( prg, PerPipeline, matrixProjectionIT ); 
 		if( !used ) {
 			prg->usedBuffers &= ~ BIT( CF_PER_PIPELINE );
 		}
 	}
 	if( prg->usedBuffers & BIT( CF_PER_VIEWS ) ) {
 		bool used = false;
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixProjection ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixProjectionInverse ); 
+		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixProjectionIT ); 
 		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixView ); 
 		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewInverse ); 
 		YOLK_VALIDATE_PRG_OFFSETS( prg, PerViews, matrixViewIT ); 

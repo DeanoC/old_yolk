@@ -28,26 +28,22 @@ void RenderContext::popDebugMarker() const {
 
 void RenderContext::bindRenderTargets( const Scene::TexturePtr& starget, 
 										const Scene::TexturePtr& sdepthTarget ) {
-	const std::shared_ptr<Dx11::Texture> target = 
-				std::static_pointer_cast<Dx11::Texture>( starget );
-	const std::shared_ptr<Dx11::Texture> depthTarget = 
-				std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
+	const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( starget );
+	const std::shared_ptr<Dx11::Texture> depthTarget = std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
 
 	ID3D11RenderTargetView* rtViews[] = { (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get() };
 	ctx->OMSetRenderTargets( 1, rtViews, (ID3D11DepthStencilView*)depthTarget->getView( Resource::DEPTH_STENCIL_VIEW ).get() );
 }
 
 void RenderContext::bindRenderTarget( const Scene::TexturePtr& starget ) {
-	const std::shared_ptr<Dx11::Texture> target = 
-				std::static_pointer_cast<Dx11::Texture>( starget );
+	const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( starget );
 
 	ID3D11RenderTargetView* rtViews[] = { (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get()};
 	ctx->OMSetRenderTargets( 1, rtViews, nullptr );
 }
 
 void RenderContext::bindDepthOnlyRenderTarget( const Scene::TexturePtr& sdepthTarget ) {
-	const std::shared_ptr<Dx11::Texture> depthTarget = 
-				std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
+	const std::shared_ptr<Dx11::Texture> depthTarget = std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
 	ctx->OMSetRenderTargets( 0, nullptr, (ID3D11DepthStencilView*)depthTarget->getView( Resource::DEPTH_STENCIL_VIEW ).get() );
 }
 
@@ -72,6 +68,17 @@ void RenderContext::bindRenderTargets( unsigned int numTargets, const Scene::Tex
 	};
 	ctx->OMSetRenderTargets( numTargets, rtViews, nullptr );
 }
+
+void RenderContext::bindUnorderedViews( unsigned int numViews, const Scene::TexturePtr* const stargets ) {
+	ID3D11UnorderedAccessView* uavViews[8];
+	assert( numViews < 8 );
+	for( unsigned int i=0;i < numViews;++i ){ 
+		const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( stargets[i] );
+		uavViews[i] = (ID3D11UnorderedAccessView*)target->getView( Resource::UNORDERED_ACCESS_VIEW ).get();
+	};
+	ctx->CSSetUnorderedAccessViews( 0, numViews, uavViews, nullptr );
+}
+
 
 void RenderContext::bind( const Scene::Viewport& viewport ) {
 	ctx->RSSetViewports( 1, (D3D11_VIEWPORT*) &viewport );
@@ -122,7 +129,10 @@ void RenderContext::bind( const Scene::ProgramPtr& sprg ) {
 				} break;
 				case Scene::ST_COMPUTE: {
 					auto shader = (ID3D11ComputeShader*) prg->shader[i].get();
-					ctx->CSSetShader( shader, nullptr, 0 ); 
+					ctx->CSSetShader( shader, nullptr, 0 );
+					threadGroupXSize = prg->threadGroupXSize;
+					threadGroupYSize = prg->threadGroupYSize;
+					threadGroupZSize = prg->threadGroupZSize;
 				} break;
 				default:;
 			}
@@ -284,10 +294,27 @@ void RenderContext::drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexC
 	ctx->IASetPrimitiveTopology( PT_Map[ topo ] );
 	ctx->DrawIndexed( indexCount, startIndex, baseOffset );
 }
-
-
-void RenderContext::unbindRenderTargets() {
-	ctx->OMSetRenderTargets( 0, nullptr, nullptr );
+void RenderContext::dispatch( uint32_t xThreads, uint32_t yThreads, uint32_t zThreads ) {
+	ctx->Dispatch( xThreads / threadGroupXSize, yThreads / threadGroupYSize, zThreads / threadGroupZSize );
 }
 
+void RenderContext::unbindRenderTargets() {
+	ctx->OMSetRenderTargetsAndUnorderedAccessViews( 0, nullptr, nullptr, 0, 0, nullptr, nullptr );
+}
+void RenderContext::unbindTexture( const Scene::SHADER_TYPES type, const uint32_t unit, const uint32_t count ) {
+	static ID3D11ShaderResourceView* const nadaArray[16] = { 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 };
+	switch( type ) {
+	case Scene::ST_VERTEX: ctx->VSSetShaderResources( unit, count, nadaArray ); break;
+	case Scene::ST_FRAGMENT: ctx->PSSetShaderResources( unit, count, nadaArray ); break;
+	case Scene::ST_GEOMETRY: ctx->GSSetShaderResources( unit, count, nadaArray ); break;
+	case Scene::ST_HULL: ctx->HSSetShaderResources( unit, count, nadaArray ); break;
+	case Scene::ST_DOMAIN: ctx->DSSetShaderResources( unit, count, nadaArray ); break;
+	case Scene::ST_COMPUTE: ctx->CSSetShaderResources( unit, count, nadaArray ); break;
+	default:;
+	}
+}
+void RenderContext::unbindUnorderedViews() {
+	static ID3D11UnorderedAccessView* const nadaArray[8] = { 0, 0, 0, 0,  0, 0, 0, 0 };
+	ctx->CSSetUnorderedAccessViews( 0, 8, nadaArray, nullptr );
+}
 }

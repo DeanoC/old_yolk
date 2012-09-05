@@ -15,7 +15,6 @@ DECLARE_SHADER( vs_wvp_pos_col );
 DECLARE_SHADER( vs_vp_pos_col );
 DECLARE_SHADER( vs_vtsolidwireframe );
 
-
 DECLARE_SHADER( gs_fullscreen );
 DECLARE_SHADER( gs_vtsolidwireframe );
 
@@ -27,6 +26,8 @@ DECLARE_SHADER( fs_tex_col );
 DECLARE_SHADER( fs_vtsolidwireframe );
 DECLARE_SHADER( fs_vtresolve );
 
+DECLARE_SHADER( cs_vtlighting );
+
 DECLARE_PROGRAM( basic );
 DECLARE_PROGRAM( rendertarget_copy );
 DECLARE_PROGRAM( sprite_basic );
@@ -34,3 +35,4 @@ DECLARE_PROGRAM( 2dcolour );
 DECLARE_PROGRAM( debugline );
 DECLARE_PROGRAM( vtsolidwireframe );
 DECLARE_PROGRAM( vtresolve );
+DECLARE_PROGRAM( vtlighting );

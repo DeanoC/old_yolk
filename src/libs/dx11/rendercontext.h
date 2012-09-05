@@ -37,6 +37,7 @@ namespace Dx11 {
 		virtual void bindDepthOnlyRenderTarget( const Scene::TexturePtr& depthTarget ) override;
 		virtual void bindRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const pTargets, const Scene::TexturePtr& depthTarget ) override;
 		virtual void bindRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const pTargets ) override;
+		virtual void bindUnorderedViews( unsigned int numViews, const Scene::TexturePtr* const sviews ) override;
 
 			// todo proper viewports
 		virtual void bind( const Scene::Viewport& viewport ) override;
@@ -61,11 +62,18 @@ namespace Dx11 {
 
 		virtual void draw( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) override;
 		virtual void drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) override;
+		virtual void dispatch( uint32_t xThreads, uint32_t yThreads, uint32_t zThreads ) override; // D3D11 NOTE: threads NOT thread groups
 
 		virtual void unbindRenderTargets() override;
-
+		virtual void unbindTexture( const Scene::SHADER_TYPES type, const uint32_t unit, const uint32_t count = 1 ) override; // not usually needed but shuts up d3d11 warnings
+		virtual void unbindUnorderedViews() override;
 		//---------------------------------------------------------------
 		D3DDeviceContextPtr				ctx;
+		// whem a compute shader is bound these descrive the thread group size 
+		uint32_t					threadGroupXSize;
+		uint32_t					threadGroupYSize;
+		uint32_t					threadGroupZSize;
+
 	};
 
 }

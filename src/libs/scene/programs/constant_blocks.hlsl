@@ -32,7 +32,6 @@
 #endif
 
 constant_buffer( Static, CF_STATIC )  {
-	float4		dummy;
 };
 
 constant_buffer( PerFrame, CF_PER_FRAME ) {
@@ -40,14 +39,15 @@ constant_buffer( PerFrame, CF_PER_FRAME ) {
 };
 
 constant_buffer( PerPipeline, CF_PER_PIPELINE )  {
+	uint4		lightCounts; // x = num directional, 
+};
+
+constant_buffer( PerViews, CF_PER_VIEWS )  {
 	float16		matrixProjection;
 	float16		matrixProjectionInverse;
 	float16		matrixProjectionIT;
 	float4		zPlanes;		//x = near, y = far, z = far - near
 	float4		fov;
-};
-
-constant_buffer( PerViews, CF_PER_VIEWS )  {
 	float16		matrixView;
 	float16		matrixViewInverse;
 	float16		matrixViewIT;

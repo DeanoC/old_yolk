@@ -40,21 +40,27 @@ namespace Scene {
 		virtual void conditionWob( class Scene::Wob* wob ) override;
 	protected:
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetHandle;
-		Core::ScopedResourceHandle<TextureHandle>			colourTargetMSHandle;
+
 		Core::ScopedResourceHandle<TextureHandle>			depthTargetMSHandle;
 		Core::ScopedResourceHandle<TextureHandle>			gBuffer0MSHandle;
+		Core::ScopedResourceHandle<TextureHandle>			gBuffer1MSHandle;
 
 		Core::ScopedResourceHandle<ProgramHandle>			solidWireFrameProgramHandle;
 		Core::ScopedResourceHandle<ProgramHandle>			resolveProgramHandle;
+		Core::ScopedResourceHandle<ProgramHandle>			lightingProgramHandle;
+
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
 		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetWriteHandle;
 
 		bool												gpuMaterialStoreOk;
 		Core::ScopedResourceHandle<DataBufferHandle>		materialStoreHandle;
-		Core::ScopedResourceHandle<DataBufferHandle>		materialStoreCPUHandle;
 		std::vector<GPUConstants::VtMaterial>				materialStoreSystemMem;
+
+		bool												gpuLightStoreOk;
+		Core::ScopedResourceHandle<DataBufferHandle>		lightStoreHandle;
 		std::vector<GPUConstants::VtDirectionalLight>		directionalLightStoreSystemMem;
+
 	};
 
 	class VtPipelineDataStore : public PipelineDataStore {
