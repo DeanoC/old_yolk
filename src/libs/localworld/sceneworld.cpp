@@ -86,6 +86,9 @@ void SceneWorld::remove( ThingPtr _thing ) {
 }
 
 void SceneWorld::update( float delta ) {
+	// todo this mutux is WAY to big and heavy
+	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
+
 	for( auto it : updatables ) {
 		if( it && it->updateCallback ) {
 			it->updateCallback( delta );

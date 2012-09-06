@@ -37,11 +37,12 @@ namespace Scene {
 		// each pipeline needs geometry submitting, it should be
 		// sent GeomPassCoutn times with start and end bracketing it
 		virtual int getGeomPassCount() = 0;
+		virtual bool isGeomPassOpaque( int pass ) = 0;
 		virtual void startGeomPass( RenderContext* _context, int i ) = 0;
 		virtual void endGeomPass ( RenderContext* _context, int i ) = 0;
 
+		// where the pipeline work ends up
 		virtual TextureHandlePtr getResult() = 0;
-
 		// setup 
 		virtual void conditionWob( Wob* wob ) = 0;
 	protected:
@@ -57,6 +58,7 @@ namespace Scene {
 	public:
 		virtual ~PipelineDataStore(){};
 		virtual void render( Scene::RenderContext* context ) = 0;
+		virtual void renderTransparent( Scene::RenderContext* context ) = 0;
 	};
 }
 

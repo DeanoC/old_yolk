@@ -66,19 +66,27 @@ void main(    	uint3 groupId : SV_GroupID,
 		float viewSpaceZ = matrixProjection._43 / (depth - matrixProjection._33);		
 		float3 viewPos = computePositionViewFromZ( positionScreen, viewSpaceZ );
 
-		float3 difcol = materialStore[ matIndex ].diffuse.xyz;
+		float3 difcol = materialStore[ matIndex ].diffuse_transp.xyz;
 		float3 speccol = materialStore[ matIndex ].specular.xyz;
 		float specpow = materialStore[ matIndex ].specular.w;
-		float3 emmcol = materialStore[ matIndex ].emissive.xyz;
+		float3 emmcol = materialStore[ matIndex ].emissive_transl.xyz;
 
-		float3 viewDir = normalize( viewPos );
+		// emmisive doesn't care about dots etc.
+		col += emmcol;
+
+		// diffuse light needs view space light (TODO move to upload)
 		float3 viewLightDir = mul( float4(lightStore[0].direction.xyz,0), matrixViewIT ).xyz;
 		float3 lightCol = lightStore[0].colour.xyz; 
-		float NdotL = max( 0.0f, dot( viewNormal, viewLightDir ) );
-		float RdotV = max( 0.0f, dot( reflect( viewLightDir, viewNormal ), viewDir ) );
-		col += lightCol * difcol * NdotL; 
-		col += speccol * pow( RdotV, specpow );
-		col += emmcol;
+		float NdotL = dot( viewNormal, viewLightDir );
+		if( NdotL > 0.0f ) {
+			col += lightCol * difcol * max( 0.0f, NdotL ); 
+
+			// specular if we are in the diffuse light part
+			float3 viewDir = normalize( viewPos );
+			float3 r = reflect( viewLightDir, viewNormal );
+			float RdotV = max( 0.0f, dot( r, viewDir ) );
+			col += lightCol * speccol * pow( RdotV, specpow ) * NdotL;
+		}
 
 		if (edgeDist <= 0.5*LineWidth+1) {
 			// Map the computed distance to the [0,2] range on the border of the line

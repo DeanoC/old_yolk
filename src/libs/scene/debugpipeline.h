@@ -33,6 +33,8 @@ namespace Scene {
 		virtual void unbind( RenderContext* _context ) override;
 
 		virtual int getGeomPassCount() override { return 1; }
+		virtual bool isGeomPassOpaque( int pass ) override { return true; }
+
 		virtual void startGeomPass( RenderContext* _context, int i ) override {};
 		virtual void endGeomPass ( RenderContext* _context, int i ) override {};
 
@@ -54,6 +56,7 @@ namespace Scene {
 		~DebugPipelineDataStore();
 
 		void render( Scene::RenderContext* context );
+		void renderTransparent( Scene::RenderContext* context ) {};
 	protected:
 		struct PerMaterial {
 			std::string						name;

@@ -40,6 +40,7 @@ namespace Scene {
 		virtual ~Hier();
 
 		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
+		virtual void renderTransparent( RenderContext* context, Pipeline* pipeline ) override;
 
 		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const override {
 			if( !isEnabled() ) return 0;

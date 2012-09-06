@@ -170,6 +170,15 @@ void WobbyWriter::ConvertLightParamsToMaterialParameters( 	MeshMod::MaterialElem
 			paramCon.pushBack<RGBElements>( "DiffuseColour", RGBColour(params.diffuse[0], params.diffuse[1], params.diffuse[2] ) );
 			paramCon.pushBack<RGBElements>( "SpecularColour", RGBColour(params.specular[0], params.specular[1], params.specular[2] ) );
 			paramCon.pushBack<FloatScalarElements>( "Shininess", FloatScalar( params.specular_exponent ) );
+			if( params.transparency > 0.f ) {
+				paramCon.pushBack<FloatScalarElements>( "Transparency", FloatScalar( params.transparency ) );
+			}
+			if( params.translucency > 0.f ) {
+				paramCon.pushBack<FloatScalarElements>( "Translucency", FloatScalar( params.translucency ) );
+			}
+			if( params.reflection > 0.f ) {
+				paramCon.pushBack<FloatScalarElements>( "Reflection", FloatScalar( params.reflection ) );
+			}
 		}
 	}
 }
@@ -241,10 +250,14 @@ void WobbyWriter::WriteMaterial( const unsigned int matNum, const unsigned int u
 	parameterDataString << ".type float\n";
 	parameterString << ".type u32\n";
 
+	bool transp = false;
 	uint32_t numParams = 0;
 	if( parameterElements ) {
 		// material parameters
 		const MaterialData::ParameterContainer& params = (*parameterElements)[matNum].parameters;
+
+		transp |= (params.getElementsNameAndSubName( MaterialData::FloatScalar::getName(), "Transparency" ) != nullptr);
+		transp |= (params.getElementsNameAndSubName( MaterialData::FloatScalar::getName(), "Translucency" ) != nullptr);
 
 		std::string txtParamBaseName = parameterLabel.str();
 		numParams += WriteScalarParams( params, txtParamBaseName , parameterString, parameterDataString );
@@ -289,6 +302,9 @@ void WobbyWriter::WriteMaterial( const unsigned int matNum, const unsigned int u
 	uint16_t flags = 0;
 	if( m_vertListArray[matNum].size() > (64*1024) ) {
 		flags |= WobMaterial::WM_32BIT_INDICES;
+	}
+	if( transp ) {
+		flags |= WobMaterial::WM_TRANSPARENT;
 	}
 	outStream << "(u8) " << numUsedVertexTypes << "\t//num vertex elements \n";
 	outStream << "(u8) " << numParams << "\t//num material parameters \n"; // how many parameters

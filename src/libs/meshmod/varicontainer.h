@@ -127,7 +127,7 @@ namespace MeshMod {
 
 		void cloneTo( VariContainer<T>& nvc ) const;
 
-	private:
+	public:
 		//! add the element with default subname
 		T* addElements( T* face, const std::string& subName = std::string() );
 
@@ -146,7 +146,7 @@ namespace MeshMod {
 		// gets the element of name and sub name (const_
 		const T* getElementsNameAndSubName( const std::string& name, const std::string& subName ) const;
 
-	public:
+
 		// how many elements do we have.
 		size_t getElementCount() const {
 			return elements.size();

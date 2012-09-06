@@ -1,8 +1,9 @@
 
 struct VtMaterial {
-	float4 diffuse; 	// w not used
-	float4 emissive;	// w not used
-	float4 specular;	// w = shininess AKA specular exponent
+	float4 diffuse_transp; 	// xyz = diffuse, w = transparency
+	float4 emissive_transl;	// xyz = emissive, w = transluceny
+	float4 specular;		// xyz = specular, w = shininess AKA specular exponent
+	float4 reflection;		// x = reflection, yzw = not used
 };
 
 struct VtDirectionalLight {
@@ -22,4 +23,9 @@ struct VtGBuffer1 {
 	float2  normal;
 	float  	edgeDist; 
 	// 1 half free
+};
+
+struct VtGbufferFragment {
+	VtGBuffer0 frag0;
+	VtGBuffer0 frag1;
 };

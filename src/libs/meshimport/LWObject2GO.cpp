@@ -837,6 +837,10 @@ namespace LWObject2Go_Local
 			(*lightEle)[ matNum ].specular_exponent = 0.f;
 		}
 
+		(*lightEle)[ matNum ].translucency = curSurface->translunency;
+		(*lightEle)[ matNum ].transparency = curSurface->transparency;
+		(*lightEle)[ matNum ].reflection = curSurface->reflection;
+
 		// back face culling
 		(*backfaceEle)[ matNum ].facing = (curSurface->doubleSided ? 
 						MaterialData::BackFace::NONE : MaterialData::BackFace::BACK);

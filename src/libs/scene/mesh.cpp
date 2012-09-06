@@ -71,5 +71,23 @@ void Mesh::render( RenderContext* context, Pipeline* pipeline ) {
 //		LOG(INFO) << "Mesh not ready yet\n";
 	}
 }
+void Mesh::renderTransparent( RenderContext* context, Pipeline* pipeline ) {
+
+	// set the prev WVP stored last frame to into the constant cache
+	// and change our world matrix
+	context->getConstantCache().changeObject( prevWVP, 
+							getTransformNode()->getRenderMatrix() );
+
+	// grap WVP for next frame (will cause a re-evail of WVP this frame)
+	prevWVP = context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
+
+	WobPtr wob = meshHandle->tryAcquire();
+	if( wob ) {
+		localAabb = Core::AABB( wob->header->minAABB, wob->header->maxAABB );
+		wob->pipelineDataStores[ pipeline->getIndex() ]->renderTransparent( context );
+	} else {
+//		LOG(INFO) << "Mesh not ready yet\n";
+	}
+}
 
 }

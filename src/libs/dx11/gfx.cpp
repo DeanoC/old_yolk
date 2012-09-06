@@ -83,6 +83,10 @@ Gfx::Gfx() {
 		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
 	RasteriserStateHandle::create( "_RS_Normal", &nrsci, Core::RMRF_DONTFLUSH );
+	RasteriserState::CreationInfo nnmsrsci = {
+		RasteriserState::CreationInfo::NONE, FIM_FILL, CUM_BACK, 0, 0, 0
+	};
+	RasteriserStateHandle::create( "_RS_Normal_NoMS", &nnmsrsci, Core::RMRF_DONTFLUSH );	
 	RenderTargetStates::CreationInfo nrtci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1, 
@@ -93,6 +97,12 @@ Gfx::Gfx() {
 		CF_LESS
 	};
 	DepthStencilStateHandle::create( "_DSS_Normal", &ndsci );
+
+	DepthStencilState::CreationInfo dlwdsci = {
+		(DepthStencilState::CreationInfo::FLAGS)(DepthStencilState::CreationInfo::DEPTH_ENABLE ), 
+		CF_LESS
+	};
+	DepthStencilStateHandle::create( "_DSS_Less_NoWrite", &dlwdsci );
 
 	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll", &nrtci );
 	RenderTargetStates::CreationInfo nwcrtci = {
@@ -126,6 +136,16 @@ Gfx::Gfx() {
 		}
 	};
 	RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll", &pmartci );
+
+	RenderTargetStates::CreationInfo aartci = {
+		(RenderTargetStates::CreationInfo::FLAGS)0, 
+		1, 
+		{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
+				BM_ONE, BM_ONE, BO_ADD,		// colour blend
+				BM_ONE, BM_ONE, BO_ADD,		// alpha blend
+		}
+	};
+	RenderTargetStatesHandle::create( "_RTS_Add_WriteAll", &aartci );
 
 }
 

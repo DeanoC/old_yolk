@@ -19,6 +19,8 @@
 
 #define FIXED_WIDTH 1280
 #define FIXED_HEIGHT 960
+static const int MAX_TRANSPARENT_FRAGMENTS = FIXED_WIDTH * FIXED_HEIGHT * 3;
+
 namespace Scene {
 
 VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false ) {
@@ -26,6 +28,7 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	solidWireFrameProgramHandle.reset( Scene::ProgramHandle::load( "vtsolidwireframe" ) );
 	resolveProgramHandle.reset( Scene::ProgramHandle::load( "vtresolve" ) );
 	lightingProgramHandle.reset( Scene::ProgramHandle::load( "vtlighting" ) );
+	transCountProgramHandle.reset( Scene::ProgramHandle::load( "vttranscount" ) );
 
 	Texture::CreationInfo ccs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
@@ -60,10 +63,31 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	static const std::string gb1TargetMSName = "VtPipe_GBuffer1MS";
 	gBuffer1MSHandle.reset( TextureHandle::create( gb1TargetMSName.c_str(), &gb1mscs ) );
 
-	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
-	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
-	renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
+	// transparent fragment count
+	Texture::CreationInfo tfcmscs = Texture::TextureCtor(
+		RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
+		GTF_RGBA8,
+		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
+	);
+	static const std::string tfcmsTargetName = "VtPipe_TransFragmentCountMS";
+	tfcMSHandle.reset( TextureHandle::create( tfcmsTargetName.c_str(), &tfcmscs ) );
 
+	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
+	depthStencilNoWriteStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Less_NoWrite" ) );
+	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
+	rasterStateNoMSHandle.reset( RasteriserStateHandle::create( "_RS_Normal_NoMS" ) );
+	renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
+	renderTargetAddWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_Add_WriteAll" ) );
+
+	// transparent fragment buffer
+	DataBuffer::CreationInfo tfbdcs = Resource::BufferCtor(
+		RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
+		sizeof( GPUConstants::VtGbufferFragment ) * MAX_TRANSPARENT_FRAGMENTS
+	);
+	tfbdcs.structureSize = sizeof( GPUConstants::VtGbufferFragment );
+	static const std::string transFragDataName = "VtPipe_TransFragBuffer";
+	materialStoreHandle.reset( DataBufferHandle::create( transFragDataName.c_str(), &tfbdcs ) );
+	
 	// null material
 	GPUConstants::VtMaterial nullMaterial = {
 		Math::Vector4(0,0,0,0),
@@ -82,17 +106,23 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 }
 	
 VtPipeline::~VtPipeline() {
-	renderTargetWriteHandle.reset();
-	rasterStateHandle.reset();
-	depthStencilStateHandle.reset();
 
 	materialStoreHandle.reset();
+	lightStoreHandle.reset();
 
-	depthTargetMSHandle.reset();
+	renderTargetAddWriteHandle.reset();
+	renderTargetWriteHandle.reset();
+	depthStencilNoWriteStateHandle.reset();
+	depthStencilStateHandle.reset();
+	rasterStateHandle.reset();
+
+	tfcMSHandle.reset();
 	gBuffer1MSHandle.reset();
 	gBuffer0MSHandle.reset();
+	depthTargetMSHandle.reset();
 	colourTargetHandle.reset();
 
+	transCountProgramHandle.reset();
 	lightingProgramHandle.reset();
 	resolveProgramHandle.reset();
 	solidWireFrameProgramHandle.reset();
@@ -131,28 +161,6 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 		lightStoreHandle.reset( DataBufferHandle::create( lightDataName.c_str(), &ldcs ) );
 		gpuLightStoreOk = true;
 	}
-
-	Scene::TexturePtr gBufferTargets[] = {
-		gBuffer0MSHandle.acquire(),
-		gBuffer1MSHandle.acquire()
-	};
-	auto depthTarget = depthTargetMSHandle.acquire();
-	auto program = solidWireFrameProgramHandle.acquire();
-	auto rasterState = rasterStateHandle.acquire();
-	auto depthStencilState = depthStencilStateHandle.acquire();
-	auto rtw = renderTargetWriteHandle.acquire();
-
-	ctx->clear( gBufferTargets[0], Core::RGBAColour(0,0,0,0) );
-	ctx->clear( gBufferTargets[1], Core::RGBAColour(0,0,0,0) );
-	ctx->clearDepthStencil( depthTarget, true, 1.0f, true, 0 );
-
-	ctx->bindRenderTargets( 2, gBufferTargets, depthTarget );
-
-	ctx->getConstantCache().updateGPU( ctx, program );
-	ctx->bind( program );
-	ctx->bind( rasterState );
-	ctx->bind( depthStencilState );
-	ctx->bind( rtw );
 }
 
 void VtPipeline::unbind( Scene::RenderContext* ctx ) {
@@ -203,6 +211,123 @@ void VtPipeline::unbind( Scene::RenderContext* ctx ) {
 	ctx->popDebugMarker();
 }
 
+static enum VTPIPE_GEOMETRY_PASSES {
+	GBUFFER_RENDER_OPAQUE_PASS = 0,
+
+	GBUFFER_COUNT_TRANS_PASS,
+
+	GBUFFER_RENDER_TRANS_PASS,
+
+	MAX_RENDER_PASSES,
+};
+
+int VtPipeline::getGeomPassCount() { 
+	return MAX_RENDER_PASSES; 
+}
+bool VtPipeline::isGeomPassOpaque( int pass ) {
+	if( pass < GBUFFER_COUNT_TRANS_PASS ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void VtPipeline::startGeomPass( RenderContext* ctx, int i ) {
+	switch ( i ) {
+	case GBUFFER_RENDER_OPAQUE_PASS:
+		startGeomRenderOpaquePass( ctx ); break;
+	case GBUFFER_COUNT_TRANS_PASS: 
+		startGeomCountTransparentPass( ctx ); break;
+	case GBUFFER_RENDER_TRANS_PASS: 
+		startGeomRenderTransparentPass( ctx ); break;
+	default: CORE_ASSERT(false) break;
+	}
+}
+
+void VtPipeline::endGeomPass ( RenderContext* ctx, int i ) {
+	switch ( i ) {
+	case GBUFFER_RENDER_OPAQUE_PASS:
+		endGeomRenderOpaquePass( ctx ); break;
+	case GBUFFER_COUNT_TRANS_PASS: 
+		endGeomCountTransparentPass( ctx ); break;
+	case GBUFFER_RENDER_TRANS_PASS: 
+		endGeomRenderTransparentPass( ctx ); break;
+	default: CORE_ASSERT(false) break;
+	}
+}
+void VtPipeline::startGeomRenderOpaquePass( RenderContext* ctx ) {
+	Scene::TexturePtr gBufferTargets[] = {
+		gBuffer0MSHandle.acquire(),
+		gBuffer1MSHandle.acquire()
+	};
+
+	auto depthTarget = depthTargetMSHandle.acquire();
+	auto program = solidWireFrameProgramHandle.acquire();
+	auto rasterState = rasterStateHandle.acquire();
+	auto dss = depthStencilStateHandle.acquire();
+	auto rtw = renderTargetWriteHandle.acquire();
+
+	ctx->clear( gBufferTargets[0], Core::RGBAColour(0,0,0,0) );
+	ctx->clear( gBufferTargets[1], Core::RGBAColour(0,0,0,0) );
+	ctx->clearDepthStencil( depthTarget, true, 1.0f, true, 0 );
+
+	ctx->bindRenderTargets( 2, gBufferTargets, depthTarget );
+
+	ctx->getConstantCache().updateGPU( ctx, program );
+	ctx->bind( program );
+	ctx->bind( rasterState );
+	ctx->bind( dss );
+	ctx->bind( rtw );
+}
+
+void VtPipeline::startGeomCountTransparentPass( RenderContext* ctx ) {
+	auto prg = transCountProgramHandle.acquire();
+	auto dt = depthTargetMSHandle.acquire(); // R/O
+	auto rs = rasterStateNoMSHandle.acquire();
+	auto tgt = tfcMSHandle.acquire();
+	auto dss = depthStencilNoWriteStateHandle.acquire();
+	auto rtw = renderTargetAddWriteHandle.acquire();
+
+	ctx->clear( tgt, Core::RGBAColour(0,0,0,0) );
+	ctx->bindRenderTargets( tgt, dt );
+
+	ctx->bind( prg );
+	ctx->bind( dss );
+	ctx->bind( rtw );
+
+}
+
+void VtPipeline::startGeomRenderTransparentPass( RenderContext* ctx ) {
+	Scene::TexturePtr gBufferTargets[] = {
+		gBuffer0MSHandle.acquire(),
+		gBuffer1MSHandle.acquire()
+	};
+
+	auto depthTarget = depthTargetMSHandle.acquire();
+	auto program = solidWireFrameProgramHandle.acquire();
+	auto rasterState = rasterStateHandle.acquire();
+	auto dss = depthStencilStateHandle.acquire();
+	auto rtw = renderTargetWriteHandle.acquire();
+
+	ctx->bindRenderTargets( 2, gBufferTargets, depthTarget );
+
+	ctx->getConstantCache().updateGPU( ctx, program );
+	ctx->bind( program );
+	ctx->bind( rasterState );
+	ctx->bind( dss );
+	ctx->bind( rtw );}
+
+void VtPipeline::endGeomRenderOpaquePass( RenderContext* ctx ) {
+
+}
+
+void VtPipeline::endGeomCountTransparentPass( RenderContext* ctx ) {
+}
+
+void VtPipeline::endGeomRenderTransparentPass( RenderContext* ctx ) {
+}
+
+
 void VtPipeline::conditionWob( Scene::Wob* wob ) {
 	using namespace Scene;
 	WobFileHeader* header = wob->header.get();
@@ -210,6 +335,12 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 	auto program = solidWireFrameProgramHandle.acquire();
 
 	VtPipelineDataStore* pds =  CORE_NEW VtPipelineDataStore();
+
+	// count opaque and transparency/translucent surfaces
+	for( uint16_t i = 0; i < header->uiNumMaterials; ++i ) {
+		WobMaterial* mat = &header->pMaterials.p[i];
+	}
+
 	pds->numMaterials = header->uiNumMaterials;
 	pds->materials.reset( CORE_NEW_ARRAY VtPipelineDataStore::PerMaterial[ pds->numMaterials ] );
 	wob->pipelineDataStores[pipelineIndex] = std::unique_ptr<VtPipelineDataStore>( pds );
@@ -251,28 +382,44 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 			mds->vacs.data[i].stride = VI_AUTO_STRIDE;
 		}
 		gpuMaterialStoreOk = false;
+		Math::Vector3 diffuse;
+		Math::Vector3 emissive;
 		Math::Vector3 specular;
 		float specExp = 40.f;
+		float translucency = 0.f;
+		float transparency = 0.f;
+		float reflection = 0.f;
+
 		GPUConstants::VtMaterial gpuMat;
 		for( uint8_t i = 0; i < mat->uiNumParameters; ++i ) {
 			if( std::string( mat->pParameters.p[i].pName.p ) == "DiffuseColour" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
-				gpuMat.diffuse = Math::Vector4( (const float*)mat->pParameters.p[i].pData.p );
+				diffuse = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "SpecularColour" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
-				auto spec = (const float*)mat->pParameters.p[i].pData.p;
-				specular = Math::Vector3( spec[0], spec[1], spec[2] );
+				specular = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "EmissiveColour" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
-				gpuMat.emissive = Math::Vector4( (const float*)mat->pParameters.p[i].pData.p );
+				emissive = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Shininess" ) {
 				specExp = *(const float*)mat->pParameters.p[i].pData.p;
 				specExp = Math::Max( specExp, 1e-2f ); // get NANs in the render with pow( x, 0.0f)...
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Transparency" ) {
+				transparency = *(const float*)mat->pParameters.p[i].pData.p;
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Translucency" ) {
+				transparency = *(const float*)mat->pParameters.p[i].pData.p;
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Reflection" ) {
+				reflection = *(const float*)mat->pParameters.p[i].pData.p;
 			}
 		}
 		// pack specular exponent and specular colour
+		gpuMat.diffuse_transp = Math::Vector4( diffuse[0], diffuse[1], diffuse[2], transparency );
+		gpuMat.emissive_transl = Math::Vector4( emissive[0], emissive[1], emissive[2], translucency );
 		gpuMat.specular = Math::Vector4( specular[0], specular[1], specular[2], specExp );
+		gpuMat.reflection = Math::Vector4( reflection, 0.0f, 0.0f, 0.0f );
 		materialStoreSystemMem.push_back( gpuMat );
+
+		mds->isTransparent = (transparency > 0.f);
 		mds->materialIndex = (uint32_t) (materialStoreSystemMem.size() - 1);
 
 		mds->vaoHandle = VertexInputHandle::create( 
@@ -289,17 +436,41 @@ void VtPipelineDataStore::render( Scene::RenderContext* rc ) {
 	for( int i = 0;i < numMaterials; ++i ) {
 		const PerMaterial* mds = &materials[i];
 
-		const uint32_t materialIndex[4] = { mds->materialIndex, mds->materialIndex, mds->materialIndex, mds->materialIndex };
-		ctx->getConstantCache().setVector( CVN_MATERIAL_INDEX, materialIndex );
-		ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_PER_MATERIAL );
+		if( !mds->isTransparent ) {
+			const uint32_t materialIndex[4] = { mds->materialIndex, mds->materialIndex, mds->materialIndex, mds->materialIndex };
+			ctx->getConstantCache().setVector( CVN_MATERIAL_INDEX, materialIndex );
+			ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_PER_MATERIAL );
 
-		auto vao = mds->vaoHandle->tryAcquire();
-		if( !vao ) { /* LOG(INFO) << "vao not ready\n"; */ return; }
-		auto ib = mds->indexBuffer->tryAcquire();
-		if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
-		ctx->bind( vao );
-		ctx->bindIndexBuffer( ib, mds->indexSize );
-		ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
+			auto vao = mds->vaoHandle->tryAcquire();
+			if( !vao ) { /* LOG(INFO) << "vao not ready\n"; */ return; }
+			auto ib = mds->indexBuffer->tryAcquire();
+			if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
+			ctx->bind( vao );
+			ctx->bindIndexBuffer( ib, mds->indexSize );
+			ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
+		}
+	}
+}
+void VtPipelineDataStore::renderTransparent( Scene::RenderContext* rc ) {
+	RenderContext* ctx = (RenderContext*) rc;
+	ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_STD_OBJECT );
+
+	for( int i = 0;i < numMaterials; ++i ) {
+		const PerMaterial* mds = &materials[i];
+
+		if( mds->isTransparent ) {
+			const uint32_t materialIndex[4] = { mds->materialIndex, mds->materialIndex, mds->materialIndex, mds->materialIndex };
+			ctx->getConstantCache().setVector( CVN_MATERIAL_INDEX, materialIndex );
+			ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_PER_MATERIAL );
+
+			auto vao = mds->vaoHandle->tryAcquire();
+			if( !vao ) { /* LOG(INFO) << "vao not ready\n"; */ return; }
+			auto ib = mds->indexBuffer->tryAcquire();
+			if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
+			ctx->bind( vao );
+			ctx->bindIndexBuffer( ib, mds->indexSize );
+			ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
+		}
 	}
 
 }
@@ -320,3 +491,4 @@ VtPipelineDataStore::~VtPipelineDataStore() {
 }
 
 }
+

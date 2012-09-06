@@ -107,7 +107,8 @@ namespace Scene {
 	struct WobMaterial {
 		//! material flags
 		enum Flags {
-			WM_32BIT_INDICES = (1 << 0)				//!< index data is 32 bit per entry
+			WM_32BIT_INDICES = BIT(0),				//!< index data is 32 bit per entry
+			WM_TRANSPARENT = BIT(1),				//!< material is transparent or translucent
 		};
 		FOP( const char*,		pName );			//!< Name of the material
 		FOP( const char*,		pShader );			//!< Name of the shader

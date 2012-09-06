@@ -97,8 +97,6 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 			gatherArray[i]->getRenderAABB( waabb );
 			if( renderCamera->getFrustum().cullAABB( waabb ) != Core::Frustum::OUTSIDE ) {
 				visibleRenderables.push_back( gatherArray[i] );
-			} else {
-				int a = 0;
 			}
 		}
 		++it;
@@ -117,12 +115,17 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 		// output geometry
 		STIndexContainer::const_iterator rmit = visibleRenderables.cbegin();
 		while( rmit != visibleRenderables.cend() ) {
-			(*rmit)->render( context, pipeline );
+			if( pipeline->isGeomPassOpaque( i ) ) {
+				(*rmit)->render( context, pipeline );
+			} else {
+				(*rmit)->renderTransparent( context, pipeline );
+			}
 			++rmit;
 		}
 
 		pipeline->endGeomPass( context, i );
 	}
+
 
 	pipeline->unbind( context );
 }

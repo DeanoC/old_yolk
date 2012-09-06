@@ -15,7 +15,7 @@ float3 faceNormal( in float3 posA, in float3 posB, in float3 posC ) {
 	return normalize( cross(normalize(posB - posA), normalize(posC - posA)) );
 }
 
-static const float vertexNormalWeight = 1.0f;
+static const float vertexNormalWeight = 1.5f;
 
 [maxvertexcount(3)]
 void main( in triangle VS_IN input[3], inout TriangleStream<GS_OUT> stream0 ) {

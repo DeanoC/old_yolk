@@ -56,6 +56,9 @@ namespace MeshMod
 			float specular[3];
 			float luminosity[3];
 			float specular_exponent;
+			float transparency;
+			float translucency;
+			float reflection;
 
 			static const std::string getName() { return "LightParams"; };
 		};

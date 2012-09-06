@@ -49,6 +49,8 @@ namespace Scene {
 		//! called to render this thing
 		virtual void render( RenderContext* context, Pipeline* pipeline ) = 0;
 
+		virtual void renderTransparent( RenderContext* context, Pipeline* pipeline ) {};
+
 /*		virtual void debugDraw( RenderContext* context ) const {
 			Core::AABB waabb;
 			getWorldAABB( waabb );

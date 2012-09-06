@@ -35,7 +35,8 @@ namespace Scene {
 
 		//! inherited from Renderable
 		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
-		
+		virtual void renderTransparent( RenderContext* context, Pipeline* pipeline ) override;
+
 		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const override {
 			if( (_type == R_MESH || _type == R_ALL) && (arraySize > 0) && isEnabled() ) {
 				outArray[0] = (Scene::Renderable*) this;

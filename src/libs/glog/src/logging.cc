@@ -1254,7 +1254,7 @@ void InstallFailureFunction(void (*fail_func)()) {
 }
 
 void LogMessage::Fail() {
-  g_logging_fail_func();
+   g_logging_fail_func();
 }
 
 // L >= log_mutex (callers must hold the log_mutex).

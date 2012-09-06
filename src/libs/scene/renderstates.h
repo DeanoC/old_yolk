@@ -127,6 +127,7 @@ namespace Scene {
 		virtual ~RasteriserState(){}
 		struct CreationInfo {
 			enum FLAGS {
+				NONE			= 0,
 				FRONT_CCW		= BIT(0),
 				DEPTH_CLAMP		= BIT(1),
 				SCISSOR			= BIT(2),

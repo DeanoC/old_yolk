@@ -96,5 +96,12 @@ void Hier::render( RenderContext* context, Pipeline* pipeline ) {
 		++it;
 	}
 }
+void Hier::renderTransparent( RenderContext* context, Pipeline* pipeline ) {
+	OwnedMeshes::const_iterator it = ownedMeshes.begin();
+	while( it != ownedMeshes.end() ) {
+		(*it)->renderTransparent( context, pipeline );
+		++it;
+	}
+}
 
 }
