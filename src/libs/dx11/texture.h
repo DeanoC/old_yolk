@@ -34,6 +34,10 @@ namespace Dx11 {
 
 		Texture( D3DResourcePtr _resource ) : Resource( _resource ) {}
 
+		Scene::ViewPtr getView( uint32_t viewType ) const override { 
+			return getDx11View( viewType );
+		}
+
 		DXGI_FORMAT	d3dFormat;
 
 	};

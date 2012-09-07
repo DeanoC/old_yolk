@@ -40,30 +40,32 @@ namespace Scene {
 		//setup
 		virtual void conditionWob( class Scene::Wob* wob ) override;
 	protected:
-		void startGeomRenderOpaquePass( RenderContext* _context );
-		void startGeomCountTransparentPass( RenderContext* _context );
-		void startGeomRenderTransparentPass( RenderContext* _context );
-		void endGeomRenderOpaquePass( RenderContext* _context );
-		void endGeomCountTransparentPass( RenderContext* _context );
-		void endGeomRenderTransparentPass( RenderContext* _context );
+		const static int MAX_FRAGMENTS_PER_SAMPLE = 8;
+		const static int NUM_MSAA_SAMPLES = 8;
+		void startGeomRenderOpaquePass( RenderContext* ctx );
+		void startGeomRenderTransparentPass( RenderContext* ctx );
+		void endGeomRenderOpaquePass( RenderContext* ctx );
+		void endGeomRenderTransparentPass( RenderContext* ctx );
+
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetHandle;
 
 		Core::ScopedResourceHandle<TextureHandle>			depthTargetMSHandle;
-		Core::ScopedResourceHandle<TextureHandle>			gBuffer0MSHandle;
-		Core::ScopedResourceHandle<TextureHandle>			gBuffer1MSHandle;
-		Core::ScopedResourceHandle<TextureHandle>			tfcMSHandle;
+		Core::ScopedResourceHandle<TextureHandle>			gBufferMSHandle0;
+		Core::ScopedResourceHandle<TextureHandle>			tfcHandle;
 
-		Core::ScopedResourceHandle<ProgramHandle>			solidWireFrameProgramHandle;
+		Core::ScopedResourceHandle<DataBufferHandle>		transparentFragmentsHandle;
+
+		Core::ScopedResourceHandle<ProgramHandle>			opaqueProgramHandle;
 		Core::ScopedResourceHandle<ProgramHandle>			resolveProgramHandle;
 		Core::ScopedResourceHandle<ProgramHandle>			lightingProgramHandle;
-		Core::ScopedResourceHandle<ProgramHandle>			transCountProgramHandle;
+		Core::ScopedResourceHandle<ProgramHandle>			transparentProgramHandle;
 
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateNoMSHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilNoWriteStateHandle;
 		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetWriteHandle;
-		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetAddWriteHandle;
+		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetNoWriteHandle;
 
 		bool												gpuMaterialStoreOk;
 		Core::ScopedResourceHandle<DataBufferHandle>		materialStoreHandle;

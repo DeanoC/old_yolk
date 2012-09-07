@@ -7,7 +7,6 @@ struct VS_IN {
 struct GS_OUT {
 	float4 position : SV_POSITION;
 	float3 viewNormal 	: TEXCOORD0;
-	float3 edgeH	: TEXCOORD1;
 };
 
 // Compute the triangle face normal from 3 points
@@ -25,18 +24,14 @@ void main( in triangle VS_IN input[3], inout TriangleStream<GS_OUT> stream0 ) {
 
 	vert.position = input[0].position;
 	vert.viewNormal = normalize( faceViewNormal + (vertexNormalWeight * input[0].viewNormal) );
-	vert.edgeH = float3( 1, 0, 0 );
 	stream0.Append( vert );
 
 	vert.position = input[1].position;
 	vert.viewNormal = normalize( faceViewNormal + (vertexNormalWeight * input[1].viewNormal) );
-	vert.edgeH = float3( 0, 1, 0 );
 	stream0.Append( vert );
-
 
 	vert.position = input[2].position;
 	vert.viewNormal = normalize( faceViewNormal + (vertexNormalWeight * input[2].viewNormal) );
-	vert.edgeH = float3( 0, 0, 1 );
 	stream0.Append( vert );
 
 	stream0.RestartStrip();

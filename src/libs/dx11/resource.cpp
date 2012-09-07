@@ -17,9 +17,9 @@ namespace Dx11
 
 uint32_t Resource::createView( uint32_t viewType, const Scene::Resource::CreationInfo* creation ) {
 
-	bool custom = !!(viewType & CUSTOM_VIEW);
-	viewType = viewType & ~CUSTOM_VIEW;
-	CORE_ASSERT( viewType <= UNORDERED_ACCESS_VIEW );
+	bool custom = !!(viewType & Scene::Resource::CUSTOM_VIEW);
+	viewType = viewType & ~Scene::Resource::CUSTOM_VIEW;
+	CORE_ASSERT( viewType <= Scene::Resource::UNORDERED_ACCESS_VIEW );
 	uint32_t index;
 	if( custom ) {
 		views.resize( views.size() + 1 );
@@ -29,10 +29,10 @@ uint32_t Resource::createView( uint32_t viewType, const Scene::Resource::Creatio
 		views.resize( Math::Max( viewType+1, (uint32_t)views.size()) );		
 	}
 	switch( viewType ) {
-		case SHADER_RESOURCE_VIEW: 		createSRView( index, creation ); break;
-		case DEPTH_STENCIL_VIEW:		createDSView( index, creation ); break;
-		case RENDER_TARGET_VIEW:		createRTView( index, creation ); break;
-		case UNORDERED_ACCESS_VIEW:		createUAView( index, creation ); break;
+		case Scene::Resource::SHADER_RESOURCE_VIEW: 		createSRView( index, creation ); break;
+		case Scene::Resource::DEPTH_STENCIL_VIEW:		createDSView( index, creation ); break;
+		case Scene::Resource::RENDER_TARGET_VIEW:		createRTView( index, creation ); break;
+		case Scene::Resource::UNORDERED_ACCESS_VIEW:		createUAView( index, creation ); break;
 		default: CORE_ASSERT( false );	
 	}
 	return index;
@@ -131,7 +131,7 @@ void Resource::createSRView( uint32_t index, const Scene::Resource::CreationInfo
 	HRESULT hr;
 	ID3D11ShaderResourceView* view;
 	DXFAIL( Gfx::getr()()->CreateShaderResourceView( resource.get(), &srDesc, &view ) );
-	views[ index ] = D3DViewPtr( view, false );
+	views[ index ] = std::make_shared<Dx11View>( D3DViewPtr( view, false ) );
 }
 void Resource::createDSView( uint32_t index, const Scene::Resource::CreationInfo* creation ) {
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsDesc;
@@ -146,7 +146,7 @@ void Resource::createDSView( uint32_t index, const Scene::Resource::CreationInfo
 	HRESULT hr;
 	ID3D11DepthStencilView* view;
 	DXFAIL( Gfx::getr()()->CreateDepthStencilView( resource.get(), &dsDesc, &view ) );
-	views[ index ] = D3DViewPtr( view, false );
+	views[ index ] = std::make_shared<Dx11View>( D3DViewPtr( view, false ) );
 
 }
 void Resource::createRTView( uint32_t index, const Scene::Resource::CreationInfo* creation ) {
@@ -161,7 +161,7 @@ void Resource::createRTView( uint32_t index, const Scene::Resource::CreationInfo
 	HRESULT hr;
 	ID3D11RenderTargetView* view;
 	DXFAIL( Gfx::getr()()->CreateRenderTargetView( resource.get(), &rtDesc, &view ) );
-	views[ index ] = D3DViewPtr( view, false );
+	views[ index ] = std::make_shared<Dx11View>( D3DViewPtr( view, false ) );
 
 }
 
@@ -171,13 +171,15 @@ void Resource::createUAView( uint32_t index, const Scene::Resource::CreationInfo
 	uavDesc.Format = DXGIFormat::getDXGIFormat( creation->format );
 
 	if( creation->flags & (RCF_BUF_CONSTANT | RCF_BUF_VERTEX | RCF_BUF_INDEX | RCF_BUF_STREAMOUT | RCF_BUF_GENERAL) ) {
-		if( creation->flags & RCF_PRG_STRUCTURED ) {
-			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-		}
 		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 		uavDesc.Buffer.FirstElement = 0;
 		uavDesc.Buffer.Flags = 0;
 		uavDesc.Buffer.NumElements = creation->width;
+
+		if( creation->flags & RCF_PRG_STRUCTURED ) {
+			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+			uavDesc.Buffer.NumElements = creation->width / creation->structureSize;
+		}
 
 		if( creation->flags & RCF_OUT_UA_COUNTER ) {
 			uavDesc.Buffer.Flags  |= D3D11_BUFFER_UAV_FLAG_COUNTER;
@@ -231,7 +233,8 @@ void Resource::createUAView( uint32_t index, const Scene::Resource::CreationInfo
 	HRESULT hr;
 	ID3D11UnorderedAccessView* view;
 	DXFAIL( Gfx::getr()()->CreateUnorderedAccessView( resource.get(), &uavDesc, &view ) );
-	views[ index ] = D3DViewPtr( view, false );
+	views[ index ] = std::make_shared<Dx11View>( D3DViewPtr( view, false ) );
+
 }
 
 

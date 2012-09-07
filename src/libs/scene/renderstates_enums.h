@@ -30,7 +30,7 @@ namespace Scene {
 	};
 
 	enum TARGET_WRITE_ENABLE {
-		TWM_NONE		= 0,		// no channels will be written too
+		TWE_NONE		= 0,		// no channels will be written too
 		TWE_RED 		= BIT(0),	// red will be written too
 		TWE_GREEN 		= BIT(1),	// green will be written too
 		TWE_BLUE 		= BIT(2),	// blue will be written too

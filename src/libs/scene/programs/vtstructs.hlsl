@@ -11,21 +11,13 @@ struct VtDirectionalLight {
 	float4	colour;		// w/a not used
 };
 
-// 4 16 bit unsigned integers
-struct VtGBuffer0 {
-	uint  materialIndex;
-	uint  coverage;
-	// 2x 16bit uint free
+// 1 32 bit unsigned integer
+struct VtOpaqueFragment {
+	uint matIndex_normal;		// 16 bit material index + encoded normal 2 8 bit 
 };
 
-// 4 16 bit floats
-struct VtGBuffer1 {
-	float2  normal;
-	float  	edgeDist; 
-	// 1 half free
-};
-
-struct VtGbufferFragment {
-	VtGBuffer0 frag0;
-	VtGBuffer0 frag1;
+// 2 32 bit unsigned integer
+struct VtTransparentFragment {
+	uint	matIndex_depth;		// 16 bit material index + 16 bit normalised depth
+	uint	normal;				// encoded normal 2 8 bit, 16 bit spare
 };

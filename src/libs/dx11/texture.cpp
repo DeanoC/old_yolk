@@ -19,8 +19,8 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 	HRESULT hr;
 
 	// copy and point to TODO big ugly but quick...
-	Texture::CreationInfo copyTCS = *((Texture::CreationInfo*)data);
-	Texture::CreationInfo* creation = &copyTCS;
+	auto copyTCS = *((Scene::Resource::CreationInfo*)data);
+	auto creation = &copyTCS;
 
 	DXGI_FORMAT fmt = DXGIFormat::getDXGIFormat( creation->format );
 	CORE_ASSERT( (creation->flags & RCF_D3D_FROM_OS ) || (fmt != DXGI_FORMAT_UNKNOWN) );
@@ -215,25 +215,25 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 
 	// create default views for this texture
 	if( bind & D3D11_BIND_SHADER_RESOURCE ) {
-		CreationInfo vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+		auto vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
 										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
 										tex->format );
 		tex->createView( SHADER_RESOURCE_VIEW, &vs );
 	}
 	if( bind & D3D11_BIND_RENDER_TARGET ) {		
-		CreationInfo vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+		auto vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
 										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
 										tex->format );
 		tex->createView( RENDER_TARGET_VIEW, &vs );
 	}
 	if( bind & D3D11_BIND_DEPTH_STENCIL ) {		
-		CreationInfo vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+		auto vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
 										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
 										tex->format );
 		tex->createView( DEPTH_STENCIL_VIEW, &vs );
 	}
 	if( bind & D3D11_BIND_UNORDERED_ACCESS ) {
-		CreationInfo vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
+		auto vs = Scene::Resource::ViewCtor( 	creation->flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP),
 										tex->width, tex->height, tex->depth, tex->slices, tex->mipLevels, tex->samples,
 										tex->format );
 		tex->createView( UNORDERED_ACCESS_VIEW, &vs );

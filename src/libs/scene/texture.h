@@ -18,15 +18,9 @@ namespace Scene {
 	//! Texture Type
 	static const uint32_t TextureType = RESOURCE_NAME('T','X','T','R');
 
-	class Texture : public Core::Resource<TextureType> {
+	class Texture : public Core::Resource<TextureType>, public Resource {
 	public:
 		friend class ResourceLoader;
-		struct CreationInfo : public Scene::Resource::CreationInfo {
-			CreationInfo(){};
-			CreationInfo( const Scene::Resource::CreationInfo& rhs ) {
-				memcpy( this, &rhs, sizeof(Scene::Resource::CreationInfo) );
-			}
-		};
 
 		Texture() : width( 0 ), height( 0 ), depth( 0 ), slices( 0 ), mipLevels ( 0 ), samples( 1 ) {}
 
@@ -40,11 +34,6 @@ namespace Scene {
 		GENERIC_TEXTURE_FORMAT getFormat() const { return format; }
 		uint32_t getMipLevelCount() const { return mipLevels; }
 		uint32_t getSamples() const { return samples; }
-
-		static CreationInfo TextureCtor( 	uint32_t flags, GENERIC_TEXTURE_FORMAT fmt,
-											uint32_t width, uint32_t height = 1, uint32_t depth = 1, uint32_t slices = 1, 
-											uint32_t mipLevels = 1, uint32_t samples = 1, 
-											const void* prefillData = nullptr, uint32_t prefillPitch = 0, const void* refTex = nullptr );
 
 	protected:
 		static const void* internalPreCreate( const char* name, const CreationInfo *loader );
@@ -61,27 +50,6 @@ namespace Scene {
 	typedef const Core::ResourceHandle<TextureType, Texture> TextureHandle;
 	typedef TextureHandle* TextureHandlePtr;
 	typedef std::shared_ptr<Texture> TexturePtr;
-
-	inline Texture::CreationInfo Texture::TextureCtor( 			uint32_t flags, GENERIC_TEXTURE_FORMAT fmt, 
-																uint32_t width, uint32_t height, uint32_t depth, uint32_t slices, 
-																uint32_t mipLevels, uint32_t samples,  
-																const void* prefillData, uint32_t prefillPitch, const void* refTex ) {
-		CORE_ASSERT( flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP) );
-		CreationInfo cs;
-		cs.flags = (RESOURCE_CREATION_FLAGS)flags;
-		cs.width = width;
-		cs.height = height;
-		cs.depth = depth;
-		cs.slices = slices;
-		cs.mipLevels = mipLevels;
-		cs.samples= samples;
-		cs.format = fmt;
-		cs.prefillData = prefillData;
-		cs.prefillPitch = prefillPitch;
-		cs.referenceTex = refTex;
-		return cs;
-	}
-
 }
 
 #endif

@@ -61,7 +61,7 @@ void DebugPipeline::bind( Scene::RenderContext* ctx ) {
 	auto depthStencilState = depthStencilStateHandle.acquire();
 
 	ctx->clear( colourTarget, Core::RGBAColour(0,0,0,0) );
-	ctx->clearDepthStencil( depthTarget, true, 1.0f, true, 0 );
+	ctx->clear( depthTarget, true, 1.0f, true, 0 );
 
 	ctx->bindRenderTargets( colourTarget, depthTarget );
 

@@ -26,7 +26,7 @@ namespace Scene {
 		DBMF_UNSYNC,
 	};
 
-	class DataBuffer : public Core::Resource<DataBufferType> {
+	class DataBuffer : public Core::Resource<DataBufferType>, public Resource {
 	public:	
 		friend class ResourceLoader;
 		static const int MIN_BUFFER_SIZE = 256; // all buffer will be increased to this size in bytes if less

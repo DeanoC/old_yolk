@@ -87,6 +87,11 @@ Gfx::Gfx() {
 		RasteriserState::CreationInfo::NONE, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
 	RasteriserStateHandle::create( "_RS_Normal_NoMS", &nnmsrsci, Core::RMRF_DONTFLUSH );	
+	RasteriserState::CreationInfo nnnmsrsci = {
+		RasteriserState::CreationInfo::NONE, FIM_FILL, CUM_NONE, 0, 0, 0
+	};
+	RasteriserStateHandle::create( "_RS_Normal_NoMS_NoCull", &nnnmsrsci, Core::RMRF_DONTFLUSH );	
+
 	RenderTargetStates::CreationInfo nrtci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1, 

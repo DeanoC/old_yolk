@@ -46,7 +46,7 @@ void DataBuffer::unmap( Scene::RenderContext* scontext  ) {
 
 DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	using namespace Scene;
-	auto creation = (const DataBuffer::CreationInfo*) data;
+	auto creation = (const Scene::Resource::CreationInfo*) data;
 
 	size_t size = (size_t)Core::alignTo( creation->width, DataBuffer::MIN_BUFFER_SIZE);
 	uint32_t usage = 0;
@@ -138,7 +138,7 @@ DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	if( bind & D3D11_BIND_SHADER_RESOURCE ) {
 		dbuffer->createView( SHADER_RESOURCE_VIEW, creation );
 	}
-	if( bind & RCF_OUT_UNORDERED_ACCESS ) {
+	if( bind & D3D11_BIND_UNORDERED_ACCESS ) {
 		dbuffer->createView( UNORDERED_ACCESS_VIEW, creation );
 	}
 	return dbuffer;

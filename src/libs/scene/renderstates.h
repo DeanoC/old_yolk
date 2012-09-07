@@ -48,6 +48,7 @@ namespace Scene {
 
 	struct TargetState {
 		enum FLAGS {
+			NONE		= 0,
 			BLEND_ENABLE = BIT(0),
 			LOGIC_OP_ENABLE	= BIT(1),		// not supported on dx11 api/hw, so be careful
 		};
@@ -73,6 +74,7 @@ namespace Scene {
 		static const int MAX_RENDER_TARGETS = 8;
 		struct CreationInfo {
 			enum FLAGS {
+				NONE					= 0,
 				ALPHA_TO_COV 			= BIT(0),
 			}					flags;
 

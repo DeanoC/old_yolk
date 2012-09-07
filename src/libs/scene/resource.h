@@ -6,6 +6,10 @@
 
 namespace Scene {
 
+	// private class to renders but needs visibility at Scene lever
+	struct View{};
+	typedef std::shared_ptr<View> ViewPtr;
+
 	///-------------------------------------------------------------------------------------------------
 	/// \enum	RESOURCE_CREATION_FLAGS
 	///
@@ -71,14 +75,30 @@ namespace Scene {
 			void*		deleteWhenFinish;		//!< CORE_DELETE on this when its loaded, make async memory management a bit easier
 			uint32_t	structureSize;			//!< size of a structure for structured buffers, width is in bytes for RCF_PRG_STRUCTURED
 		};
+		
+		enum VIEW_TYPE {
+			// the first slots are hardcoded to views created at resource creation time (depending on what was created)
+			SHADER_RESOURCE_VIEW = 0,
+			DEPTH_STENCIL_VIEW,
+			RENDER_TARGET_VIEW,
+			UNORDERED_ACCESS_VIEW,
+			CUSTOM_VIEW 		= BIT(31),
+		};
+
+		virtual ViewPtr getView( uint32_t viewType ) const = 0;
 
 		static CreationInfo BufferCtor( 	uint32_t flags, uint32_t width, const void* prefillData = nullptr );
 
 		static CreationInfo ViewCtor( 	uint32_t flags, uint32_t width, uint32_t height = 0, uint32_t depth = 0, uint32_t slices = 0, 
 											uint32_t mipLevels = 0, uint32_t sampleCount = 0, GENERIC_TEXTURE_FORMAT fmt = GTF_UNKNOWN );
 
-	private:
-		Resource();
+		static CreationInfo TextureCtor( 	uint32_t flags, GENERIC_TEXTURE_FORMAT fmt,
+											uint32_t width, uint32_t height = 1, uint32_t depth = 1, uint32_t slices = 1, 
+											uint32_t mipLevels = 1, uint32_t samples = 1, 
+											const void* prefillData = nullptr, uint32_t prefillPitch = 0, const void* refTex = nullptr );
+
+	protected:
+		Resource(){};
 	};
 
 	inline Resource::CreationInfo Resource::BufferCtor( 	uint32_t flags, uint32_t width, const void* prefillData ) {
@@ -114,6 +134,27 @@ namespace Scene {
 		cs.referenceTex = nullptr;
 		return cs;
 	}
+
+	inline Resource::CreationInfo Resource::TextureCtor( 			uint32_t flags, GENERIC_TEXTURE_FORMAT fmt, 
+																uint32_t width, uint32_t height, uint32_t depth, uint32_t slices, 
+																uint32_t mipLevels, uint32_t samples,  
+																const void* prefillData, uint32_t prefillPitch, const void* refTex ) {
+		CORE_ASSERT( flags & (RCF_TEX_1D | RCF_TEX_2D | RCF_TEX_3D | RCF_TEX_CUBE_MAP) );
+		CreationInfo cs;
+		cs.flags = (RESOURCE_CREATION_FLAGS)flags;
+		cs.width = width;
+		cs.height = height;
+		cs.depth = depth;
+		cs.slices = slices;
+		cs.mipLevels = mipLevels;
+		cs.samples= samples;
+		cs.format = fmt;
+		cs.prefillData = prefillData;
+		cs.prefillPitch = prefillPitch;
+		cs.referenceTex = refTex;
+		return cs;
+	}
+	typedef std::shared_ptr<Resource> ResourcePtr;
 }
 
 #endif

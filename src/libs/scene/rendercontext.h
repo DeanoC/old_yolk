@@ -57,6 +57,7 @@ namespace Scene {
 		virtual void bindRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets, const TexturePtr& depthTarget ) = 0;
 		virtual void bindRenderTargets( unsigned int numTargets, const TexturePtr* const pTargets ) = 0;
 		virtual void bindUnorderedViews( unsigned int numViews, const Scene::TexturePtr* const sviews ) = 0;
+		virtual void bindRenderTargetsAndUnorderedViews( unsigned int numTargets, const Scene::TexturePtr* const pTargets, const Scene::TexturePtr& depthTarget, unsigned int numViews, const Scene::ViewPtr* const sviews ) = 0;
 
 		// todo proper viewports
 		virtual void bind( const Viewport& viewport ) = 0;
@@ -72,8 +73,9 @@ namespace Scene {
 
 		virtual void bindIndexBuffer( const DataBufferPtr& ib, int indexBytes ) = 0;
 
+		virtual void clear( const ViewPtr& target ) = 0;
 		virtual void clear( const TexturePtr& target, const Core::Colour& colour ) = 0;
-		virtual void clearDepthStencil( const TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) = 0; 
+		virtual void clear( const TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) = 0; 
 
 		virtual void copy( const DataBufferPtr& dst, const DataBufferPtr& src ) = 0; 		//!< copy an entire buffer from src to dst
 		virtual void copy( const TexturePtr& dst, const TexturePtr& src ) = 0;				//!< copy an entire texture from src to dst

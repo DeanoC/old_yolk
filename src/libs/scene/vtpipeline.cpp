@@ -6,6 +6,7 @@
 //!-----------------------------------------------------
 
 #include "scene.h"
+#include <boost/lexical_cast.hpp>
 #include "core/resourceman.h"
 #include "wobfile.h"
 #include "texture.h"
@@ -25,10 +26,10 @@ namespace Scene {
 
 VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false ) {
 	// NOTE programs are loaded off disk even when from the internal default programs (which are actually bound in the code)
-	solidWireFrameProgramHandle.reset( Scene::ProgramHandle::load( "vtsolidwireframe" ) );
+	opaqueProgramHandle.reset( Scene::ProgramHandle::load( "vtopaque" ) );
 	resolveProgramHandle.reset( Scene::ProgramHandle::load( "vtresolve" ) );
 	lightingProgramHandle.reset( Scene::ProgramHandle::load( "vtlighting" ) );
-	transCountProgramHandle.reset( Scene::ProgramHandle::load( "vttranscount" ) );
+	transparentProgramHandle.reset( Scene::ProgramHandle::load( "vttransparent" ) );
 
 	Texture::CreationInfo ccs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
@@ -42,51 +43,49 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	Texture::CreationInfo dmscs = Texture::TextureCtor(
 			RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
 			GTF_DEPTH24_STENCIL8,
-			FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
+			FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, NUM_MSAA_SAMPLES
 		);
 	static const std::string depthTargetMSName = "VtPipe_DepthTargetMS";
 	depthTargetMSHandle.reset( TextureHandle::create( depthTargetMSName.c_str(), &dmscs ) );
-	// material index, edge alpha, coverage, 
+	
+	// packed: material index + depth + 2D normal + alpha
 	Texture::CreationInfo gb0mscs = Texture::TextureCtor(
 		RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
-		GTF_RGBA16UI,
-		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
+		GTF_RG32UI,
+		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, NUM_MSAA_SAMPLES
 	);
-	static const std::string gb0TargetMSName = "VtPipe_GBuffer0MS";
-	gBuffer0MSHandle.reset( TextureHandle::create( gb0TargetMSName.c_str(), &gb0mscs ) );
-	// packed normal 
-	Texture::CreationInfo gb1mscs = Texture::TextureCtor(
-		RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
-		GTF_RGBA16F,
-		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
-	);
-	static const std::string gb1TargetMSName = "VtPipe_GBuffer1MS";
-	gBuffer1MSHandle.reset( TextureHandle::create( gb1TargetMSName.c_str(), &gb1mscs ) );
+	static const std::string gbTargetMSName = "VtPipe_GBufferMS0";
+	gBufferMSHandle0.reset( TextureHandle::create( gbTargetMSName.c_str(), &gb0mscs ) );
 
-	// transparent fragment count
-	Texture::CreationInfo tfcmscs = Texture::TextureCtor(
-		RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
-		GTF_RGBA8,
-		FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, 8
+	// transparent fragment count 
+	Texture::CreationInfo tfscs = Texture::TextureCtor(
+		RCF_TEX_2D | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
+		GTF_R32UI,
+		FIXED_WIDTH, FIXED_HEIGHT
 	);
-	static const std::string tfcmsTargetName = "VtPipe_TransFragmentCountMS";
-	tfcMSHandle.reset( TextureHandle::create( tfcmsTargetName.c_str(), &tfcmscs ) );
+	static const std::string tfcTargetName = "VtPipe_TransFragmentCount";
+	tfcHandle.reset( TextureHandle::create( tfcTargetName.c_str(), &tfscs ) );
+	// transparent fragments
+	DataBuffer::CreationInfo tfdcs = Resource::BufferCtor(
+		RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
+		sizeof( GPUConstants::VtTransparentFragment ) * FIXED_WIDTH * FIXED_HEIGHT * MAX_FRAGMENTS_PER_SAMPLE
+	);
+	tfdcs.structureSize = sizeof( GPUConstants::VtTransparentFragment );
+	static const std::string transparentFragmentDataName = "VtPipe_TransparentFragments";
+	transparentFragmentsHandle.reset( DataBufferHandle::create( transparentFragmentDataName .c_str(), &tfdcs ) );
 
 	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
 	depthStencilNoWriteStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Less_NoWrite" ) );
 	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
-	rasterStateNoMSHandle.reset( RasteriserStateHandle::create( "_RS_Normal_NoMS" ) );
+	rasterStateNoMSHandle.reset( RasteriserStateHandle::create( "_RS_Normal_NoMS_NoCull" ) );
 	renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
-	renderTargetAddWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_Add_WriteAll" ) );
 
-	// transparent fragment buffer
-	DataBuffer::CreationInfo tfbdcs = Resource::BufferCtor(
-		RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
-		sizeof( GPUConstants::VtGbufferFragment ) * MAX_TRANSPARENT_FRAGMENTS
-	);
-	tfbdcs.structureSize = sizeof( GPUConstants::VtGbufferFragment );
-	static const std::string transFragDataName = "VtPipe_TransFragBuffer";
-	materialStoreHandle.reset( DataBufferHandle::create( transFragDataName.c_str(), &tfbdcs ) );
+	RenderTargetStates::CreationInfo aartci = {
+		RenderTargetStates::CreationInfo::NONE, 
+		1, 
+		{ TargetState::FLAGS::NONE, TWE_NONE },
+	};
+	renderTargetNoWriteHandle.reset( RenderTargetStatesHandle::create( "VTPipe_NoWrite", &aartci ) );
 	
 	// null material
 	GPUConstants::VtMaterial nullMaterial = {
@@ -110,22 +109,23 @@ VtPipeline::~VtPipeline() {
 	materialStoreHandle.reset();
 	lightStoreHandle.reset();
 
-	renderTargetAddWriteHandle.reset();
+	renderTargetNoWriteHandle.reset();
 	renderTargetWriteHandle.reset();
 	depthStencilNoWriteStateHandle.reset();
 	depthStencilStateHandle.reset();
 	rasterStateHandle.reset();
 
-	tfcMSHandle.reset();
-	gBuffer1MSHandle.reset();
-	gBuffer0MSHandle.reset();
+	tfcHandle.reset();
+
+	transparentFragmentsHandle.reset();
+	gBufferMSHandle0.reset();
 	depthTargetMSHandle.reset();
 	colourTargetHandle.reset();
 
-	transCountProgramHandle.reset();
+	transparentProgramHandle.reset();
 	lightingProgramHandle.reset();
 	resolveProgramHandle.reset();
-	solidWireFrameProgramHandle.reset();
+	opaqueProgramHandle.reset();
 }
 
 void VtPipeline::bind( Scene::RenderContext* ctx ) {
@@ -169,9 +169,11 @@ void VtPipeline::unbind( Scene::RenderContext* ctx ) {
 	// light
 	{
 		auto prg = lightingProgramHandle.acquire();
-		auto gb0 = gBuffer0MSHandle.acquire();
-		auto gb1 = gBuffer1MSHandle.acquire();
+		auto ogb = gBufferMSHandle0.acquire();
+		auto tfc = tfcHandle.acquire();
 		auto db = depthTargetMSHandle.acquire();
+
+		auto tfrags = transparentFragmentsHandle.acquire();
 		auto materialStore = materialStoreHandle.acquire();
 		auto lightStore = lightStoreHandle.acquire();	
 
@@ -184,37 +186,23 @@ void VtPipeline::unbind( Scene::RenderContext* ctx ) {
 		};
 
 		ctx->bindUnorderedViews( 1, targets );
-		ctx->bind( Scene::ST_COMPUTE, 0, gb0 );
-		ctx->bind( Scene::ST_COMPUTE, 1, gb1 );
-		ctx->bind( Scene::ST_COMPUTE, 9, db );
+		ctx->bind( Scene::ST_COMPUTE, 0, ogb );
+		ctx->bind( Scene::ST_COMPUTE, 1, tfc );
+		ctx->bind( Scene::ST_COMPUTE, 2, tfrags );
+		ctx->bind( Scene::ST_COMPUTE, 8, db );
+
 		ctx->bind( Scene::ST_COMPUTE, 10, materialStore );
 		ctx->bind( Scene::ST_COMPUTE, 11, lightStore );
 		ctx->dispatch( FIXED_WIDTH, FIXED_HEIGHT, 1 );
 		ctx->unbindUnorderedViews();
 		ctx->unbindTexture( Scene::ST_COMPUTE, 0, 12 );
 	}
-	// resolve
-/*	{
-		auto target = colourTargetHandle.acquire();
-		auto tex = gBuffer0MSHandle.acquire();
-		auto prg = resolveProgramHandle.acquire();
-		auto rtw = renderTargetWriteHandle.acquire();
-
-		ctx->getConstantCache().updateGPU( ctx, prg );
-		ctx->bindRenderTarget( target );
-		ctx->bind( Scene::ST_FRAGMENT, 0, tex );
-		ctx->bind( prg );
-		ctx->bind( rtw );
-		ctx->draw( Scene::PT_POINT_LIST, 1 );
-	}*/
 
 	ctx->popDebugMarker();
 }
 
 static enum VTPIPE_GEOMETRY_PASSES {
 	GBUFFER_RENDER_OPAQUE_PASS = 0,
-
-	GBUFFER_COUNT_TRANS_PASS,
 
 	GBUFFER_RENDER_TRANS_PASS,
 
@@ -225,19 +213,17 @@ int VtPipeline::getGeomPassCount() {
 	return MAX_RENDER_PASSES; 
 }
 bool VtPipeline::isGeomPassOpaque( int pass ) {
-	if( pass < GBUFFER_COUNT_TRANS_PASS ) {
+	if( pass < GBUFFER_RENDER_TRANS_PASS ) {
 		return true;
 	} else {
 		return false;
 	}
 }
 
-void VtPipeline::startGeomPass( RenderContext* ctx, int i ) {
+void VtPipeline::startGeomPass ( RenderContext* ctx, int i ) {
 	switch ( i ) {
 	case GBUFFER_RENDER_OPAQUE_PASS:
 		startGeomRenderOpaquePass( ctx ); break;
-	case GBUFFER_COUNT_TRANS_PASS: 
-		startGeomCountTransparentPass( ctx ); break;
 	case GBUFFER_RENDER_TRANS_PASS: 
 		startGeomRenderTransparentPass( ctx ); break;
 	default: CORE_ASSERT(false) break;
@@ -248,82 +234,59 @@ void VtPipeline::endGeomPass ( RenderContext* ctx, int i ) {
 	switch ( i ) {
 	case GBUFFER_RENDER_OPAQUE_PASS:
 		endGeomRenderOpaquePass( ctx ); break;
-	case GBUFFER_COUNT_TRANS_PASS: 
-		endGeomCountTransparentPass( ctx ); break;
 	case GBUFFER_RENDER_TRANS_PASS: 
 		endGeomRenderTransparentPass( ctx ); break;
 	default: CORE_ASSERT(false) break;
 	}
 }
-void VtPipeline::startGeomRenderOpaquePass( RenderContext* ctx ) {
-	Scene::TexturePtr gBufferTargets[] = {
-		gBuffer0MSHandle.acquire(),
-		gBuffer1MSHandle.acquire()
-	};
+void VtPipeline::startGeomRenderOpaquePass ( RenderContext* ctx ) {
+	Scene::TexturePtr tgt = gBufferMSHandle0.acquire();
 
 	auto depthTarget = depthTargetMSHandle.acquire();
-	auto program = solidWireFrameProgramHandle.acquire();
+	auto program = opaqueProgramHandle.acquire();
 	auto rasterState = rasterStateHandle.acquire();
 	auto dss = depthStencilStateHandle.acquire();
 	auto rtw = renderTargetWriteHandle.acquire();
-
-	ctx->clear( gBufferTargets[0], Core::RGBAColour(0,0,0,0) );
-	ctx->clear( gBufferTargets[1], Core::RGBAColour(0,0,0,0) );
-	ctx->clearDepthStencil( depthTarget, true, 1.0f, true, 0 );
-
-	ctx->bindRenderTargets( 2, gBufferTargets, depthTarget );
-
-	ctx->getConstantCache().updateGPU( ctx, program );
-	ctx->bind( program );
-	ctx->bind( rasterState );
-	ctx->bind( dss );
-	ctx->bind( rtw );
-}
-
-void VtPipeline::startGeomCountTransparentPass( RenderContext* ctx ) {
-	auto prg = transCountProgramHandle.acquire();
-	auto dt = depthTargetMSHandle.acquire(); // R/O
-	auto rs = rasterStateNoMSHandle.acquire();
-	auto tgt = tfcMSHandle.acquire();
-	auto dss = depthStencilNoWriteStateHandle.acquire();
-	auto rtw = renderTargetAddWriteHandle.acquire();
 
 	ctx->clear( tgt, Core::RGBAColour(0,0,0,0) );
-	ctx->bindRenderTargets( tgt, dt );
+	ctx->clear( depthTarget, true, 1.0f, true, 0 );
 
-	ctx->bind( prg );
-	ctx->bind( dss );
-	ctx->bind( rtw );
-
-}
-
-void VtPipeline::startGeomRenderTransparentPass( RenderContext* ctx ) {
-	Scene::TexturePtr gBufferTargets[] = {
-		gBuffer0MSHandle.acquire(),
-		gBuffer1MSHandle.acquire()
-	};
-
-	auto depthTarget = depthTargetMSHandle.acquire();
-	auto program = solidWireFrameProgramHandle.acquire();
-	auto rasterState = rasterStateHandle.acquire();
-	auto dss = depthStencilStateHandle.acquire();
-	auto rtw = renderTargetWriteHandle.acquire();
-
-	ctx->bindRenderTargets( 2, gBufferTargets, depthTarget );
+	ctx->bindRenderTargets( tgt, depthTarget );
 
 	ctx->getConstantCache().updateGPU( ctx, program );
 	ctx->bind( program );
 	ctx->bind( rasterState );
 	ctx->bind( dss );
-	ctx->bind( rtw );}
+	ctx->bind( rtw );
+}
 
+void VtPipeline::startGeomRenderTransparentPass ( RenderContext* ctx ) {
+	Scene::ViewPtr uavs[] = {
+		tfcHandle.acquire()->getView( Resource::UNORDERED_ACCESS_VIEW ), 
+		transparentFragmentsHandle.acquire()->getView( Resource::UNORDERED_ACCESS_VIEW )
+	};
+
+	ctx->clear( uavs[0] );
+
+	Scene::TexturePtr dum[] = { gBufferMSHandle0.acquire() };
+	auto depthTarget = depthTargetMSHandle.acquire();
+	auto program = transparentProgramHandle.acquire();
+	auto rasterState = rasterStateNoMSHandle.acquire();
+	auto dss = depthStencilNoWriteStateHandle.acquire();
+	auto rtw = renderTargetNoWriteHandle.acquire();
+
+	ctx->bindRenderTargetsAndUnorderedViews( 1, dum, depthTarget,
+											 2, uavs );
+
+	ctx->getConstantCache().updateGPU( ctx, program );
+	ctx->bind( program );
+	ctx->bind( rasterState );
+	ctx->bind( dss );
+	ctx->bind( rtw );
+
+}
 void VtPipeline::endGeomRenderOpaquePass( RenderContext* ctx ) {
-
 }
-
-void VtPipeline::endGeomCountTransparentPass( RenderContext* ctx ) {
-}
-
 void VtPipeline::endGeomRenderTransparentPass( RenderContext* ctx ) {
 }
 
@@ -332,7 +295,7 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 	using namespace Scene;
 	WobFileHeader* header = wob->header.get();
 
-	auto program = solidWireFrameProgramHandle.acquire();
+	auto program = opaqueProgramHandle.acquire();
 
 	VtPipelineDataStore* pds =  CORE_NEW VtPipelineDataStore();
 

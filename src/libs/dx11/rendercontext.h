@@ -38,8 +38,9 @@ namespace Dx11 {
 		virtual void bindRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const pTargets, const Scene::TexturePtr& depthTarget ) override;
 		virtual void bindRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const pTargets ) override;
 		virtual void bindUnorderedViews( unsigned int numViews, const Scene::TexturePtr* const sviews ) override;
+		virtual void bindRenderTargetsAndUnorderedViews( unsigned int numTargets, const Scene::TexturePtr* const pTargets, const Scene::TexturePtr& depthTarget, unsigned int numViews, const Scene::ViewPtr* const sviews ) override;
 
-			// todo proper viewports
+		// todo proper viewports
 		virtual void bind( const Scene::Viewport& viewport ) override;
 	
 		virtual void bind( const Scene::ProgramPtr& prg ) override;
@@ -54,8 +55,9 @@ namespace Dx11 {
 
 		virtual void bindIndexBuffer( const Scene::DataBufferPtr& ib, int indexBytes ) override;
 
+		virtual void clear( const Scene::ViewPtr& target ) override;
 		virtual void clear( const Scene::TexturePtr& target, const Core::Colour& colour ) override;
-		virtual void clearDepthStencil( const Scene::TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) override; 
+		virtual void clear( const Scene::TexturePtr& target, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) override; 
 
 		virtual void copy( const Scene::DataBufferPtr& dst, const Scene::DataBufferPtr& src ) override;
 		virtual void copy( const Scene::TexturePtr& dst, const Scene::TexturePtr& src ) override;

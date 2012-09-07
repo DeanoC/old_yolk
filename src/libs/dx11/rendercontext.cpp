@@ -31,54 +31,81 @@ void RenderContext::bindRenderTargets( const Scene::TexturePtr& starget,
 	const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( starget );
 	const std::shared_ptr<Dx11::Texture> depthTarget = std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
 
-	ID3D11RenderTargetView* rtViews[] = { (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get() };
-	ctx->OMSetRenderTargets( 1, rtViews, (ID3D11DepthStencilView*)depthTarget->getView( Resource::DEPTH_STENCIL_VIEW ).get() );
+	ID3D11RenderTargetView* rtViews[] = { 
+		static_cast<ID3D11RenderTargetView*> ( target->getDx11View( Scene::Resource::RENDER_TARGET_VIEW )->view.get() ) 
+	};
+	ctx->OMSetRenderTargets( 1, rtViews, static_cast<ID3D11DepthStencilView*>( depthTarget->getDx11View( Scene::Resource::DEPTH_STENCIL_VIEW )->view.get() ) );
 }
 
 void RenderContext::bindRenderTarget( const Scene::TexturePtr& starget ) {
 	const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( starget );
 
-	ID3D11RenderTargetView* rtViews[] = { (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get()};
+	ID3D11RenderTargetView* rtViews[] = { 
+		static_cast<ID3D11RenderTargetView*>( target->getDx11View( Scene::Resource::RENDER_TARGET_VIEW )->view.get() ) 
+	};
 	ctx->OMSetRenderTargets( 1, rtViews, nullptr );
 }
 
 void RenderContext::bindDepthOnlyRenderTarget( const Scene::TexturePtr& sdepthTarget ) {
 	const std::shared_ptr<Dx11::Texture> depthTarget = std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
-	ctx->OMSetRenderTargets( 0, nullptr, (ID3D11DepthStencilView*)depthTarget->getView( Resource::DEPTH_STENCIL_VIEW ).get() );
+	ctx->OMSetRenderTargets( 0, nullptr, static_cast<ID3D11DepthStencilView*>( depthTarget->getDx11View( Scene::Resource::DEPTH_STENCIL_VIEW )->view.get() ) );
 }
 
 
 void RenderContext::bindRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const stargets, const Scene::TexturePtr& sdepthTarget ) {
 	ID3D11RenderTargetView* rtViews[8];
-	assert( numTargets < 8 );
+	assert( numTargets <= 8 );
 	for( unsigned int i=0;i < numTargets;++i ){ 
 		const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( stargets[i] );
-		rtViews[i] = (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get();
+		rtViews[i] = static_cast<ID3D11RenderTargetView*>( target->getDx11View( Scene::Resource::RENDER_TARGET_VIEW )->view.get() );
 	};
 	const std::shared_ptr<Dx11::Texture> depthTarget = std::static_pointer_cast<Dx11::Texture>( sdepthTarget );
-	ID3D11DepthStencilView* dTarget = (ID3D11DepthStencilView*) depthTarget->getView( Resource::DEPTH_STENCIL_VIEW ).get();
+	ID3D11DepthStencilView* dTarget = static_cast<ID3D11DepthStencilView*>( depthTarget->getDx11View( Scene::Resource::DEPTH_STENCIL_VIEW )->view.get() );
 	ctx->OMSetRenderTargets( numTargets, rtViews, dTarget );
 }
 void RenderContext::bindRenderTargets( unsigned int numTargets, const Scene::TexturePtr* const stargets ) {
 	ID3D11RenderTargetView* rtViews[8];
-	assert( numTargets < 8 );
+	assert( numTargets <= 8 );
 	for( unsigned int i=0;i < numTargets;++i ){ 
 		const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( stargets[i] );
-		rtViews[i] = (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get();
+		rtViews[i] = static_cast<ID3D11RenderTargetView*>( target->getDx11View( Scene::Resource::RENDER_TARGET_VIEW )->view.get() );
 	};
 	ctx->OMSetRenderTargets( numTargets, rtViews, nullptr );
 }
 
 void RenderContext::bindUnorderedViews( unsigned int numViews, const Scene::TexturePtr* const stargets ) {
 	ID3D11UnorderedAccessView* uavViews[8];
-	assert( numViews < 8 );
+	assert( numViews <= 8 );
 	for( unsigned int i=0;i < numViews;++i ){ 
 		const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( stargets[i] );
-		uavViews[i] = (ID3D11UnorderedAccessView*)target->getView( Resource::UNORDERED_ACCESS_VIEW ).get();
+		uavViews[i] = static_cast<ID3D11UnorderedAccessView*>( target->getDx11View( Scene::Resource::UNORDERED_ACCESS_VIEW )->view.get() );
 	};
 	ctx->CSSetUnorderedAccessViews( 0, numViews, uavViews, nullptr );
 }
 
+void RenderContext::bindRenderTargetsAndUnorderedViews( unsigned int numTargets, const Scene::TexturePtr* const stargets, const Scene::TexturePtr& sdepthtarget, unsigned int numViews, const Scene::ViewPtr* const sviews ) {
+	ID3D11RenderTargetView* rtViews[8];
+	ID3D11UnorderedAccessView* uavViews[8];
+	assert( numViews + numTargets <= 8 );
+	assert( numTargets <= 8 );
+
+	const std::shared_ptr<Dx11::Texture> depthTarget = std::static_pointer_cast<Dx11::Texture>( sdepthtarget );
+	ID3D11DepthStencilView* dTarget = static_cast<ID3D11DepthStencilView*>( depthTarget->getDx11View( Scene::Resource::DEPTH_STENCIL_VIEW )->view.get() );
+
+	for( unsigned int i=0;i < numTargets;++i ){ 
+		const std::shared_ptr<Dx11::Texture> target = std::static_pointer_cast<Dx11::Texture>( stargets[i] );
+		rtViews[i] = static_cast<ID3D11RenderTargetView*>( target->getDx11View( Scene::Resource::RENDER_TARGET_VIEW )->view.get() );
+	};
+
+	assert( numViews <= 8 );
+	for( unsigned int i=0;i < numViews;++i ){ 
+		const std::shared_ptr<Dx11View> target = std::static_pointer_cast<Dx11View>( sviews[i] );
+		uavViews[i] = static_cast<ID3D11UnorderedAccessView*>( target->view.get() );
+	};
+
+	ctx->OMSetRenderTargetsAndUnorderedAccessViews( numTargets, rtViews, dTarget, numTargets, numViews, uavViews, nullptr );
+
+}
 
 void RenderContext::bind( const Scene::Viewport& viewport ) {
 	ctx->RSSetViewports( 1, (D3D11_VIEWPORT*) &viewport );
@@ -92,7 +119,7 @@ void RenderContext::bind( const Scene::ProgramPtr& sprg ) {
 			for( int j = 0; j < Scene::CF_NUM_BLOCKS; ++j ) {
 				if( prg->usedBuffers & BIT(j) ) {
 					auto cb = std::static_pointer_cast<Dx11::DataBuffer>( constantCache.getBlock((Scene::CONSTANT_FREQ_BLOCKS)j)->acquire() );
-					auto buf = (ID3D11Buffer*) cb->get().get();
+					auto buf = static_cast<ID3D11Buffer*>( cb->get().get() );
 					// TODO cache which are set
 					switch( i ) {
 					case Scene::ST_VERTEX: ctx->VSSetConstantBuffers( j, 1, &buf ); break;
@@ -164,7 +191,7 @@ void RenderContext::bind( const Scene::ProgramPtr& sprg ) {
 
 void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::TexturePtr& stex ) {
 	auto tex = std::static_pointer_cast<Dx11::Texture>( stex );
-	auto view = (ID3D11ShaderResourceView* const) tex->getView( tex->SHADER_RESOURCE_VIEW ).get();
+	auto view = static_cast<ID3D11ShaderResourceView* const>( tex->getDx11View( tex->SHADER_RESOURCE_VIEW )->view.get() );
 	switch( type ) {
 	case Scene::ST_VERTEX: ctx->VSSetShaderResources( unit,1, &view ); break;
 	case Scene::ST_FRAGMENT: ctx->PSSetShaderResources( unit,1, &view ); break;
@@ -178,7 +205,7 @@ void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, c
 
 void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& stex ) {
 	auto buf = std::static_pointer_cast<Dx11::DataBuffer>( stex );
-	auto view = (ID3D11ShaderResourceView* const) buf->getView( buf->SHADER_RESOURCE_VIEW ).get();
+	auto view = static_cast<ID3D11ShaderResourceView* const>( buf->getDx11View( buf->SHADER_RESOURCE_VIEW )->view.get() );
 	switch( type ) {
 	case Scene::ST_VERTEX: ctx->VSSetShaderResources( unit,1, &view ); break;
 	case Scene::ST_FRAGMENT: ctx->PSSetShaderResources( unit,1, &view ); break;
@@ -192,7 +219,7 @@ void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, c
 
 void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr& ssampler ) {
 	auto sampler = std::static_pointer_cast<Dx11::SamplerState>( ssampler );
-	auto samp = query_interface<ID3D11SamplerState>( sampler->samplerState, IID_ID3D11SamplerState ).get();
+	auto samp = static_cast<ID3D11SamplerState*>( sampler->samplerState.get() );
 	switch( type ) {
 	case Scene::ST_VERTEX: ctx->VSSetSamplers( unit,1, &samp ); break;
 	case Scene::ST_FRAGMENT: ctx->PSSetSamplers( unit,1, &samp ); break;
@@ -207,20 +234,20 @@ void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, c
 
 void RenderContext::bind( const Scene::RenderTargetStatesPtr& stargetStates ) {
 	auto targetStates = std::static_pointer_cast<Dx11::RenderTargetStates>( stargetStates );
-	auto states = (ID3D11BlendState* const)targetStates->renderTargetState.get();
+	auto states = static_cast<ID3D11BlendState* const>( targetStates->renderTargetState.get() );
 	// TODO blend factor and sample mask
 	float todo[4] = { 1,1,1,1 };
 	ctx->OMSetBlendState( states, todo, 0xFFFFFFFF );
 }
 void RenderContext::bind( const Scene::DepthStencilStatePtr& sdsState ) {
 	auto dsState = std::static_pointer_cast<Dx11::DepthStencilState>( sdsState );
-	auto state = (ID3D11DepthStencilState* const)dsState->depthStencilState.get();
+	auto state = static_cast<ID3D11DepthStencilState* const>( dsState->depthStencilState.get() );
 	// todo stencil ref
 	ctx->OMSetDepthStencilState( state, 0 );
 }
 void RenderContext::bind( const Scene::RasteriserStatePtr& sraster ) {
 	auto raster = std::static_pointer_cast<Dx11::RasteriserState>( sraster );
-	auto state = (ID3D11RasterizerState* const)raster->rasteriserState.get();
+	auto state = static_cast<ID3D11RasterizerState* const>( raster->rasteriserState.get() );
 	ctx->RSSetState( state );
 }
 void RenderContext::bind( const Scene::VertexInputPtr& svertexInput ) {
@@ -234,7 +261,7 @@ void RenderContext::bind( const Scene::VertexInputPtr& svertexInput ) {
 	for( int i = 0; i < vin->streamCount; ++i ) {
 		// bind vertex buffers
 		buffers[ i ] = std::static_pointer_cast<Dx11::DataBuffer>( vin->streamBuffers[i]->acquire() );
-		d3dBuffers[ i ] = (ID3D11Buffer*)buffers[i]->get().get();
+		d3dBuffers[ i ] = static_cast<ID3D11Buffer*>(buffers[i]->get().get() );
 		offsets[ i ] = 0;
 	}
 	ctx->IASetVertexBuffers( 0 , vin->streamCount, d3dBuffers, vin->streamStrides, offsets );
@@ -243,25 +270,33 @@ void RenderContext::bind( const Scene::VertexInputPtr& svertexInput ) {
 
 void RenderContext::bindIndexBuffer( const Scene::DataBufferPtr& sib, int indexBytes ) {
 	auto ib = std::static_pointer_cast<Dx11::DataBuffer>( sib );
-	auto buf = (ID3D11Buffer* const)ib->get().get();
+	auto buf = static_cast<ID3D11Buffer* const>( ib->get().get() );
 	ctx->IASetIndexBuffer( buf, (indexBytes == 2) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0 );
 }
 
 void RenderContext::clear( const Scene::TexturePtr& starget, const Core::Colour& colour ) {
 	const std::shared_ptr<Dx11::Texture> target = 
 				std::static_pointer_cast<Dx11::Texture>( starget );
-	ctx->ClearRenderTargetView( (ID3D11RenderTargetView*)target->getView( Resource::RENDER_TARGET_VIEW ).get(),
+	ctx->ClearRenderTargetView( static_cast<ID3D11RenderTargetView*>( target->getDx11View( Scene::Resource::RENDER_TARGET_VIEW )->view.get() ),
 								(float*) &colour.getRGBAColour()[0] );
 }
 
-void RenderContext::clearDepthStencil( const Scene::TexturePtr& starget, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) {
+void RenderContext::clear( const Scene::TexturePtr& starget, bool clearDepth, float depth, bool clearStencil, uint8_t stencil ) {
 	const std::shared_ptr<Dx11::Texture> target = 
 				std::static_pointer_cast<Dx11::Texture>( starget );
-	ctx->ClearDepthStencilView( (ID3D11DepthStencilView*)target->getView( Resource::DEPTH_STENCIL_VIEW ).get(),
+	ctx->ClearDepthStencilView( static_cast<ID3D11DepthStencilView*>(target->getDx11View( Scene::Resource::DEPTH_STENCIL_VIEW )->view.get() ),
 								(clearDepth ? D3D11_CLEAR_DEPTH : 0) | (clearStencil ? D3D11_CLEAR_STENCIL : 0),
 								depth, stencil );
 
 }
+void RenderContext::clear( const Scene::ViewPtr& starget ) {
+	static const uint32_t zeros[] = { 0,0,0,0 };
+	const std::shared_ptr<Dx11::Dx11View> target = 
+				std::static_pointer_cast<Dx11::Dx11View>( starget );
+	ctx->ClearUnorderedAccessViewUint( static_cast<ID3D11UnorderedAccessView*>( target->view.get() ), zeros );
+}
+
+
 
 void RenderContext::copy( const Scene::DataBufferPtr& sdst, const Scene::DataBufferPtr& ssrc ) {
 	auto db = std::static_pointer_cast<Dx11::DataBuffer>( sdst );

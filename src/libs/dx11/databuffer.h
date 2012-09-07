@@ -25,6 +25,10 @@ namespace Dx11 {
 		void unmap( Scene::RenderContext* context ) override;
 
 		static DataBuffer* internalCreate( const void* creation );
+		
+		Scene::ViewPtr getView( uint32_t viewType ) const override { 
+			return getDx11View( viewType );
+		}
 
 	protected:
 		friend class DataBufferMan;

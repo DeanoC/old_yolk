@@ -1,6 +1,55 @@
 #include "shared_structs.hlsl"
 #include "constant_blocks.hlsl"
 #include "vtstructs.hlsl"
+Texture2DMS<uint4,8> gBufferOpaque : register( t0 );
+Texture2D<uint> fragmentCounter : register( t1 );
+StructuredBuffer<VtTransparentFragment> transparentFragments : register( t2 );
+Texture2DMS<float,8> depthBuffer : register( t8 );
+const static int MAX_TRANS_FRAGS = 8;
+
+StructuredBuffer<VtMaterial> materialStore : register( t10 );
+StructuredBuffer<VtDirectionalLight> lightStore : register( t11 );
+
+RWTexture2D<float4> target : register( u0 );
+
+void combSortTransparents( uint2 frags[8], uint inputSize ) {
+	uint gap = inputSize;
+	bool swapped = false;
+	while( gap > 1 && swapped == false ) {
+		gap = uint((float)gap * (1.0f / 1.247330950103979f));
+		if( gap < 1 ) {
+			gap = 1;
+		}
+
+		uint i = 0;
+		while( (i + gap) < inputSize ) {
+			if( (frags[i].x & 0xFFFF) > (frags[i+gap].x & 0xFFFF) ) {
+				uint2 tmp;
+				tmp = frags[i];
+				frags[i] = frags[i+gap];
+				frags[i+gap] = tmp;
+				swapped = true;
+			}
+			i++;
+		}
+	}
+}
+void shellSort( inout uint2 frags[8], in uint inputSize ) {
+	static const uint gaps[] = { 7, 3, 1 };
+	[unroll] for( uint g = 0; g < 3; ++g ) {
+		const uint gap = gaps[g];
+		for( uint i = gap; i < inputSize; ++i ) {
+			uint2 tmp = frags[i];
+			uint j = i;
+			while(	(j >= gap) && 
+					(frags[j - gap].x & 0xFFFF) > (tmp.x & 0xFFFF) ) {
+				frags[j] = frags[j -gap]; 
+				j -= gap;
+			}
+			frags[j] = tmp;
+		}
+	}
+}
 
 // normal encoding and decoding function from Andrew Lauritzen Intel Deferred Shading Sample
 float3 decodeSphereMap(float2 e) {
@@ -28,18 +77,38 @@ float3 computePositionViewFromZ(float2 positionScreen, float viewSpaceZ) {
     return positionView;
 }
 
+float3 lightFragment(	in const float3 viewNormal, 
+						in const float3 viewPos,
+						in const uint matIndex,
+						in const uint lightIndex ) {
+	float3 col;
 
-Texture2DMS<uint4,8> gBuffer0 : register( t0 );
-Texture2DMS<float4,8> gBuffer1 : register( t1 );
-Texture2DMS<float,8> depthBuffer : register( t9 );
+	float3 difcol = materialStore[ matIndex ].diffuse_transp.xyz;
+	float3 speccol = materialStore[ matIndex ].specular.xyz;
+	float specpow = materialStore[ matIndex ].specular.w;
+	float3 emmcol = materialStore[ matIndex ].emissive_transl.xyz;
 
-StructuredBuffer<VtMaterial> materialStore : register( t10 );
-StructuredBuffer<VtDirectionalLight> lightStore : register( t11 );
+	// emmisive doesn't care about dots etc.
+	col = emmcol;
 
-RWTexture2D<float4> target : register( u0 );
+	// diffuse light needs view space light (TODO move to upload)
+	float3 viewLightDir = mul(	float4(lightStore[lightIndex].direction.xyz,0), 
+								matrixViewIT ).xyz;
+	float3 lightCol = lightStore[lightIndex].colour.xyz; 
 
-static const float LineWidth = 1.3f;
-static const float FadeDistance = 50.f;
+	float NdotL = dot( viewNormal, viewLightDir );
+	if( NdotL > 0.0f ) {
+		col += lightCol * difcol * max( 0.0f, NdotL ); 
+
+		// specular if we are in the diffuse light part
+		float3 viewDir = normalize( viewPos );
+		float3 r = reflect( viewLightDir, viewNormal );
+		float RdotV = max( 0.0f, dot( r, viewDir ) );
+		col += lightCol * speccol * pow( RdotV, specpow ) * NdotL;
+	}
+
+	return col;
+}
 
 [numthreads(8,8,1)]
 void main(    	uint3 groupId : SV_GroupID,
@@ -50,57 +119,66 @@ void main(    	uint3 groupId : SV_GroupID,
 
  	float2 gbufferDim;
     uint dummy;
-    gBuffer0.GetDimensions(gbufferDim.x, gbufferDim.y, dummy);
+    gBufferOpaque.GetDimensions(gbufferDim.x, gbufferDim.y, dummy);
     
     float2 screenPixelOffset = float2(2.0f, -2.0f) / gbufferDim;
     float2 positionScreen = (float2(dispatchThreadId.xy) + 0.5f) * screenPixelOffset.xy + float2(-1.0f, 1.0f);
 
-    float3 col = 0; 
+    float3 col = 0;
+	
+	// opaque phase
+	// TODO adaptive (we are super sampling at the moment ouchy!)
     for( uint sample = 0; sample < 8; ++sample ) {
-		uint matIndex = gBuffer0.Load( dispatchThreadId.xy, sample ).x;
-		uint coverage = gBuffer0.Load( dispatchThreadId.xy, sample ).y;
-		float3 viewNormal = decodeSphereMap( gBuffer1.Load( dispatchThreadId.xy, sample ).xy );
-		float edgeDist = gBuffer1.Load( dispatchThreadId.xy, sample ).z;
 		float depth = depthBuffer.Load( dispatchThreadId.xy, sample );
+		uint2 frag0 = gBufferOpaque.Load( dispatchThreadId.xy, sample ).xy;
+
+		uint matIndex = (frag0.x >> 16) & 0xFFFF;
+		float2 esm = float2( (frag0.x >> 8) & 0xFF, (frag0.x >> 0) & 0xFF ) * (1/255.f);
+		float3 viewNormal = decodeSphereMap( esm );
 
 		float viewSpaceZ = matrixProjection._43 / (depth - matrixProjection._33);		
 		float3 viewPos = computePositionViewFromZ( positionScreen, viewSpaceZ );
 
-		float3 difcol = materialStore[ matIndex ].diffuse_transp.xyz;
-		float3 speccol = materialStore[ matIndex ].specular.xyz;
-		float specpow = materialStore[ matIndex ].specular.w;
-		float3 emmcol = materialStore[ matIndex ].emissive_transl.xyz;
+		col += lightFragment( viewNormal, viewPos, matIndex, 0 );
 
-		// emmisive doesn't care about dots etc.
-		col += emmcol;
+	}
+	// take account of MSAA
+	col /= 8;
 
-		// diffuse light needs view space light (TODO move to upload)
-		float3 viewLightDir = mul( float4(lightStore[0].direction.xyz,0), matrixViewIT ).xyz;
-		float3 lightCol = lightStore[0].colour.xyz; 
-		float NdotL = dot( viewNormal, viewLightDir );
-		if( NdotL > 0.0f ) {
-			col += lightCol * difcol * max( 0.0f, NdotL ); 
+	// transparent phase
+	// how many transparent fragments do we have?
+	uint fragCount = fragmentCounter[ dispatchThreadId.xy ];
+	fragCount = min( fragCount, 8 );
+	if( fragCount > 0 ) {
+		// load the fragments 
+		uint2 tfrags[ MAX_TRANS_FRAGS ];
+		uint width;
+		uint dummy0;
+		fragmentCounter.GetDimensions( width, dummy0 );
 
-			// specular if we are in the diffuse light part
-			float3 viewDir = normalize( viewPos );
-			float3 r = reflect( viewLightDir, viewNormal );
-			float RdotV = max( 0.0f, dot( r, viewDir ) );
-			col += lightCol * speccol * pow( RdotV, specpow ) * NdotL;
+		uint index = ((dispatchThreadId.y * width) + (dispatchThreadId.x) ) * MAX_TRANS_FRAGS;
+
+		for( uint i = 0;i < fragCount; ++i ) {
+			tfrags[ i ] =  uint2(	transparentFragments[ index + i ].matIndex_depth,
+									transparentFragments[ index + i ].normal );
 		}
+		shellSort( tfrags, fragCount );
 
-		if (edgeDist <= 0.5*LineWidth+1) {
-			// Map the computed distance to the [0,2] range on the border of the line
-			float dist = clamp((edgeDist - (0.5*LineWidth - 1)), 0, 2);
+		for( uint j = 0;j < fragCount; ++j ) {
+			uint2 frag = tfrags[j];
+			uint matIndex = (frag.x >> 16) & 0xFFFF;
+			float depth = (frag.x & 0xFFFF) * (1.0f/65535.f);
 
-			// Alpha is computed from the function exp2(-2(x)^2).
-			float alpha = exp2( -2 * (dist*dist) );
+			float2 esm = float2( (frag.y >> 24) & 0xFF, (frag.y >> 16) & 0xFF ) * (1/255.f);
+			float alpha = materialStore[ matIndex ].diffuse_transp.w;
+			float3 viewNormal = decodeSphereMap( esm );
 
-			// Standard wire color but faded by distance
-			// Dividing by pos.w, the depth in view space
-			float fading = clamp(FadeDistance / viewSpaceZ, 0, 1);
-			//		gBuffer.edgeAlpha = fading * alpha * 65535;
-			col += col*alpha * fading;
+			float viewSpaceZ = matrixProjection._43 / (depth - matrixProjection._33);		
+			float3 viewPos = computePositionViewFromZ( positionScreen, viewSpaceZ );
+
+			col += lightFragment( viewNormal, viewPos, matIndex, 0 ) * alpha;
 		}
 	}
- 	target[ dispatchThreadId.xy ] = float4( col/8, 1 );
+
+ 	target[ dispatchThreadId.xy ] = float4( col, 1 );
 }
