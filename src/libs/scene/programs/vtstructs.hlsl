@@ -6,6 +6,10 @@ struct VtMaterial {
 	float4 reflection;		// x = reflection, yzw = not used
 };
 
+const static uint NUM_TRANS_FRAGS = 8;
+const static uint NUM_MSAA_SAMPLES = 4;
+const static uint TOTAL_TRANS_OR_AA_FRAGS = NUM_TRANS_FRAGS * NUM_MSAA_SAMPLES;
+
 struct VtDirectionalLight {
 	float4	direction;	// w not used
 	float4	colour;		// w/a not used
@@ -13,11 +17,11 @@ struct VtDirectionalLight {
 
 // 1 32 bit unsigned integer
 struct VtOpaqueFragment {
-	uint matIndex_normal;		// 16 bit material index + encoded normal 2 8 bit 
+	uint matIndex_normal;		// 12 bit material index + encoded normal 2 10 bit 
 };
 
 // 2 32 bit unsigned integer
 struct VtTransparentFragment {
-	uint	matIndex_depth;		// 16 bit material index + 16 bit normalised depth
-	uint	normal;				// encoded normal 2 8 bit, 16 bit spare
+	uint	matIndex_normal;	// 12 bit material index + encoded normal 2 10 bit 
+	uint	cov_depth;		// 8 bit coverage count, 4 bit spare, 16 bit normalised depth (lower bits)
 };

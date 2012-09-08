@@ -92,7 +92,6 @@ void DebugPipeline::conditionWob( Scene::Wob* wob ) {
 		WobMaterial* mat = &header->pMaterials.p[i];
 
 		DebugPipelineDataStore::PerMaterial* mds = &pds->materials[i];
-		mat->backEndData.p = (void*)mds;
 
 		mds->name = name + std::string( mat->pName.p );
 		const int indexSize = (mat->uiFlags & WobMaterial::WM_32BIT_INDICES) ? sizeof(uint32_t) : sizeof(uint16_t);

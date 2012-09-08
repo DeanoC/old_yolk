@@ -41,7 +41,7 @@ namespace Scene {
 		virtual void conditionWob( class Scene::Wob* wob ) override;
 	protected:
 		const static int MAX_FRAGMENTS_PER_SAMPLE = 8;
-		const static int NUM_MSAA_SAMPLES = 8;
+		const static int NUM_MSAA_SAMPLES = 4;
 		void startGeomRenderOpaquePass( RenderContext* ctx );
 		void startGeomRenderTransparentPass( RenderContext* ctx );
 		void endGeomRenderOpaquePass( RenderContext* ctx );

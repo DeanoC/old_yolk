@@ -21,6 +21,7 @@ namespace Scene {
 
     //! Resource type idenetifier for Wobs
 	static const uint32_t WobType = RESOURCE_NAME('W','O','B','1');
+	static const uint16_t WobVersion = 8;
 
 	//! defines a vertex element, consists of a usage and a format
 	struct WobVertexElement {
@@ -87,12 +88,13 @@ namespace Scene {
 		enum Flags {
 			WMPF_ANIMATED = (1 << 0),
 		};
+		FOP( const char*, pName );
+		FOP( void*,		pData );
 
 		uint16_t	uiType;
 		uint16_t	uiFlags;
-
-		FOP( const char*, pName );
-		FOP( void*,		pData );
+		// 20 bytes
+		char padd[4];// takes us to a nice dividable by 8 - 24 bytes
 	};
 
 	//! flags for wob files
@@ -110,8 +112,13 @@ namespace Scene {
 			WM_32BIT_INDICES = BIT(0),				//!< index data is 32 bit per entry
 			WM_TRANSPARENT = BIT(1),				//!< material is transparent or translucent
 		};
-		FOP( const char*,		pName );			//!< Name of the material
+
+ 		FOP( const char*,		pName );			//!< Name of the material
 		FOP( const char*,		pShader );			//!< Name of the shader
+		FOP( WobVertexElement*,		pElements );		//!< pointer to start vertex element array
+		FOP( WobMaterialParameter*,	pParameters );		//!< pointer to the parameter block
+		FOP( void*,					pIndexData );		//!< pointer to the index data
+		FOP( void*,				pVertexData );		//!< pointer to the actual vertex data
 
 		uint8_t					numVertexElements;	//!< Number of vertex elements
 		uint8_t					uiNumParameters;	//!< how many material parameters we have
@@ -120,32 +127,25 @@ namespace Scene {
 		uint32_t				uiNumVertices;		//!< number of vertices for this material
 		uint32_t				uiNumIndices;		//!< number of indices for this material
 
-		float					minAABB[3];			//!< minimum coord of AABB (xyz)
-		float					maxAABB[3];			//!< maximum coord of AABB (xyz)
-
-		FOP( WobVertexElement*,		pElements );		//!< pointer to start vertex element array
-		FOP( WobMaterialParameter*,	pParameters );		//!< pointer to the parameter block
-		FOP( void*,					pIndexData );		//!< pointer to the index data
-
-		FOP( void*,				pVertexData );		//!< pointer to the actual vertex data
-		FOP( void*,				backEndData );		//!< pointer to a backend specific structure after vertex data has been uploaded
+		// 60 bytes
+		char padd[4];// takes us to a nice dividable by 8 - 64 bytes
 	};
 
 	//! Header of a wob file
 	struct WobFileHeader {
 		uint32_t uiMagic;				//!< Should but WOB1
-
 		uint16_t uiVersion;				//!< an incrementing version number
 		uint16_t uiNumMaterials;		//!< number of different materials used
 
+		FOP( const char*, pName );			//!< name of this Wob
+		FOP( WobMaterial*,	pMaterials );	//!< array of material pointers
+
 		uint32_t uiFlags;				//!< WFH_FLAGS for this mesh
-		FOP( const char*, pName );		//!< name of this Wob
 
 		float	minAABB[3];				//!< minimum coord of AABB (xyz)
 		float	maxAABB[3];				//!< maximum coord of AABB (xyz)
 
-		FOP( WobMaterial*,	pMaterials );		//!< array of material pointers
-
+		// align on 8 byte boundrary
 		union {
 			struct {
 				uint32_t		uiSizeOfMainBlock;		//!< size of the non discardable block
@@ -156,7 +156,6 @@ namespace Scene {
 	};
 
 
-	static const uint16_t WobVersion = 7;
 
 	//! Loads a wob file
 	WobFileHeader* WobLoad( const char* pFilename );

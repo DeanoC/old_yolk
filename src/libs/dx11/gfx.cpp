@@ -88,7 +88,7 @@ Gfx::Gfx() {
 	};
 	RasteriserStateHandle::create( "_RS_Normal_NoMS", &nnmsrsci, Core::RMRF_DONTFLUSH );	
 	RasteriserState::CreationInfo nnnmsrsci = {
-		RasteriserState::CreationInfo::NONE, FIM_FILL, CUM_NONE, 0, 0, 0
+		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_NONE, 0, 0, 0
 	};
 	RasteriserStateHandle::create( "_RS_Normal_NoMS_NoCull", &nnnmsrsci, Core::RMRF_DONTFLUSH );	
 

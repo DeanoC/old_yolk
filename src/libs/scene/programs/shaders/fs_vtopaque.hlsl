@@ -16,7 +16,7 @@ float2 encodeSphereMap(float3 n) {
 
 
 void main( in FS_IN input, out uint og0 : SV_Target0 ) {
-	uint2 esm = (uint2) (encodeSphereMap( input.viewNormal ) * 255.f);
-	og0 =	((materialIndex.x & 0xFFFF) << 16)	| 
-			((esm.x & 0xFF) << 8) | ((esm.y & 0xFF) << 0);
+	uint2 esm = (uint2) (encodeSphereMap( input.viewNormal ) * 1023.f);
+	og0 = ((materialIndex.x & 0xFFF) << 20) |
+		((esm.x & 0x3FF) << 10) | ((esm.y & 0x3FF) << 0);
 }

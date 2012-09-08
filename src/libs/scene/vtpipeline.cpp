@@ -20,11 +20,12 @@
 
 #define FIXED_WIDTH 1280
 #define FIXED_HEIGHT 960
-static const int MAX_TRANSPARENT_FRAGMENTS = FIXED_WIDTH * FIXED_HEIGHT * 3;
 
 namespace Scene {
 
 VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false ) {
+	static const int MAX_TRANSPARENT_FRAGMENTS = FIXED_WIDTH * FIXED_HEIGHT * Scene::GPUConstants::TOTAL_TRANS_OR_AA_FRAGS;
+
 	// NOTE programs are loaded off disk even when from the internal default programs (which are actually bound in the code)
 	opaqueProgramHandle.reset( Scene::ProgramHandle::load( "vtopaque" ) );
 	resolveProgramHandle.reset( Scene::ProgramHandle::load( "vtresolve" ) );
@@ -48,7 +49,7 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	static const std::string depthTargetMSName = "VtPipe_DepthTargetMS";
 	depthTargetMSHandle.reset( TextureHandle::create( depthTargetMSName.c_str(), &dmscs ) );
 	
-	// packed: material index + depth + 2D normal + alpha
+	// packed: material index + 2D normal
 	Texture::CreationInfo gb0mscs = Texture::TextureCtor(
 		RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
 		GTF_RG32UI,
@@ -57,7 +58,7 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	static const std::string gbTargetMSName = "VtPipe_GBufferMS0";
 	gBufferMSHandle0.reset( TextureHandle::create( gbTargetMSName.c_str(), &gb0mscs ) );
 
-	// transparent fragment count 
+	// transparent fragment count
 	Texture::CreationInfo tfscs = Texture::TextureCtor(
 		RCF_TEX_2D | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
 		GTF_R32UI,
@@ -65,10 +66,10 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	);
 	static const std::string tfcTargetName = "VtPipe_TransFragmentCount";
 	tfcHandle.reset( TextureHandle::create( tfcTargetName.c_str(), &tfscs ) );
-	// transparent fragments
+	// transparent fragments as opaque + depth and coverage count
 	DataBuffer::CreationInfo tfdcs = Resource::BufferCtor(
 		RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
-		sizeof( GPUConstants::VtTransparentFragment ) * FIXED_WIDTH * FIXED_HEIGHT * MAX_FRAGMENTS_PER_SAMPLE
+		sizeof( GPUConstants::VtTransparentFragment ) * MAX_TRANSPARENT_FRAGMENTS
 	);
 	tfdcs.structureSize = sizeof( GPUConstants::VtTransparentFragment );
 	static const std::string transparentFragmentDataName = "VtPipe_TransparentFragments";
@@ -314,7 +315,6 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 		WobMaterial* mat = &header->pMaterials.p[i];
 
 		VtPipelineDataStore::PerMaterial* mds = &pds->materials[i];
-		mat->backEndData.p = (void*)mds;
 
 		mds->name = name + std::string( mat->pName.p );
 		const int indexSize = (mat->uiFlags & WobMaterial::WM_32BIT_INDICES) ? sizeof(uint32_t) : sizeof(uint16_t);
@@ -349,19 +349,19 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 		Math::Vector3 emissive;
 		Math::Vector3 specular;
 		float specExp = 40.f;
-		float translucency = 0.f;
-		float transparency = 0.f;
+		float translucency = 1.f;
+		float transparency = 1.f;
 		float reflection = 0.f;
 
 		GPUConstants::VtMaterial gpuMat;
 		for( uint8_t i = 0; i < mat->uiNumParameters; ++i ) {
-			if( std::string( mat->pParameters.p[i].pName.p ) == "DiffuseColour" ) {
+			if( std::string( mat->pParameters.p[i].pName.p ) == "Diffuse" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
 				diffuse = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
-			} else if( std::string( mat->pParameters.p[i].pName.p ) == "SpecularColour" ) {
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Specular" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
 				specular = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
-			} else if( std::string( mat->pParameters.p[i].pName.p ) == "EmissiveColour" ) {
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Emissive" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
 				emissive = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Shininess" ) {
@@ -370,7 +370,7 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Transparency" ) {
 				transparency = *(const float*)mat->pParameters.p[i].pData.p;
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Translucency" ) {
-				transparency = *(const float*)mat->pParameters.p[i].pData.p;
+				translucency = *(const float*)mat->pParameters.p[i].pData.p;
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Reflection" ) {
 				reflection = *(const float*)mat->pParameters.p[i].pData.p;
 			}
@@ -382,7 +382,7 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 		gpuMat.reflection = Math::Vector4( reflection, 0.0f, 0.0f, 0.0f );
 		materialStoreSystemMem.push_back( gpuMat );
 
-		mds->isTransparent = (transparency > 0.f);
+		mds->isTransparent = (transparency < (1.f - 1e-2f) );
 		mds->materialIndex = (uint32_t) (materialStoreSystemMem.size() - 1);
 
 		mds->vaoHandle = VertexInputHandle::create( 

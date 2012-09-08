@@ -837,8 +837,9 @@ namespace LWObject2Go_Local
 			(*lightEle)[ matNum ].specular_exponent = 0.f;
 		}
 
-		(*lightEle)[ matNum ].translucency = curSurface->translunency;
-		(*lightEle)[ matNum ].transparency = curSurface->transparency;
+		// LW is inverse to our way of thinking...
+		(*lightEle)[ matNum ].translucency = 1.0f - curSurface->translunency;
+		(*lightEle)[ matNum ].transparency = 1.0f - curSurface->transparency;
 		(*lightEle)[ matNum ].reflection = curSurface->reflection;
 
 		// back face culling
