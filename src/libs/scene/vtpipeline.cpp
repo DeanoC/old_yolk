@@ -97,12 +97,12 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	materialStoreSystemMem.push_back( nullMaterial );
 
 	// always at least one directional light
-	GPUConstants::VtDirectionalLight defaultLight = {
-		Math::Vector4( 0.707f, 0.707f, 0.0f, 0.0f ),
+	GPUConstants::VtLight defaultLight = {
+		Math::Vector4( 0.707f*10000.0f, 0.707f*10000.f, 0.0f*10000.f, 1.0f ),
 		Math::Vector4( 1.0f, 1.0f, 1.0f, 1.0f )
 	};
 
-	directionalLightStoreSystemMem.push_back( defaultLight );
+	lightStoreSystemMem.push_back( defaultLight );
 }
 	
 VtPipeline::~VtPipeline() {
@@ -154,10 +154,10 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 		// light data buffer, TODO Raw or make all lights same structure size?
 		DataBuffer::CreationInfo ldcs = Resource::BufferCtor(
 				RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_ACE_IMMUTABLE,
-				sizeof( GPUConstants::VtDirectionalLight ) * directionalLightStoreSystemMem.size(),
-				&directionalLightStoreSystemMem[0]
+				sizeof( GPUConstants::VtLight ) * lightStoreSystemMem.size(),
+				&lightStoreSystemMem[0]
 			);
-		ldcs.structureSize = sizeof( GPUConstants::VtDirectionalLight );
+		ldcs.structureSize = sizeof( GPUConstants::VtLight );
 		static const std::string lightDataName = "VtPipe_LightData";
 		lightStoreHandle.reset( DataBufferHandle::create( lightDataName.c_str(), &ldcs ) );
 		gpuLightStoreOk = true;

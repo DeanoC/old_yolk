@@ -73,7 +73,7 @@ namespace Scene {
 
 		bool												gpuLightStoreOk;
 		Core::ScopedResourceHandle<DataBufferHandle>		lightStoreHandle;
-		std::vector<GPUConstants::VtDirectionalLight>		directionalLightStoreSystemMem;
+		std::vector<GPUConstants::VtLight>					lightStoreSystemMem;
 
 	};
 

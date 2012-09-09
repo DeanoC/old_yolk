@@ -8,7 +8,7 @@ StructuredBuffer<VtTransparentFragment> transparentFragments : register( t2 );
 Texture2DMS<float,NUM_MSAA_SAMPLES> depthBuffer : register( t8 );
 
 StructuredBuffer<VtMaterial> materialStore : register( t10 );
-StructuredBuffer<VtDirectionalLight> lightStore : register( t11 );
+StructuredBuffer<VtLight> lightStore : register( t11 );
 
 RWTexture2D<float4> target : register( u0 );
 
@@ -91,8 +91,9 @@ float3 lightFragment(	in const float3 viewNormal,
 	col = emmcol;
 
 	// diffuse light needs view space light (TODO move to upload)
-	float3 viewLightDir = mul(	float4(lightStore[lightIndex].direction.xyz,0), 
-								matrixViewIT ).xyz;
+	float3 viewLightDir = mul( lightStore[lightIndex].position, matrixViewIT ).xyz;
+	viewLightDir = normalize( viewLightDir ); // temp HACK !
+
 	float3 lightCol = lightStore[lightIndex].colour.xyz; 
 
 	float NdotL = dot( viewNormal, viewLightDir );

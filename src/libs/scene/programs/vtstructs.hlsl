@@ -10,9 +10,10 @@ const static uint NUM_TRANS_FRAGS = 8;
 const static uint NUM_MSAA_SAMPLES = 4;
 const static uint TOTAL_TRANS_OR_AA_FRAGS = NUM_TRANS_FRAGS * NUM_MSAA_SAMPLES;
 
-struct VtDirectionalLight {
-	float4	direction;	// w not used
+struct VtLight {
+	float4	position;	// w == 1 currently world space
 	float4	colour;		// w/a not used
+	float 	attenuationEnd;
 };
 
 // 1 32 bit unsigned integer
