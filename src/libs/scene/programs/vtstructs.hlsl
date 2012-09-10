@@ -1,9 +1,8 @@
 
 struct VtMaterial {
-	float4 diffuse_transp; 	// xyz = diffuse, w = transparency
-	float4 emissive_transl;	// xyz = emissive, w = transluceny
-	float4 specular;		// xyz = specular, w = shininess AKA specular exponent
-	float4 reflection;		// x = reflection, yzw = not used
+	float4 baseColour_Kd; 		// xyz = colour, w = diffuse
+	float4 specExp_Ks_Kl_Kr;	// x = specular exponent, y = specular, z = luminosity, w = reflection factor
+	float4 transp_transl;		// x = transparency, y = translucency, zw = unused
 };
 
 const static uint NUM_TRANS_FRAGS = 8;
@@ -13,7 +12,6 @@ const static uint TOTAL_TRANS_OR_AA_FRAGS = NUM_TRANS_FRAGS * NUM_MSAA_SAMPLES;
 struct VtLight {
 	float4	position;	// w == 1 currently world space
 	float4	colour;		// w/a not used
-	float 	attenuationEnd;
 };
 
 // 1 32 bit unsigned integer

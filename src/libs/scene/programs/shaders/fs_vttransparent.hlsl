@@ -6,6 +6,7 @@ struct FS_IN {
 	float4 position		: SV_Position;
 	float3 viewNormal 	: TEXCOORD0;
 	nointerpolation uint coverage		: SV_Coverage;
+	nointerpolation bool isfaceforward : SV_IsFrontFace;
 };
 
 // normal encoding and decoding function from Andrew Lauritzen Intel Deferred Shading Sample
@@ -20,6 +21,9 @@ RWStructuredBuffer<VtTransparentFragment> fragments : register( u2 );
 
 [earlydepthstencil]
 void main( in FS_IN input ) {
+	if( !input.isfaceforward ) {
+		input.viewNormal = -input.viewNormal;
+	}
 	uint2 esm = (uint2) (encodeSphereMap( input.viewNormal ) * 1023.f);
 	uint depth = (uint) (input.position.z * 65535.f);
 

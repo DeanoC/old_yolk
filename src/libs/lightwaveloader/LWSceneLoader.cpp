@@ -128,6 +128,7 @@ SceneLoader::SceneLoader() :
 	registerCustomObjPlugin( "VTDFH_Level", &SceneLoader::VtdfhLevelPluginCallback );
 	registerCustomObjPlugin( "VTDFH_Enemy", &SceneLoader::VtdfhEnemyPluginCallback );
 	registerCustomObjPlugin( "VTDFH_Marker", &SceneLoader::VtdfhMarkerPluginCallback );
+	registerCustomObjPlugin( "VTDFH_Item", &SceneLoader::VtdfhItemPluginCallback );
 
 }
 
@@ -529,6 +530,7 @@ void SceneLoader::LoadObjectLayerKey(FILE* f, const char* ValueText)
 	}
 	curChannelGroup = 0;
 	curObject = 0;
+	curNodePlugin = nullptr;
 }
 
 void SceneLoader::LoadObjectLayerKeyV5(FILE* f, const char* ValueText)
@@ -569,6 +571,7 @@ void SceneLoader::LoadObjectLayerKeyV5(FILE* f, const char* ValueText)
 	}
 	curChannelGroup = 0;
 	curObject = 0;
+	curNodePlugin = nullptr;
 }
 
 void SceneLoader::AddNullObjectKey(FILE* f, const char* ValueText)
@@ -590,6 +593,7 @@ void SceneLoader::AddNullObjectKey(FILE* f, const char* ValueText)
 
 	curChannelGroup = 0;
 	curObject = 0;
+	curNodePlugin = nullptr;
 }
 
 void SceneLoader::AddNullObjectKeyV5(FILE* f, const char* ValueText) {
@@ -612,6 +616,7 @@ void SceneLoader::AddNullObjectKeyV5(FILE* f, const char* ValueText) {
 
 	curChannelGroup = 0;
 	curObject = 0;
+	curNodePlugin = nullptr;
 }
 
 void SceneLoader::AddBoneKey(FILE* f, const char* ValueText)
@@ -628,6 +633,7 @@ void SceneLoader::AddBoneKey(FILE* f, const char* ValueText)
 
 	curChannelGroup = 0;
 	curBone = 0;
+	curNodePlugin = nullptr;
 }
 
 void SceneLoader::AddBoneKeyV5(FILE* f, const char* ValueText)
@@ -644,6 +650,7 @@ void SceneLoader::AddBoneKeyV5(FILE* f, const char* ValueText)
 
 	curChannelGroup = 0;
 	curBone = 0;
+	curNodePlugin = nullptr;
 }
 
 void SceneLoader::ObjectMotionKey(FILE* f, const char* ValueText)

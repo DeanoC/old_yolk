@@ -24,6 +24,8 @@ extern int EnemyHandler( int version, GlobalFunc *global, LWCustomObjHandler *lo
 extern int EnemyInterface( int version, GlobalFunc *global, LWInterface *local, void *serverData );
 extern int MarkerHandler( int version, GlobalFunc *global, LWCustomObjHandler *local, void *serverData);
 extern int MarkerInterface( int version, GlobalFunc *global, LWInterface *local, void *serverData );
+extern int ItemHandler( int version, GlobalFunc *global, LWCustomObjHandler *local, void *serverData);
+extern int ItemInterface( int version, GlobalFunc *global, LWInterface *local, void *serverData );
 
 
 ServerRecord ServerDesc[] = {
@@ -33,5 +35,7 @@ ServerRecord ServerDesc[] = {
    { LWCUSTOMOBJ_ICLASS, "VTDFH_Enemy", EnemyInterface },
    { LWCUSTOMOBJ_HCLASS, "VTDFH_Marker", MarkerHandler },
    { LWCUSTOMOBJ_ICLASS, "VTDFH_Marker", MarkerInterface },
+   { LWCUSTOMOBJ_HCLASS, "VTDFH_Item", ItemHandler },
+   { LWCUSTOMOBJ_ICLASS, "VTDFH_Item", ItemInterface },
    { NULL }
 };

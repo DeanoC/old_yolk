@@ -819,28 +819,25 @@ namespace LWObject2Go_Local
 		}
 
 		// fill in the lighting parameter
-		(*lightEle)[ matNum ].diffuse[0] = curSurface->diffuse * baseColour[0];
-		(*lightEle)[ matNum ].diffuse[1] = curSurface->diffuse * baseColour[1];
-		(*lightEle)[ matNum ].diffuse[2] = curSurface->diffuse * baseColour[2];
-		(*lightEle)[ matNum ].luminosity[0] = curSurface->luminosity * baseColour[0];
-		(*lightEle)[ matNum ].luminosity[1] = curSurface->luminosity * baseColour[1];
-		(*lightEle)[ matNum ].luminosity[2] = curSurface->luminosity * baseColour[2];
-		// TODO colour highlight
-		(*lightEle)[ matNum ].specular[0] = curSurface->specular;
-		(*lightEle)[ matNum ].specular[1] = curSurface->specular;
-		(*lightEle)[ matNum ].specular[2] = curSurface->specular;
+		(*lightEle)[ matNum ].baseColour[0] = baseColour[0];
+		(*lightEle)[ matNum ].baseColour[1] = baseColour[1];
+		(*lightEle)[ matNum ].baseColour[2] = baseColour[2];
 
+		(*lightEle)[ matNum ].Kd = curSurface->diffuse;
+		// TODO colour highlight
+		(*lightEle)[ matNum ].Ks = curSurface->specular;
 		if( curSurface->specular > 0.f ) {
 			(*lightEle)[ matNum ].specular_exponent = 
-							(10.f * curSurface->glossiness) + 2.f;
+							powf(2.0f, (10.f * curSurface->glossiness) + 2.f);
 		} else {
 			(*lightEle)[ matNum ].specular_exponent = 0.f;
 		}
+		(*lightEle)[ matNum ].Kl = curSurface->luminosity;
+		(*lightEle)[ matNum ].Kr = curSurface->reflection;
 
 		// LW is inverse to our way of thinking...
 		(*lightEle)[ matNum ].translucency = 1.0f - curSurface->translunency;
 		(*lightEle)[ matNum ].transparency = 1.0f - curSurface->transparency;
-		(*lightEle)[ matNum ].reflection = curSurface->reflection;
 
 		// back face culling
 		(*backfaceEle)[ matNum ].facing = (curSurface->doubleSided ? 

@@ -192,6 +192,10 @@ namespace LightWave
 		void VtdfhMarkerPluginCallback( FILE* f );
 		void VtdfhMarkerSubKey( FILE* f, const char* ValueText );
 		void VtdfhMarkerTypeSubKey( FILE* f, const char* ValueText );
+		// vtdfh (game) item plugin
+		void VtdfhItemPluginCallback( FILE* f );
+		void VtdfhItemSubKey( FILE* f, const char* ValueText );
+		void VtdfhItemTypeSubKey( FILE* f, const char* ValueText );
 
 	};
 }

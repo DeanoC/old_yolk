@@ -23,6 +23,7 @@
 #include "lightwaveloader/VtdfhLevelCustomObjPlugin.h"
 #include "lightwaveloader/VtdfhEnemyCustomObjPlugin.h"
 #include "lightwaveloader/VtdfhMarkerCustomObjPlugin.h"
+#include "lightwaveloader/VtdfhItemCustomObjPlugin.h"
 #include "meshmod/mesh.h"
 #include "meshmod/scene.h"
 #include "meshmod/sceneobject.h"
@@ -37,6 +38,7 @@ extern void LWDynamicsItem2SceneNode( LightWave::DynamicsItemPlugin* dip, MeshMo
 extern void VtdfhLevelCustomObj2Scene( LightWave::VtdfhLevelCustomObjPlugin* dip, MeshMod::ScenePtr scnNode );
 extern void VtdfhEnemyCustomObj2SceneNode( LightWave::VtdfhEnemyCustomObjPlugin* dip, MeshMod::SceneNodePtr scnNode );
 extern void VtdfhMarkerCustomObj2SceneNode( LightWave::VtdfhMarkerCustomObjPlugin* dip, MeshMod::SceneNodePtr scnNode );
+extern void VtdfhItemCustomObj2SceneNode( LightWave::VtdfhItemCustomObjPlugin* dip, MeshMod::SceneNodePtr scnNode );
 
 
 //---------------------------------------------------------------------------
@@ -320,6 +322,9 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 			} else if( (*npropIt)->pluginName == LightWave::VtdfhMarkerCustomObjPlugin::PluginName ) {
 				auto dip = (LightWave::VtdfhMarkerCustomObjPlugin*) *npropIt;
 				VtdfhMarkerCustomObj2SceneNode( dip, scnNode );
+			} else if( (*npropIt)->pluginName == LightWave::VtdfhItemCustomObjPlugin::PluginName ) {
+				auto dip = (LightWave::VtdfhItemCustomObjPlugin*) *npropIt;
+				VtdfhItemCustomObj2SceneNode( dip, scnNode );
 			}
 
 

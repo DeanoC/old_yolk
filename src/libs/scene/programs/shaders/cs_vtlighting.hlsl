@@ -76,38 +76,45 @@ float3 computePositionViewFromZ(float2 positionScreen, float viewSpaceZ) {
     return positionView;
 }
 
-float3 lightFragment(	in const float3 viewNormal, 
-						in const float3 viewPos,
-						in const uint matIndex,
-						in const uint lightIndex ) {
-	float3 col;
+void lightFragment(	in const float3 viewNormal, 
+					in const float3 viewPos,
+					in const uint matIndex,
+					in const uint lightIndex,
+					out float3 emissiveColour,
+					out float3 diffuseColour,
+					out float3 specularColour ) {
+	float3 baseCol = materialStore[ matIndex ].baseColour_Kd.xyz;
+	float Kd = materialStore[ matIndex ].baseColour_Kd.w;
+	float specpow = materialStore[ matIndex ].specExp_Ks_Kl_Kr.x;
+	float Ks = materialStore[ matIndex ].specExp_Ks_Kl_Kr.y;
+	float Kl = materialStore[ matIndex ].specExp_Ks_Kl_Kr.z;
+	float Kr = materialStore[ matIndex ].specExp_Ks_Kl_Kr.w; // NOT USED YET
 
-	float3 difcol = materialStore[ matIndex ].diffuse_transp.xyz;
-	float3 speccol = materialStore[ matIndex ].specular.xyz;
-	float specpow = materialStore[ matIndex ].specular.w;
-	float3 emmcol = materialStore[ matIndex ].emissive_transl.xyz;
-
-	// emmisive doesn't care about dots etc.
-	col = emmcol;
+	// emissive doesn't care about dots etc.
+	emissiveColour = Kl * baseCol;
 
 	// diffuse light needs view space light (TODO move to upload)
-	float3 viewLightDir = mul( lightStore[lightIndex].position, matrixViewIT ).xyz;
+	// TODO position assumed position is actually a direction at the moment!
+	float3 viewLightDir = mul( float4(lightStore[lightIndex].position.xyz,0), matrixViewIT ).xyz;
 	viewLightDir = normalize( viewLightDir ); // temp HACK !
 
 	float3 lightCol = lightStore[lightIndex].colour.xyz; 
 
 	float NdotL = dot( viewNormal, viewLightDir );
 	if( NdotL > 0.0f ) {
-		col += lightCol * difcol * max( 0.0f, NdotL ); 
+		diffuseColour = lightCol * baseCol * Kd * max( 0.0f, NdotL ); 
 
 		// specular if we are in the diffuse light part
 		float3 viewDir = normalize( viewPos );
-		float3 r = reflect( viewLightDir, viewNormal );
-		float RdotV = max( 0.0f, dot( r, viewDir ) );
-		col += lightCol * speccol * pow( RdotV, specpow ) * NdotL;
+
+		float specDot = max( 0.0f, dot( reflect( viewLightDir, viewNormal ), viewDir ) );
+//		float specDot = max( 0.0f, dot( normalize( viewLightDir + viewDir ), viewNormal ) );
+		specularColour = lightCol * Ks * pow( specDot, specpow ) * NdotL;
+
+	} else {
+		diffuseColour = specularColour = 0;
 	}
 
-	return col;
 }
 
 void transparentFragment( in const float2 positionScreen, in const uint2 frag, inout float3 col[NUM_MSAA_SAMPLES] ) {
@@ -116,18 +123,23 @@ void transparentFragment( in const float2 positionScreen, in const uint2 frag, i
 	uint coverage = ((frag.y >> 24) & 0xFF);
 
 	float2 esm = float2( (frag.x >> 10) & 0x3FF, (frag.x >> 0) & 0x3FF ) * (1/1023.f);
-	float alpha = materialStore[ matIndex ].diffuse_transp.w;
+	float alpha = materialStore[ matIndex ].transp_transl.x;
 	float3 viewNormal = decodeSphereMap( esm );
 
 	float viewSpaceZ = matrixProjection._43 / (depth - matrixProjection._33);
 	float3 viewPos = computePositionViewFromZ( positionScreen, viewSpaceZ );
-	float3 litcol = lightFragment( viewNormal, viewPos, matIndex, 0 );
+	float3 emissiveCol;
+	float3 diffuseCol;
+	float3 specularCol;
+	lightFragment( viewNormal, viewPos, matIndex, 0, emissiveCol, diffuseCol, specularCol );
 
 	uint count = 0;
 	while( count < NUM_MSAA_SAMPLES ) {
 		// TODO move first firstbithigh
 		if( coverage & (1<<count) ) {
-			col[count] = lerp( col[count], litcol, alpha );
+			// this strangle is Lightwave light model specular doesn't blend...
+			col[count] = lerp( col[count], emissiveCol + diffuseCol, alpha );
+			col[count] += specularCol;
 		}
 		count++;
 	}
@@ -183,7 +195,11 @@ void main(    	uint3 groupId : SV_GroupID,
 		float viewSpaceZ = matrixProjection._43 / (depthBuffer.Load( dispatchThreadId.xy, 0 ) - matrixProjection._33);		
 		float3 viewPos = computePositionViewFromZ( positionScreen, viewSpaceZ );
 
-		col[0] = lightFragment( viewNormal, viewPos, matIndex, 0 );
+		float3 emissiveCol;
+		float3 diffuseCol;
+		float3 specularCol;
+		lightFragment( viewNormal, viewPos, matIndex, 0, emissiveCol, diffuseCol, specularCol );
+		col[0] = emissiveCol + diffuseCol + specularCol;
 
 		if( perSampleLit ) {
 			for( uint psample = 1; psample < NUM_MSAA_SAMPLES; ++psample ) {
@@ -195,7 +211,8 @@ void main(    	uint3 groupId : SV_GroupID,
 				float viewSpaceZ = matrixProjection._43 / (depthBuffer.Load( dispatchThreadId.xy, psample ) - matrixProjection._33);
 				float3 viewPos = computePositionViewFromZ( positionScreen, viewSpaceZ );
 
-				col[psample] = lightFragment( viewNormal, viewPos, matIndex, 0 );
+				lightFragment( viewNormal, viewPos, matIndex, 0, emissiveCol, diffuseCol, specularCol );
+				col[psample] = emissiveCol + diffuseCol + specularCol;
 			}
 		} else {
 			for( uint psample = 1; psample < NUM_MSAA_SAMPLES; ++psample ) {

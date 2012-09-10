@@ -96,9 +96,10 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	};
 	materialStoreSystemMem.push_back( nullMaterial );
 
-	// always at least one directional light
+	// always at least one directional light (HACK in a position structure, light program assumes this at the moment!)
+	// TODO positional lights
 	GPUConstants::VtLight defaultLight = {
-		Math::Vector4( 0.707f*10000.0f, 0.707f*10000.f, 0.0f*10000.f, 1.0f ),
+		Math::Vector4( -0.707f, 0.707f, -0.707f, 0.0f ),
 		Math::Vector4( 1.0f, 1.0f, 1.0f, 1.0f )
 	};
 
@@ -345,44 +346,48 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 			mds->vacs.data[i].stride = VI_AUTO_STRIDE;
 		}
 		gpuMaterialStoreOk = false;
-		Math::Vector3 diffuse;
-		Math::Vector3 emissive;
-		Math::Vector3 specular;
-		float specExp = 40.f;
-		float translucency = 1.f;
-		float transparency = 1.f;
-		float reflection = 0.f;
+		Math::Vector3 baseColour;
+		float Kd = 1.0f;
+		Math::Vector4 specExp_Ks_Kl_Kr( 40.f, 0, 0, 0 );
+		float transp = 1.0f;
+		float transl = 1.0f;
 
 		GPUConstants::VtMaterial gpuMat;
 		for( uint8_t i = 0; i < mat->uiNumParameters; ++i ) {
-			if( std::string( mat->pParameters.p[i].pName.p ) == "Diffuse" ) {
+			if( std::string( mat->pParameters.p[i].pName.p ) == "BaseColour" ) {
 				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
-				diffuse = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
-			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Specular" ) {
-				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
-				specular = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
-			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Emissive" ) {
-				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_VEC3_FLOAT ); 
-				emissive = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
-			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Shininess" ) {
-				specExp = *(const float*)mat->pParameters.p[i].pData.p;
-				specExp = Math::Max( specExp, 1e-2f ); // get NANs in the render with pow( x, 0.0f)...
+				baseColour = Math::Vector3( (const float*)mat->pParameters.p[i].pData.p );
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Kd" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT ); 
+				Kd = *(const float*)mat->pParameters.p[i].pData.p;
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Ks" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT); 
+				specExp_Ks_Kl_Kr.y = *(const float*)mat->pParameters.p[i].pData.p;
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Kl" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT); 
+				specExp_Ks_Kl_Kr.z = *(const float*)mat->pParameters.p[i].pData.p;
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Kr" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT); 
+				specExp_Ks_Kl_Kr.w = *(const float*)mat->pParameters.p[i].pData.p;
+			} else if( std::string( mat->pParameters.p[i].pName.p ) == "SpecExp" ) {
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT); 
+				float specExp = *(const float*)mat->pParameters.p[i].pData.p;
+				specExp_Ks_Kl_Kr.x = Math::Max( specExp, 1e-2f ); // get NANs in the render with pow( x, 0.0f)...
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Transparency" ) {
-				transparency = *(const float*)mat->pParameters.p[i].pData.p;
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT); 
+				transp = *(const float*)mat->pParameters.p[i].pData.p;
 			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Translucency" ) {
-				translucency = *(const float*)mat->pParameters.p[i].pData.p;
-			} else if( std::string( mat->pParameters.p[i].pName.p ) == "Reflection" ) {
-				reflection = *(const float*)mat->pParameters.p[i].pData.p;
+				CORE_ASSERT( mat->pParameters.p[i].uiType == WobMaterialParameter::WMPT_SCALAR_FLOAT); 
+				transl = *(const float*)mat->pParameters.p[i].pData.p;
 			}
 		}
 		// pack specular exponent and specular colour
-		gpuMat.diffuse_transp = Math::Vector4( diffuse[0], diffuse[1], diffuse[2], transparency );
-		gpuMat.emissive_transl = Math::Vector4( emissive[0], emissive[1], emissive[2], translucency );
-		gpuMat.specular = Math::Vector4( specular[0], specular[1], specular[2], specExp );
-		gpuMat.reflection = Math::Vector4( reflection, 0.0f, 0.0f, 0.0f );
+		gpuMat.baseColour_Kd = Math::Vector4( baseColour[0], baseColour[1], baseColour[2], Kd );
+		gpuMat.specExp_Ks_Kl_Kr = specExp_Ks_Kl_Kr;
+		gpuMat.transp_transl = Math::Vector4( transp, transl, 0, 0 );
 		materialStoreSystemMem.push_back( gpuMat );
 
-		mds->isTransparent = (transparency < (1.f - 1e-2f) );
+		mds->isTransparent = (transp < (1.f - 1e-2f) );
 		mds->materialIndex = (uint32_t) (materialStoreSystemMem.size() - 1);
 
 		mds->vaoHandle = VertexInputHandle::create( 

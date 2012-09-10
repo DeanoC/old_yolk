@@ -9,7 +9,7 @@ TestLvl::TestLvl( SceneWorldPtr _world ) :
 	world( _world ) {
     namespace arg = std::placeholders;
 
-	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "basic" ), NewThingId(), 
+	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "begin_luck" ), NewThingId(), 
 						std::bind( &TestLvl::decodeLevelProperties, this, arg::_1, arg::_2, arg::_3, arg::_4 ) ) );
 	world->add( land ); // render object
 }
@@ -36,6 +36,7 @@ void TestLvl::decodeLevelProperties( LevelThing* thing, std::unordered_map<std::
 										const Core::BinPropertyResourcePtr& binProp, Core::TransformNode * transformNode ) {
 	decodeMarkerProperties( thing, nameMap, binProp, transformNode );
 	decodeEnemyProperties( thing, nameMap, binProp, transformNode );
+	decodeItemProperties( thing, nameMap, binProp, transformNode );
 }
 
 void TestLvl::decodeMarkerProperties( LevelThing* thing, std::unordered_map<std::string, int>& nameMap, 
@@ -58,3 +59,11 @@ void TestLvl::decodeEnemyProperties( LevelThing* thing, std::unordered_map<std::
 	}
 }
 
+void TestLvl::decodeItemProperties( LevelThing* thing, std::unordered_map<std::string, int>& nameMap, 
+										const Core::BinPropertyResourcePtr& binProp, Core::TransformNode * transformNode ) {
+	if( nameMap.find( PROP_ITEM_TYPE ) != nameMap.cend() ) {
+		if(*binProp->getAs<int32_t>( nameMap[ PROP_ITEM_TYPE ] ) == IT_EnergyCrystal ) {
+			levelItems.push_back( std::make_shared<EnergyCrystal>( world, transformNode ) );
+		}
+	}
+}

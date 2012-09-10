@@ -15,4 +15,9 @@ enum MarkerType {
 	MT_PlayerStart,
 };
 
+#define PROP_ITEM_TYPE	"ItemType"
+enum ItemType {
+	IT_EnergyCrystal,
+};
+
 #endif

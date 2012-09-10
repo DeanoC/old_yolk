@@ -39,6 +39,7 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 	ship->getRenderable()->getTransformNode()->setLocalOrientation( startNode->getLocalOrientation() );
 	if( ship->getPhysicalCount() ) {
 		ship->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
+		ship->getPhysical()->getRigidBody()->setLinearFactor( btVector3(1.0f, 0.0f,1.0f) );
 		ship->getPhysical()->syncBulletTransform();
 	}
 	//world->debugRenderCallback = std::bind( &HoverTank::debugCallback, this );

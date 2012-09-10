@@ -38,7 +38,7 @@ void SceneWorld::add( ThingPtr _thing ) {
 		} else {
 			dynamicPhysicals.push_back( physical );
 		}
-		physicsWorld->addPhysical( physical );
+		physicsWorld->add( physical );
 	}
 	ThingComponent* component;
 	// add component fast lookup containers
@@ -66,7 +66,7 @@ void SceneWorld::remove( ThingPtr _thing ) {
 			CORE_ASSERT( (f != dynamicPhysicals.end()) && "Physics is not in this physics world");
 			*f = nullptr; // concurrent vector doesn't shrink until a clear
 		}
-		physicsWorld->removePhysical( physical );
+		physicsWorld->remove( physical );
 	}
 	for( int i = 0;i < _thing->getRenderableCount(); ++i ) {
 		removeRenderable( _thing->getRenderable( i ) );

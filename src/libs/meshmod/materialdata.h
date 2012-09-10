@@ -52,13 +52,14 @@ namespace MeshMod
 
 
 		struct LightParams {
-			float diffuse[3];
-			float specular[3];
-			float luminosity[3];
-			float specular_exponent;
-			float transparency;
-			float translucency;
-			float reflection;
+			float baseColour[3];
+			float Kd; // diffuse
+			float Ks; // specular
+			float Kl; // luminosity
+			float specular_exponent;	// spec exp
+			float transparency;			// 1 = solid 0 = full see through
+			float translucency;			// as transp but for lights
+			float Kr;					// reflection 
 
 			static const std::string getName() { return "LightParams"; };
 		};

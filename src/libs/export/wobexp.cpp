@@ -292,18 +292,23 @@ void WobbyWriter::ConvertLightParamsToMaterialParameters( 	MeshMod::MaterialElem
 		if( (*shaderEle)[ matIndex ].shaderName.empty() ) {
 			// no shader convert it from  light params
 			(*shaderEle)[ matIndex ] = std::string("blinn");
-			paramCon.pushBack<RGBElements>( "Emissive", RGBColour(params.luminosity[0], params.luminosity[1], params.luminosity[2] ) );
-			paramCon.pushBack<RGBElements>( "Diffuse", RGBColour(params.diffuse[0], params.diffuse[1], params.diffuse[2] ) );
-			paramCon.pushBack<RGBElements>( "Specular", RGBColour(params.specular[0], params.specular[1], params.specular[2] ) );
-			paramCon.pushBack<FloatScalarElements>( "Shininess", FloatScalar( params.specular_exponent ) );
+			paramCon.pushBack<RGBElements>( "BaseColour", RGBColour(params.baseColour[0], params.baseColour[1], params.baseColour[2] ) );
+			paramCon.pushBack<FloatScalarElements>( "Kd", FloatScalar( params.Kd ) );
+			if( params.Kl > 1e-2f ) {
+				paramCon.pushBack<FloatScalarElements>( "Kl", FloatScalar( params.Kl ) );
+			}
+			if( params.Ks > 1e-2f ) {
+				paramCon.pushBack<FloatScalarElements>( "Ks", FloatScalar( params.Ks ) );
+				paramCon.pushBack<FloatScalarElements>( "SpecExp", FloatScalar( params.specular_exponent ) );
+			}
+			if( params.Kr > 1e-2f ) {
+				paramCon.pushBack<FloatScalarElements>( "Kr", FloatScalar( params.Kr ) );
+			}
 			if( params.transparency < (1.f - 1e-2f) ) {
 				paramCon.pushBack<FloatScalarElements>( "Transparency", FloatScalar( params.transparency ) );
 			}
 			if( params.translucency < (1.f - 1e-2f) ) {
 				paramCon.pushBack<FloatScalarElements>( "Translucency", FloatScalar( params.translucency ) );
-			}
-			if( params.reflection < (1.f - 1e-2f) ) {
-				paramCon.pushBack<FloatScalarElements>( "Reflection", FloatScalar( params.reflection ) );
 			}
 		}
 	}
@@ -504,15 +509,11 @@ bool WobbyWriter::Save( MeshMod::MeshPtr goMesh, const Core::FilePath outFilenam
 		// shiny mid grey default material
 		nameEle->push_back( MaterialData::Name("Default") );
 		MaterialData::LightParams def;
-		def.diffuse[0] = 0.5f;
-		def.diffuse[1] = 0.5f;
-		def.diffuse[2] = 0.5f;
-		def.luminosity[0] = 0;
-		def.luminosity[1] = 0;
-		def.luminosity[2] = 0;
-		def.specular[0] = 1.0f;
-		def.specular[1] = 1.0f;
-		def.specular[2] = 1.0f;
+		def.baseColour[0] = 0.5f; def.baseColour[1] = 0.5f; def.baseColour[2] = 0.5f; 
+		def.Kd = 1.0f;
+		def.Ks = 0.0f;
+		def.Kl = 0.0f;
+		def.Kr = 0.0f;
 		def.specular_exponent = 40.f;
 		lightEle->push_back(def);
 	}

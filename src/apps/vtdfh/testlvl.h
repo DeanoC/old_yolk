@@ -3,6 +3,7 @@
 
 #include "localworld/levelthing.h"
 #include "indigoweakspider.h"
+#include "energycrystal.h"
 
 class PlayerStartMarker {
 public:
@@ -27,20 +28,22 @@ private:
 										const Core::BinPropertyResourcePtr& binProp, Core::TransformNode * transformNode );
 	void decodeEnemyProperties( LevelThing* thing, std::unordered_map<std::string, int>& nameMap, 
 										const Core::BinPropertyResourcePtr& binProp, Core::TransformNode * transformNode );
+	void decodeItemProperties( LevelThing* thing, std::unordered_map<std::string, int>& nameMap, 
+										const Core::BinPropertyResourcePtr& binProp, Core::TransformNode * transformNode );
 
 	SceneWorldPtr 	world;
 	LevelThingPtr	land;
 
 	typedef std::vector<PlayerStartMarker> 	PlayerStartVector;
 	typedef std::vector<GenericMarker> 		GenericMarkerVector;
-	typedef std::vector<IndigoWeakSpiderPtr>	EnemyVector; // TODO generise to more than weak spiders
+	typedef std::vector<IndigoWeakSpiderPtr>	EnemyVector; // TODO generilise to more than weak spiders
+	typedef std::vector<EnergyCrystalPtr> 		ItemVector; // TODO generilise to more than energy crystals
 
 	PlayerStartVector 						playerStarts;
 	GenericMarkerVector 					genericMarkers;
 	EnemyVector								ownedEnemies;
+	ItemVector								levelItems;
 	std::shared_ptr<HoverTank>				player;
-
-
 };
 
 #endif

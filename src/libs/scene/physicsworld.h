@@ -8,11 +8,13 @@ class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
 class btDynamicsWorld;
 class btCollisionShape;
+class btGhostPairCallback;
 class BulletColShape;
 
 namespace Scene {
 	class BulletDebugDraw;
 	class Physical;
+	class PhysicSensor;
 
 	class PhysicsWorld {
 	public:
@@ -21,8 +23,11 @@ namespace Scene {
 
 		void doSim( float delta );
 
-		void addPhysical( const std::shared_ptr<Physical>& physical );
-		void removePhysical( const std::shared_ptr<Physical>& physical );
+		void add( const std::shared_ptr<Physical>& physical );
+		void remove( const std::shared_ptr<Physical>& physical );
+
+		void add( const std::shared_ptr<PhysicSensor>& sensor );
+		void remove( const std::shared_ptr<PhysicSensor>& sensor );
 
 		btDynamicsWorld* getDynamicsWorld() const;
 		void nextPhysicsDebugMode();
@@ -33,6 +38,7 @@ namespace Scene {
 		btBroadphaseInterface* 				overlappingPairCache;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld* 			dynamicsWorld;
+		btGhostPairCallback* 				ghostPairCallback;
 		BulletDebugDraw*					debugDraw;
 		int physicsDebugMode;
 
