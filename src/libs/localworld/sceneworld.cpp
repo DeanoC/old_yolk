@@ -5,6 +5,9 @@
 //!-----------------------------------------------------
 #include "localworld.h"
 #include "scene/physicsworld.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include "updatable.h"
 #include "enemythingcomponent.h"
 #include "sceneworld.h"
@@ -38,8 +41,20 @@ void SceneWorld::add( ThingPtr _thing ) {
 		} else {
 			dynamicPhysicals.push_back( physical );
 		}
-		physicsWorld->add( physical );
+		physicsWorld->add( physical, _thing->getBroadCategories(), _thing->getPhysicalCollisionMask( i ) );
+		
+		// currently this array never shrinks :O
+		auto bulletIndex = bulletHandles.push_back( SceneBulletHandle(_thing, false, i ) );
+		physical->getRigidBody()->setUserPointer( (void*) std::distance( bulletHandles.begin(), bulletIndex ) );
 	}
+
+	for( int i = 0;i < _thing->getPhysicSensorCount(); ++i ) {
+		physicsWorld->add( _thing->getPhysicSensor( i ), _thing->getBroadCategories() | TBC_SENSOR, _thing->getPhysicSensorCollisionMask( i ) );
+		// currently this array never shrinks :O
+		auto bulletIndex = bulletHandles.push_back( SceneBulletHandle(_thing, true, i ) );
+		_thing->getPhysicSensor( i )->getGhost()->setUserPointer( (void*) std::distance( bulletHandles.begin(), bulletIndex ) );
+	}
+
 	ThingComponent* component;
 	// add component fast lookup containers
 	if( (component = _thing->getComponent( Updatable::COMPONENT_ID )) != nullptr ) {
@@ -54,6 +69,10 @@ void SceneWorld::add( ThingPtr _thing ) {
 void SceneWorld::remove( ThingPtr _thing ) {
 	auto t = std::find( things.begin(), things.end(), _thing );
 	CORE_ASSERT( (t != things.end()) && "thing is not in this world");
+
+	for( int i = 0;i < _thing->getPhysicSensorCount(); ++i ) {
+		physicsWorld->remove( _thing->getPhysicSensor( i ) );
+	}
 
 	for( int i = 0;i < _thing->getPhysicalCount(); ++i ) {
 		auto physical = _thing->getPhysical(i);

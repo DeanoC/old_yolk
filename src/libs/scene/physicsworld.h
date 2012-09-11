@@ -23,10 +23,10 @@ namespace Scene {
 
 		void doSim( float delta );
 
-		void add( const std::shared_ptr<Physical>& physical );
+		void add( const std::shared_ptr<Physical>& physical, uint16_t _collisionType, uint16_t _collisionFlags );
 		void remove( const std::shared_ptr<Physical>& physical );
 
-		void add( const std::shared_ptr<PhysicSensor>& sensor );
+		void add( const std::shared_ptr<PhysicSensor>& sensor, uint16_t _collisionType, uint16_t _collisionFlags );
 		void remove( const std::shared_ptr<PhysicSensor>& sensor );
 
 		btDynamicsWorld* getDynamicsWorld() const;
@@ -40,9 +40,11 @@ namespace Scene {
 		btDiscreteDynamicsWorld* 			dynamicsWorld;
 		btGhostPairCallback* 				ghostPairCallback;
 		BulletDebugDraw*					debugDraw;
-		int physicsDebugMode;
 
-		double curTime;
+		std::vector<std::shared_ptr<PhysicSensor>>	sensors;
+
+		int									physicsDebugMode;
+		double								curTime;
 
 	};
 }

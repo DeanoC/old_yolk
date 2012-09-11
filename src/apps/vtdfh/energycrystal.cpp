@@ -9,13 +9,13 @@ EnergyCrystal::EnergyCrystal( SceneWorldPtr _world, Core::TransformNode* startNo
 
 	namespace arg = std::placeholders;
 
-	crystal.reset(  ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "energycrystal" ) ) );
+	crystal.reset(  ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "energycrystal" ), TBC_ITEM ) );
 
 	world->add( crystal ); // render object
 	crystal->getRenderable()->getTransformNode()->setLocalPosition( startNode->getLocalPosition() );
 	crystal->getRenderable()->getTransformNode()->setLocalOrientation( startNode->getLocalOrientation() );
 	if( crystal->getPhysicalCount() ) {
-		crystal->getPhysical()->syncBulletTransform();
+		crystal->getPhysical(0)->syncBulletTransform();
 	}
 }
 

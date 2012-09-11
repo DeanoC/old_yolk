@@ -11,7 +11,7 @@ public:
 	Core::TransformNode* transform;
 };
 class GenericMarker {};
-class HoverTank;
+class Player;
 
 class TestLvl {
 public:
@@ -43,7 +43,7 @@ private:
 	GenericMarkerVector 					genericMarkers;
 	EnemyVector								ownedEnemies;
 	ItemVector								levelItems;
-	std::shared_ptr<HoverTank>				player;
+	std::shared_ptr<Player>					player;
 };
 
 #endif

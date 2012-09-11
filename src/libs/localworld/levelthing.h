@@ -10,7 +10,7 @@ class LevelThing : public Thing {
 public:
 	friend class ThingFactory;
 protected:
-	LevelThing( const ThingId _id ) : Thing( _id ) {}
+	LevelThing( const ThingId _id ) : Thing( TBC_WORLD, _id ) {}
 
 	
 };

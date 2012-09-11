@@ -17,7 +17,7 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 
 	namespace arg = std::placeholders;
 
-	ship.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "stinger" ) ) );
+	ship.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "stinger" ), TBC_PLAYER ) );
 	updater.updateCallback = std::bind( & HoverTank::update, this, arg::_1 );
 	ship->addComponent( &updater );
 
@@ -38,9 +38,9 @@ HoverTank::HoverTank( SceneWorldPtr _world, int _localPlayerNum, Core::Transform
 	ship->getRenderable()->getTransformNode()->setLocalPosition( startNode->getLocalPosition() );
 	ship->getRenderable()->getTransformNode()->setLocalOrientation( startNode->getLocalOrientation() );
 	if( ship->getPhysicalCount() ) {
-		ship->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
-		ship->getPhysical()->getRigidBody()->setLinearFactor( btVector3(1.0f, 0.0f,1.0f) );
-		ship->getPhysical()->syncBulletTransform();
+		ship->getPhysical(0)->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
+		ship->getPhysical(0)->getRigidBody()->setLinearFactor( btVector3(1.0f, 0.0f,1.0f) );
+		ship->getPhysical(0)->syncBulletTransform();
 	}
 	//world->debugRenderCallback = std::bind( &HoverTank::debugCallback, this );
 }
@@ -74,7 +74,7 @@ bool HoverTank::findHeightBelow( float& height ) {
 void HoverTank::update( float timeMS ) {
 	if( !ship->getPhysicalCount() ) return;
 
-	auto p = ship->getPhysical();
+	auto p = ship->getPhysical(0);
 	auto r = ship->getRenderable();
 	auto rb = p->getRigidBody();
 
@@ -84,8 +84,8 @@ void HoverTank::update( float timeMS ) {
 
 	InputFrame input;
 	// anti-gravity
-	btVector3 force(0,(9.81f*ship->getPhysical()->getMass() ),0);
-	ship->getPhysical()->getRigidBody()->applyCentralImpulse( force * timeMS );
+	btVector3 force(0,(9.81f*p->getMass() ),0);
+	rb->applyCentralImpulse( force * timeMS );
 
 	if( inputContext->dequeueInputFrame( &input ) ) {
 		rb->activate();

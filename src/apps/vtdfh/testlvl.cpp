@@ -1,6 +1,6 @@
 #include "vtdfh.h"
 #include "localworld/properties.h"
-#include "playership.h"
+#include "player.h"
 #include "hovertank.h"
 #include "indigoweakspider.h"
 #include "testlvl.h"
@@ -29,7 +29,7 @@ void TestLvl::spawnPlayer( int _localPlayerNum ) {
 		spawnPnt = playerStarts[0].transform;
 	}
 
-	player = std::make_shared<HoverTank>( world, _localPlayerNum, spawnPnt );
+	player = std::make_shared<Player>( world, _localPlayerNum, spawnPnt );
 }
 
 void TestLvl::decodeLevelProperties( LevelThing* thing, std::unordered_map<std::string, int>& nameMap, 

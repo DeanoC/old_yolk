@@ -8,7 +8,7 @@ namespace Scene {
 	public:
 
 		explicit DynamicPhysical( 	Core::TransformNode* node,
-									CollisionShape* _shape, 
+									std::shared_ptr<CollisionShape> _shape, 
 									float _mass = 1.0f, 
 									Math::Vector3 _localInertia = Math::Vector3(0,0,0),
 									float _friction = 0.5f,

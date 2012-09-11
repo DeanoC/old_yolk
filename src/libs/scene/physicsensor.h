@@ -8,12 +8,17 @@ namespace Core {
 }
 
 class btPairCachingGhostObject;
+class btDiscreteDynamicsWorld;
+class btCollisionObject;
 
 namespace Scene {
 	class CollisionShape;
 	class PhysicSensor : public btMotionState {
 	public:
-		explicit PhysicSensor( 	Core::TransformNode* node, CollisionShape* shape );
+		friend class PhysicsWorld;
+		typedef std::vector < btCollisionObject* > CollidedArray;
+
+		explicit PhysicSensor( 	Core::TransformNode* node, std::shared_ptr<CollisionShape> shape );
 		virtual ~PhysicSensor();
 
 		const btPairCachingGhostObject* getGhost() const { return ghost; }
@@ -27,10 +32,19 @@ namespace Scene {
 		// btMotionState interface
 		virtual void    getWorldTransform( btTransform& worldTrans ) const override;
 		virtual void    setWorldTransform( const btTransform& worldTrans ) override;	
+
+		CollidedArray::const_iterator cbegin() const { return collisions.cbegin(); }
+		CollidedArray::const_iterator cend() const { return collisions.cend(); }
+		CollidedArray::iterator begin() { return collisions.begin(); }
+		CollidedArray::iterator end() { return collisions.end(); }
+
 	protected:
+		void update( btDiscreteDynamicsWorld* dynamicsWorld );
+
 		Core::TransformNode* 					transform;
 		std::shared_ptr<CollisionShape>			shape;
 		btPairCachingGhostObject*				ghost;
+		CollidedArray							collisions;
 	};
 
 	typedef std::shared_ptr<PhysicSensor>			PhysicSensorPtr;

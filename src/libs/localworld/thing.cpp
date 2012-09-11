@@ -4,30 +4,26 @@
 //!
 //!-----------------------------------------------------
 #include "localworld.h"
-#include "sceneworld.h"
-#include "btBulletCollisionCommon.h"
-#include "btBulletDynamicsCommon.h"
-
-#include "scene/hier.h"
-#include "scene/dynamicsproperties.h"
-#include "scene/meshcolshape.h"
-#include "scene/spherecolshape.h"
-#include "scene/boxcolshape.h"
-#include "scene/cylindercolshape.h"
-#include "scene/dynamicphysical.h"
-#include "properties.h"
 #include "thing.h"
 
 Thing::~Thing() {
 	preps.clear();
+	prepColMasks.clear();
+	sreps.clear();
+	srepColMasks.clear();
 	vreps.clear();
 }
-
-size_t Thing::addPhysical( Scene::PhysicalPtr prep ) {
+size_t Thing::add( Scene::RenderablePtr vrep ) {
+	vreps.push_back( vrep );
+	return vreps.size() - 1;
+}
+size_t Thing::add( Scene::PhysicalPtr prep, uint32_t _collisionMask ) {
 	preps.push_back( prep );
+	prepColMasks.push_back( _collisionMask );
 	return preps.size() - 1;
 }
-size_t Thing::addRenderable( Scene::RenderablePtr vrep ) {
-	vreps.push_back( vrep );
-	return preps.size() - 1;
+size_t Thing::add( Scene::PhysicSensorPtr srep, uint32_t _collisionMask ) {
+	sreps.push_back( srep );
+	srepColMasks.push_back( _collisionMask );
+	return sreps.size() - 1;
 }

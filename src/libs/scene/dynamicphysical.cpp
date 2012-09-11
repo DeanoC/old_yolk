@@ -6,7 +6,7 @@
 #include "dynamicphysical.h"
 namespace Scene {
 DynamicPhysical::DynamicPhysical( Core::TransformNode* _node,
-							CollisionShape* _shape,
+							std::shared_ptr<CollisionShape> _shape,
 							float _mass, 
 							Math::Vector3 _localInertia,
 							float _friction,

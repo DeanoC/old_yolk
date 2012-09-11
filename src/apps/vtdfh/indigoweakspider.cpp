@@ -13,7 +13,7 @@ IndigoWeakSpider::IndigoWeakSpider( SceneWorldPtr _world, Core::TransformNode* s
 
 	namespace arg = std::placeholders;
 
-	spider.reset(  ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "spider" ) ) );
+	spider.reset(  ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "spider" ), TBC_ENEMY ) );
 	updater.updateCallback = std::bind( & IndigoWeakSpider::update, this, arg::_1 );
 	spider->addComponent( &updater );
 
@@ -21,8 +21,8 @@ IndigoWeakSpider::IndigoWeakSpider( SceneWorldPtr _world, Core::TransformNode* s
 	spider->getRenderable()->getTransformNode()->setLocalPosition( startNode->getLocalPosition() );
 	spider->getRenderable()->getTransformNode()->setLocalOrientation( startNode->getLocalOrientation() );
 	if( spider->getPhysicalCount() ) {
-		spider->getPhysical()->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
-		spider->getPhysical()->syncBulletTransform();
+		spider->getPhysical(0)->getRigidBody()->setAngularFactor( btVector3(0.0f, 1.0f,0.0f) );
+		spider->getPhysical(0)->syncBulletTransform();
 	}
 }
 
@@ -34,7 +34,7 @@ IndigoWeakSpider::~IndigoWeakSpider() {
 void IndigoWeakSpider::update( float timeMS ) {
 	if( !spider->getPhysicalCount() ) return;
 
-	auto p = spider->getPhysical();
+	auto p = spider->getPhysical(0);
 	auto r = spider->getRenderable();
 	auto rb = p->getRigidBody();
 
@@ -43,6 +43,6 @@ void IndigoWeakSpider::update( float timeMS ) {
 	rb->getCollisionShape()->getBoundingSphere( colCenter, colRadius );
 
 	// anti-gravity
-	btVector3 force(0,(9.81f*spider->getPhysical()->getMass() ),0);
-	spider->getPhysical()->getRigidBody()->applyCentralImpulse( force * timeMS );
+	btVector3 force(0,(9.81f*p->getMass() ),0);
+	rb->applyCentralImpulse( force * timeMS );
 }

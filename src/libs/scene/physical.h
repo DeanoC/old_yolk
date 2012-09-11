@@ -13,7 +13,7 @@ namespace Scene {
 	class Physical : public btMotionState {
 	public:
 		explicit Physical( 	Core::TransformNode* node,
-							CollisionShape* shape,
+							std::shared_ptr<CollisionShape> shape,
 							float _friction = 0.5f,
 							float _restitution = 0.f,
 							float _linearDamping = 0.f,
@@ -37,7 +37,7 @@ namespace Scene {
 
 		explicit Physical( 	INTERNAL,
 							Core::TransformNode* node,
-							CollisionShape* shape,
+							std::shared_ptr<CollisionShape> shape,
 							float _friction,
 							float _restitution,
 							float _linearDamping,

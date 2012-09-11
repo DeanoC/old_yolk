@@ -49,7 +49,7 @@ int Main() {
 	SceneWorldPtr world = shell.getSceneWorld();
 
 	Scene::HierPtr land = std::make_shared<Scene::Hier>( "basic" );
-	ThingPtr tng( ThingFactory::createThingFromHier( land ) );
+	ThingPtr tng( ThingFactory::createThingFromHier( land, TBC_WORLD ) );
 	world->add( tng );
 /*	Scene::HierPtr stinger = std::make_shared<Scene::Hier>( "stinger" );
 	ThingPtr stingr = std::make_shared<Thing>( stinger );

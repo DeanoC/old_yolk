@@ -8,7 +8,7 @@
 namespace Scene {
 
 Physical::Physical( 	Core::TransformNode* _node,
-						CollisionShape* _shape,
+						std::shared_ptr<CollisionShape> _shape,
 						float _friction,
 						float _restitution,
 						float _linearDamping,
@@ -30,7 +30,7 @@ Physical::Physical( 	Core::TransformNode* _node,
 
 Physical::Physical( 	Physical::INTERNAL,
 						Core::TransformNode* _node,
-						CollisionShape* _shape,
+						std::shared_ptr<CollisionShape> _shape,
 						float _friction,
 						float _restitution,
 						float _linearDamping,
