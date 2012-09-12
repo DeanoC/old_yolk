@@ -19,7 +19,6 @@
 #include "SwfGpuPath.h"
 #include "SwfGpuLinePath.h"
 #include "SwfRuntimeShape.h"
-#include "SwfRFS_GLTnL_iPhone.h"
 #include "SwfRuntimeShape.h"
 #include "SwfRuntimeUtils.h"
 #include "SwfRuntimeBitmap.h"
@@ -46,8 +45,8 @@ namespace Swf {
 			BuildLineStyles(_swfShape->lineStyleArray, false, _swfShape->numLineStyles, _runShape->lineFills);
 		} else {
 			// fake a simple red colour for now (fonts only?)
-			_runShape->fills.push_back( CORE_NEW iPhone::SwfRFSSolidColour(player, SwfRGBA(1.0f, 0.0f, 0.0f, 1.0f)) );
-			_runShape->lineFills.push_back( CORE_NEW iPhone::SwfRFSLine(player, NULL) );
+//			_runShape->fills.push_back( CORE_NEW iPhone::SwfRFSSolidColour(player, SwfRGBA(1.0f, 0.0f, 0.0f, 1.0f)) );
+//			_runShape->lineFills.push_back( CORE_NEW iPhone::SwfRFSLine(player, NULL) );
 		}
 
 		BuildPath(_swfShape, _runShape->fills, _runShape->lineFills, _runShape->gpuPaths, _runShape->gpuLinePaths, false, false);
@@ -165,41 +164,35 @@ namespace Swf {
 			for(int fillNum=0;fillNum < _numFills;++fillNum ) {
 				SwfFillStyle* fillStyle = _fills[fillNum];
             switch (fillStyle->fillType) {
-					case SolidFill:
-					{
+					case SolidFill:	{
 						SwfSolidFillStyle* solid = (SwfSolidFillStyle*) fillStyle;
-						fills[fillNum] = CORE_NEW iPhone::SwfRFSSolidColour(player, solid->colour);
+//						fills[fillNum] = CORE_NEW iPhone::SwfRFSSolidColour(player, solid->colour);
 						break;
 					}
 					case LinearGradientFill:
-					case RadialGradientFill:
-					{
+					case RadialGradientFill: {
 						SwfGradientFillStyle* lgrad = (SwfGradientFillStyle*) fillStyle;
-						fills[fillNum] = CORE_NEW iPhone::SwfRFSGradient(player, lgrad);
+//						fills[fillNum] = CORE_NEW iPhone::SwfRFSGradient(player, lgrad);
 						break;
 					}
-					case RepeatingBitmapFill:
-					{
+					case RepeatingBitmapFill: {
 						SwfBitmapFillStyle* bitrm = (SwfBitmapFillStyle*)fillStyle;
-						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitrm);
+//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitrm);
 						break;
 					}
-					case ClippedBitmapFill:
-					{
+					case ClippedBitmapFill:	{
 						SwfBitmapFillStyle* bitcm = (SwfBitmapFillStyle*)fillStyle;
-						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitcm);
+//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitcm);
 						break;
 					}
-					case NonSmoothedRepeatingBitmapFill:
-					{
+					case NonSmoothedRepeatingBitmapFill: {
 						SwfBitmapFillStyle* bitnsrm = (SwfBitmapFillStyle*)fillStyle;
-						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitnsrm);
+//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitnsrm);
 						break;
 					}
-					case NonSmoothedClippedBitmapFill:
-					{
+					case NonSmoothedClippedBitmapFill: {
 						SwfBitmapFillStyle* bitnscm = (SwfBitmapFillStyle*)fillStyle;
-						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitnscm);
+//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitnscm);
 						break;
 					}
 /*                case FillType.MorphSolidFill:
@@ -207,9 +200,8 @@ namespace Swf {
                     fills[fillNum] = CORE_NEW SwfRuntimeMorphSolidFillStyle(player, msfs.startColour, msfs.endColour);
                     break;*/
 					case FocalRadialGradientFill:
-					default:
-					{
-                    fills[fillNum] = CORE_NEW iPhone::SwfRFSSolidColour(player, SwfRGBA(1.0f,0.0f, 0.0f, 1.0f));
+					default: {
+//                    fills[fillNum] = CORE_NEW iPhone::SwfRFSSolidColour(player, SwfRGBA(1.0f,0.0f, 0.0f, 1.0f));
                     break;
 					}
             }
@@ -225,7 +217,7 @@ namespace Swf {
 			if (_morph) {
 				//                lineFills[lineFillNum++] = CORE_NEW SwfRuntimeMorphLineFillStyle(player, lineStyle as SwfMorphLineStyle);
 			} else {
-				lineFills[lineFillNum] = CORE_NEW iPhone::SwfRFSLine(player, lineStyle);
+//				lineFills[lineFillNum] = CORE_NEW iPhone::SwfRFSLine(player, lineStyle);
 			}
 		}
     }

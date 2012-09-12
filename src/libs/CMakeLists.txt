@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 2.8 )
 add_subdirectory( bdwgc )
 add_subdirectory( binify )
 add_subdirectory( bullet )
+add_subdirectory( jpeg )
 add_subdirectory( tbb )
 add_subdirectory( zlib )
 

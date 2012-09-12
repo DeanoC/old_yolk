@@ -8,7 +8,7 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 ADD_MSVC_PRECOMPILED_HEADER( "swfruntime.h" "${cpp_src_files}" )
 add_library( swfruntime STATIC ${src_files} ${header_files} )
 
-list( APPEND targ_link_libs swfparser scene )
+list( APPEND targ_link_libs core swfparser scene zlib jpeg )
 target_link_libraries( swfruntime ${targ_link_libs} )
 
 # make a nice hierachy

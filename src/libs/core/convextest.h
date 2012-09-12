@@ -22,8 +22,7 @@
 ///
 /// \brief	.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace PolygonClass
-{
+namespace PolygonClass {
 
 ///-------------------------------------------------------------------------------------------------
 /// \enum	Enum
@@ -42,8 +41,7 @@ enum Enum {
 };
 
 
-extern PolygonClass::Enum ClassifyPolygon( float* Input, int nVertices );
-
+PolygonClass::Enum ClassifyPolygon( float* Input, int nVertices );
 
 }	//namespace PolygonClass
 

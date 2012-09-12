@@ -35,7 +35,7 @@ struct PointTracker {
 
 /* Given a directed line pq, determine	*/
 /* whether qr turns CW or CCW.		*/
-int WhichSide(const Point2d& p, const Point2d& q, const Point2d& r)
+static int WhichSide(const Point2d& p, const Point2d& q, const Point2d& r)
 {
     float result;
     result = (p.x - q.x) * (q.y - r.y) - (p.y - q.y) * (q.x - r.x);
@@ -45,7 +45,7 @@ int WhichSide(const Point2d& p, const Point2d& q, const Point2d& r)
 }
 
 /* Lexicographic comparison of p and q	*/
-int Compare(const Point2d& p, const Point2d& q)		
+static int Compare(const Point2d& p, const Point2d& q)		
 {
     if (p.x < q.x) return -1;	/* p is less than q.			*/
     if (p.x > q.x) return  1;	/* p is greater than q.			*/
@@ -55,7 +55,7 @@ int Compare(const Point2d& p, const Point2d& q)
 }
 /* Read p's x- and y-coordinate from f	*/
 /* and return true, iff successful.	*/
-bool GetPoint(PointTracker* tracker, Point2d* p)		
+static bool GetPoint(PointTracker* tracker, Point2d* p)		
 {
 	if( tracker->offset >= tracker->nVertices){
 		return false;
@@ -66,7 +66,7 @@ bool GetPoint(PointTracker* tracker, Point2d* p)
 /* Read next point into 'next' until it */
 /* is different from 'previous' and	*/
 /* return true iff successful.		*/
-bool GetDifferentPoint(PointTracker* tracker, const Point2d& previous, Point2d* next)
+static bool GetDifferentPoint(PointTracker* tracker, const Point2d& previous, Point2d* next)
 {
     while(GetPoint(tracker, next)){
 		if(Compare(previous, *next) != 0)
@@ -89,11 +89,11 @@ bool GetDifferentPoint(PointTracker* tracker, const Point2d& previous, Point2d* 
 	    angleSign = thisSign;					\
 	}								\
 	first = second; second = third;
+namespace PolygonClass {
 
 /* Classify the polygon vertices on file 'f' according to: 'NOT_CONVEX'	*/
 /* 'NOT_CONVEX_DEGENERATE', 'CONVEX_DEGENERATE', 'CONVEX_CCW', 'CONVEX_CW'.	*/
-PolygonClass::Enum ClassifyPolygon( float* Input, int nVertices )
-{	
+PolygonClass::Enum ClassifyPolygon( float* Input, int nVertices ) {	
 	PointTracker tracker;
 	tracker.data = (PointTracker::Data*)Input;
 	tracker.nVertices = nVertices;
@@ -118,4 +118,6 @@ PolygonClass::Enum ClassifyPolygon( float* Input, int nVertices )
     if ( angleSign  > 0 ) return PolygonClass::CONVEX_CCW;
     if ( angleSign  < 0 ) return PolygonClass::CONVEX_CW;
     return PolygonClass::CONVEX_DEGENERATE;
+}
+
 }
