@@ -73,21 +73,9 @@
 #include <string>
 #include <sstream>
 #include <utility>
-#if COMPILER == MS_COMPILER && !defined( _HAS_CPP0X )
-
-// !EVIL WORKS HERE!
-#define alignedvector vector
-#	include "core/aligned_vector.h"
-#undef alignedvector
-
-#else
-#	include <vector>
-#endif
-
+#include <vector>
 #include <atomic>
-
 #include <fstream>
-// these are auto forwarding to the tr1 implementations of the platform if it supports them
 #include <functional>
 #include <memory>
 #include <type_traits>
@@ -106,17 +94,113 @@
 #include "core/thread.h"
 
 #include <boost/algorithm/string.hpp>
-/*#include <boost/asio.hpp>
-#include <boost/msm/back/state_machine.hpp>
-#include <boost/msm/front/state_machine_def.hpp>
-#include <boost/msm/front/functor_row.hpp>
-#include <boost/msm/front/euml/common.hpp>
-#include <boost/msm/front/euml/operator.hpp>
-#include <boost/msm/front/euml/state_grammar.hpp>*/
 #include <boost/scoped_array.hpp>
+#include <boost/pool/pool_alloc.hpp>
 
 // tbb concurrent containers
 #include "tbb/concurrent_hash_map.h"
 #include "tbb/concurrent_vector.h"
+
+// these extend the stl bits to Garbage Collection and Pooled allocation
+namespace Core {
+#define STRING_CTORS_DECLARE(x,y,z)															\
+	class x : public std::basic_string< y , std::char_traits< y >, z < y > > {			\
+		public: 																			\
+		typedef std::basic_string< y , std::char_traits< y >, z < y > > base_type;		\
+		x (){};																				\
+		x(base_type const & other);															\
+		explicit x(allocator_type const & al);												\
+		x(x const & other, size_type off, size_type count = npos);							\
+		x(x const & other, size_type off, size_type count, allocator_type const & al);		\
+		x(value_type const * ptr, size_type count);											\
+		x(value_type const * ptr, size_type count, allocator_type const & al);				\
+		x(value_type const * ptr);															\
+		x(value_type const * ptr, allocator_type const & al);								\
+		x(size_type count, value_type ch);													\
+		x(size_type count, value_type ch, allocator_type const & al);						\
+		template <typename InIt> inline x(InIt first, InIt last);							\
+		template <typename InIt> inline x(InIt first, InIt last, allocator_type const & al); \
+		x & operator=(value_type const * ptr);												\
+		x & operator=(value_type ch);														\
+	}
+#define STRING_CTORS_IMPL(x)																\
+	inline x :: x(base_type const & other) : base_type(other) {}							\
+	inline x :: x(allocator_type const & al) : base_type(al) {}								\
+	inline x :: x(x const & other, size_type off, size_type count) :						\
+								base_type(other, off, count) {}								\
+	inline x :: x(x const & other, size_type off, size_type count, allocator_type const & al) : \
+								base_type(other, off, count, al) {}							\
+	inline x :: x(value_type const * ptr, size_type count) : base_type(ptr, count) {}		\
+	inline x :: x(value_type const * ptr, size_type count, allocator_type const & al) :		\
+								base_type(ptr, count, al) {}								\
+	inline x :: x(value_type const * ptr) : base_type(ptr) {}								\
+	inline x :: x(value_type const * ptr, allocator_type const & al) : base_type(ptr, al) {} \
+	inline x :: x(size_type count, value_type ch) : base_type(count, ch) {}					\
+	inline x :: x(size_type count, value_type ch, allocator_type const & al) :				\
+								base_type(count, ch, al) {}									\
+	template <typename InIt> inline x :: x(InIt first, InIt last) : base_type(first, last) {}	\
+	template <typename InIt> inline x :: x(InIt first, InIt last, allocator_type const & al) :  \
+								base_type(first, last, al) {}								\
+	inline x & x :: operator=(value_type const * ptr) { base_type::operator=(ptr); return *this; } \
+	inline x & x :: operator=(value_type ch) { base_type::operator=(ch); return *this; }
+	
+	// forward decl	
+	class gcstring;
+	class poolstring;
+
+#if defined( USE_GC )
+	template<typename X> class gcvector : public std::vector<X, gc_allocator<X> > {};
+	template<typename KEY, typename VAL> class gcmap : public std::map<KEY, VAL, std::less<KEY>, 
+												gc_allocator<std::pair<const KEY,VAL> > > {};	
+	template<typename X> class gcstack : public std::stack<X, gcvector<X> > {};
+	template<typename X> class gclist : public std::list<X, gc_allocator<X> > {};
+	template<typename KEY, typename VAL> class gcunordered_map : public 
+				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY>, 
+				gc_allocator<std::pair<const KEY,VAL> > > {};	
+
+	STRING_CTORS_DECLARE( gcstring, char, gc_allocator );
+	template<typename X> class gctraceablevector : public std::vector<X, traceable_allocator<X> >{};
+	template<typename KEY, typename VAL> class gctraceablemap : public std::map<KEY, VAL, 
+				std::less<KEY>, traceable_allocator<std::pair<const KEY,VAL> > > {};	
+	template<typename X> class gctraceablestack : public std::stack<X, gctraceablevector<X> > {};
+	template<typename X> class gctraceablelist : public std::list<X, traceable_allocator<X> > {};
+	template<typename KEY, typename VAL> class gctraceableunordered_map : public 
+				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY>, 
+				gc_allocator<std::pair<const KEY,VAL> >  > {};	
+#else
+	template<typename X> class gcvector : public std::vector<X, std::allocator<X> > {};
+	template<typename KEY, typename VAL> class gcmap : public std::map<KEY, VAL, std::less<KEY>, 
+				std::allocator<std::pair<const KEY,VAL> > > {};	
+	template<typename X> class gcstack : public std::stack<X, gcvector<X> > {};
+	template<typename X> class gclist : public std::list<X, std::allocator<X> > {};
+	template<typename KEY, typename VAL> class gcunordered_map : public 
+				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY>, 
+				std::allocator<std::pair<const KEY,VAL> >  > {};	
+	STRING_CTORS_DECLARE( gcstring, char, std::allocator );
+	template<typename X> class gctraceablevector : public std::vector<X> {};
+	template<typename KEY, typename VAL> class gctraceablemap : public 
+				std::map<KEY, VAL, std::less<KEY> > {};	
+	template<typename X> class gctraceablestack : public std::stack<X, gctraceablevector<X> > {};
+	template<typename X> class gctraceablelist : public std::list<X> {};
+	template<typename KEY, typename VAL> class gctraceableunordered_map : public 
+				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY> > {};	
+#endif
+
+	template<typename X> class poolvector : public std::vector<X, boost::pool_allocator<X> > {};
+	template<typename KEY, typename VAL> class poolmap : public std::map<KEY, VAL, 
+				std::less<KEY>, boost::pool_allocator<std::pair<const KEY,VAL> > > {};	
+	template<typename X> class poolstack : public std::stack<X, poolvector<X> > {};
+	template<typename X> class poollist : public std::list<X, boost::pool_allocator<X> > {};
+	template<typename KEY, typename VAL> class poolunordered_map : public 
+				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY>, 
+				boost::pool_allocator<std::pair<const KEY,VAL> >  > {};	
+	STRING_CTORS_DECLARE( poolstring, char, boost::pool_allocator );
+
+	STRING_CTORS_IMPL( gcstring )
+	STRING_CTORS_IMPL( poolstring )
+#undef STRING_CTORS_DECLARE
+#undef STRING_CTORS_IMPL
+}
+
 
 #endif // end CORE_STANDARD_H

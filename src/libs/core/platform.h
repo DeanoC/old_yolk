@@ -19,8 +19,7 @@
 #define CUSTOM					(0x0)
 #define MS_WINDOWS				(0x1)
 #define OSX						(0x2)
-#define LINUX					(0x3)
-#define FREEBSD					(0x4)
+#define GNULINUX				(0x3)
 
 // compiler family
 #define MS_COMPILER				(0x0)
@@ -140,7 +139,7 @@
 #	define PLATFORM						POSIX
 
 #	if defined( linux ) || defined( __linux )
-#		define PLATFORM_OS					LINUX
+#		define PLATFORM_OS					GNULINUX
 #	elif defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __bsdi__ ) || defined ( __DragonFly__ ) || defined( _SYSTYPE_BSD )
 #		define PLATFORM_OS					FREEBSD
 #	else
@@ -150,7 +149,7 @@
 #elif defined( __clang__ )
 // TODO pretend we are linux for now, as use clang on multi-os sa code checker 
 #define PLATFORM					POSIX
-#define PLATFORM_OS					LINUX
+#define PLATFORM_OS					GNULINUX
 #undef _MSC_VER
 #else
 

@@ -27,6 +27,11 @@
 #include "scene/renderstates.h"
 #endif
 
+// stuck here into re-org
+#ifndef YOLK_GUI_SWFRUNTIME_SWFPLAYER_H_
+#include "gui/swfruntime/swfplayer.h"
+#endif
+
 namespace Scene {
 // forward decl
 class ImageComposer;
@@ -55,6 +60,7 @@ public:
 	virtual RenderTargetStates* createRenderTargetStates( const void* data ) = 0;
 	virtual DepthStencilState* createDepthStencilState( const void* data ) = 0;
 	virtual RasteriserState* createRasteriserState( const void* data ) = 0;
+	virtual Swf::SwfPlayer* createSwfPlayer( const void* data );
 
 	virtual const void* preCreate( const char* name, const DataBuffer::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const Hie::CreationInfo* loader );
@@ -67,6 +73,7 @@ public:
 	virtual const void* preCreate( const char* name, const RenderTargetStates::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const DepthStencilState::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const RasteriserState::CreationInfo* loader );
+	virtual const void* preCreate( const char* name, const Swf::SwfPlayer::CreationInfo* loader );
 
 protected:
 	ResourceLoader();

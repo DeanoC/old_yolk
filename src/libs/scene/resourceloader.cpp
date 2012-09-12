@@ -19,6 +19,11 @@
 #include "debugprims.h"
 #include "programman.h"
 
+// doesn't really belong here, its higher level library than scene but scene needs a seperation itself, 
+// so for now and make life simple, just bung its loader here
+#include "gui/swfruntime/swfruntime.h"
+#include "gui/swfruntime/swfplayer.h"
+
 #include <boost/asio.hpp>
 #include "resourceloader.h"
 
@@ -62,6 +67,7 @@ Core::thread::id 									ResourceLoaderImpl::loaderThreadId;
 
 void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* name, const void* data  ) {
 	using namespace Core;
+	using namespace Swf;
 	std::shared_ptr<Core::ResourceBase> res;
 
 	// route type to their specific creation functions 
@@ -77,6 +83,7 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RenderTargetStatesType: RENDER( RenderTargetStates ); break;
 	case DepthStencilStateType: RENDER( DepthStencilState ); break;
 	case RasteriserStateType: RENDER( RasteriserState ); break;
+	case SwfPlayerType: RENDER( SwfPlayer ); break;
 	default:;
 	}
 
@@ -102,6 +109,7 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RenderTargetStatesType: LOADER( RenderTargetStates ); break;
 	case DepthStencilStateType: LOADER( DepthStencilState ); break;
 	case RasteriserStateType: LOADER( RasteriserState ); break;
+	case Swf::SwfPlayerType: LOADER( Swf::SwfPlayer ); break;
 	default:;
 	}
 	CORE_ASSERT( cs != nullptr );
@@ -164,6 +172,8 @@ void ResourceLoaderImpl::installResourceTypes() {
 							NULL, 0, "" );
 	REG( RasteriserStateType, cb, &SRD(RasteriserState), SO(RasteriserStateHandle), 
 							NULL, 0, "" );
+	REG( Swf::SwfPlayerType, cb, &SRD(Swf::SwfPlayer), SO(Swf::SwfPlayerHandle), 
+							NULL, 0, "Ui" );
 	#undef SRD
 	#undef SO
 	#undef REG
@@ -254,6 +264,9 @@ Program* ResourceLoader::createProgram( const void* data ) {
 Wob* ResourceLoader::createWob( const void* data ) {
 	return Wob::internalCreate( getRenderer(), data );
 }
+Swf::SwfPlayer* ResourceLoader::createSwfPlayer( const void* data ) {
+	return (Swf::SwfPlayer*)data;
+}
 
 const void* ResourceLoader::preCreate( const char* name, const DataBuffer::CreationInfo *loader ) {
 	return DataBuffer::internalPreCreate( name, loader );
@@ -287,6 +300,9 @@ const void* ResourceLoader::preCreate( const char* name, const DepthStencilState
 }
 const void* ResourceLoader::preCreate( const char* name, const RasteriserState::CreationInfo* loader ) {
 	return RasteriserState::internalPreCreate( name, loader );
+}
+const void* ResourceLoader::preCreate( const char* name, const  Swf::SwfPlayer::CreationInfo* loader ) {
+	return Swf::SwfPlayer::internalPreCreate( name, loader );
 }
 
 }

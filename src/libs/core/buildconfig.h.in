@@ -5,7 +5,7 @@
 #cmakedefine USE_DX11
 #cmakedefine USE_OPENGL
 #cmakedefine USE_OPENCL
-#cmakedefine USE_V8
+#cmakedefine USE_GC
 #cmakedefine USE_GLOG
 #cmakedefine IS_HOST_64_BIT
 

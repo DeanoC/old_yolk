@@ -1,9 +1,7 @@
 
-add_subdirectory( tbb )
 IF( USE_DWM )
 	add_subdirectory( nacl-llvm/llvm )
 ENDIF( USE_DWM )
-add_subdirectory( zlib )
 add_subdirectory( json-spirit )
 add_subdirectory( protobuf )
 IF( USE_RIAK )

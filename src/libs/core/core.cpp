@@ -112,7 +112,7 @@ void Shutdown( void ) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void HouseKeep( void ) {
 #if defined(USE_GC)
-	GC_gcollect();
+//	GC_gcollect();
 #endif
 
 #if PLATFORM == WINDOWS
@@ -151,7 +151,3 @@ bool InitWindow( int width, int height, bool bFullscreen ) {
 }
 
 } // end namespace
-
-#if defined(USE_GC)
-#include "ThirdParty/gc/gc_cpp.cc"
-#endif
