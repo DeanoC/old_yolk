@@ -192,9 +192,9 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 	loaderThread = CORE_NEW Core::thread( 
 		[&] {
 			loaderThreadId = std::this_thread::get_id();
-//			GC_stack_base stackBase;
-//			GC_get_stack_base( &stackBase );
-//			GC_register_my_thread( &stackBase );
+			GC_stack_base stackBase;
+			GC_get_stack_base( &stackBase );
+			GC_register_my_thread( &stackBase );
 			workUnit = std::unique_ptr<boost::asio::io_service::work>( CORE_NEW boost::asio::io_service::work( *loaderIo ) );
 			loaderIo->run();
 		}

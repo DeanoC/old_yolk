@@ -531,7 +531,7 @@
 			"file": "src/libs/bdwgc/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 8663,
+				"buffer_size": 8681,
 				"line_ending": "Unix"
 			}
 		},
@@ -563,7 +563,7 @@
 			"file": "src/libs/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 751,
+				"buffer_size": 776,
 				"line_ending": "Windows"
 			}
 		},
@@ -587,7 +587,7 @@
 			"file": "src/libs/gui/swfruntime/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 713,
+				"buffer_size": 728,
 				"line_ending": "Windows"
 			}
 		},
@@ -603,7 +603,7 @@
 			"file": "src/libs/gui/swfruntime/SwfPlayer.cpp",
 			"settings":
 			{
-				"buffer_size": 5193,
+				"buffer_size": 5357,
 				"line_ending": "Windows"
 			}
 		},
@@ -611,7 +611,7 @@
 			"file": "src/libs/scene/resourceloader.cpp",
 			"settings":
 			{
-				"buffer_size": 11077,
+				"buffer_size": 11380,
 				"line_ending": "Windows"
 			}
 		},
@@ -629,6 +629,73 @@
 			{
 				"buffer_size": 1348,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/zlib/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 5369,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/jpeg/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 806,
+				"line_ending": "Windows",
+				"name": "CMakeLists.txt"
+			}
+		},
+		{
+			"file": "src/libs/core/core.h",
+			"settings":
+			{
+				"buffer_size": 2863,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/core.cpp",
+			"settings":
+			{
+				"buffer_size": 4056,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/bdwgc/include/gc.h",
+			"settings":
+			{
+				"buffer_size": 93368,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 15783 files for \"GC_register_my_thread\" (case sensitive)\n\nC:\\Users\\Artminer\\Documents\\Visual Studio 2012\\Projects\\yolk\\src\\libs\\bdwgc\\ChangeLog:\n  178  * Fix GC_init[_lib_bounds] and GC_get_main_stack_base for malloc redirection.\n  179  * Fix GC_push_all/selected boundaries check.\n  180: * Fix GC_register_my_thread marking thread as detached (Cygwin/pthreads-w32).\n  181  * Fix GC_remove_all_threads_but_me to cleanup thread-specific data storage.\n  182  * Fix GC_restart_handler to preserve errno if needed.\n  ...\n  267  pthread_stop_world.h.\n  268  * win32_threads.c (GC_write_fault_handler): Remove prototype.\n  269: * win32_threads.c (GC_register_my_thread_inner): Call\n  270  GC_set_write_fault_handler instead of SetUnhandledExceptionFilter\n  271  (only if MPROTECT_VDB).\n  ...\n  363  * pthread_support.c (pthread_join): Add assertion (check thread is\n  364  finished).\n  365: * pthread_support.c (GC_register_my_thread): Don't detach the\n  366  thread if invoked from the thread destructor.\n  367: * win32_threads.c (GC_register_my_thread): Likewise.\n  368  * win32_threads.c (GC_unregister_my_thread): Don't delete the\n  369  thread (just set FINISHED) if the thread is not detached (only if\n  ...\n  387  if GC_EXPLICIT_SIGNALS_UNBLOCK).\n  388  * pthread_support.c (GC_unblock_gc_signals): New prototype.\n  389: * pthread_support.c (GC_register_my_thread_inner,\n  390: GC_register_my_thread): Call GC_unblock_gc_signals (only if\n  391  GC_EXPLICIT_SIGNALS_UNBLOCK); add comment.\n  392  * include/private/gcconfig.h (GC_EXPLICIT_SIGNALS_UNBLOCK): New\n  ...\n  450  * pthread_support.c (GC_record_stack_base): New inline function.\n  451  * win32_threads.c (GC_record_stack_base): Likewise.\n  452: * pthread_support.c (GC_register_my_thread_inner): Invoke\n  453  GC_record_stack_base.\n  454: * win32_threads.c (GC_register_my_thread_inner): Likewise.\n  455: * pthread_support.c (GC_register_my_thread): If thread is FINISHED\n  456  then call GC_record_stack_base, clear FINISHED, initialize\n  457  thread-local list and return success.\n  458: * win32_threads.c (GC_register_my_thread): Likewise.\n  459: * include/gc.h (GC_register_my_thread): Update documentation.\n  460  * include/private/thread_local_alloc.h (GC_thread_key): Likewise.\n  461  \n  ...\n  479  * pthread_support.c (GC_unregister_my_thread,\n  480  GC_thread_exit_proc): Use GC_unregister_my_thread_inner.\n  481: * win32_threads.c (GC_register_my_thread, GC_unregister_my_thread,\n  482  GC_do_blocking_inner): Rename \"t\" local variable to \"thread_id\".\n  483  * win32_threads.c (GC_wait_marker, GC_notify_all_marker): Rename\n  ...\n  489  * pthread_support.c (GC_unregister_my_thread): Add debug output.\n  490  * win32_threads.c (GC_unregister_my_thread): Likewise.\n  491: * pthread_support.c (GC_register_my_thread,\n  492  GC_start_rtn_prepare_thread): Rename \"my_pthread\" local variable\n  493  to \"self\".\n  ...\n  501  * include/private/gc_priv.h (GC_I_HIDE_POINTERS): Likewise.\n  502  \n  503: * include/gc.h (GC_register_my_thread): Refine the comment.\n  504  \n  505  * include/gc_inline.h (GC_MALLOC_WORDS, GC_CONS): Add missing\n  ...\n  917  * win32_threads.c (DEBUG_CYGWIN_THREADS, DEBUG_WIN32_PTHREADS,\n  918  DEBUG_WIN32_THREADS): Remove.\n  919: * win32_threads.c (GC_register_my_thread_inner,\n  920  GC_win32_start_inner): Use GC_log_printf instead of GC_printf\n  921  inside \"if (GC_print_stats)\" branch.\n  ...\n  965  * pthread_stop_world.c (GC_print_sig_mask, GC_push_all_stacks,\n  966  GC_stop_world, GC_stop_init): Likewise.\n  967: * pthread_support.c (GC_thr_init, GC_register_my_thread_inner,\n  968  GC_start_routine): Likewise.\n  969: * win32_threads.c (GC_register_my_thread_inner,\n  970  GC_push_all_stacks, GC_win32_start_inner, GC_pthread_join,\n  971  GC_pthread_start_inner): Likewise.\n  ...\n 1461  PROTECT, GC_write_fault_handler, GC_mprotect_thread): Likewise.\n 1462  * pthread_stop_world.c (GC_start_world): Likewise.\n 1463: * win32_threads.c (GC_register_my_thread_inner): Likewise.\n 1464  * os_dep.c (GC_get_main_stack_base, GC_register_data_segments,\n 1465  GC_dirty_init): Remove redundant print of an error message before\n ....\n 1580  * darwin_stop_world.c (GC_push_all_stacks): Fix \"my_task\" local\n 1581  variable initialization (always call current_task()).\n 1582: * pthread_support.c (GC_thr_init, GC_register_my_thread_inner):\n 1583  Don't set thread's stop_info.stack_ptr value for Darwin.\n 1584  * include/private/darwin_stop_world.h (thread_stop_info): Update\n ....\n 1656  remove commented out GC_push_one statements.\n 1657  * pthread_support.c (GC_thr_init, GC_do_blocking_inner,\n 1658: GC_call_with_gc_active, GC_register_my_thread_inner): Initialize\n 1659  stack_ptr field for all platforms.\n 1660  * pthread_support.c (GC_call_with_gc_active): Initialize\n ....\n 1700  * include/gc.h (GC_parallel, GC_get_parallel,\n 1701  GC_get_suspend_signal, GC_allow_register_threads,\n 1702: GC_register_my_thread, GC_unregister_my_thread): Define only if\n 1703  GC_THREADS.\n 1704  * include/gc.h (GC_get_heap_size): Fix a typo in a comment.\n ....\n 2049  GC_wait_for_gc_completion, GC_init_parallel, GC_do_blocking_inner,\n 2050  GC_call_with_gc_active, GC_unregister_my_thread, pthread_join,\n 2051: pthread_detach, GC_register_my_thread, GC_inner_start_routine,\n 2052  pthread_create): Likewise.\n 2053  * reclaim.c (GC_print_all_errors): Likewise.\n 2054: * win32_threads.c (GC_is_thread_tsd_valid, GC_register_my_thread,\n 2055  GC_unregister_my_thread, GC_do_blocking_inner,\n 2056  GC_call_with_gc_active, GC_lookup_pthread, GC_pthread_join,\n ....\n 2089  VC++ compilers.\n 2090  \n 2091: * win32_threads.c (GC_register_my_thread_inner,\n 2092  GC_pthread_start_inner): Undo the previous commit changes for\n 2093  the thread flags and DETACHED state (since the state is only\n ....\n 2103  * tests/test.c (check_heap_stats): Test the main thread\n 2104  unregistering (only if THREADS).\n 2105: * win32_threads.c (GC_register_my_thread_inner): Set flags to\n 2106  DETACHED (only if GC_PTHREADS).\n 2107  * win32_threads.c (GC_unregister_my_thread): Add FIXME (for\n ....\n 2889  * typd_mlc.c (GC_push_typed_structures_proc): Likewise.\n 2890  * win32_threads.c (GC_win32_dll_threads,\n 2891: GC_register_my_thread_inner, GC_lookup_pthread, GC_get_stack_min,\n 2892  GC_waitForSingleObjectInfinite): Likewise.\n 2893  * darwin_stop_world.c (GC_use_mach_handler_thread,\n ....\n 3030  and GC_gcollect()).\n 3031  \n 3032: * include/gc.h (GC_allow_register_threads, GC_register_my_thread,\n 3033  GC_unregister_my_thread, GC_malloc_many): Refine the comment.\n 3034  * include/gc.h (GC_malloc_many, GC_NEXT): Declare unconditionally\n ....\n 3921  for WinCE (since thread Id is used as a \"real\" thread handle).\n 3922  * win32_threads.c (THREAD_HANDLE): New macro.\n 3923: * win32_threads.c (GC_register_my_thread_inner): Don't recognize\n 3924  DONT_IMPORT_GETCURTHREAD anymore; don't record thread handle on\n 3925  WinCE.\n ....\n 4108  GC_debug_gcj_malloc, GC_gcj_malloc_ignore_off_page): Likewise.\n 4109  * include/gc.h (GC_try_to_collect): Update the comment.\n 4110: * include/gc.h (GC_size, GC_register_my_thread): Add const\n 4111  qualifier for the argument referent.\n 4112  * misc.c (GC_size): Likewise.\n 4113: * pthread_support.c (GC_register_my_thread_inner,\n 4114: GC_register_my_thread): Likewise.\n 4115: * win32_threads.c (GC_register_my_thread_inner,\n 4116: GC_register_my_thread): Likewise.\n 4117  * include/gc.h (GC_INIT_CONF_ROOTS): New macro for internal use\n 4118  (define instead of GC_INIT() for Cygwin and AIX).\n ....\n 4272  * Makefile.direct (GC_NO_DLLMAIN, DONT_IMPORT_GETCURTHREAD): Add\n 4273  the comments for.\n 4274: * win32_threads.c (GC_register_my_thread_inner): Recognize\n 4275  DONT_IMPORT_GETCURTHREAD macro.\n 4276  * win32_threads.c: Recognize GC_NO_DLLMAIN macro (to exclude\n ....\n 4281  ABORT message.\n 4282  * win32_threads.c (GC_use_DllMain,\n 4283: GC_started_thread_while_stopped, GC_register_my_thread_inner,\n 4284  GC_lookup_thread_inner, GC_delete_gc_thread,\n 4285  GC_allow_register_threads, GC_lookup_pthread,\n ....\n 4462  * win32_threads.c (GC_allow_register_threads): Likewise.\n 4463  * include/gc.h (GC_allow_register_threads): New API prototype.\n 4464: * include/gc.h (GC_register_my_thread, GC_unregister_my_thread):\n 4465  Update the comments.\n 4466: * pthread_support.c (GC_register_my_thread): Check the collector\n 4467  is in the multi-threaded mode.\n 4468: * win32_threads.c (GC_register_my_thread): Likewise.\n 4469  \n 4470  * finalize.c (GC_finalize_all): Always call GC_invoke_finalizers\n ....\n 4518  \n 4519  * pthread_support.c (GC_inner_start_routine): Don't release the\n 4520: GC lock between GC_register_my_thread_inner() and\n 4521  GC_init_thread_local() calls (post the \"registered\" even after\n 4522  calling GC_init_thread_local()).\n 4523: * win32_threads.c (GC_register_my_thread, GC_unregister_my_thread):\n 4524  Use GC_lookup_thread_inner() instead of GC_lookup_thread() and\n 4525  acquire the GC lock only once.\n 4526: * win32_threads.c (GC_thr_init): Call GC_register_my_thread_inner()\n 4527: directly instead of GC_register_my_thread() since I_HOLD_LOCK\n 4528  and our (main) thread is not registered yet (add assertion for it).\n 4529  * win32_threads.c (GC_init_parallel): Call GC_lookup_thread_inner()\n ....\n 4607  * win32_threads.c (GC_Thread_Rep): Add backing_store_end and\n 4608  backing_store_ptr fields for IA64 support.\n 4609: * win32_threads.c (GC_register_my_thread_inner): Set\n 4610  backing_store_end field to reg_base value for IA64 (same as in\n 4611  pthread_support.c).\n ....\n 4722  * pthread_support.c (GC_thr_init): Treat incorrect \"GC_markers\"\n 4723  values as one.\n 4724: * pthread_support.c (GC_register_my_thread_inner): Add a check for\n 4725  \"stack_end\" is non-NULL (the same as in win32_threads.c).\n 4726  * pthread_support.c (pthread_create): Call GC_oom_fn before giving up\n ....\n 5039  \n 5040  * doc/gcinterface.html: Improve REDIRECT_MALLOC documentation.\n 5041: * include/gc.h (GC_register_my_thread): Improve comment.\n 5042  \n 5043  * Makefile.direct: Add comment for -DCHECKSUMS.\n ....\n 5163  (GC_header_cache_miss): Always blacklist pointers for free\n 5164  hblks.  Add assertion and comment.\n 5165: * pthread_support.c (GC_register_my_thread): Fix #if indentation.\n 5166  * include/private/gc_hdrs.h: USE_HDR_CACHE is no longer tested.\n 5167  Delete it.\n ....\n 5225  implementations.  (GC_get_stack_base): Add pthread_attr_destroy\n 5226  call.  No longer set GC_old_bus_handler in DARWIN workaround.\n 5227: * pthread_support.c: GC_register_my_thread must also\n 5228  call GC_init_thread_local.\n 5229  \n ....\n 5307  defined.  (GC_call_with_stack_base): Add GC_API.\n 5308  * os_dep.c (GC_get_stack_base): Add GC_API.\n 5309: * win32_threads.c: (GC_register_my_thread, GC_unregister_my_thread):\n 5310  Add GC_API.\n 5311  * include/gc.h: Add GC_API annotations.\n ....\n 5884  Untested.\n 5885  * Use thread-local allocation code by default.\n 5886: * Added GC_register_my_thread and friends for Posix and win32.\n 5887  * Patch for GWW_VDB from Ben Hutchings.\n 5888  * Removed explicit THREAD_LOCAL_ALLOC tests, since that now always\n\nC:\\Users\\Artminer\\Documents\\Visual Studio 2012\\Projects\\yolk\\src\\libs\\bdwgc\\pthread_support.c:\n 1471      me -> stack_end = sb -> mem_base;\n 1472      if (me -> stack_end == NULL)\n 1473:       ABORT(\"Bad stack base in GC_register_my_thread\");\n 1474  #   ifdef IA64\n 1475        me -> backing_store_end = sb -> reg_base;\n ....\n 1477  }\n 1478  \n 1479: STATIC GC_thread GC_register_my_thread_inner(const struct GC_stack_base *sb,\n 1480                                               pthread_t my_pthread)\n 1481  {\n ....\n 1507  }\n 1508  \n 1509: GC_API int GC_CALL GC_register_my_thread(const struct GC_stack_base *sb)\n 1510  {\n 1511      pthread_t self = pthread_self();\n ....\n 1519      me = GC_lookup_thread(self);\n 1520      if (0 == me) {\n 1521:         me = GC_register_my_thread_inner(sb, self);\n 1522          me -> flags |= DETACHED;\n 1523            /* Treat as detached, since we do not need to worry about     */\n ....\n 1574  #   endif\n 1575      LOCK();\n 1576:     me = GC_register_my_thread_inner(sb, self);\n 1577      me -> flags = si -> flags;\n 1578  #   if defined(THREAD_LOCAL_ALLOC)\n\nC:\\Users\\Artminer\\Documents\\Visual Studio 2012\\Projects\\yolk\\src\\libs\\bdwgc\\win32_threads.c:\n  371  # endif\n  372    if (me -> stack_base == NULL)\n  373:     ABORT(\"Bad stack base in GC_register_my_thread\");\n  374  }\n  375  \n  ...\n  379  /* added.  If GC_win32_dll_threads is not set, we already hold the      */\n  380  /* allocation lock except possibly during single-threaded startup code. */\n  381: STATIC GC_thread GC_register_my_thread_inner(const struct GC_stack_base *sb,\n  382                                               DWORD thread_id)\n  383  {\n  ...\n  726  }\n  727  \n  728: GC_API int GC_CALL GC_register_my_thread(const struct GC_stack_base *sb)\n  729  {\n  730    GC_thread me;\n  ...\n  740    if (me == 0) {\n  741  #   ifdef GC_PTHREADS\n  742:       me = GC_register_my_thread_inner(sb, thread_id);\n  743        me -> flags |= DETACHED;\n  744            /* Treat as detached, since we do not need to worry about     */\n  745            /* pointer results.                                           */\n  746  #   else\n  747:       GC_register_my_thread_inner(sb, thread_id);\n  748  #   endif\n  749      UNLOCK();\n  ...\n 2156      LPVOID param = ((thread_args *)arg)->param;\n 2157  \n 2158:     GC_register_my_thread(sb); /* This waits for an in-progress GC.     */\n 2159  \n 2160  #   ifdef DEBUG_THREADS\n ....\n 2486  \n 2487    GC_ASSERT(0 == GC_lookup_thread_inner(GC_main_thread));\n 2488:   GC_register_my_thread_inner(&sb, GC_main_thread);\n 2489  \n 2490  # ifdef PARALLEL_MARK\n ....\n 2612      /* We register the thread here instead of in the parent, so that    */\n 2613      /* we don't need to hold the allocation lock during pthread_create. */\n 2614:     me = GC_register_my_thread_inner(sb, thread_id);\n 2615      SET_PTHREAD_MAP_CACHE(pthread_id, thread_id);\n 2616      me -> pthread_id = pthread_id;\n ....\n 2751                          GC_get_stack_base(&sb);\n 2752              GC_ASSERT(sb_result == GC_SUCCESS);\n 2753:             GC_register_my_thread_inner(&sb, thread_id);\n 2754  #         endif\n 2755          } /* o.w. we already did it during GC_thr_init, called by GC_init */\n\nC:\\Users\\Artminer\\Documents\\Visual Studio 2012\\Projects\\yolk\\src\\libs\\bdwgc\\include\\gc.h:\n  310                                  /* should use GC_get_stack_base(),      */\n  311                                  /* GC_call_with_gc_active() and         */\n  312:                                 /* GC_register_my_thread() instead.     */\n  313  \n  314  GC_API GC_ATTR_DEPRECATED int GC_dont_precollect;\n  ...\n 1160    GC_API int GC_CALL GC_get_thr_restart_signal(void);\n 1161  \n 1162:   /* Explicitly enable GC_register_my_thread() invocation.              */\n 1163    /* Done implicitly if a GC thread-creation function is called (or     */\n 1164    /* implicit thread registration is activated).  Otherwise, it must    */\n ....\n 1188    /* created by third-party libraries.                                  */\n 1189    /* A manually registered thread requires manual unregistering.        */\n 1190:   GC_API int GC_CALL GC_register_my_thread(const struct GC_stack_base *)\n 1191                                                          GC_ATTR_NONNULL(1);\n 1192  \n ....\n 1196  \n 1197    /* Unregister the current thread.  Only an explicitly registered      */\n 1198:   /* thread (i.e. for which GC_register_my_thread() returns GC_SUCCESS) */\n 1199    /* is allowed (and required) to call this function.  (As a special    */\n 1200    /* exception, it is also allowed to once unregister the main thread.) */\n ....\n 1401  \n 1402      /* All threads must be created using GC_CreateThread or             */\n 1403:     /* GC_beginthreadex, or must explicitly call GC_register_my_thread  */\n 1404      /* (and call GC_unregister_my_thread before thread termination), so */\n 1405      /* that they will be recorded in the thread table.  For backward    */\n\nC:\\Users\\Artminer\\Documents\\Visual Studio 2012\\Projects\\yolk\\src\\libs\\bdwgc\\tests\\threadkey_test.c:\n   51  void * GC_CALLBACK on_thread_exit_inner (struct GC_stack_base * sb, void * arg)\n   52  {\n   53:   int res = GC_register_my_thread (sb);\n   54    pthread_t t;\n   55    int creation_res;     /* Used to suppress a warning about     */\n\n69 matches across 5 files\n",
+			"settings":
+			{
+				"buffer_size": 16417,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "src/libs/bdwgc/win32_threads.c",
+			"settings":
+			{
+				"buffer_size": 102117,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/libs/bdwgc/include/gc_config_macros.h",
+			"settings":
+			{
+				"buffer_size": 13076,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -816,6 +883,7 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"GC_register_my_thread",
 			"#include \"pch.h\"",
 			"SwfParser",
 			"Zombie House Studios",
@@ -942,8 +1010,7 @@
 			"createTargetMachine",
 			"RelocModel",
 			"CMModel",
-			"setCodeModel",
-			"setOutputFormat"
+			"setCodeModel"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -993,7 +1060,7 @@
 	"groups":
 	[
 		{
-			"selected": 13,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -1027,15 +1094,15 @@
 					"file": "src/libs/bdwgc/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 8663,
+						"buffer_size": 8681,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8066,
-								8066
+								7591,
+								7573
 							]
 						],
 						"settings":
@@ -1045,7 +1112,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4412.0,
+						"translation.y": 4174.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1135,15 +1202,15 @@
 					"file": "src/libs/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 751,
+						"buffer_size": 776,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								751,
-								751
+								141,
+								141
 							]
 						],
 						"settings":
@@ -1214,15 +1281,15 @@
 					"file": "src/libs/gui/swfruntime/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 713,
+						"buffer_size": 728,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								713,
-								713
+								562,
+								562
 							]
 						],
 						"settings":
@@ -1267,15 +1334,15 @@
 					"file": "src/libs/gui/swfruntime/SwfPlayer.cpp",
 					"settings":
 					{
-						"buffer_size": 5193,
+						"buffer_size": 5357,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								831,
-								831
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1294,15 +1361,15 @@
 					"file": "src/libs/scene/resourceloader.cpp",
 					"settings":
 					{
-						"buffer_size": 11077,
+						"buffer_size": 11380,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11013,
-								11013
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1366,6 +1433,513 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "src/libs/zlib/CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 5369,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 414.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "src/libs/jpeg/CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 806,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								540,
+								540
+							]
+						],
+						"settings":
+						{
+							"auto_name": "CMakeLists.txt",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "src/libs/core/core.h",
+					"settings":
+					{
+						"buffer_size": 2863,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								815,
+								815
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 138.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "src/libs/core/core.cpp",
+					"settings":
+					{
+						"buffer_size": 4056,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2138,
+								2138
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1035.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "src/libs/bdwgc/include/gc.h",
+					"settings":
+					{
+						"buffer_size": 93368,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								71091,
+								71112
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 690.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"settings":
+					{
+						"buffer_size": 16417,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										305,
+										326
+									],
+									[
+										651,
+										672
+									],
+									[
+										916,
+										937
+									],
+									[
+										1036,
+										1057
+									],
+									[
+										1353,
+										1374
+									],
+									[
+										1389,
+										1410
+									],
+									[
+										1735,
+										1756
+									],
+									[
+										1827,
+										1848
+									],
+									[
+										1895,
+										1916
+									],
+									[
+										2078,
+										2099
+									],
+									[
+										2135,
+										2156
+									],
+									[
+										2411,
+										2432
+									],
+									[
+										2771,
+										2792
+									],
+									[
+										2988,
+										3009
+									],
+									[
+										3248,
+										3269
+									],
+									[
+										3554,
+										3575
+									],
+									[
+										3645,
+										3666
+									],
+									[
+										3943,
+										3964
+									],
+									[
+										4305,
+										4326
+									],
+									[
+										4623,
+										4644
+									],
+									[
+										4893,
+										4914
+									],
+									[
+										5216,
+										5237
+									],
+									[
+										5399,
+										5420
+									],
+									[
+										5606,
+										5627
+									],
+									[
+										5907,
+										5928
+									],
+									[
+										6180,
+										6201
+									],
+									[
+										6445,
+										6466
+									],
+									[
+										6765,
+										6786
+									],
+									[
+										7067,
+										7088
+									],
+									[
+										7210,
+										7231
+									],
+									[
+										7246,
+										7267
+									],
+									[
+										7306,
+										7327
+									],
+									[
+										7342,
+										7363
+									],
+									[
+										7633,
+										7654
+									],
+									[
+										7890,
+										7911
+									],
+									[
+										8187,
+										8208
+									],
+									[
+										8292,
+										8313
+									],
+									[
+										8400,
+										8421
+									],
+									[
+										8622,
+										8643
+									],
+									[
+										8792,
+										8813
+									],
+									[
+										8994,
+										9015
+									],
+									[
+										9051,
+										9072
+									],
+									[
+										9393,
+										9414
+									],
+									[
+										9651,
+										9672
+									],
+									[
+										9946,
+										9967
+									],
+									[
+										10192,
+										10213
+									],
+									[
+										10500,
+										10521
+									],
+									[
+										10714,
+										10735
+									],
+									[
+										10921,
+										10942
+									],
+									[
+										11316,
+										11337
+									],
+									[
+										11465,
+										11486
+									],
+									[
+										11657,
+										11678
+									],
+									[
+										11856,
+										11877
+									],
+									[
+										12075,
+										12096
+									],
+									[
+										12378,
+										12399
+									],
+									[
+										12614,
+										12635
+									],
+									[
+										12801,
+										12822
+									],
+									[
+										12964,
+										12985
+									],
+									[
+										13239,
+										13260
+									],
+									[
+										13401,
+										13422
+									],
+									[
+										13599,
+										13620
+									],
+									[
+										13872,
+										13893
+									],
+									[
+										14150,
+										14171
+									],
+									[
+										14599,
+										14620
+									],
+									[
+										14809,
+										14830
+									],
+									[
+										15223,
+										15244
+									],
+									[
+										15497,
+										15518
+									],
+									[
+										15860,
+										15881
+									],
+									[
+										16266,
+										16287
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								15502,
+								15502
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 6831.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "src/libs/bdwgc/win32_threads.c",
+					"settings":
+					{
+						"buffer_size": 102117,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								82992,
+								82992
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 27586.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"file": "src/libs/bdwgc/include/gc_config_macros.h",
+					"settings":
+					{
+						"buffer_size": 13076,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2025,
+								2041
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 207.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
