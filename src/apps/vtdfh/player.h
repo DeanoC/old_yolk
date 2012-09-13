@@ -3,6 +3,7 @@
 
 #include "core/development_context.h"
 #include "localworld/inputhandlercontext.h"
+#include "gui/swfruntime/SwfPlayer.h"
 
 namespace Scene {
 	class CylinderColShape;
@@ -42,6 +43,8 @@ private:
 	std::shared_ptr<Scene::CylinderColShape>	bodyColShape;
 	std::shared_ptr<Scene::PhysicSensor>		rangedSensor;
 	std::shared_ptr<Scene::PhysicSensor>		bodySensor;
+
+	Core::ScopedResourceHandle<Swf::SwfPlayerHandle> 		flashTest;
 
 };
 

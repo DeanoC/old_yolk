@@ -35,10 +35,6 @@ int __cdecl WinCrtReportHook(int type, char * msg, int * ret ) {
 }
 #endif
 
-#if defined(USE_GC)
-#include "private/gc_priv.h"
-#endif
-
 namespace Core 
 {
 
@@ -76,8 +72,8 @@ void Init( void ) {
 #endif 
 	DevelopmentContext::init();
 #if defined(USE_GC)
-	GC_enable_incremental();
-	GC_init();
+	//GC_enable_incremental();
+	GC_init();		
 #endif
 }
 

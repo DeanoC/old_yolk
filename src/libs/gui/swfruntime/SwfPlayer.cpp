@@ -41,6 +41,7 @@ namespace Swf
 
 	void SwfPlayer::create(const std::string& _path, float _xscale, float _yscale ){
 		paused = false;
+		Core::FilePath path(_path);
 		
 #if defined( USE_ACTIONSCRIPT )
 		SwfFrameItem::s_asPropertyStringMap.clear();
@@ -68,13 +69,12 @@ namespace Swf
 		SwfFrameItem::s_asPropertyStringMap["_quality"] = 19;
 		SwfFrameItem::s_asPropertyStringMap["_xmouse"] = 20;
 		SwfFrameItem::s_asPropertyStringMap["_ymouse"] = 21;
-		
-		Core::FilePath path(_path);
 		virtualMachine = CORE_NEW AsVM( path.BaseName().RemoveExtension().value() );		
 #endif
+		
 
 		parser = CORE_NEW Parser();
-		parser->Parse(_path);
+		parser->Parse( path.ReplaceExtension(".swf").value() );
 		
 		rootClip = SwfMovieClip::CreateRoot(this, parser->frameList );
 		gradientTextureManager = CORE_NEW SwfGradientTextureManager();

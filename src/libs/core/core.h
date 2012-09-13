@@ -64,6 +64,14 @@
 #define USE_CPP_EXCEPTIONS
 
 #define GC_NOT_DLL
+#if defined( USE_GC )
+#	define GC_OPERATOR_NEW_ARRAY
+#	define GC_NAME_CONFLICT
+#	define GC_THREADS
+//#	define PARALLEL_MARK
+//#	define THREAD_LOCAL_ALLOC
+#	include "gc_cpp.h"
+#endif
 
 //#define USE_GC
 #include "memory.h"

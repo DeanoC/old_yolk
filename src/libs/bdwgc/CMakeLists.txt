@@ -52,7 +52,7 @@ SET(SRC alloc.c reclaim.c allchblk.c misc.c mach_dep.c os_dep.c
         typd_mlc.c ptr_chck.c gc_cpp.cc mallocx.c checksums.c
         thread_local_alloc.c)
 SET(LIBS)
-OPTION(enable_threads "TODO" NO)
+OPTION(enable_threads "TODO" YES)
 IF(enable_threads)
         FIND_PACKAGE(Threads REQUIRED)
         MESSAGE("Thread Model: ${CMAKE_THREAD_LIBS_INIT}" )
@@ -190,6 +190,7 @@ IF(CMAKE_USE_PTHREADS_INIT)
 ENDIF(CMAKE_USE_PTHREADS_INIT)
 
 IF(CMAKE_USE_WIN32_THREADS_INIT)
+MESSAGE("BLASH")
         ADD_DEFINITIONS("-DGC_THREADS")
         #win32_threads=true   TODO
         IF (${enable_parallel_mark})

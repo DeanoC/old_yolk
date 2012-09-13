@@ -53,7 +53,7 @@ namespace Swf {
 		GenerateShapeGpuData(_runShape);
     }
 
-	SwfRuntimeFont* SwfRuntimeBuilder::LoadSpecialFont(std::string _path) {
+	SwfRuntimeFont* SwfRuntimeBuilder::LoadSpecialFont( std::string _path ) {
 		Parser* fontParser = CORE_NEW Parser();
 		fontParser->Parse(_path);
 
@@ -77,12 +77,12 @@ namespace Swf {
 
 	SwfRuntimeFont* SwfRuntimeBuilder::GetStockFont( STOCK_FONT _font ){
 		switch( _font ){
+			case SERIF:
+//				return LoadSpecialFont( player->getStockPath() + "/_serif.swf" );
+			case TYPEWRITER:
+//				return LoadSpecialFont( player->getStockPath() + "/_typewriter.swf" );
 			case SANS:
 				return LoadSpecialFont( player->getStockPath() + "/_sans.swf" );
-			case SERIF:
-				return LoadSpecialFont( player->getStockPath() + "/_serif.swf" );
-			case TYPEWRITER:
-				return LoadSpecialFont( player->getStockPath() + "/_typewriter.swf" );
 			default:
 				return NULL;
 		}

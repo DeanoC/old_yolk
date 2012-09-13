@@ -16,8 +16,10 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	playerTransform( transformMatrix ),
 	freeControl( false ) {
 
-	namespace arg = std::placeholders;
+	flashTest.reset( Swf::SwfPlayerHandle::load( "test1" ) );
+	flashTest.acquire();
 
+	namespace arg = std::placeholders;
 	myThingy.reset( ThingFactory::createEmptyThing( TBC_PLAYER ) );
 
 	Core::AABB aabb( Math::Vector3( -10, 0, -10 ), Math::Vector3( 10, 2, 10 ) );
