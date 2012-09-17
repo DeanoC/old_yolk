@@ -36,6 +36,7 @@ uint32_t GetOffsetFromProgram( const char* block, const Scene::Program* prg, con
 }
 
 }
+
 namespace Scene {
 
 void ProgramMan::initDefaultPrograms() {

@@ -74,10 +74,10 @@ Scene::VertexInput* VertexInput::internalCreate( const Scene::VertexInput::Creat
 		default:			CORE_ASSERT( false && "Inknown vertex type" );
 		}
 
-		CORE_ASSERT( creation->data[i].buffer != NULL );
-		if( !vi->streamBuffers[creation->data[i].stream] ) {
-			vi->streamBuffers[creation->data[i].stream ] = creation->data[i].buffer;
+		if( (creation->data[i].buffer != NULL) && !vi->streamBuffers[creation->data[i].stream] ) {
+			vi->streamBuffers[ creation->data[i].stream ] = creation->data[i].buffer;
 		}
+
 		vi->streamCount = Math::Max( vi->streamCount, (int) creation->data[i].stream + 1 );
 		if( creation->data[i].stride == VI_AUTO_STRIDE ) {
 			vi->streamStrides[ creation->data[i].stream ] += getElementSize( creation->elements[i] );

@@ -9,4 +9,4 @@ ADD_MSVC_PRECOMPILED_HEADER( "swfparser.h" "${cpp_src_files}" )
 add_library( swfparser STATIC ${src_files} ${header_files} )
 
 # make a nice hierachy
-set_target_properties( swfparser PROPERTIES FOLDER "Libs")
+set_target_properties( swfparser PROPERTIES FOLDER "Gui/Libs")

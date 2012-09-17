@@ -12,8 +12,8 @@
 #include "AsObject.h"
 
 namespace Swf {
-	class SwfMovieClip;
-	class SwfFrameItem;
+	class MovieClip;
+	class FrameItem;
 	
 	namespace CodeGen { class AsFuncBase; }
 	
@@ -35,13 +35,13 @@ namespace Swf {
 			void Reset();
 		
 			// Set the target to the specified item
-			void SetTarget( SwfFrameItem* _target) {
+			void SetTarget( FrameItem* _target) {
 				target = _target;
 				origTarget = _target;
 			}
 			
 			// Set the root clip
-			void SetRoot( SwfMovieClip* _root );
+			void SetRoot( MovieClip* _root );
 			
 			// set the target to frame X
 			void GotoFrame( uint16_t _frame );
@@ -213,16 +213,16 @@ namespace Swf {
 			
 			bool EqualEcma262_11_9_3(AsObjectHandle _x, AsObjectHandle _y);			
 			
-			SwfFrameItem* FindTarget(const std::string& _path);
+			FrameItem* FindTarget(const std::string& _path);
 			
 			typedef Core::gctraceablestack<AsObjectHandle> AsStack;
 			typedef Core::gctraceablemap<std::string, AsObjectHandle> AsLocals;
 			
 			AsStack					stack;
 			AsLocals				locals;
-			SwfFrameItem*			target;
-			SwfFrameItem*			origTarget;
-			SwfMovieClip*			root;
+			FrameItem*				target;
+			FrameItem*				origTarget;
+			MovieClip*				root;
 			AsObjectFactory*		objectFactory;
 			bool 					isCaseSensitive;
 			

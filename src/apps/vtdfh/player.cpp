@@ -15,11 +15,13 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	localPlayerNum( _localPlayerNum ), 
 	playerTransform( transformMatrix ),
 	freeControl( false ) {
-
-	flashTest.reset( Swf::SwfPlayerHandle::load( "test1" ) );
-	flashTest.acquire();
-
 	namespace arg = std::placeholders;
+
+	flashTest.reset( Swf::PlayerHandle::load( "test1" ) );
+	auto fl = flashTest.acquire();
+	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1 );
+	world->addRenderable2D( std::make_shared<std::function< void (Scene::RenderContext*)>>(r2d) );
+
 	myThingy.reset( ThingFactory::createEmptyThing( TBC_PLAYER ) );
 
 	Core::AABB aabb( Math::Vector3( -10, 0, -10 ), Math::Vector3( 10, 2, 10 ) );
@@ -95,6 +97,9 @@ bool Player::findHeightBelow( float& height ) {
 
 void Player::update( float timeMS ) {
 	InputFrame input;
+
+	auto fl = flashTest.acquire();
+	fl->advance( timeMS * 1000.0f );
 
 	if( inputContext->dequeueInputFrame( &input ) ) {
 		if( input.pad[0].debugButton1 ) {
@@ -211,5 +216,11 @@ void Player::debugCallback( void ) {
 			}
 		}
 	}
+
+}
+
+void Player::renderable2DCallback( Scene::RenderContext* _ctx ) {
+	auto fl = flashTest.acquire();
+	fl->display( _ctx );
 
 }

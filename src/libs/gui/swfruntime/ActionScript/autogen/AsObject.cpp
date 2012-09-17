@@ -6,14 +6,13 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-
+#include <sstream>
 #include "gui/swfruntime/swfruntime.h"
 #include "../codegen/AsFunction.h"
+#include "gui/swfruntime/utils.h"
 #include "AsObjectFunction.h"
 #include "AsAgRuntime.h"
-#include "gui/swfruntime/SwfRuntimeUtils.h"
 #include "AsObjectFactory.h"
-#include <sstream>
 #include "AsObject.h"
 
 namespace Swf {

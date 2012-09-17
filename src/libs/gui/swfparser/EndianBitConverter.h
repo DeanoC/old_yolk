@@ -21,7 +21,7 @@ namespace Swf {
 		 @result     an Object you can use to convert endianness of your data
 		 */
 		static const EndianBitConverter CreateForLittleEndian() {
-			return EndianBitConverter((CPU_ENDIANESS == CPU_LITTLE_ENDIAN));
+			return EndianBitConverter((CPU_ENDIANESS != CPU_LITTLE_ENDIAN));
 		}
 		/*!
 		 @function	 CreateForBigEndian
@@ -31,7 +31,7 @@ namespace Swf {
 		 @result     an Object you can use to convert endianness of your data
 		 */
 		static const EndianBitConverter CreateForBigEndian() {
-			return EndianBitConverter((CPU_ENDIANESS == CPU_BIG_ENDIAN));
+			return EndianBitConverter((CPU_ENDIANESS != CPU_BIG_ENDIAN));
 		}
 		
 		EndianBitConverter(const EndianBitConverter& _copy){

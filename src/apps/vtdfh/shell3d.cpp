@@ -18,6 +18,7 @@
 #include "core/development_context.h"
 #include "localworld/debugcamcontext.h"
 #include "localworld/sceneworld.h"
+#include "gui/swfruntime/swfman.h"
 #include "shell3d.h"
 
 #define START_FLAGS			(SCRF_DEBUGPRIMS | SCRF_OVERLAY)
@@ -85,6 +86,9 @@ void Shell3D::start() {
 
 	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
+
+	Swf::SwfMan::init();
+
 }
 
 void Shell3D::run() {
@@ -114,6 +118,8 @@ void Shell3D::run() {
 void Shell3D::end() {
 	using namespace Core;
 	using namespace Scene;
+
+	Swf::SwfMan::shutdown();
 
 	renderer->destroyScreen( screen );
 	screen = nullptr;

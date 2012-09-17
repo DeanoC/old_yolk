@@ -10,9 +10,9 @@
 #include "core/fileio.h"
 #include <zlib.h>
 
-//extern "C" {
-//#include "jpeglib.h"
-//}
+extern "C" {
+	#include "jpeglib.h"
+}
 
 #endif
 

@@ -53,7 +53,9 @@ namespace Dx11 {
 		virtual void bind( const Scene::RasteriserStatePtr& rasteriser ) override;
 		virtual void bind( const Scene::VertexInputPtr& vertexInput ) override;
 
-		virtual void bindIndexBuffer( const Scene::DataBufferPtr& ib, int indexBytes ) override;
+		virtual void bindCB( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& sampler ) override;
+		virtual void bindVB( const unsigned int _stream, const Scene::DataBufferPtr& vb, const unsigned int _stride, const unsigned int _offset = 0 ) override;
+		virtual void bindIB( const Scene::DataBufferPtr& ib, const unsigned int _stride ) override;
 
 		virtual void clear( const Scene::ViewPtr& target ) override;
 		virtual void clear( const Scene::TexturePtr& target, const Core::Colour& colour ) override;

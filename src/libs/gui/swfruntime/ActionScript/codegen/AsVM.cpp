@@ -10,7 +10,7 @@
 #include "gui/swfruntime/swfruntime.h"
 #include "gui/SwfParser/EndianBitConverter.h"
 #include "gui/SwfParser/SwfActionByteCode.h"
-#include "gui/SwfRuntime/SwfMovieClip.h"
+#include "gui/swfruntime/movieclip.h"
 #include "AsFunction.h"
 #include "../AsByteCode.h"
 #include "../autogen/AsAgRuntime.h"
@@ -96,7 +96,7 @@ namespace Swf {
 //			LOG(INFO) << "} // end AutoGen\n} // end Swf\n";			
 		}
 		
-		static std::string GetUniqueName( const SwfFrameItem* _fi ) {
+		static std::string GetUniqueName( const FrameItem* _fi ) {
 			if( _fi->name.empty() ) {
 				std::ostringstream stream;
 				stream << "ID" << _fi->id;
@@ -135,10 +135,10 @@ namespace Swf {
 			return func;
 		}
 				
-		void AsVM::ProcessByteCode( SwfMovieClip* _movieClip, SwfActionByteCode* byteCode ) {
+		void AsVM::ProcessByteCode( MovieClip* _movieClip, SwfActionByteCode* byteCode ) {
 			
 			std::ostringstream stream;
-			stream << GetUniqueName(_movieClip) << "_" << _movieClip->GetCurrentFrameNumber();
+			stream << GetUniqueName(_movieClip) << "_" << _movieClip->getCurrentFrameNumber();
 			
 #if defined(AS_PREVIEW)
 			g_AsAgRuntime->Reset();

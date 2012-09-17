@@ -15,8 +15,8 @@ namespace Swf
 {
 	// forward decl
 	class SwfActionByteCode;
-	class SwfMovieClip;
 	class SwfFrame;
+	class MovieClip;
 	class EndianBitConverter;
 	namespace AutoGen { class AsAgRuntime; }
 
@@ -29,7 +29,7 @@ namespace Swf
 			AsVM ( const std::string& _name );
 			virtual ~AsVM ();
 
-			void ProcessByteCode( SwfMovieClip* _movieClip, SwfActionByteCode* byteCode );
+			void ProcessByteCode( MovieClip* _movieClip, SwfActionByteCode* byteCode );
 			
 		private:						
 			AsFunctionBuilder* ProcessFunctionByteCode( const std::string& _name, 

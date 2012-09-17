@@ -10,9 +10,9 @@
 #include "gui/swfruntime/swfruntime.h"
 #include "gui/SwfParser/parser.h"
 #include "../codegen/AsFunction.h"
-#include "../../SwfMovieClip.h"
-#include "../../SwfRuntimeUtils.h"
-#include "../../SwfPlayer.h"
+#include "../../movieclip.h"
+#include "../../utils.h"
+#include "../../player.h"
 #include "../aslib/AsDate.h"
 #include "../aslib/AsArray.h"
 #include "AsObjectFactory.h"
@@ -76,9 +76,9 @@ namespace Swf {
 			
 //			locals.clear();
 		}
-		void AsAgRuntime::SetRoot( SwfMovieClip* _root ) {
+		void AsAgRuntime::SetRoot( MovieClip* _root ) {
 			root = _root;
-			isCaseSensitive = root->GetPlayer()->parser->fileVersion >= 7;
+			isCaseSensitive = root->getPlayer()->parser->fileVersion >= 7;
 		}		
       static std::string s_targetseperators = "\\/";
       bool IsTargetAbsolute(const std::string& _path) {
@@ -87,17 +87,17 @@ namespace Swf {
 			else
 				return false;
 		}
-		SwfFrameItem* AsAgRuntime::FindTarget(const std::string& _path) {
+		FrameItem* AsAgRuntime::FindTarget(const std::string& _path) {
 			if ( _path.empty() )
 				return origTarget;
 
 			std::vector<std::string> path;
 			Tokenize( _path, path, s_targetseperators );
 			if (IsTargetAbsolute(_path)) {
-				return root->FindTarget(path, 0);
+				return root->findTarget(path, 0);
 			} else {
-				if( target->GetAsMovieClip() != NULL ) {
-					return target->GetAsMovieClip()->FindTarget(path, 0);
+				if( target->getAsMovieClip() != NULL ) {
+					return target->getAsMovieClip()->findTarget(path, 0);
 				} else {
 					return target;
 				}
@@ -222,42 +222,42 @@ namespace Swf {
 		}
 		void AsAgRuntime::Play() {
 			if(target && target->type == FIT_MOVIECLIP ) {
-				SwfMovieClip* mc = (SwfMovieClip*) target;
-				mc->Play();	
+				MovieClip* mc = (MovieClip*) target;
+				mc->play();	
 			}
 		}
 		void AsAgRuntime::Stop() {
 			if(target && target->type == FIT_MOVIECLIP ) {
-				SwfMovieClip* mc = (SwfMovieClip*) target;
-				mc->Stop();	
+				MovieClip* mc = (MovieClip*) target;
+				mc->stop();	
 			}
 		}
 		void AsAgRuntime::NextFrame() {
 			if(target && target->type == FIT_MOVIECLIP ) {
-				SwfMovieClip* mc = (SwfMovieClip*) target;
-				mc->NextFrame();
-				mc->Stop();	
+				MovieClip* mc = (MovieClip*) target;
+				mc->nextFrame();
+				mc->stop();	
 			}
 		}
 		void AsAgRuntime::PrevFrame() {
 			if(target && target->type == FIT_MOVIECLIP ) {
-				SwfMovieClip* mc = (SwfMovieClip*) target;
-				mc->PrevFrame();
-				mc->Stop();	
+				MovieClip* mc = (MovieClip*) target;
+				mc->prevFrame();
+				mc->stop();	
 			}
 		}
 		
 		void AsAgRuntime::GotoFrame( uint16_t _frame ) {
 			if(target && target->type == FIT_MOVIECLIP ) {
-				SwfMovieClip* mc = (SwfMovieClip*) target;
-				mc->GotoFrame( _frame );
+				MovieClip* mc = (MovieClip*) target;
+				mc->gotoFrame( _frame );
 			}
 		}
 
 		void AsAgRuntime::GotoFrame( const AsObjectHandle& _frame ) {
 			if(target && target->type == FIT_MOVIECLIP ) {
-				SwfMovieClip* mc = (SwfMovieClip*) target;
-				mc->GotoFrame( _frame->ToInteger() );
+				MovieClip* mc = (MovieClip*) target;
+				mc->gotoFrame( _frame->ToInteger() );
 			}
 		}
 		
@@ -411,15 +411,15 @@ namespace Swf {
 		void AsAgRuntime::GetProperty(){
 			int index = AsPop()->ToInteger();
 			std::string targstr = AsPop()->ToString();
-			SwfFrameItem* targ = FindTarget(targstr);
-			Push( targ->GetProperty(index) );
+			FrameItem* targ = FindTarget(targstr);
+			Push( targ->getProperty(index) );
 		}
 		void AsAgRuntime::SetProperty(){
 			AsObjectHandle oval = AsPop();
 			int index = AsPop()->ToInteger();
 			std::string targstr = AsPop()->ToString();
-			SwfFrameItem* targ = FindTarget(targstr);
-			targ->SetProperty(index, oval);
+			FrameItem* targ = FindTarget(targstr);
+			targ->setProperty(index, oval);
 		}
 		void AsAgRuntime::Trace() {
 			std::string str = AsPop()->ToString();
@@ -442,7 +442,7 @@ namespace Swf {
 		}
 		void AsAgRuntime::SetTarget2() {
 			std::string targ = AsPop()->ToString();
-			SwfFrameItem* obj = FindTarget(targ);
+			FrameItem* obj = FindTarget(targ);
 			if(obj)
 				target = obj; 
 		}

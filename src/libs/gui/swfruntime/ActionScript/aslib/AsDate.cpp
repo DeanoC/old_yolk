@@ -6,13 +6,12 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-
+#include <time.h>
 #include "gui/swfruntime/swfruntime.h"
+#include "gui/swfruntime/utils.h"
 #include "../autogen/AsObjectFactory.h"
 #include "../autogen/AsAgRuntime.h"
 #include "../autogen/AsObjectFunction.h"
-#include "gui/SwfRuntime/SwfRuntimeUtils.h"
-#include <time.h>
 #include "AsDate.h"
 
 namespace Swf {

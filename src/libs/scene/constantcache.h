@@ -11,7 +11,6 @@
 #include "core/vector_math.h"
 #include "scene/databuffer.h"
 #include "scene/program.h"
-//#include "cl/buffer.h"
 #include "scene/camera.h"
 
 namespace Scene {
@@ -93,6 +92,10 @@ namespace Scene {
 		// change object passed int previous WVP and new world matrix
 		void changeObject(	const Math::Matrix4x4& prevWVPMatrix = Math::IdentityMatrix(),
 							const Math::Matrix4x4& worldMatrix  = Math::IdentityMatrix() );
+
+		void changeWorldMatrix( const Math::Matrix4x4& worldMatrix  = Math::IdentityMatrix() );
+		void changeViewMatrix( const Math::Matrix4x4& viewMatrix  = Math::IdentityMatrix() );
+		void changeProjectionMatrix( const Math::Matrix4x4& projMatrix  = Math::IdentityMatrix() );
 
 		// set the camera currently used by the renderer
 		void setCamera( const Scene::CameraPtr& _camera );

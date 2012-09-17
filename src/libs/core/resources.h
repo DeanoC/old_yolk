@@ -52,6 +52,13 @@ public:
 	static ThisConstType* create( const char* _name, const struct ResourceClass::CreationInfo* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE ) {
 	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name, _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
 	}
+	static ThisConstType* load( const std::string& _name, const struct ResourceClass::CreationInfo* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE) {
+	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name.c_str(), _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_LOADOFFDISK ) );
+	}
+
+	static ThisConstType* create( const std::string& _name, const struct ResourceClass::CreationInfo* _data = NULL, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE ) {
+	  return static_cast<ThisConstType*>( Core::ResourceMan::get()->loadCreateResource<Type>( _name.c_str(), _data, sizeof(*_data), _flags | forcedCreateFlags | Core::RMRF_INMEMORYCREATE ) );
+	}
 
 	static void flush( const char* _name, Core::RESOURCE_FLAGS _flags = Core::RMRF_NONE ) {
 	  Core::ResourceMan::get()->flushResource<Type>( _name, _flags );
@@ -94,6 +101,10 @@ public:
 		} else {
 			this->reset( NULL );
 		}
+		return *this;
+	}
+	ScopedResourceHandle& operator= ( const arh* _handle ) {
+		this->reset( _handle );
 		return *this;
 	}
 

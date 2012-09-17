@@ -66,6 +66,16 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	);
 	static const std::string tfcTargetName = "VtPipe_TransFragmentCount";
 	tfcHandle.reset( TextureHandle::create( tfcTargetName.c_str(), &tfscs ) );
+
+	Texture::CreationInfo c2dcs = Texture::TextureCtor(
+			RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_PRG_READ,
+			GTF_RGBA8,
+			FIXED_WIDTH, FIXED_HEIGHT, 1, 1, 1, NUM_MSAA_SAMPLES
+		);
+	static const std::string col2dTargetName = "VtPipe_Colour2DTarget";
+	colour2DTargetHandle.reset( TextureHandle::create( col2dTargetName.c_str(), &c2dcs ) );
+
+
 	// transparent fragments as opaque + depth and coverage count
 	DataBuffer::CreationInfo tfdcs = Resource::BufferCtor(
 		RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_OUT_UNORDERED_ACCESS,
@@ -78,7 +88,7 @@ VtPipeline::VtPipeline( ) : gpuMaterialStoreOk( false ), gpuLightStoreOk( false 
 	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
 	depthStencilNoWriteStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Less_NoWrite" ) );
 	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
-	rasterStateNoMSHandle.reset( RasteriserStateHandle::create( "_RS_Normal_NoMS_NoCull" ) );
+	rasterStateNoCullHandle.reset( RasteriserStateHandle::create( "_RS_Normal_NoCull" ) );
 	renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll" ) );
 
 	RenderTargetStates::CreationInfo aartci = {
@@ -165,44 +175,6 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 	}
 }
 
-void VtPipeline::unbind( Scene::RenderContext* ctx ) {
-	ctx->unbindTexture( Scene::ST_FRAGMENT, 0, 12 );
-
-	// light
-	{
-		auto prg = lightingProgramHandle.acquire();
-		auto ogb = gBufferMSHandle0.acquire();
-		auto tfc = tfcHandle.acquire();
-		auto db = depthTargetMSHandle.acquire();
-
-		auto tfrags = transparentFragmentsHandle.acquire();
-		auto materialStore = materialStoreHandle.acquire();
-		auto lightStore = lightStoreHandle.acquire();	
-
-		ctx->unbindRenderTargets();
-		ctx->bind( prg );
-		ctx->getConstantCache().updateGPU( ctx, prg );
-
-		Scene::TexturePtr targets[] = {
-			colourTargetHandle.acquire(),
-		};
-
-		ctx->bindUnorderedViews( 1, targets );
-		ctx->bind( Scene::ST_COMPUTE, 0, ogb );
-		ctx->bind( Scene::ST_COMPUTE, 1, tfc );
-		ctx->bind( Scene::ST_COMPUTE, 2, tfrags );
-		ctx->bind( Scene::ST_COMPUTE, 8, db );
-
-		ctx->bind( Scene::ST_COMPUTE, 10, materialStore );
-		ctx->bind( Scene::ST_COMPUTE, 11, lightStore );
-		ctx->dispatch( FIXED_WIDTH, FIXED_HEIGHT, 1 );
-		ctx->unbindUnorderedViews();
-		ctx->unbindTexture( Scene::ST_COMPUTE, 0, 12 );
-	}
-
-	ctx->popDebugMarker();
-}
-
 static enum VTPIPE_GEOMETRY_PASSES {
 	GBUFFER_RENDER_OPAQUE_PASS = 0,
 
@@ -273,7 +245,7 @@ void VtPipeline::startGeomRenderTransparentPass ( RenderContext* ctx ) {
 	Scene::TexturePtr dum[] = { gBufferMSHandle0.acquire() };
 	auto depthTarget = depthTargetMSHandle.acquire();
 	auto program = transparentProgramHandle.acquire();
-	auto rasterState = rasterStateNoMSHandle.acquire();
+	auto rasterState = rasterStateNoCullHandle.acquire();
 	auto dss = depthStencilNoWriteStateHandle.acquire();
 	auto rtw = renderTargetNoWriteHandle.acquire();
 
@@ -289,9 +261,61 @@ void VtPipeline::startGeomRenderTransparentPass ( RenderContext* ctx ) {
 }
 void VtPipeline::endGeomRenderOpaquePass( RenderContext* ctx ) {
 }
+
 void VtPipeline::endGeomRenderTransparentPass( RenderContext* ctx ) {
 }
 
+void VtPipeline::start2DPass( RenderContext* ctx ) {
+	Scene::TexturePtr tgt = colour2DTargetHandle.acquire();
+
+	ctx->clear( tgt, Core::RGBAColour(0,0,0,0) );
+	ctx->bindRenderTarget( tgt );
+
+}
+
+void VtPipeline::end2DPass( RenderContext* ctx ) {
+	ctx->unbindRenderTargets();
+}
+
+
+void VtPipeline::resolve( Scene::RenderContext* ctx ) {
+	ctx->unbindTexture( Scene::ST_FRAGMENT, 0, 12 );
+
+	// light / AA / and resolve
+	{
+		auto prg = lightingProgramHandle.acquire();
+		auto ogb = gBufferMSHandle0.acquire();
+		auto tfc = tfcHandle.acquire();
+		auto c2d = colour2DTargetHandle.acquire();
+		auto db = depthTargetMSHandle.acquire();
+
+		auto tfrags = transparentFragmentsHandle.acquire();
+		auto materialStore = materialStoreHandle.acquire();
+		auto lightStore = lightStoreHandle.acquire();	
+
+		ctx->bind( prg );
+		ctx->getConstantCache().updateGPU( ctx, prg );
+
+		Scene::TexturePtr targets[] = {
+			colourTargetHandle.acquire(),
+		};
+
+		ctx->bindUnorderedViews( 1, targets );
+		ctx->bind( Scene::ST_COMPUTE, 0, ogb );
+		ctx->bind( Scene::ST_COMPUTE, 1, tfc );
+		ctx->bind( Scene::ST_COMPUTE, 2, tfrags );
+		ctx->bind( Scene::ST_COMPUTE, 3, c2d );
+		ctx->bind( Scene::ST_COMPUTE, 8, db );
+
+		ctx->bind( Scene::ST_COMPUTE, 10, materialStore );
+		ctx->bind( Scene::ST_COMPUTE, 11, lightStore );
+		ctx->dispatch( FIXED_WIDTH, FIXED_HEIGHT, 1 );
+		ctx->unbindUnorderedViews();
+		ctx->unbindTexture( Scene::ST_COMPUTE, 0, 12 );
+	}
+
+	ctx->popDebugMarker();
+}
 
 void VtPipeline::conditionWob( Scene::Wob* wob ) {
 	using namespace Scene;
@@ -396,10 +420,9 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 	}
 }
 
-void VtPipelineDataStore::render( Scene::RenderContext* rc ) {
+void VtPipelineDataStore::render( Scene::RenderContext* ctx ) {
 
-	RenderContext* ctx = (RenderContext*) rc;
-	ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_STD_OBJECT );
+	ctx->getConstantCache().updateGPUBlock( ctx, Scene::CF_STD_OBJECT );
 
 	for( int i = 0;i < numMaterials; ++i ) {
 		const PerMaterial* mds = &materials[i];
@@ -407,14 +430,14 @@ void VtPipelineDataStore::render( Scene::RenderContext* rc ) {
 		if( !mds->isTransparent ) {
 			const uint32_t materialIndex[4] = { mds->materialIndex, mds->materialIndex, mds->materialIndex, mds->materialIndex };
 			ctx->getConstantCache().setVector( CVN_MATERIAL_INDEX, materialIndex );
-			ctx->getConstantCache().updateGPUBlock( rc, Scene::CF_PER_MATERIAL );
+			ctx->getConstantCache().updateGPUBlock( ctx, Scene::CF_PER_MATERIAL );
 
 			auto vao = mds->vaoHandle->tryAcquire();
 			if( !vao ) { /* LOG(INFO) << "vao not ready\n"; */ return; }
 			auto ib = mds->indexBuffer->tryAcquire();
 			if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 			ctx->bind( vao );
-			ctx->bindIndexBuffer( ib, mds->indexSize );
+			ctx->bindIB( ib, mds->indexSize );
 			ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
 		}
 	}
@@ -436,7 +459,7 @@ void VtPipelineDataStore::renderTransparent( Scene::RenderContext* rc ) {
 			auto ib = mds->indexBuffer->tryAcquire();
 			if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 			ctx->bind( vao );
-			ctx->bindIndexBuffer( ib, mds->indexSize );
+			ctx->bindIB( ib, mds->indexSize );
 			ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
 		}
 	}

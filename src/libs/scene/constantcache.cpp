@@ -179,6 +179,38 @@ void ConstantCache::changeObject(	const Math::Matrix4x4& prevWVPMatrix,
 	cachedFlags |= BIT64(CVN_WORLD);
 	gpuHasBlocks &= ~( BIT(CF_STD_OBJECT) );
 }
+
+void ConstantCache::changeWorldMatrix( const Math::Matrix4x4& worldMatrix ) {
+	matrixCache[ CVN_WORLD ] = worldMatrix;
+	cachedFlags &= ~(	
+		BIT64(CVN_WORLD_INVERSE) | BIT64(CVN_WORLD_IT) |
+		BIT64(CVN_WORLD_VIEW) | BIT64(CVN_WORLD_VIEW_INVERSE) | BIT64(CVN_WORLD_VIEW_IT) |
+		BIT64(CVN_WORLD_VIEW_PROJ) | BIT64(CVN_WORLD_VIEW_PROJ_INVERSE) | BIT64(CVN_WORLD_VIEW_PROJ_IT)
+	);
+	cachedFlags |= BIT64(CVN_WORLD);
+	gpuHasBlocks &= ~( BIT(CF_STD_OBJECT) );
+
+}
+
+void ConstantCache::changeViewMatrix( const Math::Matrix4x4& viewMatrix ) {
+	matrixCache[ CVN_VIEW ] = viewMatrix;
+	cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_VIEW ] ] );
+	cachedFlags &= ~(varBitsPerBlock [ CF_STD_OBJECT ] );
+
+	cachedFlags |= BIT64(CVN_VIEW);
+	gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_VIEW ]) | BIT(CF_STD_OBJECT) );
+}
+
+void ConstantCache::changeProjectionMatrix( const Math::Matrix4x4& projMatrix ) {
+	matrixCache[ CVN_PROJ ] = projMatrix;
+	cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_PROJ ] ] );
+	cachedFlags &= ~(varBitsPerBlock [ CF_STD_OBJECT ] );
+
+	cachedFlags |= BIT64(CVN_PROJ);
+	gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_PROJ ]) | BIT(CF_STD_OBJECT) );
+}
+
+
 void ConstantCache::setMatrixBypassCache( CONSTANT_VAR_NAME type, const Math::Matrix4x4& mat ) {
 	matrixCache[ type ] = mat;
 
@@ -186,6 +218,7 @@ void ConstantCache::setMatrixBypassCache( CONSTANT_VAR_NAME type, const Math::Ma
 	gpuHasBlocks &= ~( BIT(varFreq[type] ));
 
 }
+
 void ConstantCache::invalidCacheOfType( CONSTANT_VAR_NAME type ) {
 	cachedFlags &= ~(BIT64(type));
 	gpuHasBlocks &= ~( BIT(varFreq[type] ));

@@ -44,7 +44,7 @@ Gfx::Gfx() {
 	dx11CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	static const D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
+	static const D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 
 	// TODO proper device enumeration
 	// For now first device on first adaptor
@@ -83,14 +83,10 @@ Gfx::Gfx() {
 		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
 	RasteriserStateHandle::create( "_RS_Normal", &nrsci, Core::RMRF_DONTFLUSH );
-	RasteriserState::CreationInfo nnmsrsci = {
-		RasteriserState::CreationInfo::NONE, FIM_FILL, CUM_BACK, 0, 0, 0
-	};
-	RasteriserStateHandle::create( "_RS_Normal_NoMS", &nnmsrsci, Core::RMRF_DONTFLUSH );	
-	RasteriserState::CreationInfo nnnmsrsci = {
+	RasteriserState::CreationInfo nncrsci = {
 		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_NONE, 0, 0, 0
 	};
-	RasteriserStateHandle::create( "_RS_Normal_NoMS_NoCull", &nnnmsrsci, Core::RMRF_DONTFLUSH );	
+	RasteriserStateHandle::create( "_RS_Normal_NoCull", &nncrsci, Core::RMRF_DONTFLUSH );
 
 	RenderTargetStates::CreationInfo nrtci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 

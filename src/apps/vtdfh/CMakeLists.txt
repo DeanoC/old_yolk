@@ -7,7 +7,7 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
 ADD_MSVC_PRECOMPILED_HEADER( "vtdfh.h" "${cpp_src_files}" )
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} json_spirit scene localworld BulletCollision BulletDynamics LinearMath )
+list( APPEND targ_link_libs ${Core_LIBRARIES} json_spirit scene localworld BulletCollision BulletDynamics LinearMath swfruntime )
 IF( USE_DWM )
 	list( APPEND targ_link_libs dwm_client )
 ENDIF( USE_DWM )

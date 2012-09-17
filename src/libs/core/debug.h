@@ -22,7 +22,7 @@
 /// Maximum (assert everything) debugging checks
 #define DEBUG_HIGH	3
 
-#if DEBUG_LEVEL >= DEBUG_NONE
+#if DEBUG_LEVEL > DEBUG_NONE
 	/// Do this on debug builds only
 #	define IF_DEBUG(x) x
 	/// start a section of code for debugging only, the ELSE will be removed

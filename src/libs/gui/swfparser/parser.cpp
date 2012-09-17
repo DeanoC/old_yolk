@@ -23,48 +23,48 @@
 #include "SwfImage.h"
 #include "SwfButton.h"
 namespace Swf {		
-	void Parser::Parse( const std::string& _path ) {
+	void SwfParser::Parse( const std::string& _path ) {
 		hasBackgroundColour = false;
 		// misc handlers
-		handlers[SetBackgroundColor] = TagHandler(&Parser::ProcessRawSetBackgroundColor);
-		handlers[ShowFrame] = TagHandler(&Parser::ProcessRawShowFrame, true);
-		handlers[DoAction] = TagHandler(&Parser::ProcessRawDoAction, true);
+		handlers[SetBackgroundColor] = TagHandler(&SwfParser::ProcessRawSetBackgroundColor);
+		handlers[ShowFrame] = TagHandler(&SwfParser::ProcessRawShowFrame, true);
+		handlers[DoAction] = TagHandler(&SwfParser::ProcessRawDoAction, true);
 
 		// font handlers
-		handlers[DefineFont] =  TagHandler(&Parser::ProcessRawDefineFont);
-		handlers[DefineFont2] =  TagHandler(&Parser::ProcessRawDefineFont2);
+		handlers[DefineFont] =  TagHandler(&SwfParser::ProcessRawDefineFont);
+		handlers[DefineFont2] =  TagHandler(&SwfParser::ProcessRawDefineFont2);
 
 		// shape handlers
-		handlers[DefineShape] = TagHandler(&Parser::ProcessRawDefineShape);
-		handlers[DefineShape2] = TagHandler(&Parser::ProcessRawDefineShape2);
-		handlers[DefineShape3] = TagHandler(&Parser::ProcessRawDefineShape3);
-		handlers[DefineMorphShape] = TagHandler(&Parser::ProcessRawDefineMorphShape);
-		handlers[DefineMorphShape2] =TagHandler(&Parser::ProcessRawDefineMorphShape2);
+		handlers[DefineShape] = TagHandler(&SwfParser::ProcessRawDefineShape);
+		handlers[DefineShape2] = TagHandler(&SwfParser::ProcessRawDefineShape2);
+		handlers[DefineShape3] = TagHandler(&SwfParser::ProcessRawDefineShape3);
+		handlers[DefineMorphShape] = TagHandler(&SwfParser::ProcessRawDefineMorphShape);
+		handlers[DefineMorphShape2] =TagHandler(&SwfParser::ProcessRawDefineMorphShape2);
 
 		// sprite define handler
-		handlers[DefineSprite] = TagHandler(&Parser::ProcessRawDefineSprite);
+		handlers[DefineSprite] = TagHandler(&SwfParser::ProcessRawDefineSprite);
 
 		// place object handlers
-		handlers[PlaceObject] = TagHandler(&Parser::ProcessRawPlaceObject, true);
-		handlers[PlaceObject2] = TagHandler(&Parser::ProcessRawPlaceObject2, true);
-		handlers[RemoveObject] = TagHandler(&Parser::ProcessRawRemoveObject, true);
-		handlers[RemoveObject2] = TagHandler(&Parser::ProcessRawRemoveObject2, true);
+		handlers[PlaceObject] = TagHandler(&SwfParser::ProcessRawPlaceObject, true);
+		handlers[PlaceObject2] = TagHandler(&SwfParser::ProcessRawPlaceObject2, true);
+		handlers[RemoveObject] = TagHandler(&SwfParser::ProcessRawRemoveObject, true);
+		handlers[RemoveObject2] = TagHandler(&SwfParser::ProcessRawRemoveObject2, true);
 
 		// text object handlers
-		handlers[DefineText] = TagHandler( &Parser::ProcessRawDefineText);
-		handlers[DefineText2] = TagHandler( &Parser::ProcessRawDefineText2);
-		handlers[DefineEditText] = TagHandler(&Parser::ProcessRawDefineEditText);
+		handlers[DefineText] = TagHandler( &SwfParser::ProcessRawDefineText);
+		handlers[DefineText2] = TagHandler( &SwfParser::ProcessRawDefineText2);
+		handlers[DefineEditText] = TagHandler(&SwfParser::ProcessRawDefineEditText);
 
 		// bitmap handlers
-		handlers[DefineBits] = TagHandler(&Parser::ProcessRawDefineBits);
-		handlers[JPEGTables] = TagHandler(&Parser::ProcessRawJPEGTables);
-		handlers[DefineBitsJPEG2] = TagHandler(&Parser::ProcessRawDefineBitsJPEG2);
-		handlers[DefineBitsJPEG3] = TagHandler(&Parser::ProcessRawDefineBitsJPEG3);
-		handlers[DefineBitsLossless] = TagHandler(&Parser::ProcessRawDefineBitsLossless);
-		handlers[DefineBitsLossless2] = TagHandler(&Parser::ProcessRawDefineBitsLossless2);
+		handlers[DefineBits] = TagHandler(&SwfParser::ProcessRawDefineBits);
+		handlers[JPEGTables] = TagHandler(&SwfParser::ProcessRawJPEGTables);
+		handlers[DefineBitsJPEG2] = TagHandler(&SwfParser::ProcessRawDefineBitsJPEG2);
+		handlers[DefineBitsJPEG3] = TagHandler(&SwfParser::ProcessRawDefineBitsJPEG3);
+		handlers[DefineBitsLossless] = TagHandler(&SwfParser::ProcessRawDefineBitsLossless);
+		handlers[DefineBitsLossless2] = TagHandler(&SwfParser::ProcessRawDefineBitsLossless2);
 		
 		// button handlers
-		handlers[DefineButton] = TagHandler(&Parser::ProcessRawDefineButton);
+		handlers[DefineButton] = TagHandler(&SwfParser::ProcessRawDefineButton);
 
 		frameList = CORE_NEW std::vector<SwfFrame*>();
 		currentFrame = CORE_NEW SwfFrame(); // initial frame, added on the show frame tag
@@ -83,7 +83,7 @@ namespace Swf {
 
 	}
 	
-	bool Parser::ParseTag(bool _isSpriteTag) {
+	bool SwfParser::ParseTag(bool _isSpriteTag) {
 #if _DEBUG
 		static uint16_t prevTagCodeAndLength = 0;
 		static SwfTag prevTagCode;
@@ -134,13 +134,13 @@ namespace Swf {
 			return true;
 	}
 	
-	void Parser::ProcessTag(SwfTag _tag, int _length) {
+	void SwfParser::ProcessTag(SwfTag _tag, int _length) {
 		TagHandler::Handler handler = handlers[_tag].handler;
 		if (handler != NULL)
 			(this->*handler)(_length);
 	}
 
-	void Parser::ProcessSpriteTag(SwfTag _tag, int _length) {
+	void SwfParser::ProcessSpriteTag(SwfTag _tag, int _length) {
 		TagHandler::Handler handler = (handlers[_tag].spriteAllowed == false) ? NULL : handlers[_tag].handler;
 		if (handler != NULL)
 			(this->*handler)(_length);
@@ -151,84 +151,84 @@ namespace Swf {
 	//-----------------------------
 	//------------------------------------
 
-	void Parser::ProcessRawDefineFont(int _length) {
+	void SwfParser::ProcessRawDefineFont(int _length) {
 		SwfFont* font = SwfFont::Read(stream, 1);
 		dictionary.fonts[font->id] = font;
 		ProcessDefineFont(font);
 	}
 	
-	void Parser::ProcessRawDefineFont2(int _length) {
+	void SwfParser::ProcessRawDefineFont2(int _length) {
 		SwfFont* font = SwfFont::Read(stream, 2);
 		dictionary.fonts[font->id] = font;
 		ProcessDefineFont(font);
 	}	
 	
-	void Parser::ProcessRawSetBackgroundColor(int _length) {
+	void SwfParser::ProcessRawSetBackgroundColor(int _length) {
 		backgroundColour = SwfRGBA::ReadRGB(stream);
 		hasBackgroundColour = true;
 		ProcessSetBackgroundColor(backgroundColour);
 	}
 
-	void Parser::ProcessRawDefineShape(int _length) {
+	void SwfParser::ProcessRawDefineShape(int _length) {
 		SwfShapeObject* shape = SwfShapeObject::Read(stream, 1);
 		dictionary.characters[shape->id] = shape;
 		ProcessDefineShape(shape);
 	}
 	
-	void Parser::ProcessRawDefineShape2(int _length) {
+	void SwfParser::ProcessRawDefineShape2(int _length) {
 		SwfShapeObject* shape = SwfShapeObject::Read(stream, 2);
 		dictionary.characters[shape->id] = shape;
 		ProcessDefineShape(shape);
 	}
 	
-	void Parser::ProcessRawDefineShape3(int _length) {
+	void SwfParser::ProcessRawDefineShape3(int _length) {
 		SwfShapeObject* shape = SwfShapeObject::Read(stream, 3);
 		dictionary.characters[shape->id] = shape;
 		ProcessDefineShape(shape);
 	}
 
-	void Parser::ProcessRawPlaceObject(int _length) {
+	void SwfParser::ProcessRawPlaceObject(int _length) {
 		SwfDisplayObject* obj = SwfDisplayObject::Read(stream, 1);
 		currentFrame->frameElements.push_back(obj);
 		ProcessDisplayObject(obj);
 	}
 	
-	void Parser::ProcessRawPlaceObject2(int _length) {
+	void SwfParser::ProcessRawPlaceObject2(int _length) {
 		SwfDisplayObject* obj = SwfDisplayObject::Read(stream,2);
 		currentFrame->frameElements.push_back(obj);
 		ProcessDisplayObject(obj);
 	}
 	
-	void Parser::ProcessRawRemoveObject(int _length) {
+	void SwfParser::ProcessRawRemoveObject(int _length) {
 		SwfRemoveObject* obj = SwfRemoveObject::Read(stream, 1);
 		currentFrame->frameElements.push_back(obj);
 		ProcessRemoveObject(obj);
 	}
 	
-	void Parser::ProcessRawRemoveObject2(int _length) {
+	void SwfParser::ProcessRawRemoveObject2(int _length) {
 		SwfRemoveObject* obj = SwfRemoveObject::Read(stream,2);
 		currentFrame->frameElements.push_back(obj);
 		ProcessRemoveObject(obj);
 	}
 
-	void Parser::ProcessRawShowFrame(int _length) {
+	void SwfParser::ProcessRawShowFrame(int _length) {
 		frameList->push_back(currentFrame);
 		currentFrame = CORE_NEW SwfFrame();
 	}
 	
-	void Parser::ProcessRawDefineText(int _length) {
+	void SwfParser::ProcessRawDefineText(int _length) {
 		SwfText* text = SwfText::Read(stream, 1);
 		dictionary.characters[text->id] = text;
 		ProcessText(text);
 	}
 
-	void Parser::ProcessRawDefineText2(int _length) {
+	void SwfParser::ProcessRawDefineText2(int _length) {
 		SwfText* text = SwfText::Read(stream, 2);
 		dictionary.characters[text->id], text;
 		ProcessText(text);
 	}
 
-	void Parser::ProcessRawDefineEditText(int _length) {
+	void SwfParser::ProcessRawDefineEditText(int _length) {
 		SwfDynamicText* dtext = SwfDynamicText::Read(stream);
 		dictionary.characters[dtext->id]  = dtext;
 		ProcessDynamicText(dtext);
@@ -272,7 +272,7 @@ namespace Swf {
 
 		inflateEnd(&d_stream);
 	}
-#if defined( TODO_JPEG_READER )	
+
 	struct JpegSourceMgrWrapper {
 		jpeg_source_mgr sourceMgr;
 		Core::InOutInterface* io;
@@ -308,7 +308,7 @@ namespace Swf {
 		static boolean	fill_input_buffer(j_decompress_ptr cinfo) {
 			JpegSourceMgrWrapper*	src = (JpegSourceMgrWrapper*) cinfo->src;
 
-			size_t	bytes_read = src->io->Read(src->buffer, src->bufferSize);
+			size_t	bytes_read = src->io->read(src->buffer, src->bufferSize);
 
 			if (bytes_read <= 0) {
 				// Is the file completely empty?
@@ -471,13 +471,12 @@ namespace Swf {
 			lines_read = lines_read;	// avoid warning in NDEBUG
 		}
 	};
-#endif
-	void Parser::ProcessRawDefineBits(int _length) {
+
+	void SwfParser::ProcessRawDefineBits(int _length) {
 		uint16_t id = stream.readUInt16();
 		_length -= sizeof(uint16_t);
 		SwfBitmap* bitmap = CORE_NEW SwfBitmap(id);
 
-#if defined( TODO_JPEG_READER )	
 		if(jpegReader == NULL) {
 			jpegReader = CORE_NEW JpegReader(stream.stream, _length);
 		} else {
@@ -498,20 +497,16 @@ namespace Swf {
 		bitmap->height = height;
 		bitmap->image = CORE_NEW SwfRGBAImage(width,height,true,3,width*comps,buffer);
 		CORE_DELETE_ARRAY buffer;
-#endif
 		dictionary.bitmaps[ bitmap->id ] = bitmap;
 	}
 
-	void Parser::ProcessRawJPEGTables(int _length) {
-#if defined( TODO_JPEG_READER )	
+	void SwfParser::ProcessRawJPEGTables(int _length) {
 		assert(jpegReader == NULL);
 		jpegReader = CORE_NEW JpegReader(stream.stream, _length);
 		jpegReader->ReadHeaderOnly();
-#endif
 	}
 
-	void Parser::ProcessRawDefineBitsJPEG2(int _length) {
-#if defined( TODO_JPEG_READER )	
+	void SwfParser::ProcessRawDefineBitsJPEG2(int _length) {
 		uint16_t id = stream.readUInt16();
 		_length -= sizeof(uint16_t);
 		SwfBitmap* bitmap = CORE_NEW SwfBitmap(id);
@@ -532,13 +527,11 @@ namespace Swf {
 		bitmap->image = CORE_NEW SwfRGBAImage(width,height,true,3,width*comps,buffer);
 		CORE_DELETE_ARRAY buffer;
 		dictionary.bitmaps[bitmap->id] = bitmap;
-#endif
 	}
 
-	void Parser::ProcessRawDefineBitsJPEG3(int _length) {
+	void SwfParser::ProcessRawDefineBitsJPEG3(int _length) {
 		uint16_t id = stream.readUInt16();
 		uint32_t jpegSize = stream.readUInt32();
-#if defined( TODO_JPEG_READER )	
 
 		// jpeg data
 		jpegReader = CORE_NEW JpegReader(stream.stream, jpegSize);
@@ -565,18 +558,17 @@ namespace Swf {
 
 		CORE_DELETE_ARRAY data;
 		dictionary.bitmaps[bitmap->id] = bitmap;
-#endif
 	}
 
-	void Parser::ProcessRawDefineBitsLossless(int _length) {
+	void SwfParser::ProcessRawDefineBitsLossless(int _length) {
 		ProcessRawDefineBitsLossless(false, _length);
 	}
 
-	void Parser::ProcessRawDefineBitsLossless2(int _length) {
+	void SwfParser::ProcessRawDefineBitsLossless2(int _length) {
 		ProcessRawDefineBitsLossless(true, _length);
 	}
 
-	void Parser::ProcessRawDefineBitsLossless(bool v2, int _length) {
+	void SwfParser::ProcessRawDefineBitsLossless(bool v2, int _length) {
 		uint16_t id = stream.readUInt16();
 		_length -= sizeof(uint16_t);
 		SwfBitmap* bitmap = CORE_NEW SwfBitmap(id);
@@ -622,7 +614,7 @@ namespace Swf {
 	/// and as such needs closer interaction with the parser than 
 	/// other tags
 	/// </summary>
-	void Parser::ProcessRawDefineSprite(int _length) {
+	void SwfParser::ProcessRawDefineSprite(int _length) {
 		// back up the main frame list
 		std::vector<SwfFrame*>* backup = frameList;
 		SwfFrame* backupCurrent = currentFrame;
@@ -646,17 +638,17 @@ namespace Swf {
 		dictionary.characters[sprite->id] = sprite;
 	}
 
-	void Parser::ProcessRawDefineMorphShape(int _length) {
+	void SwfParser::ProcessRawDefineMorphShape(int _length) {
 		SwfMorphShape* morph = SwfMorphShape::Read(stream, 1);
 		dictionary.characters[morph->id] = morph;
 	}
 	
-	void Parser::ProcessRawDefineMorphShape2(int _length) {
+	void SwfParser::ProcessRawDefineMorphShape2(int _length) {
 		SwfMorphShape* morph = SwfMorphShape::Read(stream, 2);
 		dictionary.characters[morph->id] = morph;
 	}
 
-	void Parser::ProcessRawDoAction(int _length) {
+	void SwfParser::ProcessRawDoAction(int _length) {
 		SwfActionByteCode* actionScript = CORE_NEW SwfActionByteCode();
 		actionScript->byteCode = CORE_NEW_ARRAY uint8_t[_length];
 		actionScript->lengthInBytes = _length;
@@ -669,13 +661,13 @@ namespace Swf {
 		currentFrame->frameElements.push_back(actionScript);
 	}
 
-	void Parser::ProcessRawDefineButton(int _length) {
+	void SwfParser::ProcessRawDefineButton(int _length) {
 //		SwfMorphShape* morph = SwfMorphShape::Read(stream, 2);
 //		dictionary.characters[morph->id] = morph;
 	}
 
 	//-----------------------------
-	void Parser::ParseHeader(std::string _path) {
+	void SwfParser::ParseHeader(std::string _path) {
 		Core::File* osstream = CORE_NEW Core::File( _path.c_str() );
 		assert(osstream != NULL && osstream->isValid());
 

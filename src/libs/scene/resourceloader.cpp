@@ -22,7 +22,7 @@
 // doesn't really belong here, its higher level library than scene but scene needs a seperation itself, 
 // so for now and make life simple, just bung its loader here
 #include "gui/swfruntime/swfruntime.h"
-#include "gui/swfruntime/swfplayer.h"
+#include "gui/swfruntime/player.h"
 
 #include <boost/asio.hpp>
 #include "resourceloader.h"
@@ -64,6 +64,8 @@ Core::thread::id 									ResourceLoaderImpl::loaderThreadId;
 
 #define RENDER( x ) res = std::static_pointer_cast<ResourceBase>( x ## Ptr( ResourceLoaderImpl::parent->create ## x( data ) ) ); \
 					if( flags & Core::RMRF_SCENE_DEFINED ) { CORE_DELETE (const x ::CreationInfo*) data; };
+#define RENDER1( x, y ) res = std::static_pointer_cast<ResourceBase>( x ## Ptr( ResourceLoaderImpl::parent->create ## y( data ) ) ); \
+					if( flags & Core::RMRF_SCENE_DEFINED ) { CORE_DELETE (const x ::CreationInfo*) data; };
 
 void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* name, const void* data  ) {
 	using namespace Core;
@@ -83,7 +85,7 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RenderTargetStatesType: RENDER( RenderTargetStates ); break;
 	case DepthStencilStateType: RENDER( DepthStencilState ); break;
 	case RasteriserStateType: RENDER( RasteriserState ); break;
-	case SwfPlayerType: RENDER( SwfPlayer ); break;
+	case PlayerType: RENDER1( Player, SwfPlayer ); break;
 	default:;
 	}
 
@@ -95,6 +97,7 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 #define LOADER( x ) cs = (void*) ResourceLoaderImpl::parent->preCreate( (flags & Core::RMRF_LOADOFFDISK) ? pName : nullptr, (const x ::CreationInfo*) pData )
 
 void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
+	using namespace Swf;
 	void* cs = nullptr;
 	// route type to their specific creation functions, they should alloc and fill a new creation struct
 	switch( handle->getType() ) {
@@ -109,7 +112,7 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RenderTargetStatesType: LOADER( RenderTargetStates ); break;
 	case DepthStencilStateType: LOADER( DepthStencilState ); break;
 	case RasteriserStateType: LOADER( RasteriserState ); break;
-	case Swf::SwfPlayerType: LOADER( Swf::SwfPlayer ); break;
+	case PlayerType: LOADER( Player ); break;
 	default:;
 	}
 	CORE_ASSERT( cs != nullptr );
@@ -172,7 +175,7 @@ void ResourceLoaderImpl::installResourceTypes() {
 							NULL, 0, "" );
 	REG( RasteriserStateType, cb, &SRD(RasteriserState), SO(RasteriserStateHandle), 
 							NULL, 0, "" );
-	REG( Swf::SwfPlayerType, cb, &SRD(Swf::SwfPlayer), SO(Swf::SwfPlayerHandle), 
+	REG( Swf::PlayerType, cb, &SRD(Swf::Player), SO(Swf::PlayerHandle), 
 							NULL, 0, "Ui/" );
 	#undef SRD
 	#undef SO
@@ -267,8 +270,8 @@ Program* ResourceLoader::createProgram( const void* data ) {
 Wob* ResourceLoader::createWob( const void* data ) {
 	return Wob::internalCreate( getRenderer(), data );
 }
-Swf::SwfPlayer* ResourceLoader::createSwfPlayer( const void* data ) {
-	return (Swf::SwfPlayer*)data;
+Swf::Player* ResourceLoader::createSwfPlayer( const void* data ) {
+	return (Swf::Player*)data;
 }
 
 const void* ResourceLoader::preCreate( const char* name, const DataBuffer::CreationInfo *loader ) {
@@ -304,8 +307,8 @@ const void* ResourceLoader::preCreate( const char* name, const DepthStencilState
 const void* ResourceLoader::preCreate( const char* name, const RasteriserState::CreationInfo* loader ) {
 	return RasteriserState::internalPreCreate( name, loader );
 }
-const void* ResourceLoader::preCreate( const char* name, const  Swf::SwfPlayer::CreationInfo* loader ) {
-	return Swf::SwfPlayer::internalPreCreate( name, loader );
+const void* ResourceLoader::preCreate( const char* name, const  Swf::Player::CreationInfo* loader ) {
+	return Swf::Player::internalPreCreate( name, loader );
 }
 
 }

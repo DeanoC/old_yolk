@@ -23,9 +23,9 @@ namespace Swf {
 	class SwfText;
 	class SwfDynamicText;
 
-	class Parser {
+	class SwfParser {
 	public:
-		virtual ~Parser(){}	
+		virtual ~SwfParser(){}	
 		void Parse( const std::string& _path );
 
 		static const int MAX_VERSION_SUPPORTED = 7;
@@ -50,7 +50,7 @@ namespace Swf {
 		//        JpegDecoder tableDecoder;
 
 		struct TagHandler {
-			typedef void (Parser::*Handler)(int _length);
+			typedef void (SwfParser::*Handler)(int _length);
 			TagHandler() {
 				handler = NULL;
 				spriteAllowed = false;

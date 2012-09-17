@@ -6,6 +6,8 @@ add_subdirectory( bullet )
 add_subdirectory( jpeg )
 add_subdirectory( tbb )
 add_subdirectory( zlib )
+add_subdirectory( json-spirit )
+add_subdirectory( protobuf )
 
 add_subdirectory( core )
 add_subdirectory( protocols )

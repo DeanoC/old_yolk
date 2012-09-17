@@ -64,14 +64,16 @@ namespace Scene {
 	
 		virtual void bind( const ProgramPtr& prg ) = 0;
 		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const TexturePtr& tex ) = 0;
-		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const DataBufferPtr& sampler ) = 0;
+		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const DataBufferPtr& buffer ) = 0;
 		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const SamplerStatePtr& sampler ) = 0;
 		virtual void bind( const RenderTargetStatesPtr& targetStates ) = 0;
 		virtual void bind( const DepthStencilStatePtr& dsStates ) = 0;
 		virtual void bind( const RasteriserStatePtr& rasteriser ) = 0;
 		virtual void bind( const VertexInputPtr& vertexInput ) = 0;
 
-		virtual void bindIndexBuffer( const DataBufferPtr& ib, int indexBytes ) = 0;
+		virtual void bindCB( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& buffer ) = 0;
+		virtual void bindVB( const unsigned int _stream, const Scene::DataBufferPtr& vb, const unsigned int _stride, const unsigned int _offset = 0 ) = 0;
+		virtual void bindIB( const DataBufferPtr& ib, const unsigned int _stride ) = 0;
 
 		virtual void clear( const ViewPtr& target ) = 0;
 		virtual void clear( const TexturePtr& target, const Core::Colour& colour ) = 0;

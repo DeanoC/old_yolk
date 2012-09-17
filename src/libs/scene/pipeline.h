@@ -29,9 +29,8 @@ namespace Scene {
 		virtual const char* getName() const = 0;
 		const size_t getIndex() const { return pipelineIndex; }
 
-		// making this the pipeline currently active/unactive
+		// making this the pipeline currently active
 		virtual void bind( RenderContext* _context ) = 0;
-		virtual void unbind( RenderContext* _context ) = 0;
 
 		// geometry passes
 		// each pipeline needs geometry submitting, it should be
@@ -40,6 +39,13 @@ namespace Scene {
 		virtual bool isGeomPassOpaque( int pass ) = 0;
 		virtual void startGeomPass( RenderContext* _context, int i ) = 0;
 		virtual void endGeomPass ( RenderContext* _context, int i ) = 0;
+
+		// 2D pass
+		virtual void start2DPass( RenderContext* _context ) = 0;
+		virtual void end2DPass( RenderContext* _context ) = 0;
+
+		// transfer into the result texture and makes this pipeline inactive except for getResult()
+		virtual void resolve( RenderContext* _context ) = 0;
 
 		// where the pipeline work ends up
 		virtual TextureHandlePtr getResult() = 0;

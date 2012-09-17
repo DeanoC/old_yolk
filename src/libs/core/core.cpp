@@ -74,6 +74,7 @@ void Init( void ) {
 #if defined(USE_GC)
 	//GC_enable_incremental();
 	GC_init();		
+	GC_allow_register_threads();
 #endif
 }
 
