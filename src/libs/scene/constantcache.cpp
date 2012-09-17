@@ -34,6 +34,8 @@ const int varFreq[Scene::CVN_NUM_CONSTANTS] = {
 	Scene::CF_STD_OBJECT,		//	WORLD_VIEW_PROJ_INVERSE,
 	Scene::CF_STD_OBJECT,		//	WORLD_VIEW_PROJ_IT,
 	Scene::CF_STD_OBJECT,		//	PREV_WORLD_VIEW_PROJ
+	Scene::CF_STD_OBJECT,		//	USER_MATRIX_0,
+	Scene::CF_STD_OBJECT,		//	USER_MATRIX_1
 	0,							//	CVN_NUM_MATRICES
 	Scene::CF_PER_FRAME,		//	FRAMECOUNT
 	Scene::CF_PER_TARGETS,		//	TARGET_DIMS
@@ -49,7 +51,7 @@ const uint32_t varsPerBlock[ Scene::CF_NUM_BLOCKS ] = {
 	1,		// CF_PER_PIPELINE
 	11,		// CF_PER_VIEWS
 	1,		// CF_PER_TARGETS
-	10,		// CF_STD_OBJECT
+	12,		// CF_STD_OBJECT
 	1,		// CF_PER_MATERIAL
 };
 
@@ -63,7 +65,7 @@ const Scene::ConstantCache::CachedBitFlags varBitsPerBlock[ Scene::CF_NUM_BLOCKS
 	BIT64(Scene::CVN_TARGET_DIMS),
 	BIT64(Scene::CVN_WORLD) | BIT64(Scene::CVN_WORLD_INVERSE) | BIT64(Scene::CVN_WORLD_IT) | BIT64(Scene::CVN_WORLD_VIEW) | BIT64(Scene::CVN_WORLD_VIEW_INVERSE) | 
 		BIT64(Scene::CVN_WORLD_VIEW_IT) | BIT64(Scene::CVN_WORLD_VIEW_PROJ) | BIT64(Scene::CVN_WORLD_VIEW_PROJ_INVERSE) | BIT64(Scene::CVN_WORLD_VIEW_PROJ_IT) | 
-		BIT64(Scene::CVN_PREV_WORLD_VIEW_PROJ),
+		BIT64(Scene::CVN_PREV_WORLD_VIEW_PROJ) | BIT64(Scene::CVN_USER_MATRIX_0) | BIT64(Scene::CVN_USER_MATRIX_1),
 	BIT64(Scene::CVN_MATERIAL_INDEX),
 };
 
@@ -87,6 +89,8 @@ const size_t offsetInBlocks[ Scene::CVN_NUM_CONSTANTS ] = {
 	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjectionInverse ),		// WORLD_VIEW_PROJ_INVERSE
 	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjectionIT ),			// WORLD_VIEW_PROJ_IT
 	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
+	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixUser0 ),							// USER_MATRIX_0
+	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixUser1 ),							// USER_MATRIX_1
 	0,					//		CVN_NUM_MATRICES
 	YOLK_GL_GET_OFFSET_IN_BLOCK( PerFrame, frameCount ),							// FRAMERATE
 	YOLK_GL_GET_OFFSET_IN_BLOCK( PerTargets, targetDims),							// TARGET_DIMS
@@ -117,6 +121,8 @@ const size_t sizeofInBlock[ Scene::CVN_NUM_CONSTANTS ] = {
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionInverse ),	// WORLD_VIEW_PROJ_INVERSE
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionIT ),		// WORLD_VIEW_PROJ_IT
 	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixUser0 ),						// USER_MATRIX_0
+	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixUser1 ),						// USER_MATRIX_1
 	0,					//		CVN_NUM_MATRICES
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerFrame, frameCount ),							// FRAMERATE
 	YOLK_GL_GET_SIZEOF_PRG_VAR( PerTargets, targetDims),						// TARGET_DIMS
@@ -166,7 +172,7 @@ ConstantCache::~ConstantCache() {
 	}
 }
 
-void ConstantCache::changeObject(	const Math::Matrix4x4& prevWVPMatrix,
+void ConstantCache::setObject(	const Math::Matrix4x4& prevWVPMatrix,
 									const Math::Matrix4x4& worldMatrix ) {
 	matrixCache[ CVN_PREV_WORLD_VIEW_PROJ ] = prevWVPMatrix;
 	matrixCache[ CVN_WORLD ] = worldMatrix;
@@ -180,7 +186,7 @@ void ConstantCache::changeObject(	const Math::Matrix4x4& prevWVPMatrix,
 	gpuHasBlocks &= ~( BIT(CF_STD_OBJECT) );
 }
 
-void ConstantCache::changeWorldMatrix( const Math::Matrix4x4& worldMatrix ) {
+void ConstantCache::setWorldMatrix( const Math::Matrix4x4& worldMatrix ) {
 	matrixCache[ CVN_WORLD ] = worldMatrix;
 	cachedFlags &= ~(	
 		BIT64(CVN_WORLD_INVERSE) | BIT64(CVN_WORLD_IT) |
@@ -192,8 +198,9 @@ void ConstantCache::changeWorldMatrix( const Math::Matrix4x4& worldMatrix ) {
 
 }
 
-void ConstantCache::changeViewMatrix( const Math::Matrix4x4& viewMatrix ) {
+void ConstantCache::setViewMatrix( const Math::Matrix4x4& viewMatrix ) {
 	matrixCache[ CVN_VIEW ] = viewMatrix;
+	// clearing out the whole block cache bits is a bit lazy but...
 	cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_VIEW ] ] );
 	cachedFlags &= ~(varBitsPerBlock [ CF_STD_OBJECT ] );
 
@@ -201,8 +208,9 @@ void ConstantCache::changeViewMatrix( const Math::Matrix4x4& viewMatrix ) {
 	gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_VIEW ]) | BIT(CF_STD_OBJECT) );
 }
 
-void ConstantCache::changeProjectionMatrix( const Math::Matrix4x4& projMatrix ) {
+void ConstantCache::setProjectionMatrix( const Math::Matrix4x4& projMatrix ) {
 	matrixCache[ CVN_PROJ ] = projMatrix;
+	// clearing out the whole block cache bits is a bit lazy but...
 	cachedFlags &= ~(varBitsPerBlock [ varFreq[ CVN_PROJ ] ] );
 	cachedFlags &= ~(varBitsPerBlock [ CF_STD_OBJECT ] );
 
@@ -210,6 +218,17 @@ void ConstantCache::changeProjectionMatrix( const Math::Matrix4x4& projMatrix ) 
 	gpuHasBlocks &= ~ ( BIT(varFreq[ CVN_PROJ ]) | BIT(CF_STD_OBJECT) );
 }
 
+void ConstantCache::setUserMatrix0( const Math::Matrix4x4& userMatrix ) {
+	matrixCache[ CVN_USER_MATRIX_0 ] = userMatrix;
+	cachedFlags |= BIT64(CVN_USER_MATRIX_0);
+	gpuHasBlocks &= ~ BIT(varFreq[ CVN_USER_MATRIX_0 ]);
+}
+
+void ConstantCache::setUserMatrix1( const Math::Matrix4x4& userMatrix ) {
+	matrixCache[ CVN_USER_MATRIX_1 ] = userMatrix;
+	cachedFlags |= BIT64(CVN_USER_MATRIX_1);
+	gpuHasBlocks &= ~BIT(varFreq[ CVN_USER_MATRIX_1 ]);
+}
 
 void ConstantCache::setMatrixBypassCache( CONSTANT_VAR_NAME type, const Math::Matrix4x4& mat ) {
 	matrixCache[ type ] = mat;
@@ -255,6 +274,8 @@ const Math::Matrix4x4& ConstantCache::getMatrix( CONSTANT_VAR_NAME type ) const 
 	case CVN_WORLD_VIEW_PROJ_INVERSE:	return matrixCache[ type ] = InverseMatrix( getMatrix(CVN_WORLD_VIEW_PROJ) );
 	case CVN_WORLD_VIEW_PROJ_IT:		return matrixCache[ type ] = TransposeMatrix( getMatrix(CVN_WORLD_VIEW_PROJ_INVERSE) );
 	case CVN_PREV_WORLD_VIEW_PROJ:	return matrixCache[ type ];
+	case CVN_USER_MATRIX_0:	return matrixCache[ type ];
+	case CVN_USER_MATRIX_1:	return matrixCache[ type ];
 	default: CORE_ASSERT( false && ("Invalid matrix type") ); return matrixCache[ 0 ];
 	};
 }

@@ -36,8 +36,8 @@ DebugPrims::DebugPrims() {
 			{ VE_POSITION, VT_FLOAT3 },
 			{ VE_COLOUR0, VT_BYTEARGB },
 		}, {
-			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0,
-			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0,
+			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM,
+			vertexBufferHandle, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM,
 		}
 	};
 

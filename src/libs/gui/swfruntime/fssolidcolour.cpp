@@ -1,30 +1,52 @@
 #include "swfruntime.h"
 #include "gui/swfparser/SwfColourTransform.h"
+#include "scene/constantcache.h"
+#include "basepath.h"
 #include "fssolidcolour.h"
 
 namespace Swf {
+FSSolidColour::FSSolidColour( Player* _player, const SwfRGBA&  _colour ) : 
+	FillStyle ( _player ), 
+	colour( _colour ) {
 
-FillStyle::APPLY_RESULT FSSolidColour::testApply( const SwfColourTransform* _colourTransform ){
-	float alpha = colour.a * _colourTransform->mul[3] + _colourTransform->add[3];
-	if( alpha < 1e-2f )
-		return NO_OUTPUT;
-	else if( alpha > 0.99f)
-		return SOLID_OUTPUT;
-	else
-		return BLEND_OUTPUT;			
+	Math::Matrix4x4 instanceData( _colour.r, _colour.g, _colour.b, _colour.a,
+								  0,0,0,0,
+								  0,0,0,0,
+								  0,0,0,0 );
+	namespace s = Scene;
+	s::DataBuffer::CreationInfo insbcs ( s::Resource::BufferCtor(
+		s::RCF_BUF_CONSTANT | s::RCF_ACE_IMMUTABLE, 
+		sizeof(Math::Matrix4x4), &instanceData
+	) );
+	instanceBufferHandle = s::DataBufferHandle::create( "FSSolidColour_insb", &insbcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
+
+	instanceBufferHandle.acquire(); // cos our immutable data lies on the stack, so we must ensure it lasts till after an acquire
 }
 
-FillStyle::APPLY_RESULT FSSolidColour::apply(const SwfColourTransform* _colourTransform) {
-	// colour = colour * colourTransform.Mul + colourtransform.Add			
+void FSSolidColour::apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) {
 	float alpha = colour.a * _colourTransform->mul[3] + _colourTransform->add[3];
+	if( alpha < 1e-2f )
+		return;
 //	CALL_GL( glColor4f(	colour.r * _colourTransform->mul[0] + _colourTransform->add[0], 
 //						colour.g * _colourTransform->mul[1] + _colourTransform->add[1], 
 //						colour.b * _colourTransform->mul[2] + _colourTransform->add[2], 
 //						alpha ) );
-	LOG(INFO) << "TODO FSSolidColour setColour\n";
 
-	return testApply( _colourTransform );
+	// bind vertex and index buffers					
+	auto vb = _path->vertexBufferHandle.tryAcquire();
+	if( !vb ) { return; }
+	auto insb = instanceBufferHandle.tryAcquire();
+	if( !insb ) { return; }
+	auto ib = _path->indexBufferHandle.tryAcquire();
+	if( !ib ) { return; }
+
+	_ctx->bindVB( 0, vb, sizeof(float) * 2 );
+	_ctx->bindCB( Scene::ST_VERTEX, Scene::CF_USER_BLOCK0, insb );
+	_ctx->bindIB( ib, sizeof(uint16_t) );
+	_ctx->drawIndexed( Scene::PT_TRIANGLE_LIST, _path->numIndices );
+
 }
+
 /*
       SwfRFSGradient::SwfRFSGradient(SwfPlayer* _player, SwfGradientFillStyle* _gradientFill) :
 	SwfRuntimeFillStyle(_player)

@@ -13,8 +13,13 @@
 namespace Swf {
 	// forward decl
 	class SwfMatrix;
-	
-	Math::Matrix4x4 Convert(SwfMatrix* _matrix);
+	class SwfColourTransform;
+
+	Math::Matrix4x4 Convert(const SwfMatrix* _matrix);
+
+	// NOTE muls are in the row(0), adds are in row(1), last two rows = 0
+	Math::Matrix4x4 Convert(const SwfColourTransform* _ct);
+
 	inline bool Equal(const SwfVec2Twip& _a, const SwfVec2Twip& _b) {
 		return ((_a.x == _b.x) && (_a.y == _b.y));
 	}

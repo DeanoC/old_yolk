@@ -26,6 +26,15 @@ namespace Scene {
 		CF_PER_MATERIAL, // TODO concanate materials via instancing hw
 
 		CF_NUM_BLOCKS,
+		CF_USER_BLOCK0 = CF_NUM_BLOCKS,
+		CF_USER_BLOCK1,
+		CF_USER_BLOCK2,
+		CF_USER_BLOCK3,
+		CF_USER_BLOCK4,
+		CF_USER_BLOCK5,
+		CF_USER_BLOCK6,
+		CF_USER_BLOCK7,
+		CF_USER_BLOCK8,
 
 		CF_MAX_BLOCKS = 16,
 	};
@@ -50,7 +59,9 @@ namespace Scene {
 		CVN_WORLD_VIEW_PROJ_INVERSE,
 		CVN_WORLD_VIEW_PROJ_IT,
 
-		CVN_PREV_WORLD_VIEW_PROJ, // special case used in reprojection shaders, its the WVP from the previous frame
+		CVN_PREV_WORLD_VIEW_PROJ,	// special case used in reprojection shaders, its the WVP from the previous frame
+		CVN_USER_MATRIX_0,			// these user matrixs have no specified use, but shader can interpret them as sees fit
+		CVN_USER_MATRIX_1,			// examples include texture transforms, colour shifts etc.
 
 		CVN_NUM_MATRICES,
 
@@ -90,12 +101,18 @@ namespace Scene {
 		void invalidCacheOfType( CONSTANT_VAR_NAME type );
 
 		// change object passed int previous WVP and new world matrix
-		void changeObject(	const Math::Matrix4x4& prevWVPMatrix = Math::IdentityMatrix(),
+		void setObject(	const Math::Matrix4x4& prevWVPMatrix = Math::IdentityMatrix(),
 							const Math::Matrix4x4& worldMatrix  = Math::IdentityMatrix() );
 
-		void changeWorldMatrix( const Math::Matrix4x4& worldMatrix  = Math::IdentityMatrix() );
-		void changeViewMatrix( const Math::Matrix4x4& viewMatrix  = Math::IdentityMatrix() );
-		void changeProjectionMatrix( const Math::Matrix4x4& projMatrix  = Math::IdentityMatrix() );
+		// in general the set object and set camera, do the job of setting world/view/projection
+		// but in some cases its handy to do directly
+		void setWorldMatrix( const Math::Matrix4x4& worldMatrix  = Math::IdentityMatrix() );
+		void setViewMatrix( const Math::Matrix4x4& viewMatrix  = Math::IdentityMatrix() );
+		void setProjectionMatrix( const Math::Matrix4x4& projMatrix  = Math::IdentityMatrix() );
+		
+		// set either of the user matrixes
+		void setUserMatrix0( const Math::Matrix4x4& userMatrix );
+		void setUserMatrix1( const Math::Matrix4x4& userMatrix );
 
 		// set the camera currently used by the renderer
 		void setCamera( const Scene::CameraPtr& _camera );

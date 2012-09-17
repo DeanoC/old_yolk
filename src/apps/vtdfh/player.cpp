@@ -211,7 +211,7 @@ void Player::debugCallback( void ) {
 			if( !(rigid->getBroadphaseProxy()->m_collisionFilterGroup & TBC_WORLD) ) {
 				btVector3 minAABB, maxAABB;
 				rigid->getAabb( minAABB, maxAABB );
-				Core::g_pDebugRender->worldLine( Core::RGBAColour(i/2,i/4,0,0), Math::GetTranslation(sm), 
+				Core::g_pDebugRender->worldLine( Core::RGBAColour(i/2.f,i/4.f,0,0), Math::GetTranslation(sm), 
 						Math::Vector3((minAABB[0]+maxAABB[0])/2.f, maxAABB[1], (minAABB[2]+maxAABB[2])/2.0f ) );
 			}
 		}

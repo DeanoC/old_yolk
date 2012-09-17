@@ -31,7 +31,8 @@ namespace Swf {
 		}
 		Math::Matrix4x4 mat(*_concatMatrix);
 		mat._43 = (float)_depth / 255.f;//65535.0f; // TODO code is straight from GL, see why
-		_ctx->getConstantCache().changeWorldMatrix( mat );
+		_ctx->getConstantCache().setWorldMatrix( mat );
+		_ctx->getConstantCache().setUserMatrix0( Convert(_colourTransform ) );
 		_ctx->getConstantCache().updateGPUBlock( _ctx, Scene::CF_STD_OBJECT );
 
 		displayFill( _ctx, _concatMatrix, _colourTransform, _depth, false, _morph );		
@@ -46,24 +47,13 @@ namespace Swf {
 				++i ) {
 			const BasePath* path = *i;
 			if( path != NULL ) {
-				// set textures/material setting
-				FillStyle::APPLY_RESULT ao = path->fillStyle->apply( _colourTransform );
-				if(ao == FillStyle::NO_OUTPUT)
-					continue;
+				path->fillStyle->apply( _ctx, _colourTransform, path );
 
-				// bind vertex and index buffers					
-
-				auto vb = path->vertexBufferHandle.tryAcquire();
-				if( !vb ) { continue; }
-				auto ib = path->indexBufferHandle.tryAcquire();
-				if( !ib ) { continue; }
-				_ctx->bindVB( 0, vb, sizeof(float) * 2 );
-				_ctx->bindIB( ib, sizeof(uint16_t) );
-				if( ao == FillStyle::BLEND_OUTPUT) {
+//				if( ao == FillStyle::BLEND_OUTPUT) {
 //					CALL_GL( glEnable( GL_BLEND ) );
 //					CALL_GL( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
-				}
-				_ctx->drawIndexed( Scene::PT_LINE_LIST, path->numIndices );
+//				}
+//				_ctx->drawIndexed( Scene::PT_LINE_LIST, path->numIndices );
 				/*
 				CALL_GL( glDisable( GL_CULL_FACE ) );
 				CALL_GL( glColorMask(1,1,1,0) );		
@@ -83,32 +73,22 @@ namespace Swf {
 			if( path != NULL ){
 				if( path->isSimple() ) {
 					// set textures/material setting
-					FillStyle::APPLY_RESULT ao = path->fillStyle->apply( _colourTransform );
-					if(ao == FillStyle::NO_OUTPUT)
-						continue;
+					path->fillStyle->apply( _ctx, _colourTransform, path );
 
-					// bind vertex and index buffers					
-					auto vb = path->vertexBufferHandle.tryAcquire();
-					if( !vb ) { continue; }
-					auto ib = path->indexBufferHandle.tryAcquire();
-					if( !ib ) { continue; }
-					_ctx->bindVB( 0, vb, sizeof(float) * 2 );
-					_ctx->bindIB( ib, sizeof(uint16_t) );
-					if( ao == FillStyle::BLEND_OUTPUT) {
-	//					CALL_GL( glEnable( GL_BLEND ) );
-	//					CALL_GL( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
-					}
-					_ctx->drawIndexed( Scene::PT_TRIANGLE_LIST, path->numIndices );
+//					if( ao == FillStyle::BLEND_OUTPUT) {
+//					CALL_GL( glEnable( GL_BLEND ) );
+//					CALL_GL( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
+//					}
 					/*											
 					CALL_GL( glDisable( GL_CULL_FACE ) );
 					CALL_GL( glColorMask(1,1,1,0) );
 					*/
 				} else {
-					FillStyle::APPLY_RESULT ao = path->fillStyle->testApply( _colourTransform );
+/*					FillStyle::APPLY_RESULT ao = path->fillStyle->testApply( _colourTransform );
 					
 					if(ao == FillStyle::NO_OUTPUT)
 						continue;
-					/*
+					
 					
 					// bind vertex and index buffers
 					CALL_GL( glBindBuffer( GL_ARRAY_BUFFER, path->vertexBuffer) );

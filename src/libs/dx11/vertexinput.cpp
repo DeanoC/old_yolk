@@ -50,7 +50,6 @@ Scene::VertexInput* VertexInput::internalCreate( const Scene::VertexInput::Creat
 		const VinElement* ourtype = &creation->elements[i];
 		D3D11_INPUT_ELEMENT_DESC* d3dtype = &vi->vertexElements[i];
 
-		uint32_t beginOffset = offset;
 		switch( ourtype->usage ) {
 		case VE_POSITION:	d3dtype->SemanticName = "POSITION";		d3dtype->SemanticIndex = 0; break;
 		case VE_NORMAL:		d3dtype->SemanticName = "NORMAL"; 		d3dtype->SemanticIndex = 0; break;
@@ -88,16 +87,21 @@ Scene::VertexInput* VertexInput::internalCreate( const Scene::VertexInput::Creat
 
 		size_t offset = 0;
 		if( creation->data[i].offset == VI_AUTO_OFFSET ) {
-			offset = streamOffset[ i ];
+			offset = streamOffset[ creation->data[i].stream ];
 		} else {
 			offset = creation->data[i].offset;
 		}
-		streamOffset[ i + 1 ] = offset + getElementSize( creation->elements[i] );
+		streamOffset[  creation->data[i].stream ] = offset + getElementSize( creation->elements[i] );
 
 		d3dtype->InputSlot = creation->data[i].stream;
 		d3dtype->AlignedByteOffset = (UINT) offset;
-		d3dtype->InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		d3dtype->InstanceDataStepRate = 0;
+		if( creation->data[i].instanceCount == 0 ) {
+			d3dtype->InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			d3dtype->InstanceDataStepRate = 0;
+		} else {
+			d3dtype->InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
+			d3dtype->InstanceDataStepRate = creation->data[i].instanceCount;
+		}
 	}
 
 	return vi;

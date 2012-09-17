@@ -366,9 +366,11 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 		for( int i = 0; i < mds->vacs.elementCount; ++i ) { 
 			mds->vacs.data[i].buffer = vertexBuffer;
 			mds->vacs.data[i].offset = VI_AUTO_OFFSET;
-			mds->vacs.data[i].stream = 0;
 			mds->vacs.data[i].stride = VI_AUTO_STRIDE;
+			mds->vacs.data[i].stream = 0;
+			mds->vacs.data[i].instanceCount = VI_VERTEX_STREAM;
 		}
+
 		gpuMaterialStoreOk = false;
 		Math::Vector3 baseColour;
 		float Kd = 1.0f;

@@ -57,17 +57,16 @@ namespace Swf {
 		if (destIndexData.size() >= 2) {
 
 			namespace s = Scene;
-			static int counter = 0;
 			s::DataBuffer::CreationInfo vbcs ( s::Resource::BufferCtor(
 				s::RCF_BUF_VERTEX | s::RCF_ACE_IMMUTABLE, 
 				polysSizeInBytes, tmp 
 			) );
-			vertexBufferHandle = s::DataBufferHandle::create( "swfgpulinepath_vb" + boost::lexical_cast<std::string>(counter++), &vbcs );
+			vertexBufferHandle = s::DataBufferHandle::create( "swfgpulinepath_vb", &vbcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
 			s::DataBuffer::CreationInfo ibcs ( s::Resource::BufferCtor(
 				s::RCF_BUF_INDEX | s::RCF_ACE_IMMUTABLE, 
 				sizeof(uint16_t) * destIndexData.size(), &destIndexData[0]
 			) );
-			indexBufferHandle = s::DataBufferHandle::create( "swfgpulinepath_ib" + boost::lexical_cast<std::string>(counter++), &ibcs );
+			indexBufferHandle = s::DataBufferHandle::create( "swfgpulinepath_ib", &ibcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
 
 			numIndices = destIndexData.size();
 

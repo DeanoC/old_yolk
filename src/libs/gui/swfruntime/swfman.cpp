@@ -71,9 +71,9 @@ SwfMan::SwfMan() {
 
 		gradientTextureManager = CORE_NEW GradientTextureManager();
 
-		VertexInput::CreationInfo vocs = {
-			1,	{ { VE_POSITION, VT_FLOAT2 }, },
-				{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, }
+		VertexInput::CreationInfo vocs = {		
+			1,	{	{ VE_POSITION, VT_FLOAT2 },  },
+				{	{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM }, }
 		};
 
 		const std::string viName = "_SWFPlayer" + VertexInput::genEleString(vocs.elementCount, vocs.elements );

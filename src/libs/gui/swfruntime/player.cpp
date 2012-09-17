@@ -81,8 +81,8 @@ namespace Swf {
 		twipToNdx = Math::IdentityMatrix();
 		twipToNdx = Math::CreateTranslationMatrix(-(sx / 2.0f), -(sy / 2.0f), 0.0f);
 		twipToNdx = Math::MultiplyMatrix(twipToNdx, Math::CreateScaleMatrix((2.0f*scaleX) / sx, -(2.0f*scaleY) / sy, 1.0f));
-		_ctx->getConstantCache().changeViewMatrix();
-		_ctx->getConstantCache().changeProjectionMatrix( twipToNdx );
+		_ctx->getConstantCache().setViewMatrix();
+		_ctx->getConstantCache().setProjectionMatrix( twipToNdx );
 
 /*		twipToPixels = Math::MultiplyMatrix(twipToNdx, Math::CreateScaleMatrix( _backingWidth*0.5f, _backingHeight*0.5f, 1.0f ) );
 		int scisWidth = _backingWidth * scaleX;
