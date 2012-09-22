@@ -59,7 +59,6 @@ namespace Swf {
 		float frameRateInMs;
 	
 		const Math::Matrix4x4& getTwipToNdx() const { return twipToNdx; }
-		const Math::Matrix4x4& getTwipToPixels() const { return twipToPixels; }
 		
 #if defined( USE_ACTIONSCRIPT )
 		AsVM*				virtualMachine;
@@ -77,8 +76,6 @@ namespace Swf {
 		Fonts								runtimeFonts;
 		
 		Math::Matrix4x4 					twipToNdx;
-		Math::Matrix4x4 					twipToPixels;
-
 	};
 
 	typedef const Core::ResourceHandle<PlayerType, Player> PlayerHandle;

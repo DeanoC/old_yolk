@@ -35,12 +35,13 @@ FSLine::FSLine( Player* _player, const SwfLineStyle* _lineFill ) : FillStyle( _p
 
 bool FSLine::apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) {
 	float alpha = colour.getAlpha() * _colourTransform->mul[3] + _colourTransform->add[3];
-	Math::Vector2 width = Math::TransformNormal(lineWidth, player->getTwipToPixels()) ;
+//	Math::Vector2 width = Math::TransformNormal(lineWidth, player->getTwipToPixels()) ;
 
 	if( alpha < 1e-2f )
 		return false;
-	if(Math::Length(width) < 1e-2f)
-		return false;
+	// TODO line width
+//	if(Math::Length(width) < 1e-2f)
+//		return false;
 
 	// bind vertex and index buffers					
 	auto vb = _path->vertexBufferHandle.tryAcquire();

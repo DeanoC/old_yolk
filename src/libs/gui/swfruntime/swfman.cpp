@@ -104,8 +104,8 @@ SwfMan::SwfMan() {
 		// where stencil is odd render the pixel and clear the stencil buffer
 		DepthStencilState::CreationInfo renderoddci = {
 			DepthStencilState::CreationInfo::STENCIL_ENABLE, CF_ALWAYS, 0x1, 0x3F, 
-				SO_ZERO, SO_KEEP, SO_KEEP, CF_EQUAL,
-				SO_ZERO, SO_KEEP, SO_KEEP, CF_EQUAL
+				SO_ZERO, SO_ZERO, SO_ZERO, CF_EQUAL,
+				SO_ZERO, SO_ZERO, SO_ZERO, CF_EQUAL
 		};
 		oddDepthStateHandle.reset( DepthStencilStateHandle::create( "_DS_SWF_RenderOdd", &renderoddci ) );
 
