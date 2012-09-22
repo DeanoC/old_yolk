@@ -22,6 +22,8 @@ FS_OUT main( VS_IN input ) {
 	} else {
 		output.colour0 = input.colUV;
 	}
+	// colour matrix transform
+	output.colour0 = (output.colour0 * matrixUser0[0]) + matrixUser0[1];
 
 	return output;
 }

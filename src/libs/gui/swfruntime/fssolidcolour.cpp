@@ -27,10 +27,6 @@ void FSSolidColour::apply( Scene::RenderContext* _ctx, const SwfColourTransform*
 	float alpha = colour.getAlpha() * _colourTransform->mul[3] + _colourTransform->add[3];
 	if( alpha < 1e-2f )
 		return;
-//	CALL_GL( glColor4f(	colour.r * _colourTransform->mul[0] + _colourTransform->add[0], 
-//						colour.g * _colourTransform->mul[1] + _colourTransform->add[1], 
-//						colour.b * _colourTransform->mul[2] + _colourTransform->add[2], 
-//						alpha ) );
 
 	// bind vertex and index buffers					
 	auto vb = _path->vertexBufferHandle.tryAcquire();
@@ -101,47 +97,6 @@ SwfRuntimeFillStyle::APPLY_RESULT SwfRFSTexture::Apply(const SwfColourTransform*
 	CALL_GL( glTexCoordPointer(2, GL_FLOAT, 0, 0) );
 	CALL_GL( glTexEnvfv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR, _colourTransform->add) );
 	CALL_GL( glColor4f(_colourTransform->mul[0],_colourTransform->mul[1],_colourTransform->mul[2],_colourTransform->mul[3]));
-	return TestApply(_colourTransform);
-}
-SwfRFSLine::SwfRFSLine(SwfPlayer* _player, SwfLineStyle* _lineFill) :
-	SwfRuntimeFillStyle(_player)
-{
-	if(_lineFill != NULL){
-		colour = _lineFill->colour;
-		if(_lineFill->width > 0) {
-			lineWidth = Math::Vector2(_lineFill->width,_lineFill->width);
-		} else {
-			lineWidth = Math::Vector2(10.0f,10.0f);
-		} 
-	} else {
-		lineWidth = Math::Vector2(10.0f,10.0f);
-	}
-}
-SwfRuntimeFillStyle::APPLY_RESULT SwfRFSLine::TestApply(const SwfColourTransform* _colourTransform){			
-	Math::Vector2 width = Math::TransformNormal(lineWidth, player->GetTwipToNdx()) * 480;
-	if(Math::Length(width) < 1e-2f)
-		return NO_OUTPUT;
-	float alpha = colour.a * _colourTransform->mul[3] + _colourTransform->add[3];
-	if(alpha < 1e-2f)
-		return NO_OUTPUT;
-	else if( alpha > 0.99f)
-		return SOLID_OUTPUT;
-	else
-		return BLEND_OUTPUT;
-}
-
-SwfRuntimeFillStyle::APPLY_RESULT SwfRFSLine::Apply(const SwfColourTransform* _colourTransform){			
-	// colour = colour * colourTransform.Mul + colourtransform.Add			
-	float alpha = colour.a * _colourTransform->mul[3] + _colourTransform->add[3];
-	CALL_GL( glColor4f(	colour.r * _colourTransform->mul[0] + _colourTransform->add[0], 
-						colour.g * _colourTransform->mul[1] + _colourTransform->add[1], 
-						colour.b * _colourTransform->mul[2] + _colourTransform->add[2], 
-						alpha ) );
-						
-	Math::Vector2 width = Math::TransformNormal(lineWidth, player->GetTwipToPixels()) ;
-	
-	CALL_GL( glLineWidth(Math::Length(width)) );
-	
 	return TestApply(_colourTransform);
 }
 */

@@ -87,7 +87,6 @@ SwfMan::SwfMan() {
 		rasterStateHandle.reset( RasteriserStateHandle::create( RENDER_STATE_NORMAL_NOCULL ) );
 		renderStateHandle.reset( RenderTargetStatesHandle::create( RENDER_TARGET_STATES_PMOVER_WRITEALL ) );
 		clampSamplerHandle.reset( SamplerStateHandle::create( SAMPLER_STATE_ANISO16_CLAMP ) );
-		pointClampSamplerHandle.reset( SamplerStateHandle::create( SAMPLER_STATE_POINT_CLAMP ) );
 
 }
 SwfMan::~SwfMan() {

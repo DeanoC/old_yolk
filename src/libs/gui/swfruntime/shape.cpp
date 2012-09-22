@@ -48,12 +48,6 @@ namespace Swf {
 			const BasePath* path = *i;
 			if( path != NULL ) {
 				path->fillStyle->apply( _ctx, _colourTransform, path );
-
-//				if( ao == FillStyle::BLEND_OUTPUT) {
-//					CALL_GL( glEnable( GL_BLEND ) );
-//					CALL_GL( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
-//				}
-//				_ctx->drawIndexed( Scene::PT_LINE_LIST, path->numIndices );
 				/*
 				CALL_GL( glDisable( GL_CULL_FACE ) );
 				CALL_GL( glColorMask(1,1,1,0) );		
@@ -74,11 +68,6 @@ namespace Swf {
 				if( path->isSimple() ) {
 					// set textures/material setting
 					path->fillStyle->apply( _ctx, _colourTransform, path );
-
-//					if( ao == FillStyle::BLEND_OUTPUT) {
-//					CALL_GL( glEnable( GL_BLEND ) );
-//					CALL_GL( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
-//					}
 					/*											
 					CALL_GL( glDisable( GL_CULL_FACE ) );
 					CALL_GL( glColorMask(1,1,1,0) );

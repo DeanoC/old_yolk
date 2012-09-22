@@ -158,6 +158,10 @@ namespace Scene {
 #define SAMPLER_STATE_POINT_CLAMP					"_SS_Point_Clamp"
 #define SAMPLER_STATE_LINEAR_CLAMP					"_SS_Linear_Clamp"
 #define SAMPLER_STATE_ANISO16_CLAMP					"_SS_Aniso16_Clamp"
+#define SAMPLER_STATE_POINT_WRAP					"_SS_Point_Wrap"
+#define SAMPLER_STATE_LINEAR_WRAP					"_SS_Linear_Wrap"
+#define SAMPLER_STATE_ANISO16_WRAP					"_SS_Aniso16_Wrap"
+
 #define RENDER_STATE_NORMAL 						"_RS_Normal"
 #define RENDER_STATE_NORMAL_NOCULL 					"_RS_Normal_NoCull"
 #define DEPTH_STENCIL_STATE_NORMAL 					"_DSS_Normal"

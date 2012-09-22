@@ -18,6 +18,7 @@
 #include "fillstyle.h"
 #include "fssolidcolour.h"
 #include "fsgradient.h"
+#include "fstexture.h"
 #include "fsline.h"
 
 #include "shape.h"
@@ -168,46 +169,35 @@ namespace Swf {
 			for(int fillNum=0;fillNum < _numFills;++fillNum ) {
 				SwfFillStyle* fillStyle = _fills[fillNum];
             switch (fillStyle->fillType) {
-					case SolidFill:	{
-						SwfSolidFillStyle* solid = (SwfSolidFillStyle*) fillStyle;
-						fills[fillNum] = CORE_NEW FSSolidColour( player, solid->colour );
-						break;
-					}
-					case LinearGradientFill:
-					case RadialGradientFill: {
-						SwfGradientFillStyle* lgrad = (SwfGradientFillStyle*) fillStyle;
-						fills[fillNum] = CORE_NEW FSGradient(player, lgrad);
-						break;
-					}
-/*					case RepeatingBitmapFill: {
-						SwfBitmapFillStyle* bitrm = (SwfBitmapFillStyle*)fillStyle;
-//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitrm);
-						break;
-					}
-					case ClippedBitmapFill:	{
-						SwfBitmapFillStyle* bitcm = (SwfBitmapFillStyle*)fillStyle;
-//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitcm);
-						break;
-					}
-					case NonSmoothedRepeatingBitmapFill: {
-						SwfBitmapFillStyle* bitnsrm = (SwfBitmapFillStyle*)fillStyle;
-//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitnsrm);
-						break;
-					}
-					case NonSmoothedClippedBitmapFill: {
-						SwfBitmapFillStyle* bitnscm = (SwfBitmapFillStyle*)fillStyle;
-//						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitnscm);
-						break;
-					}
-                case FillType.MorphSolidFill:
-                    SwfMorphSolidFillStyle msfs = fillStyle as SwfMorphSolidFillStyle;
-                    fills[fillNum] = CORE_NEW SwfRuntimeMorphSolidFillStyle(player, msfs.startColour, msfs.endColour);
-                    break;*/
-					case FocalRadialGradientFill:
-					default: {
-                    fills[fillNum] = CORE_NEW FSSolidColour(player, SwfRGBA(1.0f,0.0f, 0.0f, 1.0f));
-                    break;
-					}
+				case SolidFill:	{
+					SwfSolidFillStyle* solid = (SwfSolidFillStyle*) fillStyle;
+					fills[fillNum] = CORE_NEW FSSolidColour( player, solid->colour );
+					break;
+				}
+				case LinearGradientFill:
+				case RadialGradientFill: {
+					SwfGradientFillStyle* lgrad = (SwfGradientFillStyle*) fillStyle;
+					fills[fillNum] = CORE_NEW FSGradient(player, lgrad);
+					break;
+				}
+
+				case NonSmoothedClippedBitmapFill:
+				case NonSmoothedRepeatingBitmapFill:
+				case ClippedBitmapFill:	
+				case RepeatingBitmapFill: {
+					SwfBitmapFillStyle* bitrm = (SwfBitmapFillStyle*)fillStyle;
+					fills[fillNum] = CORE_NEW FSTexture(player, bitrm);
+					break;
+				}
+	/*                case FillType.MorphSolidFill:
+				SwfMorphSolidFillStyle msfs = fillStyle as SwfMorphSolidFillStyle;
+				fills[fillNum] = CORE_NEW SwfRuntimeMorphSolidFillStyle(player, msfs.startColour, msfs.endColour);
+				break;*/
+				case FocalRadialGradientFill:
+				default: {
+				fills[fillNum] = CORE_NEW FSSolidColour(player, SwfRGBA(1.0f,0.0f, 0.0f, 1.0f));
+				break;
+				}
             }
         }
     }

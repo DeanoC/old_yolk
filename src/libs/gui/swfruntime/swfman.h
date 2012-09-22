@@ -38,7 +38,6 @@ namespace Swf {
 		Core::ScopedResourceHandle<Scene::RasteriserStateHandle>		rasterStateHandle;
 		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>		renderStateHandle;
 		Core::ScopedResourceHandle<Scene::SamplerStateHandle>			clampSamplerHandle;
-		Core::ScopedResourceHandle<Scene::SamplerStateHandle>			pointClampSamplerHandle;
 
 	};
 }

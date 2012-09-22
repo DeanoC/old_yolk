@@ -41,6 +41,7 @@ void FSLine::apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colou
 		return;
 	if(Math::Length(width) < 1e-2f)
 		return;
+
 	// bind vertex and index buffers					
 	auto vb = _path->vertexBufferHandle.tryAcquire();
 	if( !vb ) { return; }

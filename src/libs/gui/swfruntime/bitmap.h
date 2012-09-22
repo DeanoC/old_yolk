@@ -16,7 +16,8 @@ namespace Swf {
 	public:
 		Bitmap( const SwfBitmap* _bitmap );
 				
-		unsigned int texNum;
+		Core::ScopedResourceHandle<Scene::TextureHandle>	textureHandle;
+
 		Math::Vector2 offset;
 		Math::Vector2 scale;
 		

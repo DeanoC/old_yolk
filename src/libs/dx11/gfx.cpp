@@ -79,6 +79,19 @@ Gfx::Gfx() {
 		FM_ANISOTROPIC, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 16
 	};
 	SamplerStateHandle::create( SAMPLER_STATE_ANISO16_CLAMP, &acsci, Core::RMRF_DONTFLUSH );
+	SamplerState::CreationInfo wpcsci = {
+		FM_MIN_MAG_MIP_POINT, AM_WRAP, AM_WRAP, AM_WRAP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
+	};
+	SamplerStateHandle::create( SAMPLER_STATE_POINT_WRAP, &wpcsci, Core::RMRF_DONTFLUSH );
+	SamplerState::CreationInfo wlcsci = {
+		FM_MIN_MAG_MIP_LINEAR, AM_WRAP, AM_WRAP, AM_WRAP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
+	};
+	SamplerStateHandle::create( SAMPLER_STATE_LINEAR_WRAP, &wlcsci, Core::RMRF_DONTFLUSH );
+	SamplerState::CreationInfo wacsci = {
+		FM_ANISOTROPIC, AM_WRAP, AM_WRAP, AM_WRAP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 16
+	};
+	SamplerStateHandle::create( SAMPLER_STATE_ANISO16_WRAP, &wacsci, Core::RMRF_DONTFLUSH );
+
 	RasteriserState::CreationInfo nrsci = {
 		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
