@@ -67,7 +67,7 @@ namespace Scene {
 		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const DataBufferPtr& buffer ) = 0;
 		virtual void bind( const SHADER_TYPES type, const uint32_t unit, const SamplerStatePtr& sampler ) = 0;
 		virtual void bind( const RenderTargetStatesPtr& targetStates ) = 0;
-		virtual void bind( const DepthStencilStatePtr& dsStates ) = 0;
+		virtual void bind( const DepthStencilStatePtr& dsStates, uint32_t _stencilRef = 0 ) = 0;
 		virtual void bind( const RasteriserStatePtr& rasteriser ) = 0;
 		virtual void bind( const VertexInputPtr& vertexInput ) = 0;
 

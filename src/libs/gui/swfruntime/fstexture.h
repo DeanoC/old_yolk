@@ -14,7 +14,7 @@ namespace Swf {
 	public:
 		FSTexture( Player* _player, SwfBitmapFillStyle* _gradientFill );
 
-		void apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
+		bool apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
 	private:
 		Bitmap*														bitmapTex;
 		SwfBitmapFillStyle*											bitmapFill;

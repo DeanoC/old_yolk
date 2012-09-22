@@ -26,18 +26,21 @@ namespace Swf {
 
 		GradientTextureManager* getGradientTextureManager() { return gradientTextureManager; }
 
+		Core::ScopedResourceHandle<Scene::VertexInputHandle>			vertexInputHandle;
+		Core::ScopedResourceHandle<Scene::ProgramHandle>				mainProgramHandle;
+		Core::ScopedResourceHandle<Scene::RasteriserStateHandle>		rasterStateHandle;
+		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>		renderStateHandle;
+		Core::ScopedResourceHandle<Scene::SamplerStateHandle>			clampSamplerHandle;
+		Core::ScopedResourceHandle<Scene::DepthStencilStateHandle>		countCrossingDepthStateHandle;
+		Core::ScopedResourceHandle<Scene::DepthStencilStateHandle>		oddDepthStateHandle;
+		Core::ScopedResourceHandle<Scene::DepthStencilStateHandle>		normalDepthStateHandle;
+		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>		norenderStateHandle;
 	private:
 		friend class Core::Singleton<SwfMan>;
 		//! ctor
 		SwfMan();
 
 		GradientTextureManager*											gradientTextureManager;
-
-		Core::ScopedResourceHandle<Scene::VertexInputHandle>			vertexInputHandle;
-		Core::ScopedResourceHandle<Scene::ProgramHandle>				mainProgramHandle;
-		Core::ScopedResourceHandle<Scene::RasteriserStateHandle>		rasterStateHandle;
-		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>		renderStateHandle;
-		Core::ScopedResourceHandle<Scene::SamplerStateHandle>			clampSamplerHandle;
 
 	};
 }

@@ -25,7 +25,7 @@ namespace Swf {
 		FillStyle( Player* _player) : player(_player){}
 		virtual ~FillStyle (){};
 		
-		virtual void apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) = 0;
+		virtual bool apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) = 0;
 	protected:
 		Player* player;
 	};

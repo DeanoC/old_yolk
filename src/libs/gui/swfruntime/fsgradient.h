@@ -13,7 +13,7 @@ namespace Swf {
 	public:
 		FSGradient( Player* _player, SwfGradientFillStyle* _gradientFill );
 
-		void apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
+		bool apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
 	private:
 		SwfGradientFillStyle*										gradientFill;
 		Math::Matrix4x4												matrix;

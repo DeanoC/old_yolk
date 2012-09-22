@@ -12,7 +12,7 @@ namespace Swf {
 	public:
 		FSSolidColour( Player* _player, const SwfRGBA&  _colour );
 
-		void apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
+		bool apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
 	private:
 		SwfRGBA colour;
 		Core::ScopedResourceHandle<Scene::DataBufferHandle>			constBufferHandle;

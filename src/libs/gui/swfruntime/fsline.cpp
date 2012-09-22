@@ -33,28 +33,28 @@ FSLine::FSLine( Player* _player, const SwfLineStyle* _lineFill ) : FillStyle( _p
 
 }
 
-void FSLine::apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) {
+bool FSLine::apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) {
 	float alpha = colour.getAlpha() * _colourTransform->mul[3] + _colourTransform->add[3];
 	Math::Vector2 width = Math::TransformNormal(lineWidth, player->getTwipToPixels()) ;
 
 	if( alpha < 1e-2f )
-		return;
+		return false;
 	if(Math::Length(width) < 1e-2f)
-		return;
+		return false;
 
 	// bind vertex and index buffers					
 	auto vb = _path->vertexBufferHandle.tryAcquire();
-	if( !vb ) { return; }
+	if( !vb ) { return false; }
 	auto insb = constBufferHandle.tryAcquire();
-	if( !insb ) { return; }
+	if( !insb ) { return false; }
 	auto ib = _path->indexBufferHandle.tryAcquire();
-	if( !ib ) { return; }
+	if( !ib ) { return false; }
 
 	_ctx->bindVB( 0, vb, sizeof(float) * 2 );
 	_ctx->bindCB( Scene::ST_VERTEX, Scene::CF_USER_BLOCK0, insb );
 	_ctx->bindIB( ib, sizeof(uint16_t) );
 	_ctx->drawIndexed( Scene::PT_LINE_LIST, _path->numIndices );
-
+	return true;
 }
 
 }

@@ -14,6 +14,7 @@
 #include "gpupath.h"
 #include "player.h"
 #include "utils.h"
+#include "swfman.h"
 #include "shape.h"
 
 namespace Swf {
@@ -45,14 +46,8 @@ namespace Swf {
 		for(	GpuPathArray::const_iterator i = gpuLinePaths.begin();
 				i != gpuLinePaths.end();
 				++i ) {
-			const BasePath* path = *i;
-			if( path != NULL ) {
-				path->fillStyle->apply( _ctx, _colourTransform, path );
-				/*
-				CALL_GL( glDisable( GL_CULL_FACE ) );
-				CALL_GL( glColorMask(1,1,1,0) );		
-				*/
-			}
+			if( *i == nullptr) { continue; }
+			(*i)->fillStyle->apply( _ctx, _colourTransform, *i );
 		}
 	}	
 	void Shape::displayFill(	Scene::RenderContext* _ctx, 
@@ -61,63 +56,9 @@ namespace Swf {
 								uint16_t _depth, bool _clipLayer, float _morph ) {
 		for(	GpuPathArray::const_iterator i = gpuPaths.begin();
 				i != gpuPaths.end();
-				++i )
-		{
-			const BasePath* path = *i;
-			if( path != NULL ){
-				if( path->isSimple() ) {
-					// set textures/material setting
-					path->fillStyle->apply( _ctx, _colourTransform, path );
-					/*											
-					CALL_GL( glDisable( GL_CULL_FACE ) );
-					CALL_GL( glColorMask(1,1,1,0) );
-					*/
-				} else {
-/*					FillStyle::APPLY_RESULT ao = path->fillStyle->testApply( _colourTransform );
-					
-					if(ao == FillStyle::NO_OUTPUT)
-						continue;
-					
-					
-					// bind vertex and index buffers
-					CALL_GL( glBindBuffer( GL_ARRAY_BUFFER, path->vertexBuffer) );
-					CALL_GL( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, path->indexBuffer) );
-					CALL_GL( glVertexPointer(2, GL_FLOAT, 0, 0) );
-					
-					// GPU tesselate into Dest.A
-					CALL_GL( glDisable( GL_CULL_FACE ) );
-					CALL_GL( glEnable( GL_COLOR_LOGIC_OP) );
-					CALL_GL( glLogicOp( GL_XOR ) );
-					CALL_GL( glColorMask(0,0,0,1) );
-					CALL_GL( glColor4f(0.0f,0.0f,0.0f,1.0f) );
-					CALL_GL( glDrawElements(GL_TRIANGLES, path->numIndices,  GL_UNSIGNED_SHORT, 0) );
-				
-					// set textures/material setting
-					path->fillStyle->Apply( _colourTransform );
-					CALL_GL( glDisable( GL_COLOR_LOGIC_OP ) );
-					CALL_GL( glEnable( GL_BLEND ) );
-				
-					if( ao == SwfRuntimeFillStyle::BLEND_OUTPUT) {
-						// Dest.A = Dest.A * Material.Alpha
-						CALL_GL( glBlendFunc( GL_ZERO, GL_SRC_ALPHA ) );
-						CALL_GL( glDrawArrays(GL_TRIANGLE_FAN, path->extentsRectVertexOffset, 4) );
-					}
-					
-					// Dest.colour = Material.colour * Dest.Alpha (which has tesselation + material alpha)
-					CALL_GL( glColorMask(1,1,1,1) );
-					CALL_GL( glBlendFunc( GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA ) );
-					CALL_GL( glDrawArrays(GL_TRIANGLE_FAN, path->extentsRectVertexOffset, 4) );
-			
-					// ensure dest alpha is cleared for this polygon
-					CALL_GL( glDisable(GL_BLEND) );
-					CALL_GL( glColorMask(0,0,0,1) );
-					CALL_GL( glEnable( GL_COLOR_LOGIC_OP) );
-					CALL_GL( glLogicOp( GL_CLEAR ) );
-					CALL_GL( glDrawArrays(GL_TRIANGLE_FAN, path->extentsRectVertexOffset, 4) );
-					*/
-					TODO_ASSERT( false && "GL code" );
-				}
-			}
+				++i ) {
+			if( *i == nullptr) { continue; }
+			(*i)->fillStyle->apply( _ctx, _colourTransform, *i );
 		}
 	}
     

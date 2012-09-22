@@ -239,11 +239,11 @@ void RenderContext::bind( const Scene::RenderTargetStatesPtr& stargetStates ) {
 	ctx->OMSetBlendState( states, todo, 0xFFFFFFFF );
 }
 
-void RenderContext::bind( const Scene::DepthStencilStatePtr& sdsState ) {
-	auto dsState = std::static_pointer_cast<Dx11::DepthStencilState>( sdsState );
+void RenderContext::bind( const Scene::DepthStencilStatePtr& _sdsState, uint32_t _stencilRef ) {
+	auto dsState = std::static_pointer_cast<Dx11::DepthStencilState>( _sdsState );
 	auto state = static_cast<ID3D11DepthStencilState* const>( dsState->depthStencilState.get() );
 	// todo stencil ref
-	ctx->OMSetDepthStencilState( state, 0 );
+	ctx->OMSetDepthStencilState( state, _stencilRef );
 }
 
 void RenderContext::bind( const Scene::RasteriserStatePtr& sraster ) {

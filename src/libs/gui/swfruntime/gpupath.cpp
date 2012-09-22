@@ -76,6 +76,7 @@ namespace Swf {
 		polysSizeInBytes = sizeof(float) * 2 * pathVertices.size();
 		extentsRectVertexOffset = pathVertices.size();
 
+		// tri-strip for coverage quad
 		tmp[index++] = (float)minX;
 		tmp[index++] = (float)minY;
 
@@ -83,10 +84,11 @@ namespace Swf {
 		tmp[index++] = (float)maxY;
 
 		tmp[index++] = (float)maxX;
-		tmp[index++] = (float)maxY;
+		tmp[index++] = (float)minY;
 
 		tmp[index++] = (float)maxX;
-		tmp[index++] = (float)minY;
+		tmp[index++] = (float)maxY;
+
 
 		if (destIndexData.size() >= 3) {
 			namespace s = Scene;

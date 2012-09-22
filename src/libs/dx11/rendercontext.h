@@ -48,10 +48,10 @@ namespace Dx11 {
 		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& sampler ) override;
 		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr& sampler ) override;
 
-		virtual void bind( const Scene::RenderTargetStatesPtr& targetStates ) override;
-		virtual void bind( const Scene::DepthStencilStatePtr& dsStates ) override;
-		virtual void bind( const Scene::RasteriserStatePtr& rasteriser ) override;
-		virtual void bind( const Scene::VertexInputPtr& vertexInput ) override;
+		virtual void bind( const Scene::RenderTargetStatesPtr& _targetStates ) override;
+		virtual void bind( const Scene::DepthStencilStatePtr& _dsStates, uint32_t _stencilRef = 0 ) override;
+		virtual void bind( const Scene::RasteriserStatePtr& _rasteriser ) override;
+		virtual void bind( const Scene::VertexInputPtr& _vertexInput ) override;
 
 		virtual void bindCB( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& sampler ) override;
 		virtual void bindVB( const unsigned int _stream, const Scene::DataBufferPtr& vb, const unsigned int _stride, const unsigned int _offset = 0 ) override;

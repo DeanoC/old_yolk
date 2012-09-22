@@ -14,7 +14,7 @@ namespace Swf {
 	public:
 		FSLine( Player* _player, const SwfLineStyle* _lineFill );
 
-		void apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
+		bool apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
 	private:
 		SwfRGBA 		colour;
 		Math::Vector2 	lineWidth;

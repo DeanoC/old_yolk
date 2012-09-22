@@ -267,9 +267,10 @@ void VtPipeline::endGeomRenderTransparentPass( RenderContext* ctx ) {
 
 void VtPipeline::start2DPass( RenderContext* ctx ) {
 	Scene::TexturePtr tgt = colour2DTargetHandle.acquire();
+	auto depthTarget = depthTargetMSHandle.acquire();
 
 	ctx->clear( tgt, Core::RGBAColour(0,0,0,0) );
-	ctx->bindRenderTarget( tgt );
+	ctx->bindRenderTargets( tgt, depthTarget );
 
 }
 

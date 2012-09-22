@@ -85,8 +85,29 @@ SwfMan::SwfMan() {
 		vi->validate( prg );
 
 		rasterStateHandle.reset( RasteriserStateHandle::create( RENDER_STATE_NORMAL_NOCULL ) );
+		norenderStateHandle.reset( RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOWRITE ) );
 		renderStateHandle.reset( RenderTargetStatesHandle::create( RENDER_TARGET_STATES_PMOVER_WRITEALL ) );
 		clampSamplerHandle.reset( SamplerStateHandle::create( SAMPLER_STATE_ANISO16_CLAMP ) );
+		
+		DepthStencilState::CreationInfo normalci = { (DepthStencilState::CreationInfo::FLAGS)0 };
+		normalDepthStateHandle.reset( DepthStencilStateHandle::create( "_DS_SWF_Normal", &normalci ) );
+
+		// reserve top two bits of stencil for other uses (None yet but possible clip paths?)
+		DepthStencilState::CreationInfo countcrossingci = {
+			DepthStencilState::CreationInfo::STENCIL_ENABLE, CF_ALWAYS, 0x3F, 0x3F, 
+				SO_KEEP, SO_KEEP, SO_INC, CF_ALWAYS,
+				SO_KEEP, SO_KEEP, SO_INC, CF_ALWAYS
+		};
+		countCrossingDepthStateHandle.reset( DepthStencilStateHandle::create( "_DS_SWF_CountCrossings", &countcrossingci ) );
+
+		// reserve top two bits of stencil for other uses (None yet but possible clip paths?)
+		// where stencil is odd render the pixel and clear the stencil buffer
+		DepthStencilState::CreationInfo renderoddci = {
+			DepthStencilState::CreationInfo::STENCIL_ENABLE, CF_ALWAYS, 0x1, 0x3F, 
+				SO_ZERO, SO_KEEP, SO_KEEP, CF_EQUAL,
+				SO_ZERO, SO_KEEP, SO_KEEP, CF_EQUAL
+		};
+		oddDepthStateHandle.reset( DepthStencilStateHandle::create( "_DS_SWF_RenderOdd", &renderoddci ) );
 
 }
 SwfMan::~SwfMan() {
@@ -99,8 +120,10 @@ void SwfMan::bind( Scene::RenderContext* _ctx ) {
 	auto rs = rasterStateHandle.acquire();
 	auto rts = renderStateHandle.acquire();
 	auto ss = clampSamplerHandle.acquire();
+	auto dss = normalDepthStateHandle.acquire();
 
 	_ctx->bind( Scene::ST_FRAGMENT, 0, ss );
+	_ctx->bind( dss );
 	_ctx->bind( rts );
 	_ctx->bind( rs );
 	_ctx->bind( vi );

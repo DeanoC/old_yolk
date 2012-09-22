@@ -105,30 +105,22 @@ Gfx::Gfx() {
 		(DepthStencilState::CreationInfo::FLAGS)(DepthStencilState::CreationInfo::DEPTH_ENABLE | DepthStencilState::CreationInfo::DEPTH_WRITE), 
 		CF_LESS
 	};
-	DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_NORMAL, &ndsci );
+	DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_NORMAL, &ndsci, Core::RMRF_DONTFLUSH );
 
 	DepthStencilState::CreationInfo dlwdsci = {
 		(DepthStencilState::CreationInfo::FLAGS)(DepthStencilState::CreationInfo::DEPTH_ENABLE ), 
 		CF_LESS
 	};
-	DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_LESS_NOWRITE, &dlwdsci );
+	DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_LESS_NOWRITE, &dlwdsci, Core::RMRF_DONTFLUSH );
 
-	RenderTargetStates::CreationInfo nrtci = {
-		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, { (TargetState::FLAGS)0, TWE_ALL }
-	};
-	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALL, &nrtci );
-
-	RenderTargetStates::CreationInfo nwcrtci = {
-		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, { (TargetState::FLAGS)0, TWE_COLOUR }
-	};
-	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITECOLOUR, &nwcrtci );
-	RenderTargetStates::CreationInfo nwartci = {
-		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, { (TargetState::FLAGS)0, TWE_ALPHA }
-	};
-	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALPHA, &nwartci );
+	RenderTargetStates::CreationInfo nwnrtci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_NONE } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOWRITE, &nwnrtci, Core::RMRF_DONTFLUSH );
+	RenderTargetStates::CreationInfo nrtci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_ALL } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALL, &nrtci, Core::RMRF_DONTFLUSH );
+	RenderTargetStates::CreationInfo nwcrtci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_COLOUR } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITECOLOUR, &nwcrtci, Core::RMRF_DONTFLUSH );
+	RenderTargetStates::CreationInfo nwartci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_ALPHA } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALPHA, &nwartci, Core::RMRF_DONTFLUSH );
 
 	RenderTargetStates::CreationInfo artci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
@@ -137,7 +129,7 @@ Gfx::Gfx() {
 				BM_SRC_ALPHA, BM_INV_SRC_ALPHA, BO_ADD,		// alpha blend
 			}
 	};
-	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_OVER_WRITEALL, &artci );
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_OVER_WRITEALL, &artci, Core::RMRF_DONTFLUSH );
 	RenderTargetStates::CreationInfo pmartci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
 		1,	{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
@@ -145,7 +137,7 @@ Gfx::Gfx() {
 				BM_ONE, BM_INV_SRC_ALPHA, BO_ADD,		// alpha blend
 			}
 	};
-	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_PMOVER_WRITEALL, &pmartci );
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_PMOVER_WRITEALL, &pmartci, Core::RMRF_DONTFLUSH );
 
 	RenderTargetStates::CreationInfo aartci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
@@ -154,7 +146,7 @@ Gfx::Gfx() {
 				BM_ONE, BM_ONE, BO_ADD,		// alpha blend
 			}
 	};
-	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_ADD_WRITEALL, &aartci );
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_ADD_WRITEALL, &aartci, Core::RMRF_DONTFLUSH );
 
 }
 
