@@ -27,9 +27,9 @@ namespace Swf {
 			unusedBits = 0;
 		}
 
-		long marker();
+		uint64_t marker();
 
-		void setToMarker(long readInt);
+		void setToMarker( uint64_t marker );
 
 		void readBytes(uint8_t* _dest, size_t _numBytes) {
 			align();

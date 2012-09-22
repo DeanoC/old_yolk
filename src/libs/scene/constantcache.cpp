@@ -337,7 +337,7 @@ void ConstantCache::updateGPUBlock( Scene::RenderContext* context, CONSTANT_FREQ
 	int varsToSet = varsPerBlock[block];
 	int count = 0;
 	if( varsToSet > 0 ) {
-		void* buffer = db->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD, 0, 0 );
+		void* buffer = db->map( context, (RESOURCE_MAP_ACCESS)( RMA_WRITE | RMA_DISCARD ) );
 		while( varsToSet > 0 ) {
 			CORE_ASSERT( count < CVN_NUM_CONSTANTS );
 			// TODO better than naive bit checking

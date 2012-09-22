@@ -17,6 +17,7 @@
 
 #include "fillstyle.h"
 #include "fssolidcolour.h"
+#include "fsgradient.h"
 #include "fsline.h"
 
 #include "shape.h"
@@ -172,13 +173,13 @@ namespace Swf {
 						fills[fillNum] = CORE_NEW FSSolidColour( player, solid->colour );
 						break;
 					}
-/*					case LinearGradientFill:
+					case LinearGradientFill:
 					case RadialGradientFill: {
 						SwfGradientFillStyle* lgrad = (SwfGradientFillStyle*) fillStyle;
-//						fills[fillNum] = CORE_NEW iPhone::SwfRFSGradient(player, lgrad);
+						fills[fillNum] = CORE_NEW FSGradient(player, lgrad);
 						break;
 					}
-					case RepeatingBitmapFill: {
+/*					case RepeatingBitmapFill: {
 						SwfBitmapFillStyle* bitrm = (SwfBitmapFillStyle*)fillStyle;
 //						fills[fillNum] = CORE_NEW iPhone::SwfRFSTexture(player, bitrm);
 						break;

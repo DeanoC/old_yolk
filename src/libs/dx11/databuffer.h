@@ -16,13 +16,25 @@ namespace Dx11 {
 
 	class DataBuffer :	public Scene::DataBuffer, public Resource {
 	public:	
+	
+		void* map( Scene::RenderContext* scontext, const Scene::RESOURCE_MAP_ACCESS _access, const int _mip = 0, const int _slice = 0, Scene::ResourceMapAccess* _outAccess = nullptr ) override {
+			CORE_ASSERT( _mip == 0 );
+			CORE_ASSERT( _slice == 0 );
+			return Resource::map( scontext, _access, 0, _outAccess );
+		}
+		void unmap( Scene::RenderContext* scontext, const int _mip, const int _slice ) override {
+			CORE_ASSERT( _mip == 0 );
+			CORE_ASSERT( _slice == 0 );
+			return Resource::unmap( scontext, 0 );
+		}
+		void update( Scene::RenderContext* scontext, const int _mip, const int _slice, const int _dstX, const int _dstY, const int _dstZ, 
+													 const int _dstWidth, const int _dstHeight, const int _dstDepth, 
+													 const Scene::ResourceMapAccess* _inAccess ) override {
+			CORE_ASSERT( _mip == 0 );
+			CORE_ASSERT( _slice == 0 );
 
-		// default maps entire buffer;
-		void* map( Scene::RenderContext* context,  Scene::DATA_BUFFER_MAP_ACCESS access, 
-						Scene::DATA_BUFFER_MAP_FLAGS flags = Scene::DBMF_NONE, 
-						size_t offset = 0, size_t bytes = 0 ) override;
-
-		void unmap( Scene::RenderContext* context ) override;
+			return Resource::update( scontext, 0, _dstX, _dstY, _dstZ, _dstWidth, _dstHeight, _dstDepth, _inAccess );
+		}
 
 		static DataBuffer* internalCreate( const void* creation );
 		

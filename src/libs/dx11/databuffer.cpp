@@ -6,43 +6,8 @@
 #include "dx11.h"
 #include "databuffer.h"
 
-namespace {
-
-// map DATA_BUFFER_MAP_ACCESS to Dx11
-static const D3D11_MAP DBMA_Map[] = {
-	D3D11_MAP_READ,										// DBMA_READ_ONLY
-	D3D11_MAP_WRITE,									// DBMA_WRITE_ONLY
-	D3D11_MAP_READ_WRITE,							// DBMA_READ_WRITE
-};
-
-}
 
 namespace Dx11 {
-
-void* DataBuffer::map( Scene::RenderContext* scontext, Scene::DATA_BUFFER_MAP_ACCESS _access, Scene::DATA_BUFFER_MAP_FLAGS _flags, size_t offset, size_t bytes ) {
-	RenderContext* context = static_cast<RenderContext*>( scontext );
-	using namespace Scene;
-	D3D11_MAP access = DBMA_Map[ _access ];
-
-	if( access == D3D11_MAP_WRITE ) {
-		if( _flags & DBMF_DISCARD  ) {
-			access = D3D11_MAP_WRITE_DISCARD;
-		} else if( _flags & DBMF_UNSYNC ) {
-			access = D3D11_MAP_WRITE_NO_OVERWRITE;
-		}
-	}
-
-	HRESULT hr;
-	D3D11_MAPPED_SUBRESOURCE mapped;
-	DXFAIL( context->ctx->Map( resource.get(), 0, access, 0, &mapped ) );
-
-	return ((uint8_t*)mapped.pData) + offset;
-}
-
-void DataBuffer::unmap( Scene::RenderContext* scontext  ) {
-	RenderContext* context = static_cast<RenderContext*>( scontext );
-	context->ctx->Unmap( resource.get(), 0 );
-}
 
 DataBuffer* DataBuffer::internalCreate(	const void* data ) {
 	using namespace Scene;

@@ -38,6 +38,18 @@ namespace Dx11 {
 			return getDx11View( viewType );
 		}
 
+		void* map( Scene::RenderContext* scontext, const Scene::RESOURCE_MAP_ACCESS _access, const int _mip, const int _slice, Scene::ResourceMapAccess* _outAccess = nullptr ) override {
+			return Resource::map( scontext, _access, (getMipLevelCount() * _slice) + _mip, _outAccess );
+		}
+		void unmap( Scene::RenderContext* scontext, const int _mip, const int _slice ) override {
+			return Resource::unmap( scontext, (getMipLevelCount() * _slice) + _mip );
+		}
+		void update( Scene::RenderContext* scontext, const int _mip, const int _slice, const int _dstX, const int _dstY, const int _dstZ, 
+													 const int _dstWidth, const int _dstHeight, const int _dstDepth, 
+													 const Scene::ResourceMapAccess* _inAccess ) override {
+			return Resource::update( scontext, (getMipLevelCount() * _slice) + _mip, _dstX, _dstY, _dstZ, _dstWidth, _dstHeight, _dstDepth, _inAccess );
+		}
+
 		DXGI_FORMAT	d3dFormat;
 
 	};

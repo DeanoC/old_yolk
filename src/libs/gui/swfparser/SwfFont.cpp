@@ -24,7 +24,7 @@ namespace Swf
 
 		if (_fontVer == 1)
 		{
-			long marker1 = _stream.marker();
+			uint64_t marker1 = _stream.marker();
 
 			uint32_t offset0 = (uint32_t)_stream.readUInt16();
 			uint16_t numGlyphs1 = (uint16_t)(offset0 / 2);
@@ -43,7 +43,7 @@ namespace Swf
 			// shape records here
 			for (int i = 0; i < numGlyphs1; ++i)
 			{
-				long offset = marker1 + offsetTable[i];
+				uint64_t offset = marker1 + offsetTable[i];
 				_stream.setToMarker(offset);
 				font->shapes[i] = SwfShape::Read(_stream, false, _fontVer);
 			}
@@ -64,7 +64,7 @@ namespace Swf
 		uint16_t numGlyphs = _stream.readUInt16();
 		font->numGlyphs = numGlyphs;
 
-		long marker = _stream.marker();
+		uint64_t marker = _stream.marker();
 
 		offsetTable = CORE_NEW uint32_t[numGlyphs];
 		if (fontFlagWideOffsets) {
@@ -82,7 +82,7 @@ namespace Swf
 		font->shapes = CORE_NEW SwfShape*[numGlyphs];
 		// shape records here
 		for (int i = 0; i < numGlyphs; ++i) {
-			long offset = marker + offsetTable[i];
+			uint64_t offset = marker + offsetTable[i];
 			_stream.setToMarker(offset);
 			font->shapes[i] = SwfShape::Read(_stream, false, _fontVer);
 		}

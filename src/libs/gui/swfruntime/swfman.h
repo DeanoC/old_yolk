@@ -19,9 +19,12 @@ namespace Swf {
 	//! The main singleton for the Swf runtime
 	class SwfMan : public Core::Singleton<SwfMan> {
 	public:
+		friend class GradientTextureManager;
 		~SwfMan();
 
 		void bind( Scene::RenderContext* _ctx );
+
+		GradientTextureManager* getGradientTextureManager() { return gradientTextureManager; }
 
 	private:
 		friend class Core::Singleton<SwfMan>;
@@ -34,6 +37,8 @@ namespace Swf {
 		Core::ScopedResourceHandle<Scene::ProgramHandle>				mainProgramHandle;
 		Core::ScopedResourceHandle<Scene::RasteriserStateHandle>		rasterStateHandle;
 		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>		renderStateHandle;
+		Core::ScopedResourceHandle<Scene::SamplerStateHandle>			clampSamplerHandle;
+		Core::ScopedResourceHandle<Scene::SamplerStateHandle>			pointClampSamplerHandle;
 
 	};
 }

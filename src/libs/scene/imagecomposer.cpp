@@ -419,7 +419,7 @@ void ImageComposer::render( RenderContext* context ) {
 			page.unmap();
 			DataBufferPtr db = page.vertexBufferHandle->acquire();
 			if( !db ) { ++pmIt; continue; }
-			void* gpuVerts = (void*) db->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD );
+			void* gpuVerts = (void*) db->map( context, (RESOURCE_MAP_ACCESS)( RMA_WRITE | RMA_DISCARD ) );
 			memcpy( gpuVerts, page.mapped.get(), page.numVertices * 6 * SizeOfRenderType[ pagekey.type ] );
 			db->unmap( context );
 			auto icProgram = program[ pagekey.type ].acquire();

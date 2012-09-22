@@ -3,7 +3,7 @@
 
 
 struct VS_IN {
-	float4 position		: VE_POSITION;
+	float2 position		: VE_POSITION;
 };
 struct VS_OUT {
 	float4 position : SV_POSITION;
@@ -19,7 +19,18 @@ constant_buffer( FillData, CF_USER_BLOCK_0 ) {
 
 VS_OUT main( VS_IN input ) {
 	VS_OUT output;
-	output.position = mul( input.position, matrixWorldViewProjection );
-	output.colUV = colTexMat0;
+	output.position = mul( float4(input.position,0,1), matrixWorldViewProjection );
+
+	if( colTexMat0.w >= 0.0f ) {
+		output.colUV = colTexMat0;
+	} else {
+		matrix texMat;
+		texMat[0] = float4(colTexMat0.xyz,0);
+		texMat[1] = texMat1.xyzw;
+		texMat[2] = texMat2.xyzw;
+		texMat[3] = texMat3.xyzw;
+		output.colUV = float4( mul( float4(input.position,0,1), texMat ).xy, 0, -1 ); // -1 Alpha indicates to fragment shader to do a texture lookup
+	}
+
 	return output;
 }

@@ -27,11 +27,11 @@ namespace Swf{
 		stream = _file;
 	}
 	
-	void SwfStream::setToMarker(long _marker) {
+	void SwfStream::setToMarker(uint64_t _marker) {
 		stream->seekFromStart( _marker);
 	}
 	
-	long SwfStream::marker() {
+	uint64_t SwfStream::marker() {
 		return stream->tell();
 	}
 	

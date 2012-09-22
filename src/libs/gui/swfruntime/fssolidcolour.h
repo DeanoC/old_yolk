@@ -15,7 +15,7 @@ namespace Swf {
 		void apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) override;
 	private:
 		SwfRGBA colour;
-		Core::ScopedResourceHandle<Scene::DataBufferHandle>			instanceBufferHandle;
+		Core::ScopedResourceHandle<Scene::DataBufferHandle>			constBufferHandle;
 	};
 }
 #endif

@@ -42,10 +42,10 @@ void Text::display(		Player* _player,
 		// force rec colour into each fill in the shape
 		SwfColourTransform fakeCT;
 		fakeCT.mul[0] = fakeCT.mul[1] = fakeCT.mul[2] = fakeCT.mul[3] = 0;
-		fakeCT.add[0] = rec->colour.r * _colourTransform->mul[0] + _colourTransform->add[0];
-		fakeCT.add[1] = rec->colour.g * _colourTransform->mul[1] + _colourTransform->add[1];
-		fakeCT.add[2] = rec->colour.b * _colourTransform->mul[2] + _colourTransform->add[2];
-		fakeCT.add[3] = rec->colour.a * _colourTransform->mul[3] + _colourTransform->add[3];
+		fakeCT.add[0] = rec->colour.getLinearRed() * _colourTransform->mul[0] + _colourTransform->add[0];
+		fakeCT.add[1] = rec->colour.getLinearGreen() * _colourTransform->mul[1] + _colourTransform->add[1];
+		fakeCT.add[2] = rec->colour.getLinearBlue() * _colourTransform->mul[2] + _colourTransform->add[2];
+		fakeCT.add[3] = rec->colour.getAlpha() * _colourTransform->mul[3] + _colourTransform->add[3];
 
 		SwfVec2Twip offset = rec->offset;
 		float scale = rec->textHeight / 1024.0f;

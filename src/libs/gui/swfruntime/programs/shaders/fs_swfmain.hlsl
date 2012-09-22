@@ -6,6 +6,8 @@ struct VS_IN {
 	float4 colUV	: TEXCOORD0;
 };
 
+Texture2D inputTexture : register( t0 );
+SamplerState linearSampler : register( s0 );
 
 struct FS_OUT {
 	float4 colour0 : SV_TARGET0;	
@@ -14,7 +16,12 @@ struct FS_OUT {
 FS_OUT main( VS_IN input ) {
 	FS_OUT output;
 
-	output.colour0 = float4(input.colUV.xyz,1);
+	// is colUV a colour or a UV set to lookup a < 0.0f is the decider
+	if( input.colUV.a < 0.0f ) {
+		 output.colour0 = inputTexture.Sample( linearSampler, input.colUV.xy );
+	} else {
+		output.colour0 = input.colUV;
+	}
 
 	return output;
 }

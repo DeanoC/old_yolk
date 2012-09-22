@@ -229,7 +229,7 @@ void DebugPrims::render( RenderContext* context ) {
 	}
 	// TODO only copy required
 	DataBufferPtr vertexBuffer = vertexBufferHandle->acquire();
-	Vertex* gpuVerts = (Vertex*) vertexBuffer->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD );
+	Vertex* gpuVerts = (Vertex*) vertexBuffer->map( context, (RESOURCE_MAP_ACCESS)( RMA_WRITE | RMA_DISCARD ) );
 	memcpy( gpuVerts, vertices, (MAX_DEBUG_VERTICES * 2) * sizeof(Vertex) );
 	vertexBuffer->unmap( context );
 

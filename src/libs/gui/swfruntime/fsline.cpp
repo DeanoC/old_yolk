@@ -17,29 +17,40 @@ FSLine::FSLine( Player* _player, const SwfLineStyle* _lineFill ) : FillStyle( _p
 	} else {
 		lineWidth = Math::Vector2(10.0f,10.0f);
 	}
+
+	Math::Matrix4x4 instanceData( colour.getLinearRed(), colour.getLinearGreen(), colour.getLinearBlue(), colour.getAlpha(),
+								  0,0,0,0,
+								  0,0,0,0,
+								  0,0,0,0 );
+	namespace s = Scene;
+	s::DataBuffer::CreationInfo insbcs ( s::Resource::BufferCtor(
+		s::RCF_BUF_CONSTANT | s::RCF_ACE_IMMUTABLE, 
+		sizeof(Math::Matrix4x4), &instanceData
+	) );
+	constBufferHandle = s::DataBufferHandle::create( "FSLine_insb", &insbcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
+
+	constBufferHandle.acquire(); // cos our immutable data lies on the stack, so we must ensure it lasts till after an acquire
+
 }
 
 void FSLine::apply( Scene::RenderContext* _ctx, const SwfColourTransform* _colourTransform, const BasePath* _path ) {
-	float alpha = colour.a * _colourTransform->mul[3] + _colourTransform->add[3];
+	float alpha = colour.getAlpha() * _colourTransform->mul[3] + _colourTransform->add[3];
 	Math::Vector2 width = Math::TransformNormal(lineWidth, player->getTwipToPixels()) ;
 
 	if( alpha < 1e-2f )
 		return;
 	if(Math::Length(width) < 1e-2f)
 		return;
-//	CALL_GL( glColor4f(	colour.r * _colourTransform->mul[0] + _colourTransform->add[0], 
-//						colour.g * _colourTransform->mul[1] + _colourTransform->add[1], 
-//						colour.b * _colourTransform->mul[2] + _colourTransform->add[2], 
-//						alpha ) );
-	LOG(INFO) << "TODO FSLine width\n";
-
 	// bind vertex and index buffers					
 	auto vb = _path->vertexBufferHandle.tryAcquire();
 	if( !vb ) { return; }
+	auto insb = constBufferHandle.tryAcquire();
+	if( !insb ) { return; }
 	auto ib = _path->indexBufferHandle.tryAcquire();
 	if( !ib ) { return; }
 
 	_ctx->bindVB( 0, vb, sizeof(float) * 2 );
+	_ctx->bindCB( Scene::ST_VERTEX, Scene::CF_USER_BLOCK0, insb );
 	_ctx->bindIB( ib, sizeof(uint16_t) );
 	_ctx->drawIndexed( Scene::PT_LINE_LIST, _path->numIndices );
 

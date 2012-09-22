@@ -63,6 +63,8 @@ namespace Dx11 {
 
 		virtual void copy( const Scene::DataBufferPtr& dst, const Scene::DataBufferPtr& src ) override;
 		virtual void copy( const Scene::TexturePtr& dst, const Scene::TexturePtr& src ) override;
+		virtual void copy(	const Scene::TexturePtr& dst, const int dstX, const int dstY, const int dstZ, 
+							const Scene::TexturePtr& src, const int srcX, const int srcY, const int srcZ, const int srcWidth, const int srcHeight, const int srcDepth ) override;
 
 		virtual void draw( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) override;
 		virtual void drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) override;

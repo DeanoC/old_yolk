@@ -84,8 +84,10 @@ SwfMan::SwfMan() {
 		auto vi = vertexInputHandle.acquire();
 		vi->validate( prg );
 
-		rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal_NoCull" ) );
-		renderStateHandle.reset( RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll" ) );
+		rasterStateHandle.reset( RasteriserStateHandle::create( RENDER_STATE_NORMAL_NOCULL ) );
+		renderStateHandle.reset( RenderTargetStatesHandle::create( RENDER_TARGET_STATES_PMOVER_WRITEALL ) );
+		clampSamplerHandle.reset( SamplerStateHandle::create( SAMPLER_STATE_ANISO16_CLAMP ) );
+		pointClampSamplerHandle.reset( SamplerStateHandle::create( SAMPLER_STATE_POINT_CLAMP ) );
 
 }
 SwfMan::~SwfMan() {
@@ -97,6 +99,9 @@ void SwfMan::bind( Scene::RenderContext* _ctx ) {
 	auto prg = mainProgramHandle.acquire();
 	auto rs = rasterStateHandle.acquire();
 	auto rts = renderStateHandle.acquire();
+	auto ss = clampSamplerHandle.acquire();
+
+	_ctx->bind( Scene::ST_FRAGMENT, 0, ss );
 	_ctx->bind( rts );
 	_ctx->bind( rs );
 	_ctx->bind( vi );

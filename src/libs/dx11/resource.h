@@ -34,6 +34,14 @@ namespace Dx11 {
 
 		// for custom view or in CUSTOM_VIEW for type and it will create the view and return its index
 		uint32_t createView( uint32_t viewType, const Scene::Resource::CreationInfo* creation );
+
+		void* map( Scene::RenderContext* scontext, const Scene::RESOURCE_MAP_ACCESS _access, const int _subLevel, Scene::ResourceMapAccess* _outAccess );
+		void unmap( Scene::RenderContext* scontext, const int _subLevel );
+		void update( Scene::RenderContext* scontext, const int _subLevel, const int dstX, const int dstY, const int dstZ, 
+													 const int dstWidth, const int dstHeight, const int dstDepth, 
+													 const Scene::ResourceMapAccess* _inAccess );
+
+
 	protected:
 		void createSRView( uint32_t index, const Scene::Resource::CreationInfo* creation );
 		void createDSView( uint32_t index, const Scene::Resource::CreationInfo* creation );

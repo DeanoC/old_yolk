@@ -88,11 +88,11 @@ namespace Swf {
 		static uint16_t prevTagCodeAndLength = 0;
 		static SwfTag prevTagCode;
 		static SwfTag prevPrevTagCode;
-		static long prevPrevMarker;
-		static long prevMarker = 0;
+		static uint64_t prevPrevMarker;
+		static uint64_t prevMarker = 0;
 		static bool gobackToPrev = false;
 	redo:
-		long debugMarker = stream.marker();
+		uint64_t debugMarker = stream.marker();
 #endif
 		uint16_t tagCodeAndLength = stream.readUInt16();
 		SwfTag tagCode = (SwfTag)((tagCodeAndLength & ~0x3f) >> 6);
@@ -102,7 +102,7 @@ namespace Swf {
 			// long tag
 			length = stream.readInt32();
 		}
-		long marker = stream.marker();
+		uint64_t marker = stream.marker();
 		
 		if (_isSpriteTag) {
 			ProcessSpriteTag(tagCode, length);
@@ -308,7 +308,7 @@ namespace Swf {
 		static boolean	fill_input_buffer(j_decompress_ptr cinfo) {
 			JpegSourceMgrWrapper*	src = (JpegSourceMgrWrapper*) cinfo->src;
 
-			size_t	bytes_read = src->io->read(src->buffer, src->bufferSize);
+			uint64_t bytes_read = src->io->read(src->buffer, src->bufferSize);
 
 			if (bytes_read <= 0) {
 				// Is the file completely empty?
@@ -340,7 +340,7 @@ namespace Swf {
 
 			// Expose buffer state to clients.
 			src->sourceMgr.next_input_byte = src->buffer;
-			src->sourceMgr.bytes_in_buffer = bytes_read;
+			src->sourceMgr.bytes_in_buffer = (size_t) bytes_read;
 			src->start = false;
 
 			return TRUE;
@@ -709,11 +709,11 @@ namespace Swf {
 				// at the moment decompress the entire file first
 				// should use a decompression stream in future
 				uint8_t* decompBuf = CORE_NEW_ARRAY uint8_t[fileSize];
-				long bytesLeft = osstream->bytesLeft();
-				uint8_t* compBuf = CORE_NEW_ARRAY uint8_t[bytesLeft];
+				uint64_t bytesLeft = osstream->bytesLeft();
+				uint8_t* compBuf = CORE_NEW_ARRAY uint8_t[(unsigned int) bytesLeft]; // > 32 bit not suppored on 32 bit OSs
 				osstream->read(compBuf,bytesLeft);
 				uLongf fs = fileSize;
-				uncompress(decompBuf, &fs, compBuf, bytesLeft);
+				uncompress( decompBuf, &fs, compBuf, (uLong) bytesLeft ); // TODO uncompress doesn't support 64 bit on windows it seems
 				CORE_DELETE( osstream );
 				CORE_DELETE_ARRAY( compBuf );
 				swfStream.setStream(CORE_NEW Core::MemFile(decompBuf, fs));

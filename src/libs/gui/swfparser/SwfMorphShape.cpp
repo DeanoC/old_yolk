@@ -21,7 +21,7 @@ namespace Swf
         morph->startRect = SwfRect::Read(_stream);
         morph->endRect = SwfRect::Read(_stream);
         uint32_t offset = _stream.readUInt32();
-        long startEdgeOffset = _stream.marker() + offset;
+        uint64_t startEdgeOffset = _stream.marker() + offset;
         int fillCount = (int) _stream.readUInt8();
         if (fillCount == 0xFF)
         {

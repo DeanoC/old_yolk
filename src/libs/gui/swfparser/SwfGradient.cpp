@@ -9,15 +9,13 @@
 #include "SwfGradient.h"
 #include <math.h>
 
-
 namespace Swf
 {
 	// TODO move
 	static const float Epsilon = 1e-7f;
-	
+
 	// Return the color at the specified ratio into our gradient.
-	SwfRGBA SwfGradient::SampleGradient(float ratio)
-	{
+	SwfRGBA SwfGradient::SampleGradient(float ratio ) {
 		if (ratio < gradientRecords[0]->ratio)
 			return gradientRecords[0]->colour;
 
@@ -43,14 +41,17 @@ namespace Swf
 					break;
 					}
 				}
-				return SwfRGBA::Lerp(gr0->colour, gr1->colour, 1.0f - f);
+				if( interpolationMode == LinearRGB ) {
+					return SwfRGBA::LinearLerp(gr0->colour, gr1->colour, 1.0f - f);
+				} else {
+					return SwfRGBA::Lerp(gr0->colour, gr1->colour, 1.0f - f);
+				}
 			}
 		}
 		return gradientRecords[numGradients - 1]->colour;
 	}
 
-	SwfGradient* SwfGradient::Read(SwfStream& _stream, bool _shape3orMore)
-	{
+	SwfGradient* SwfGradient::Read(SwfStream& _stream, bool _shape3orMore) {
 	    _stream.align();
 	    SwfGradient* gradient = CORE_NEW SwfGradient();
 
@@ -58,15 +59,13 @@ namespace Swf
 	    gradient->interpolationMode = (InterpolationMode)_stream.readUInt(2);
 	    gradient->numGradients = _stream.readUInt(4);
 	    gradient->gradientRecords = CORE_NEW SwfGradRecord*[gradient->numGradients];
-	    for (uint32_t i = 0; i < gradient->numGradients; i++)
-	    {
+	    for (uint32_t i = 0; i < gradient->numGradients; i++) {
 	        gradient->gradientRecords[i] = SwfGradRecord::Read(_stream, _shape3orMore);
 	    }
 	    return gradient;
 	}
 
-	SwfGradient* SwfGradient::ReadMorph(SwfStream& _stream)
-	{
+	SwfGradient* SwfGradient::ReadMorph(SwfStream& _stream) {
 	    _stream.align();
 	    SwfGradient* gradient = CORE_NEW SwfGradient();
 
@@ -74,8 +73,7 @@ namespace Swf
 	    gradient->interpolationMode = NormalRGB;
 	    gradient->numGradients = _stream.readUInt(4);
 	    gradient->gradientRecords = (SwfGradRecord**)CORE_NEW SwfMorphGradRecord*[gradient->numGradients];
-	    for (uint32_t i = 0; i < gradient->numGradients; i++)
-	    {
+	    for (uint32_t i = 0; i < gradient->numGradients; i++) {
 	        gradient->gradientRecords[i] = SwfMorphGradRecord::Read(_stream);
 	    }
 	    return gradient;

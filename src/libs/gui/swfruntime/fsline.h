@@ -18,6 +18,7 @@ namespace Swf {
 	private:
 		SwfRGBA 		colour;
 		Math::Vector2 	lineWidth;
+		Core::ScopedResourceHandle<Scene::DataBufferHandle>			constBufferHandle;
 	};
 }
 #endif

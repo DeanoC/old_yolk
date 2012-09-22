@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"Swf",
+				"SwfMan"
+			],
+			[
 				"CVN_M",
 				"CVN_MATERIAL_INDEX"
 			],
@@ -510,224 +514,61 @@
 			[
 				"ver",
 				"version_minor"
-			],
-			[
-				"version",
-				"version_major"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/libs/gui/swfruntime/builder.cpp",
+			"file": "src/libs/gui/swfruntime/swfman.h",
 			"settings":
 			{
-				"buffer_size": 14610,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/fssolidcolour.h",
-			"settings":
-			{
-				"buffer_size": 602,
+				"buffer_size": 1140,
 				"line_ending": "Windows",
-				"name": "rfssolidcolour.h"
+				"name": "swfman.h"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/fssolidcolour.cpp",
+			"file": "src/libs/gui/swfruntime/swfman.cpp",
 			"settings":
 			{
-				"buffer_size": 8869,
+				"buffer_size": 3931,
 				"line_ending": "Windows",
-				"name": "fssolidcolour.cpp"
+				"name": "swfman.cpp"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/fsline.h",
+			"file": "src/libs/gui/swfruntime/programs/programs/swfmain.hlsl",
 			"settings":
 			{
-				"buffer_size": 570,
+				"buffer_size": 98,
 				"line_ending": "Windows",
-				"name": "fsline.h"
+				"name": "swfmain.hlsl"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/fsline.cpp",
+			"file": "src/libs/gui/swfruntime/programs/shaders/vs_swfmain.hlsl",
 			"settings":
 			{
-				"buffer_size": 1759,
+				"buffer_size": 539,
 				"line_ending": "Windows",
-				"name": "fsline.cpp"
+				"name": "vs_swfmain.hlsl"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/fillstyle.h",
+			"file": "src/libs/gui/swfruntime/programs/shaders/fs_swfmain.hlsl",
 			"settings":
 			{
-				"buffer_size": 991,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/fillstyle.cpp",
-			"settings":
-			{
-				"buffer_size": 185,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/builder.h",
-			"settings":
-			{
-				"buffer_size": 1752,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/shape.cpp",
-			"settings":
-			{
-				"buffer_size": 6698,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/shape.h",
-			"settings":
-			{
-				"buffer_size": 1493,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/character.h",
-			"settings":
-			{
-				"buffer_size": 729,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/basepath.h",
-			"settings":
-			{
-				"buffer_size": 1605,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/basepath.cpp",
-			"settings":
-			{
-				"buffer_size": 1293,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/gpupath.h",
-			"settings":
-			{
-				"buffer_size": 1319,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/gpupath.cpp",
-			"settings":
-			{
-				"buffer_size": 3881,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/gpulinepath.h",
-			"settings":
-			{
-				"buffer_size": 1387,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/gpulinepath.cpp",
-			"settings":
-			{
-				"buffer_size": 2725,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/utils.h",
-			"settings":
-			{
-				"buffer_size": 1377,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/dynamictext.h",
-			"settings":
-			{
-				"buffer_size": 918,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/dynamictext.cpp",
-			"settings":
-			{
-				"buffer_size": 5675,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/text.h",
-			"settings":
-			{
-				"buffer_size": 719,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/text.cpp",
-			"settings":
-			{
-				"buffer_size": 2161,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/character.h",
-			"settings":
-			{
-				"buffer_size": 741,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/bitmap.h",
-			"settings":
-			{
-				"buffer_size": 522,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/bitmap.cpp",
-			"settings":
-			{
-				"buffer_size": 1228,
-				"line_ending": "Windows"
+				"buffer_size": 304,
+				"line_ending": "Windows",
+				"name": "fs_swfmain.hlsl"
 			}
 		},
 		{
 			"file": "src/libs/gui/swfruntime/player.h",
 			"settings":
 			{
-				"buffer_size": 2923,
+				"buffer_size": 2277,
 				"line_ending": "Windows"
 			}
 		},
@@ -735,39 +576,7 @@
 			"file": "src/libs/gui/swfruntime/player.cpp",
 			"settings":
 			{
-				"buffer_size": 5117,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/movieclip.h",
-			"settings":
-			{
-				"buffer_size": 2989,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/displayobjectframeitem.h",
-			"settings":
-			{
-				"buffer_size": 974,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/frameitem.h",
-			"settings":
-			{
-				"buffer_size": 2027,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/movieclip.cpp",
-			"settings":
-			{
-				"buffer_size": 10488,
+				"buffer_size": 2951,
 				"line_ending": "Windows"
 			}
 		},
@@ -775,72 +584,66 @@
 			"file": "src/libs/gui/swfruntime/gradienttexturemanager.h",
 			"settings":
 			{
-				"buffer_size": 1603,
+				"buffer_size": 1625,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/gradienttexturemanager.cpp",
+			"file": "src/libs/gui/swfruntime/frameitem.h",
 			"settings":
 			{
-				"buffer_size": 5863,
+				"buffer_size": 2118,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/frameitem.cpp",
+			"file": "src/libs/scene/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 4112,
+				"buffer_size": 1348,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/displayobjectframeitem.cpp",
+			"file": "src/libs/gui/swfruntime/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 3180,
+				"buffer_size": 1370,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfparser/swfparser.h",
+			"file": "src/libs/gui/swfparser/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 262,
+				"buffer_size": 436,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfparser/parser.h",
+			"file": "src/apps/vtdfh/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 3315,
+				"buffer_size": 1106,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfparser/parser.cpp",
+			"file": "src/libs/gui/swfruntime/fsgradient.h",
 			"settings":
 			{
-				"buffer_size": 22134,
-				"line_ending": "Windows"
+				"buffer_size": 670,
+				"line_ending": "Windows",
+				"name": "fsgradient.h"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/font.h",
+			"file": "src/libs/gui/swfruntime/fsgradient.cpp",
 			"settings":
 			{
-				"buffer_size": 504,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "yolk_setup.cmake",
-			"settings":
-			{
-				"buffer_size": 3693,
-				"line_ending": "Windows"
+				"buffer_size": 3408,
+				"line_ending": "Windows",
+				"name": "fsgradient.cpp"
 			}
 		}
 	],
@@ -876,6 +679,45 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/builder.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fssolidcolour.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fssolidcolour.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsline.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsline.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fillstyle.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fillstyle.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/builder.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/shape.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/shape.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/character.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/basepath.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/basepath.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpupath.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpupath.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/utils.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/dynamictext.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/dynamictext.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/swfparser.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/font.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/submodules/CMakeLists.txt",
@@ -891,7 +733,6 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk.sublime-project",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/CMakeLists.txt",
 		"/C/Users/Artminer/Documents/projects/wierd/source/core/standard.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
 		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfBasePath.h",
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfBasePath.cpp",
@@ -965,45 +806,7 @@
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRect.cpp",
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRect.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRGB.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRGB.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfShape.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfShape.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfShapeRecord.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfShapeRecord.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfSprite.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfTag.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfText.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfText.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfTextRecord.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfTextRecord.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfVec2Twip.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfCharacter.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsByteCode.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsObject.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsObject.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsScriptLLVM.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsScriptLLVM.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsUTF8.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsVM.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/LLVM/AsVM.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/EndianBitConverter.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfActionByteCode.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfBitmap.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfCharacter.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfClipActions.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfClipActions.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfColourTransform.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfDictionary.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfDisplayObject.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfDisplayObject.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfFillStyle.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfFont.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfFont.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfFrame.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfGradient.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfGradient.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfImage.cpp"
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRGB.cpp"
 	],
 	"find":
 	{
@@ -1205,56 +1008,58 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 14,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/gui/swfruntime/builder.cpp",
+					"file": "src/libs/gui/swfruntime/swfman.h",
 					"settings":
 					{
-						"buffer_size": 14610,
+						"buffer_size": 1140,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3,
-								3
+								0,
+								0
 							]
 						],
 						"settings":
 						{
+							"auto_name": "swfman.h",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1716.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/gui/swfruntime/fssolidcolour.h",
+					"file": "src/libs/gui/swfruntime/swfman.cpp",
 					"settings":
 					{
-						"buffer_size": 602,
+						"buffer_size": 3931,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								382,
-								382
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "rfssolidcolour.h",
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"auto_name": "swfman.cpp",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1264,52 +1069,52 @@
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/gui/swfruntime/fssolidcolour.cpp",
+					"file": "src/libs/gui/swfruntime/programs/programs/swfmain.hlsl",
 					"settings":
 					{
-						"buffer_size": 8869,
+						"buffer_size": 98,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7750,
-								7385
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "fssolidcolour.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"auto_name": "swfmain.hlsl",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 3080.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/libs/gui/swfruntime/fsline.h",
+					"file": "src/libs/gui/swfruntime/programs/shaders/vs_swfmain.hlsl",
 					"settings":
 					{
-						"buffer_size": 570,
+						"buffer_size": 539,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								488,
-								488
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "fsline.h",
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"auto_name": "vs_swfmain.hlsl",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1319,38 +1124,10 @@
 				},
 				{
 					"buffer": 4,
-					"file": "src/libs/gui/swfruntime/fsline.cpp",
+					"file": "src/libs/gui/swfruntime/programs/shaders/fs_swfmain.hlsl",
 					"settings":
 					{
-						"buffer_size": 1759,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								939,
-								939
-							]
-						],
-						"settings":
-						{
-							"auto_name": "fsline.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 198.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/libs/gui/swfruntime/fillstyle.h",
-					"settings":
-					{
-						"buffer_size": 991,
+						"buffer_size": 304,
 						"regions":
 						{
 						},
@@ -1358,7 +1135,34 @@
 						[
 							[
 								0,
-								991
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_name": "fs_swfmain.hlsl",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/libs/gui/swfruntime/player.h",
+					"settings":
+					{
+						"buffer_size": 2277,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1367,51 +1171,52 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1386.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 6,
-					"file": "src/libs/gui/swfruntime/fillstyle.cpp",
+					"file": "src/libs/gui/swfruntime/player.cpp",
 					"settings":
 					{
-						"buffer_size": 185,
+						"buffer_size": 2951,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								184,
-								184
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 176.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "src/libs/gui/swfruntime/builder.h",
+					"file": "src/libs/gui/swfruntime/gradienttexturemanager.h",
 					"settings":
 					{
-						"buffer_size": 1752,
+						"buffer_size": 1625,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1386,
-								1386
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1420,589 +1225,25 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 528.0,
+						"translation.y": 396.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "src/libs/gui/swfruntime/shape.cpp",
-					"settings":
-					{
-						"buffer_size": 6698,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2783,
-								2783
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/libs/gui/swfruntime/shape.h",
-					"settings":
-					{
-						"buffer_size": 1493,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1271,
-								1271
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 252.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/libs/gui/swfruntime/character.h",
-					"settings":
-					{
-						"buffer_size": 729,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								304,
-								304
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "src/libs/gui/swfruntime/basepath.h",
-					"settings":
-					{
-						"buffer_size": 1605,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								273,
-								273
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 66.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "src/libs/gui/swfruntime/basepath.cpp",
-					"settings":
-					{
-						"buffer_size": 1293,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								164,
-								164
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "src/libs/gui/swfruntime/gpupath.h",
-					"settings":
-					{
-						"buffer_size": 1319,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1157,
-								1157
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 76.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "src/libs/gui/swfruntime/gpupath.cpp",
-					"settings":
-					{
-						"buffer_size": 3881,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1049,
-								1049
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1980.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "src/libs/gui/swfruntime/gpulinepath.h",
-					"settings":
-					{
-						"buffer_size": 1387,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								916,
-								916
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 16,
-					"file": "src/libs/gui/swfruntime/gpulinepath.cpp",
-					"settings":
-					{
-						"buffer_size": 2725,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								246,
-								246
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1518.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 17,
-					"file": "src/libs/gui/swfruntime/utils.h",
-					"settings":
-					{
-						"buffer_size": 1377,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								256,
-								256
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 18,
-					"file": "src/libs/gui/swfruntime/dynamictext.h",
-					"settings":
-					{
-						"buffer_size": 918,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								332,
-								333
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 19,
-					"file": "src/libs/gui/swfruntime/dynamictext.cpp",
-					"settings":
-					{
-						"buffer_size": 5675,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4866,
-								4866
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2980.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 20,
-					"file": "src/libs/gui/swfruntime/text.h",
-					"settings":
-					{
-						"buffer_size": 719,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								446,
-								446
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 21,
-					"file": "src/libs/gui/swfruntime/text.cpp",
-					"settings":
-					{
-						"buffer_size": 2161,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2161,
-								2161
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 428.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 22,
-					"file": "src/libs/gui/swfruntime/character.h",
-					"settings":
-					{
-						"buffer_size": 741,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								220,
-								220
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 23,
-					"file": "src/libs/gui/swfruntime/bitmap.h",
-					"settings":
-					{
-						"buffer_size": 522,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								330,
-								330
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 24,
-					"file": "src/libs/gui/swfruntime/bitmap.cpp",
-					"settings":
-					{
-						"buffer_size": 1228,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								338,
-								338
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 25,
-					"file": "src/libs/gui/swfruntime/player.h",
-					"settings":
-					{
-						"buffer_size": 2923,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1795,
-								1795
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1012.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 26,
-					"file": "src/libs/gui/swfruntime/player.cpp",
-					"settings":
-					{
-						"buffer_size": 5117,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5117,
-								5117
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2276.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 27,
-					"file": "src/libs/gui/swfruntime/movieclip.h",
-					"settings":
-					{
-						"buffer_size": 2989,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2843,
-								2843
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1308.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 28,
-					"file": "src/libs/gui/swfruntime/displayobjectframeitem.h",
-					"settings":
-					{
-						"buffer_size": 974,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								277,
-								277
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 29,
 					"file": "src/libs/gui/swfruntime/frameitem.h",
 					"settings":
 					{
-						"buffer_size": 2027,
+						"buffer_size": 2118,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1770,
-								1770
+								2024,
+								2024
 							]
 						],
 						"settings":
@@ -2017,158 +1258,130 @@
 					"type": "text"
 				},
 				{
-					"buffer": 30,
-					"file": "src/libs/gui/swfruntime/movieclip.cpp",
+					"buffer": 9,
+					"file": "src/libs/scene/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 10488,
+						"buffer_size": 1348,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1982,
-								1982
+								1174,
+								1158
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2094.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 31,
-					"file": "src/libs/gui/swfruntime/gradienttexturemanager.h",
+					"buffer": 10,
+					"file": "src/libs/gui/swfruntime/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 1603,
+						"buffer_size": 1370,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								272,
-								272
+								1164,
+								1164
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 264.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 32,
-					"file": "src/libs/gui/swfruntime/gradienttexturemanager.cpp",
+					"buffer": 11,
+					"file": "src/libs/gui/swfparser/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 5863,
+						"buffer_size": 436,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5860,
-								5860
+								429,
+								429
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 2160.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 33,
-					"file": "src/libs/gui/swfruntime/frameitem.cpp",
+					"buffer": 12,
+					"file": "src/apps/vtdfh/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 4112,
+						"buffer_size": 1106,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								64,
-								64
+								759,
+								759
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 88.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 34,
-					"file": "src/libs/gui/swfruntime/displayobjectframeitem.cpp",
+					"buffer": 13,
+					"file": "src/libs/gui/swfruntime/fsgradient.h",
 					"settings":
 					{
-						"buffer_size": 3180,
+						"buffer_size": 670,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2,
-								2
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 66.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 35,
-					"file": "src/libs/gui/swfparser/swfparser.h",
-					"settings":
-					{
-						"buffer_size": 262,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								230,
-								230
-							]
-						],
-						"settings":
-						{
+							"auto_name": "fsgradient.h",
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -2178,109 +1391,29 @@
 					"type": "text"
 				},
 				{
-					"buffer": 36,
-					"file": "src/libs/gui/swfparser/parser.h",
+					"buffer": 14,
+					"file": "src/libs/gui/swfruntime/fsgradient.cpp",
 					"settings":
 					{
-						"buffer_size": 3315,
+						"buffer_size": 3408,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								500,
-								500
+								14,
+								14
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 264.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 37,
-					"file": "src/libs/gui/swfparser/parser.cpp",
-					"settings":
-					{
-						"buffer_size": 22134,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3062,
-								3062
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 66.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 38,
-					"file": "src/libs/gui/swfruntime/font.h",
-					"settings":
-					{
-						"buffer_size": 504,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								500,
-								500
-							]
-						],
-						"settings":
-						{
+							"auto_name": "fsgradient.cpp",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 39,
-					"file": "yolk_setup.cmake",
-					"settings":
-					{
-						"buffer_size": 3693,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2689,
-								2689
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1518.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -2420,6 +1553,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 309.0,
+	"side_bar_width": 305.0,
 	"status_bar_visible": true
 }

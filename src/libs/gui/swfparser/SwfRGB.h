@@ -14,7 +14,8 @@
 namespace Swf{
 	//forward decl
 	class SwfStream;
-	
+
+	/// SwfRGBA by default SWF use sRGB colours
 	struct SwfRGBA {
 		SwfRGBA(){
 			r = g = b = a = 0.0f;
@@ -34,20 +35,31 @@ namespace Swf{
 			a = _a;
 		}
 
-		float r;
-		float g;
-		float b;
-		float a;
-
 		uint32_t ToPackedRGBA();
 		uint32_t ToPackedARGB();
 		uint32_t ToPackedABGR();
 		
 		static SwfRGBA Lerp(const SwfRGBA& _a, const SwfRGBA& _b, float t);
+		static SwfRGBA LinearLerp( const SwfRGBA& _a, const SwfRGBA& _b, float t );
 		
 		static SwfRGBA ReadRGB(SwfStream& _stream);
 		static SwfRGBA ReadRGBA(SwfStream& _stream);
 		static SwfRGBA ReadARGB(SwfStream& _stream);
+
+		float getRed() const { return r; }
+		float getGreen() const { return g; }
+		float getBlue() const { return b; }
+		float getAlpha() const { return a; }
+		
+		float getLinearRed() const;
+		float getLinearGreen() const;
+		float getLinearBlue() const;
+
+	private:
+		float r;
+		float g;
+		float b;
+		float a;
 	};
 }
 #endif

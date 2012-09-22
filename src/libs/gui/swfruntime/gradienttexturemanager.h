@@ -8,49 +8,61 @@
 #ifndef YOLK_SWFRUNTIME_GRADIENTTEXTUREMANAGER_H_
 #define YOLK_SWFRUNTIME_GRADIENTTEXTUREMANAGER_H_
 
+#include "scene/texture.h"
+#include "scene/rendercontext.h"
+
 namespace Swf {
 	// forward decl
 	class SwfGradientFillStyle;
+	class GradientTexturePage;
 
 	class GradientTexture {
 	public:
-		GradientTexture() : textureNum(0xFFFFFFFF) {}
-		uint32_t textureNum;
-		Math::Vector2 offset;
-		Math::Vector2 scale;
-		SwfGradientFillStyle* gradientFill;
+		friend class GradientTextureManager;
+
+		GradientTexturePage*					page;
+		int										pageY;
+		Math::Vector2							offset;
+		Math::Vector2							scale;
+	private:
+		GradientTexture() : page( nullptr ) {}
+
 	};
 
 	class GradientTexturePage {
 	public:
+		friend class GradientTextureManager;
 		enum GradientPageType {
 			Linear,
 			Radial
 		};
-		GradientPageType 				pageType;
-		uint32_t 						textureNum;
-		GradientTexture*	 			gradients;
-		int	 							usageCount;
-		int 							lowFree;
+		GradientPageType 									pageType;
+		GradientTexture*	 								gradients;
+		int	 												usageCount;
+		int 												lowFree;
+		Scene::TexturePtr									page;
+		Core::ScopedResourceHandle<Scene::TextureHandle>	textureHandle;
+	private:
+		GradientTexturePage() : lowFree(-1) {}
+
+		~GradientTexturePage() {
+			page.reset();
+			textureHandle.reset();
+		}
 	};
 	
 	class GradientTextureManager {
 	public:
 		GradientTextureManager();
-		static const int LINEAR_GRADIENT_WIDTH = 256;
-		static const int LINEAR_GRADIENT_HEIGHT = 256; // 3 lines per linear gradient so 256 * 768 * RGBA texture
-		static const int RADIAL_GRADIENT_WIDTH = 64; // radial are square width * width
-		static const int RADIAL_GRADIENT_PAGE_HEIGHT = 1024; // how big each page is
-
 		static const int MAX_TEXTURE_PAGES = 16;
 
-		GradientTexture* allocateGradient( SwfGradientFillStyle* _gradientFill );
+		GradientTexture* allocateLinearGradientTexture();
+		GradientTexture* allocateRadialGradientTexture();
+		void updateLinearGradient( Scene::RenderContext* _ctx, const GradientTexture* grad, SwfGradientFillStyle* _gradientFill );
+		void updateRadialGradient( Scene::RenderContext* _ctx, const GradientTexture* grad, SwfGradientFillStyle* _gradientFill );
 
 	private:
 		GradientTexturePage* allocatePage( GradientTexturePage::GradientPageType _type );
-		GradientTexture* allocateLinearGradient( SwfGradientFillStyle* _gradientFill );
-		GradientTexture* allocateRadialGradient( SwfGradientFillStyle* _gradientFill );
-
 		GradientTexturePage pages[MAX_TEXTURE_PAGES];
 	};
 	

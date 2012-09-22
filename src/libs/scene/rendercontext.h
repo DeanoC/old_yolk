@@ -81,6 +81,7 @@ namespace Scene {
 
 		virtual void copy( const DataBufferPtr& dst, const DataBufferPtr& src ) = 0; 		//!< copy an entire buffer from src to dst
 		virtual void copy( const TexturePtr& dst, const TexturePtr& src ) = 0;				//!< copy an entire texture from src to dst
+		virtual void copy( const TexturePtr& dst, const int dstX, const int dstY, const int dstZ, const TexturePtr& src, const int srcX, const int srcY, const int srcZ, const int srcWidth, const int srcHeight, const int srcDepth ) = 0;
 
 		virtual void draw( PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) = 0;
 		virtual void drawIndexed( PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) = 0;

@@ -236,6 +236,60 @@ void Resource::createUAView( uint32_t index, const Scene::Resource::CreationInfo
 	views[ index ] = std::make_shared<Dx11View>( D3DViewPtr( view, false ) );
 
 }
+// map DATA_BUFFER_MAP_ACCESS to Dx11
+static const D3D11_MAP RBMA_Map[] = {
+	D3D11_MAP_READ,									// DBA_READ
+	D3D11_MAP_WRITE,								// DBMA_WRITE
+	D3D11_MAP_READ_WRITE,							// DBMA_READ_WRITE
+};
 
+void* Resource::map( Scene::RenderContext* scontext, const Scene::RESOURCE_MAP_ACCESS _access, const int _subLevel, Scene::ResourceMapAccess* _outAccess ) {
+	RenderContext* context = static_cast<RenderContext*>( scontext );
+	using namespace Scene;
+	D3D11_MAP access = RBMA_Map[ _access & RMA_READ_WRITE ];
+
+	if( _access & RMA_WRITE ) {
+		if( _access & RMA_DISCARD  ) {
+			access = D3D11_MAP_WRITE_DISCARD;
+		} else if( _access & RMA_UNSYNC ) {
+			access = D3D11_MAP_WRITE_NO_OVERWRITE;
+		}
+	}
+
+	HRESULT hr;
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	DXFAIL( context->ctx->Map( resource.get(), _subLevel, access, 0, &mapped ) );
+
+	if( _outAccess != nullptr ) {
+		_outAccess->data = mapped.pData;
+		_outAccess->widthStride = mapped.RowPitch;
+		_outAccess->depthStride = mapped.DepthPitch;
+	}
+
+	return mapped.pData;
+}
+
+void Resource::unmap( Scene::RenderContext* scontext, const int _subLevel ) {
+
+	RenderContext* context = static_cast<RenderContext*>( scontext );
+	context->ctx->Unmap( resource.get(), _subLevel );
+}
+
+void Resource::update( Scene::RenderContext* scontext,	const int _subLevel, const int dstX, const int dstY, const int dstZ, 
+														const int dstWidth, const int dstHeight, const int dstDepth, 
+														const Scene::ResourceMapAccess* _inAccess ) {
+	RenderContext* ctx = static_cast<RenderContext*>( scontext );
+
+	D3D11_BOX dstBox;
+	dstBox.left = dstX;
+	dstBox.top = dstY;
+	dstBox.front = dstZ;
+	dstBox.right = dstX + dstWidth;
+	dstBox.bottom = dstY + dstHeight;
+	dstBox.back = dstZ + dstDepth;
+
+	ctx->ctx->UpdateSubresource( resource.get(), _subLevel, &dstBox, _inAccess->data, _inAccess->widthStride, _inAccess->depthStride );
+
+}
 
 }

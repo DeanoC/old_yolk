@@ -51,9 +51,29 @@ namespace Swf{
 
 		float it = 1.0f - t;
 		return SwfRGBA(		_a.r * t + _b.r * it,
-									_a.g * t + _b.g * it,
-									_a.b * t + _b.b * it,
-									_a.a * t + _b.a * it);
+							_a.g * t + _b.g * it,
+							_a.b * t + _b.b * it,
+							_a.a * t + _b.a * it);
+	}
+
+	SwfRGBA SwfRGBA::LinearLerp(const SwfRGBA& _a, const SwfRGBA& _b, float t) {
+		assert( t <= 1.0f );
+
+		float it = 1.0f - t;
+		return SwfRGBA(		Math::float_to_SRGB(_a.getLinearRed() * t + _b.getLinearRed() * it),
+							Math::float_to_SRGB(_a.getLinearGreen() * t + _b.getLinearGreen() * it),
+							Math::float_to_SRGB(_a.getLinearBlue() * t + _b.getLinearBlue() * it),
+							Math::float_to_SRGB(_a.getAlpha() * t + _b.getAlpha() * it) );
+	}
+
+	float SwfRGBA::getLinearRed() const {
+		return Math::SRGB_to_float( r );
+	}
+	float SwfRGBA::getLinearGreen() const {
+		return Math::SRGB_to_float( g );
+	}
+	float SwfRGBA::getLinearBlue() const {
+		return Math::SRGB_to_float( b );
 	}
 
 	SwfRGBA SwfRGBA::ReadRGB(SwfStream& _stream) {

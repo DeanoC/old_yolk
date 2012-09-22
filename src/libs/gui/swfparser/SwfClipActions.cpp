@@ -63,7 +63,7 @@ namespace Swf
 			car->eventFlags = flags;
 
 			uint32_t nextOffset = _stream.readUInt32();
-			long nextClipRecord = _stream.marker() + nextOffset;
+			uint64_t nextClipRecord = _stream.marker() + nextOffset;
 
 			if ((flags & KeyPress) == KeyPress) {
 				car->keyCode = _stream.readUInt8();

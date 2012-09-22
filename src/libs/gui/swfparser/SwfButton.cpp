@@ -16,7 +16,7 @@ namespace Swf
 {
 	SwfButtonObject* SwfButtonObject::Read( SwfStream& _stream, int _length, int _version ) {
 		
-		long marker = _stream.marker();
+		uint64_t marker = _stream.marker();
 		
 		uint16_t id = _stream.readUInt16();
 
@@ -63,7 +63,8 @@ namespace Swf
 
 		// version one only had one action press and release
 		if( _version == 1 ) {
-			_length -= (_stream.marker() - marker);
+			// TODO 64 bit files
+			_length -= (int)(_stream.marker() - marker);
 		
 			SwfActionByteCode* actionScript = CORE_NEW SwfActionByteCode();
 			actionScript->byteCode = CORE_NEW_ARRAY uint8_t[_length];

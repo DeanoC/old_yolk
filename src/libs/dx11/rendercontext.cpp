@@ -345,6 +345,22 @@ void RenderContext::copy( const Scene::TexturePtr& sdst, const Scene::TexturePtr
 	auto st = std::static_pointer_cast<Dx11::Texture>( ssrc );
 	ctx->CopyResource( dt->get().get(), st->get().get() );
 }
+void RenderContext::copy(	const Scene::TexturePtr& sdst, const int dstX, const int dstY, const int dstZ, 
+							const Scene::TexturePtr& ssrc, const int srcX, const int srcY, const int srcZ, const int srcWidth, const int srcHeight, const int srcDepth ) {
+	auto dt = std::static_pointer_cast<Dx11::Texture>( sdst );
+	auto st = std::static_pointer_cast<Dx11::Texture>( ssrc );
+
+	D3D11_BOX box;
+	box.left = srcX;
+	box.top = srcY;
+	box.front = srcZ;
+	box.right = srcX + srcWidth;
+	box.bottom = srcY + srcHeight;
+	box.back = srcZ + srcDepth;
+
+	ctx->CopySubresourceRegion( dt->get().get(), 0, dstX, dstY, dstZ, st->get().get(), 0, &box );
+
+}
 
 static D3D11_PRIMITIVE_TOPOLOGY PT_Map[] = {
 		D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
