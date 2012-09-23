@@ -9,6 +9,7 @@
 #include "scene/programman.h"
 #include "scene/vertexinput.h"
 #include "gradienttexturemanager.h"
+#include "frameitem.h"
 #include "swfman.h"
 
 #define DECLARE_SHARED( x ) 		extern "C" const char* binary_data_programs_ ## x;
@@ -28,32 +29,32 @@ namespace Swf {
 SwfMan::SwfMan() {
 
 #if defined( USE_ACTIONSCRIPT )
-		SwfFrameItem::s_asPropertyStringMap = CORE_NEW SwfFrameItem::AsPropertyStringMap();
-		SwfFrameItem::s_asPropertyStringMap->clear();
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_x" ] = 0;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_y" ] = 1;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_X" ] = 0;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_Y" ] = 1;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_xscale" ] = 2;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_yscale" ] = 3;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_currentframe" ] = 4;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_totalframes" ] = 5;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_alpha" ] = 6;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_visible" ] = 7;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_width" ] = 8;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_height" ] = 9;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_rotation" ] = 10;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_target" ] = 11;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_framesloaded" ] = 12;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_name" ] = 13;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_droptarget" ] = 14;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_url" ] = 15;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_highquality" ] = 16;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_focusrect" ] = 17;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_soundbuftime" ] = 18;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_quality" ] = 19;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_xmouse" ] = 20;
-		(*SwfFrameItem::s_asPropertyStringMap)[ "_ymouse" ] = 21;
+		FrameItem::s_asPropertyStringMap = CORE_NEW FrameItem::AsPropertyStringMap();
+		FrameItem::s_asPropertyStringMap->clear();
+		(*FrameItem::s_asPropertyStringMap)[ "_x" ] = 0;
+		(*FrameItem::s_asPropertyStringMap)[ "_y" ] = 1;
+		(*FrameItem::s_asPropertyStringMap)[ "_X" ] = 0;
+		(*FrameItem::s_asPropertyStringMap)[ "_Y" ] = 1;
+		(*FrameItem::s_asPropertyStringMap)[ "_xscale" ] = 2;
+		(*FrameItem::s_asPropertyStringMap)[ "_yscale" ] = 3;
+		(*FrameItem::s_asPropertyStringMap)[ "_currentframe" ] = 4;
+		(*FrameItem::s_asPropertyStringMap)[ "_totalframes" ] = 5;
+		(*FrameItem::s_asPropertyStringMap)[ "_alpha" ] = 6;
+		(*FrameItem::s_asPropertyStringMap)[ "_visible" ] = 7;
+		(*FrameItem::s_asPropertyStringMap)[ "_width" ] = 8;
+		(*FrameItem::s_asPropertyStringMap)[ "_height" ] = 9;
+		(*FrameItem::s_asPropertyStringMap)[ "_rotation" ] = 10;
+		(*FrameItem::s_asPropertyStringMap)[ "_target" ] = 11;
+		(*FrameItem::s_asPropertyStringMap)[ "_framesloaded" ] = 12;
+		(*FrameItem::s_asPropertyStringMap)[ "_name" ] = 13;
+		(*FrameItem::s_asPropertyStringMap)[ "_droptarget" ] = 14;
+		(*FrameItem::s_asPropertyStringMap)[ "_url" ] = 15;
+		(*FrameItem::s_asPropertyStringMap)[ "_highquality" ] = 16;
+		(*FrameItem::s_asPropertyStringMap)[ "_focusrect" ] = 17;
+		(*FrameItem::s_asPropertyStringMap)[ "_soundbuftime" ] = 18;
+		(*FrameItem::s_asPropertyStringMap)[ "_quality" ] = 19;
+		(*FrameItem::s_asPropertyStringMap)[ "_xmouse" ] = 20;
+		(*FrameItem::s_asPropertyStringMap)[ "_ymouse" ] = 21;
 #endif
 		using namespace Scene;
 

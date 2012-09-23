@@ -6,52 +6,52 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-#include <sstream>
 #include "gui/swfruntime/swfruntime.h"
-#include "../codegen/AsFunction.h"
 #include "gui/swfruntime/utils.h"
+#include "AsFunction.h"
 #include "AsObjectFunction.h"
 #include "AsAgRuntime.h"
 #include "AsObjectFactory.h"
 #include "AsObject.h"
 
+#include <sstream>
+
 namespace Swf {
-	using namespace CodeGen;
-namespace AutoGen {	
 	AsObjectHandle AsObject::s_objectPrototype;
 	AsObjectHandle AsObjectString::s_stringPrototype;
 	
-	AsObjectHandle AsObject::CallMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params ) {
+	AsObjectHandle AsObject::callMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params ) {
 		// check object members first
 		PropertyMap::const_iterator it = properties.find( _name );
 		if( it != properties.end() ) {
-			if( it->second->Type() == APT_FUNCTION ) {
+			if( it->second->type() == APT_FUNCTION ) {
 				AsObjectThisFunction* func = (AsObjectThisFunction*)(it->second);
-				return func->value->Call( _runtime, _this, _numParams, _params );
+				return func->value->call( _runtime, _this, _numParams, _params );
 			}
 		}
 		if( prototype != NULL ) {
-			return prototype->CallMethodOn( _runtime, _this, _name, _numParams, _params );
+			return prototype->callMethodOn( _runtime, _this, _name, _numParams, _params );
 		} else {
-			return AsObjectHandle( AsObjectUndefined::Get() );
+			return AsObjectHandle( AsObjectUndefined::get() );
 		}
 	}
 
-	AsObjectHandle AsObject::GetProperty( const std::string& _name ) {
-		if( properties.find( _name ) != properties.end() ) {
-			return properties[ _name ];
+	AsObjectHandle AsObject::getProperty( const std::string& _name ) const {
+		Swf::AsObject::PropertyMap::const_iterator prop = properties.find( _name );
+		if( prop != properties.end() ) {
+			return prop->second;//properties[ _name ];
 		} else if( prototype != NULL ) {
-			return prototype->GetProperty( _name );
+			return prototype->getProperty( _name );
 		} else {
-			return AsObjectHandle( AsObjectUndefined::Get() );
+			return AsObjectHandle( AsObjectUndefined::get() );
 		}
 	}
 
-	void AsObject::SetProperty( const std::string& _name, AsObjectHandle _handle ) {
+	void AsObject::setProperty( const std::string& _name, AsObjectHandle _handle ) {
 		properties[ _name ] = _handle;
 	}
 	
-	bool AsObject::HasOwnProperty( const std::string& _name ) {
+	bool AsObject::hasOwnProperty( const std::string& _name ) {
 		if( properties.find( _name ) != properties.end() ) {
 			return true;
 		} else {
@@ -59,32 +59,32 @@ namespace AutoGen {
 		}
 	}
 	
-	void AsObject::Construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
-		SetProperty( "hasOwnProperty", CORE_NEW AsObjectThisFunction( &AsObject::hasOwnProperty ) );
-		SetProperty( "toString", CORE_NEW AsObjectThisFunction( &AsObject::toString ) );
-		SetProperty( "toNumber", CORE_NEW AsObjectThisFunction( &AsObject::toNumber ) );
+	void AsObject::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		setProperty( "hasOwnProperty", CORE_NEW AsObjectThisFunction( &AsObject::hasOwnProperty ) );
+		setProperty( "toString", CORE_NEW AsObjectThisFunction( &AsObject::toString ) );
+		setProperty( "toNumber", CORE_NEW AsObjectThisFunction( &AsObject::toNumber ) );
 	}
 	
 	AsObjectHandle AsObject::hasOwnProperty( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert( _numParams == 1 );
-		return CORE_NEW AsObjectBool( HasOwnProperty(_params[0]->ToString()) );
+		return CORE_NEW AsObjectBool( hasOwnProperty(_params[0]->toString()) );
 	}
 	
 	AsObjectHandle AsObject::toString( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert( _numParams == 0 );
-		return CORE_NEW AsObjectString( ToString() );
+		return CORE_NEW AsObjectString( toString() );
 	}
 	
 	AsObjectHandle AsObject::toNumber( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert( _numParams == 0 );
-		return CORE_NEW AsObjectNumber( ToNumber() );
+		return CORE_NEW AsObjectNumber( toNumber() );
 	}
 		
-	bool AsObject::Is( AsObjectHandle _b ) {
+	bool AsObject::is( AsObjectHandle _b ) const {
 		// Is sees if we are the same type
 		// for objects we then check same class
-		if( Type() == _b->Type() ) {
-			if(_b->Type() == APT_OBJECT ) {
+		if( type() == _b->type() ) {
+			if(_b->type() == APT_OBJECT ) {
 				// TODO check prototypes?
 				return true;
 			} else {
@@ -95,17 +95,17 @@ namespace AutoGen {
 		}
 	}
 	
-	std::string AsObjectNumber::ToString() {
+	std::string AsObjectNumber::toString() const {
 		std::ostringstream stream;
 		stream << value;
 		return stream.str();
 	}
 	
-	void AsObjectString::Construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+	void AsObjectString::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		prototype = s_objectPrototype;
-		SetProperty( "length", CORE_NEW AsObjectThisFunction( &AsObjectString::length ) );
+		setProperty( "length", CORE_NEW AsObjectThisFunction( &AsObjectString::length ) );
 	}
-	bool AsObjectString::ToBoolean() {
+	bool AsObjectString::toBoolean() const {
 		if( value == "1" || value == "true" ||
 			 value == "True" || value == "TRUE" ){
 			return true;
@@ -114,11 +114,11 @@ namespace AutoGen {
 		}
 	}
 	
-	AsObjectHandle  AsObjectString::GetProperty( const std::string& _name ) {
+	AsObjectHandle  AsObjectString::getProperty( const std::string& _name ) const {
 		if( _name == "length" ) {
 			return CORE_NEW AsObjectNumber( (int)value.length() );
 		} else {
-			return AsObject::GetProperty( _name );
+			return AsObject::getProperty( _name );
 		}
 	}
 	
@@ -127,11 +127,10 @@ namespace AutoGen {
 		return AsObjectHandle( CORE_NEW AsObjectNumber( (int)value.length() ) );
 	}
 	
-	double AsObjectString::ToNumber() {
+	double AsObjectString::toNumber() const {
 		std::istringstream stream(value);
 		double d;
 		stream >> d;
 		return d;
 	}		
-}
 }

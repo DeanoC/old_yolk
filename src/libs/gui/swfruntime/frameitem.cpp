@@ -8,7 +8,7 @@
  */
 
 #include "swfruntime.h"
-#include "ActionScript/autogen/AsObject.h"
+#include "ActionScript/AsObject.h"
 #include "frameitem.h"
 
 namespace Swf {
@@ -51,9 +51,7 @@ void FrameItem::setRotation(float angle) {
 	concatMatrix._22 = (float)(yscale * cosAngle);
 }
 
-Swf::AutoGen::AsObjectHandle FrameItem::getProperty( int _index ) {
-	using namespace AutoGen;
-	
+Swf::AsObjectHandle FrameItem::getProperty( int _index ) {
 	switch( _index) {
 		case 0: // _X
 		case 1: // _Y
@@ -88,34 +86,34 @@ Swf::AutoGen::AsObjectHandle FrameItem::getProperty( int _index ) {
 		case 21: //_ymouse 21 
 		break;
 	}
-	return AsObjectUndefined::Get();
+	return AsObjectUndefined::get();
 };
 
-void FrameItem::setProperty( int _index, AutoGen::AsObjectHandle _val ){	
+void FrameItem::setProperty( int _index, AsObjectHandle _val ){	
 	switch( _index ) {
 		case 0: // _X
 		case 1: // _Y
 		break;
 		case 2: //_xscale 2 
-			setXScale( (float)_val->ToNumber() ); break;
+			setXScale( (float)_val->toNumber() ); break;
 		case 3: //_yscale 3 
-			setYScale( (float)_val->ToNumber() ); break;
+			setYScale( (float)_val->toNumber() ); break;
 		case 4: //_currentframe 4 
 		case 5: //_totalframes 5 
 		case 6: //_alpha 6
 		break;
 		case 7: //_visible 7 
-			visible = _val->ToBoolean(); break;
+			visible = _val->toBoolean(); break;
 		case 8: // _width 8 
 		case 9: //_height 9 
 		break;
 		case 10: //_rotation 10 
-			setRotation( (float)_val->ToNumber() ); break;
+			setRotation( (float)_val->toNumber() ); break;
 		case 11: //_target 11 
 		case 12: //_framesloaded 12 
 		break;
 		case 13: //_name 13 
-			name = _val->ToString(); break;
+			name = _val->toString(); break;
 		case 14: //_droptarget 14 
 		case 15: //_url 15			
 		case 16: //_highquality 16 
@@ -129,27 +127,23 @@ void FrameItem::setProperty( int _index, AutoGen::AsObjectHandle _val ){
 };
 
 
-AutoGen::AsObjectHandle FrameItem::getProperty( const std::string& _name ) {
-	using namespace AutoGen;
-	
+AsObjectHandle FrameItem::getProperty( const std::string& _name ) {
 	AsPropertyStringMap::const_iterator propIt = s_asPropertyStringMap->find( _name );
 	if( propIt != s_asPropertyStringMap->end() ) {
 		return AsObjectHandle( getProperty( propIt->second ) );
 	} else {
-		return AsObject::GetProperty( _name );
+		return AsObject::getProperty( _name );
 	}
 }
 
-void FrameItem::setProperty( const std::string& _name, AutoGen::AsObjectHandle _handle ) {
-	using namespace AutoGen;
-
+void FrameItem::setProperty( const std::string& _name, AsObjectHandle _handle ) {
 	CORE_ASSERT( s_asPropertyStringMap && "SWF Manager singleton needs createing" );
 	
 	AsPropertyStringMap::iterator propIt = s_asPropertyStringMap->find( _name );
 	if( propIt != s_asPropertyStringMap->end() ) {
 		setProperty( propIt->second, _handle );
 	} else {
-		AsObject::SetProperty( _name, _handle );
+		AsObject::setProperty( _name, _handle );
 	}
 }
 

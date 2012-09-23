@@ -11,7 +11,7 @@
 #include "frameitem.h"
 #include "displayobjectframeitem.h"
 
-#include "actionscript/autogen/AsObject.h"
+#include "actionscript/AsObject.h"
 
 namespace Swf {
 	// forward decl

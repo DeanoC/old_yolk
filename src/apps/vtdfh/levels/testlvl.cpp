@@ -1,8 +1,7 @@
 #include "vtdfh.h"
 #include "localworld/properties.h"
-#include "player.h"
-#include "hovertank.h"
-#include "indigoweakspider.h"
+#include "player/player.h"
+#include "enemies/indigoweakspider.h"
 #include "testlvl.h"
 
 TestLvl::TestLvl( SceneWorldPtr _world ) :

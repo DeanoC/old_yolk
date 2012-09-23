@@ -10,29 +10,26 @@
 #ifndef ASDATE_H_QGTI5HXD
 #define ASDATE_H_QGTI5HXD
 
-#include "../autogen/AsObject.h"
-#include "../autogen/AsObjectFactory.h"
+#include "../AsObject.h"
+#include "../AsObjectFactory.h"
 namespace Swf
 {
-	namespace AutoGen
-	{		
-		class AsDate : public AsObject {
-		public:
-			AsDate() : AsObject( APT_OBJECT ) {}
+	class AsDate : public AsObject {
+	public:
+		AsDate() : AsObject( APT_OBJECT ) {}
 
-			virtual void Construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );			
-			static AsObjectHandle ConstructFunction( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		virtual void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );			
+		static AsObjectHandle constructFunction( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 	
-		protected:
-			AsObjectHandle getHours( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
-			AsObjectHandle getMinutes( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
-			AsObjectHandle getSeconds( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
-			AsObjectHandle getDay( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
-			AsObjectHandle getDate( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
-			AsObjectHandle getMonth( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
-			AsObjectHandle getFullYear( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
-		};
-	} /* AsLib */ 
+	protected:
+		AsObjectHandle getHours( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
+		AsObjectHandle getMinutes( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
+		AsObjectHandle getSeconds( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
+		AsObjectHandle getDay( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		AsObjectHandle getDate( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		AsObjectHandle getMonth( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		AsObjectHandle getFullYear( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+	};
 	
 } /* Swf */ 
 

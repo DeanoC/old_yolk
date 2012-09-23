@@ -11,7 +11,7 @@
 #include "gui/SwfParser/SwfRect.h"
 #include "gui/SwfParser/SwfTextRecord.h"
 #include "gui/SwfParser/SwfFont.h"
-#include "ActionScript/autogen/AsObject.h"
+#include "ActionScript/AsObject.h"
 #include "frameitem.h"
 #include "movieclip.h"
 #include "font.h"
@@ -72,18 +72,16 @@ namespace Swf {
 		SwfVec2Twip pos = rec->offset;
 		int	leading = dynText->leading + font->font->fontLeading;
 		float scale = dynText->fontHeight / 1024.0f;
-
-		using namespace AutoGen;
 		
 		uint16_t code;
 		std::string textstr;
 		if( dynText->varName.empty() == false ) {
-			AsObjectHandle textObj = _parent->parent->GetProperty( dynText->varName );
-			if( textObj->Type() == APT_UNDEFINED ) {
-				_parent->parent->SetProperty( dynText->varName, CORE_NEW AsObjectString( dynText->initialText ) );
-				textObj = _parent->parent->GetProperty( dynText->varName );
+			AsObjectHandle textObj = _parent->parent->getProperty( dynText->varName );
+			if( textObj->type() == APT_UNDEFINED ) {
+				_parent->parent->setProperty( dynText->varName, CORE_NEW AsObjectString( dynText->initialText ) );
+				textObj = _parent->parent->getProperty( dynText->varName );
 			}
-			textstr = textObj->ToString();
+			textstr = textObj->toString();
 		} else {
 			textstr = dynText->initialText;
 		}

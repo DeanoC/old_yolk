@@ -2,8 +2,8 @@
 #define YOLK_TESTLVL_H_ 1
 
 #include "localworld/levelthing.h"
-#include "indigoweakspider.h"
-#include "energycrystal.h"
+#include "enemies/indigoweakspider.h"
+#include "items/energycrystal.h"
 
 class PlayerStartMarker {
 public:

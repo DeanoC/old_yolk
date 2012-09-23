@@ -4,9 +4,7 @@
 #include "localworld/inputhandlercontext.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
-#include "zarchcam.h"
-#include "objectcam.h"
-#include "indigoweakspider.h"
+#include "enemies/indigoweakspider.h"
 
 IndigoWeakSpider::IndigoWeakSpider( SceneWorldPtr _world, Core::TransformNode* startNode ) :
 	world( _world ) {

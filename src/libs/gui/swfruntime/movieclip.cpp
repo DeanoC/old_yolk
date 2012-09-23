@@ -15,7 +15,7 @@
 #include "gui/SwfParser/SwfParser.h"
 #include "gui/SwfParser/SwfDictionary.h"
 #if defined( USE_ACTIONSCRIPT )
-#	include "ActionScript/CodeGen/AsVM.h"
+#	include "ActionScript/AsVM.h"
 #endif
 #include "displayobjectframeitem.h"
 #include "player.h"
@@ -133,7 +133,7 @@ namespace Swf {
 		Math::Matrix4x4 mat = item->concatMatrix;
 		SwfColourTransform* colourTransform = item->colourTransform;
 		depthToFrameItem.erase( _dIt );
-		setProperty( name, AutoGen::AsObjectUndefined::Get() );
+		setProperty( name, AsObjectUndefined::get() );
 		
 		// create the new one
 		addDisplayObject(_dobj, _did);
@@ -195,7 +195,7 @@ namespace Swf {
 		FrameItem* oldItem = (*dIt).second;		
 		
 		depthToFrameItem.erase( dIt );
-		setProperty( ToLowerIfReq(oldItem->name,player->parser->fileVersion >= 7), AutoGen::AsObjectUndefined::Get() );
+		setProperty( ToLowerIfReq(oldItem->name,player->parser->fileVersion >= 7), AsObjectUndefined::get() );
 //		CORE_DELETE oldItem;
 	}
 
@@ -209,7 +209,7 @@ namespace Swf {
 	void MovieClip::updateFrame( bool _hasMatrix, Math::Matrix4x4 _concat, bool _hasColourCx, SwfColourTransform* _concatCx) {
 		if(frameABC) {
 #if defined( USE_ACTIONSCRIPT )
-			player->virtualMachine->ProcessByteCode( this, frameABC );	
+			player->virtualMachine->processByteCode( this, frameABC );	
 #endif
 			frameABC = NULL;
 		}

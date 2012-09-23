@@ -14,7 +14,7 @@
 #include "gui/SwfParser/Parser.h"
 #include "gui/SwfParser/SwfRect.h"
 #if defined( USE_ACTIONSCRIPT )
-#	include "AsVM.h"
+#	include "ActionScript/AsVM.h"
 #endif
 #include "swfman.h"
 #include "builder.h"

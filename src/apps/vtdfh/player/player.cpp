@@ -4,10 +4,10 @@
 #include "localworld/inputhandlercontext.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
-#include "zarchcam.h"
-#include "objectcam.h"
 #include "scene/cylindercolshape.h"
 #include "scene/physicsensor.h"
+#include "cameras/zarchcam.h"
+#include "cameras/objectcam.h"
 #include "player.h"
 
 Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* startNode ) :
@@ -17,7 +17,7 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	freeControl( false ) {
 	namespace arg = std::placeholders;
 
-	flashTest.reset( Swf::PlayerHandle::load( "test1" ) );
+	flashTest.reset( Swf::PlayerHandle::load( "simple_targetcircle" ) );
 	auto fl = flashTest.acquire();
 	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1 );
 	world->addRenderable2D( std::make_shared<std::function< void (Scene::RenderContext*)>>(r2d) );
@@ -140,12 +140,12 @@ void Player::freeControls( const InputFrame& input ) {
 
 	if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
 		Math::Vector3 zvec = Math::GetZAxis( rm );
-		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100.f;
+		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100000.f;
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 	if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
 		Math::Vector3 xvec = Math::GetXAxis( rm );
-		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 100.f;
+		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 1000.f;
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 	float mxdt = input.mouseX  * input.deltaTime;

@@ -1,9 +1,10 @@
 #include "vtdfh.h"
 #include "shell3d.h"
-#include "testlvl.h"
 #include "gamethread.h"
 #include "core/development_context.h"
 #include "localworld/inputhandlercontext.h"
+
+#include "levels/testlvl.h"
 
 int Main() {
 	using namespace Core;

@@ -10,8 +10,7 @@
 #define ASOBJECT_H_4OQQI5Z0
 
 namespace Swf {
-	namespace CodeGen { 	class AsFuncBase; }
-namespace AutoGen {
+	class AsFuncBase; 
 	class AsAgRuntime;
 	
 	enum AsPrimitiveType {
@@ -39,26 +38,26 @@ namespace AutoGen {
 		}
 		
 
-		virtual AsPrimitiveType Type() {
+		virtual AsPrimitiveType type() const {
 #if DEBUG
 			assert( type ==  APT_OBJECT );
 #endif
 			return APT_OBJECT;
 		}
 		
-		virtual bool Is( AsObjectHandle _b );
-		virtual void Construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
-		virtual bool ToBoolean() { return false; }		
-		virtual std::string ToString() { return ""; }
-		virtual double ToNumber() { return 0; }
-		virtual int ToInteger() { return (int) ToNumber(); }
+		virtual bool is( AsObjectHandle _b ) const;
+		virtual void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		virtual bool toBoolean() const { return false; }		
+		virtual std::string toString() const { return ""; }
+		virtual double toNumber() const { return 0; }
+		virtual int toInteger() const { return (int) toNumber(); }
 
-		AsObjectHandle CallMethod( AsAgRuntime* _runtime, const std::string& _name, int _numParams, AsObjectHandle* _params ) {
-			return CallMethodOn(_runtime, this, _name, _numParams, _params );
+		AsObjectHandle callMethod( AsAgRuntime* _runtime, const std::string& _name, int _numParams, AsObjectHandle* _params ) {
+			return callMethodOn(_runtime, this, _name, _numParams, _params );
 		}
-		virtual AutoGen::AsObjectHandle GetProperty( const std::string& _name );
-		virtual void SetProperty( const std::string& _name, AutoGen::AsObjectHandle _handle );
-		virtual bool HasOwnProperty( const std::string& _name );
+		virtual AsObjectHandle getProperty( const std::string& _name ) const;
+		virtual void setProperty( const std::string& _name, AsObjectHandle _handle );
+		virtual bool hasOwnProperty( const std::string& _name );
 		
 	protected:
 		friend class AsObjectFactory;
@@ -69,9 +68,8 @@ namespace AutoGen {
 		{}
 
 		// use by prototypes to call there method on another object
-		virtual AsObjectHandle CallMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params );
-
-		
+		virtual AsObjectHandle callMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params );
+	
 		AsObjectHandle hasOwnProperty( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 		AsObjectHandle toString( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 		AsObjectHandle toNumber( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
@@ -79,7 +77,7 @@ namespace AutoGen {
 		AsObjectHandle prototype;
 		static AsObjectHandle s_objectPrototype;
 		
-		typedef Core::gcmap<std::string, AutoGen::AsObjectHandle> PropertyMap;
+		typedef Core::gcmap<std::string, AsObjectHandle> PropertyMap;
 		PropertyMap			properties;		
 #if DEBUG
 		AsPrimitiveType type;
@@ -90,16 +88,16 @@ namespace AutoGen {
 	public:
 		friend class AsObject;
 		
-		virtual AsPrimitiveType Type() {
+		virtual AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_UNDEFINED );
 #endif
 			return APT_UNDEFINED;
 		}
 		
-		virtual std::string ToString() { return "undefined"; }
+		virtual std::string toString()  const override { return "undefined"; }
 		
-		static AsObjectUndefined* Get() {
+		static AsObjectUndefined* get() {
 			static AsObjectUndefined* theOne = CORE_GC_NEW_ROOT_ONLY AsObjectUndefined();
 			return theOne;
 		}
@@ -112,16 +110,16 @@ namespace AutoGen {
 	
 	class AsObjectNull : public AsObject {
 	public:
-		virtual AsPrimitiveType Type() {
+		virtual AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_NULL );
 #endif
 			return APT_NULL;
 		}
 
-		virtual std::string ToString() { return "null"; }
+		virtual std::string toString()  const override { return "null"; }
 
-		static AsObjectNull* Get() {
+		static AsObjectNull* get() {
 			static AsObjectNull* theOne = CORE_GC_NEW_ROOT_ONLY AsObjectNull();
 			return theOne;
 		}
@@ -139,16 +137,16 @@ namespace AutoGen {
 			prototype = s_objectPrototype;			
 		}
 			
-		virtual AsPrimitiveType Type() {
+		virtual AsPrimitiveType type() const override {
 #if DEBUG
 			assert( type ==  APT_BOOLEAN );
 #endif
 			return APT_BOOLEAN;
 		}
 
-		virtual std::string ToString() { return value ? "true" : "false"; }
-		virtual bool ToBoolean() { return value; }
-		virtual double ToNumber() { return value ? 1.0 : 0.0; }
+		virtual std::string toString()  const override { return value ? "true" : "false"; }
+		virtual bool toBoolean()  const override { return value; }
+		virtual double toNumber()  const override { return value ? 1.0 : 0.0; }
 		
 		bool value;
 	};
@@ -167,24 +165,23 @@ namespace AutoGen {
 				prototype = s_stringPrototype;				
 			}
 		
-		virtual AsPrimitiveType Type() {
+		virtual AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_STRING );
 #endif
 			return APT_STRING;
 		}
 
-		virtual void Construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		virtual void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) override;
 		
-		virtual std::string ToString() { return value; }
+		virtual std::string toString()  const override { return value; }
 		
-		virtual double ToNumber();
+		virtual double toNumber()  const override;
 		
-		virtual bool ToBoolean();
+		virtual bool toBoolean() const override;
 		
-		virtual AsObjectHandle GetProperty( const std::string& _name );
-		
-		
+		virtual AsObjectHandle getProperty( const std::string& _name ) const override;
+			
 		AsObjectHandle length( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
 		
 		std::string		value;
@@ -212,16 +209,16 @@ namespace AutoGen {
 				prototype = s_objectPrototype;
 			}
 
-		virtual AsPrimitiveType Type() {
+		virtual AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_NUMBER );
 #endif
 			return APT_NUMBER;
 		}
 
-		virtual std::string ToString();
+		virtual std::string toString() const override ;
 		
-		virtual bool ToBoolean() {
+		virtual bool toBoolean()  const override {
 			// TODO epsilon
 			if( value == 0.0) 
 				return false;
@@ -229,14 +226,11 @@ namespace AutoGen {
 				return true;
 		}
 
-		virtual double ToNumber() { return value; }
-		virtual int ToInteger() { return (int) value; }
+		virtual double toNumber()  const override { return value; }
+		virtual int toInteger()  const override { return (int) value; }
 
  		double value;
-	};
-	
-} /* AutoGen */ 
-	
+	};	
 } /* Swf */ 
 
 

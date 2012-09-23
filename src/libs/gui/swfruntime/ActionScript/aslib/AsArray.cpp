@@ -8,28 +8,26 @@
  */
 
 #include "gui/swfruntime/swfruntime.h"
-#include "../autogen/AsObjectFactory.h"
-#include "../autogen/AsAgRuntime.h"
 #include <sstream>
+#include "../AsObjectFactory.h"
+#include "../AsAgRuntime.h"
 #include "AsArray.h"
 
 namespace Swf {
-	namespace AutoGen {
-		void AsArray::Construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
-			AsObject::Construct( _runtime, _numParams, _params );
+	void AsArray::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		AsObject::construct( _runtime, _numParams, _params );
 			
-			for( int i=0; i < _numParams; ++i ) {
-				std::ostringstream stream;
-				stream << i;
-				SetProperty( stream.str(), _params[i] );
-			}
+		for( int i=0; i < _numParams; ++i ) {
+			std::ostringstream stream;
+			stream << i;
+			setProperty( stream.str(), _params[i] );
 		}
+	}
 		
-		AsObjectHandle AsArray::ConstructFunction( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
-			AsObjectHandle obj = CORE_NEW AsArray();
-			obj->Construct( _runtime, _numParams, _params );
-			return obj;
-		}
-	} /* AutoGen */ 
+	AsObjectHandle AsArray::constructFunction( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		AsObjectHandle obj = CORE_NEW AsArray();
+		obj->construct( _runtime, _numParams, _params );
+		return obj;
+	}
 	
 } /* Swf */ 

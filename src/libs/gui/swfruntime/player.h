@@ -49,7 +49,6 @@ namespace Swf {
 		void advance( float _elapsedMs );
 		void togglePause();
 		void display( Scene::RenderContext* _ctx );
-		void process();
 
 		Character* getCharacter(uint16_t _id) { return characterPaths[ _id ]; }
 		Bitmap* getBitmap(uint16_t _id) { return runtimeBitmaps[ _id ]; }
@@ -59,11 +58,12 @@ namespace Swf {
 		float frameRateInMs;
 	
 		const Math::Matrix4x4& getTwipToNdx() const { return twipToNdx; }
-		
+
+		// special use
+		void process();
 #if defined( USE_ACTIONSCRIPT )
 		AsVM*				virtualMachine;
-#endif
-		
+#endif	
 	private:
 		static const void* internalPreCreate( const char* name, const CreationInfo *creation );
 	

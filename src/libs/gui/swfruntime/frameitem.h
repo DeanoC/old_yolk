@@ -8,7 +8,7 @@
 #ifndef YOLK_GUI_SWFRUNTIME_FRAMEITEM_H_
 #define YOLK_GUI_SWFRUNTIME_FRAMEITEM_H_
 
-#include "actionscript/autogen/AsObject.h"
+#include "actionscript/AsObject.h"
 
 namespace Scene {
 	class RenderContext;
@@ -28,7 +28,7 @@ namespace Swf {
 	// ======================================================
 	// = The base item in each frame list, the heart of Swf =
 	// ======================================================
-	class FrameItem : public AutoGen::AsObject {
+	class FrameItem : public AsObject {
 	public:
 		typedef std::unordered_map<std::string, int> AsPropertyStringMap;
 		
@@ -38,8 +38,8 @@ namespace Swf {
 		virtual MovieClip* getAsMovieClip() { return NULL; }
 		
 		// numeric property handling
-		virtual AutoGen::AsObjectHandle getProperty( int _index );
-		virtual void setProperty( int _index, AutoGen::AsObjectHandle _val );
+		virtual AsObjectHandle getProperty( int _index );
+		virtual void setProperty( int _index, AsObjectHandle _val );
 		
 		virtual float getXScale();
 		virtual void setXScale( float _xscale );
@@ -48,12 +48,12 @@ namespace Swf {
 		virtual float getRotation();
 		virtual void setRotation( float angle );
 			
-		virtual AutoGen::AsObjectHandle getProperty( const std::string& _name );
-		virtual void setProperty( const std::string& _name, AutoGen::AsObjectHandle _handle );
+		virtual AsObjectHandle getProperty( const std::string& _name );
+		virtual void setProperty( const std::string& _name, AsObjectHandle _handle );
 		
 	protected:
 		FrameItem ( uint16_t _depth, FrameItemType _type, uint16_t _id, MovieClip* _parent, const std::string& _name ) :
-			AutoGen::AsObject(AutoGen::APT_OBJECT) {
+			AsObject( APT_OBJECT ) {
 			depth = _depth;
 			type = _type;
 			id = _id;
