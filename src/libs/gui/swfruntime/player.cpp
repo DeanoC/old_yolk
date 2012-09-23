@@ -77,6 +77,7 @@ namespace Swf {
 	void Player::display( Scene::RenderContext* _ctx ){
 		float sx = (float)(parser->headerRect->maxX - parser->headerRect->minX);
 		float sy = (float)(parser->headerRect->maxY - parser->headerRect->minY);
+		CORE_ASSERT( parser->fileVersion <= Swf::SwfParser::MAX_VERSION_SUPPORTED );
 		
 		twipToNdx = Math::IdentityMatrix();
 		twipToNdx = Math::CreateTranslationMatrix(-(sx / 2.0f), -(sy / 2.0f), 0.0f);

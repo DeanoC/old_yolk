@@ -80,21 +80,20 @@ namespace Swf {
 		return rtFont;
 	}
 
-	Font* Builder::getStockFont( STOCK_FONT _font ){
+	Font* Builder::getStockFont( STOCK_FONT _font ) {
 		switch( _font ){
 			case SERIF:
-//				return LoadSpecialFont( player->getStockPath() + "/_serif.swf" );
+				return loadSpecialFont( "Ui/_serif.swf" );
 			case TYPEWRITER:
-//				return LoadSpecialFont( player->getStockPath() + "/_typewriter.swf" );
+				return loadSpecialFont( "Ui/_typewriter.swf" );
 			case SANS:
-				return loadSpecialFont( "_sans.swf" );
+				return loadSpecialFont( "Ui/_sans.swf" );
 			default:
 				return NULL;
 		}
 	}
 
-	void Builder::buildFonts( Fonts& _runtimeFonts )
-	{
+	void Builder::buildFonts( Fonts& _runtimeFonts ) {
 		for( 	std::map<uint16_t, SwfFont*>::const_iterator i = parser->dictionary.fonts.begin();
 				i != parser->dictionary.fonts.end();
 				++i ) {
@@ -106,7 +105,7 @@ namespace Swf {
 			} else if( font->name == "_serif") {
 				_runtimeFonts[font->id] = getStockFont( SERIF );
 				continue;
-			}	else if( font->name == "_typewriter") {
+			} else if( font->name == "_typewriter") {
 				_runtimeFonts[font->id] = getStockFont( TYPEWRITER );
 				continue;
 			}

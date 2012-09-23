@@ -15,7 +15,6 @@ foreach( sc ${shader_files} )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp 
 						COMMAND bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp ${sc}
 						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} 
-						COMMENT "${sc}: if this fails create the directory part of ${sc} in the build folders manually" 
 					)
 	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
 endforeach( sc ${shader_files} )
