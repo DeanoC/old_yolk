@@ -9,14 +9,15 @@ std::atomic<bool>	shutdownFinished;
 GameThread::GameThread( SceneWorldPtr _world ) {
 	SceneWorldPtr	world = _world;
 	gameThread = CORE_NEW Core::thread( [world] {
-			// flush 'load' time from first time update
 			shutdownFinished = false;
-			Core::Clock::get()->update();
+			// flush 'load' time from first time update
+			Core::Clock::get()->update();			
 			while( !g_quitFlag ) {
 				float deltaT = Core::Clock::get()->update();
+				deltaT = Math::Clamp( deltaT, 0.0f, (1.0f/15.0f) );
 				Core::DevelopmentContext::get()->update( deltaT );
 				world->update( deltaT );
-				Core::Clock::sleep( Math::Clamp(1.0f/120.0f - deltaT,0.0f,1.0f) );
+//				Core::Clock::sleep( Math::Clamp(1.0f/120.0f - deltaT,0.0f,1.0f) );
 			}
 			shutdownFinished = true;
 	} );

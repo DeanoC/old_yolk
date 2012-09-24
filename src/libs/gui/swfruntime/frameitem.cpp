@@ -14,8 +14,26 @@
 namespace Swf {
 	
 FrameItem::AsPropertyStringMap* FrameItem::s_asPropertyStringMap;
-	
-float FrameItem::getXScale() {
+
+//-- NOTE: Hmmm FrameItem get/set transforms work on the concatanated matrix, whereis displayobject work on local matrix
+//--       I suspect frameitem is wrong, but not sure ?!
+float FrameItem::getXPosition() const {
+	return concatMatrix._41;
+}
+
+void FrameItem::setXPosition( const float _xpos ) {
+	concatMatrix._41 = _xpos;
+}
+
+float FrameItem::getYPosition() const {
+	return concatMatrix._42;
+}
+
+void FrameItem::setYPosition( const float _ypos ) {
+	concatMatrix._42 = _ypos;
+}
+
+float FrameItem::getXScale() const {
 	return sqrt(concatMatrix._11 * concatMatrix._11 + concatMatrix._12 * concatMatrix._12);
 }
 
@@ -25,7 +43,7 @@ void FrameItem::setXScale( float _xscale ) {
 	concatMatrix._12 = (concatMatrix._12 / oldScale) * _xscale;
 }
 
-float FrameItem::getYScale() {
+float FrameItem::getYScale() const {
 	return sqrt(concatMatrix._22 * concatMatrix._22 + concatMatrix._21 * concatMatrix._21);
 }
 
@@ -35,7 +53,7 @@ void FrameItem::setYScale( float _yscale ) {
 	concatMatrix._21 = (concatMatrix._21 / oldScale) * _yscale;
 }
 
-float FrameItem::getRotation() {
+float FrameItem::getRotation() const {
 	return Math::radian_to_degree<float>() * atan2(concatMatrix._21, concatMatrix._11);
 }
 
@@ -51,11 +69,12 @@ void FrameItem::setRotation(float angle) {
 	concatMatrix._22 = (float)(yscale * cosAngle);
 }
 
-Swf::AsObjectHandle FrameItem::getProperty( int _index ) {
+Swf::AsObjectHandle FrameItem::getProperty( int _index ) const {
 	switch( _index) {
 		case 0: // _X
+			return CORE_NEW AsObjectNumber( getXPosition() );
 		case 1: // _Y
-		break;
+			return CORE_NEW AsObjectNumber( getYPosition() );
 		case 2: //_xscale 2 
 			return CORE_NEW AsObjectNumber( getXScale() );
 		case 3: //_yscale 3 
@@ -92,8 +111,9 @@ Swf::AsObjectHandle FrameItem::getProperty( int _index ) {
 void FrameItem::setProperty( int _index, AsObjectHandle _val ){	
 	switch( _index ) {
 		case 0: // _X
+			setXPosition( (float)_val->toNumber() ); break;
 		case 1: // _Y
-		break;
+			setYPosition( (float)_val->toNumber() ); break;
 		case 2: //_xscale 2 
 			setXScale( (float)_val->toNumber() ); break;
 		case 3: //_yscale 3 

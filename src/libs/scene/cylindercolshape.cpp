@@ -10,7 +10,8 @@ namespace Scene {
 		cylinderShape( nullptr ) 
 	{
 		const auto& v = aabb.getHalfLength();
-		cylinderShape  = CORE_NEW btCylinderShape( btVector3(v[0], v[1], v[2]) );
+		// use new as btSphereShape as class specific new
+		cylinderShape  = new btCylinderShape( btVector3(v[0], v[1], v[2]) );
 	}
 	CylinderColShape::~CylinderColShape() {
 		CORE_DELETE cylinderShape;

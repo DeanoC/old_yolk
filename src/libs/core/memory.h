@@ -39,20 +39,25 @@ namespace Core
 
 #if defined( USE_GC )
 #	define CORE_GC_NEW 				new(UseGC)
-#	define CORE_GC_NEW_PTR_FREE 	new(PointerFreeGC)
+#	define CORE_GC_NEW_NOT_ROOT 	new(PointerFreeGC)
 #	define CORE_GC_NEW_ROOT_ONLY 	new(NoGC)
 #	define CORE_GC_DELETE(x)		Core::GC_Delete(x)
+#	define CORE_NEW 				CORE_GC_NEW_ROOT_ONLY
+#	define CORE_DELETE 				delete
+#	define CORE_NEW_ARRAY 			new
+#	define CORE_DELETE_ARRAY 		delete[]
 #else
 #	define CORE_GC_NEW 				new
-#	define CORE_GC_NEW_PTR_FREE 	new
+#	define CORE_GC_NEW_NOT_ROOT 	new
 #	define CORE_GC_NEW_ROOT_ONLY 	new
 #	define CORE_GC_DELETE(x)		delete x
+#	define CORE_NEW 				new
+#	define CORE_DELETE 				delete
+#	define CORE_NEW_ARRAY 			new
+#	define CORE_DELETE_ARRAY 		delete[]
+
 #endif
 
-#define CORE_NEW 				new
-#define CORE_DELETE 				delete
-#define CORE_NEW_ARRAY 			new
-#define CORE_DELETE_ARRAY 		delete[]
 
 #if PLATFORM == WINDOWS
 #	define CORE_ALIGNED_ALLOC(x,a)	_aligned_malloc(x,a)

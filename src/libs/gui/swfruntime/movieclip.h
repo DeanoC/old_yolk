@@ -5,8 +5,8 @@
 //  Created by Deano on 2008-09-27.
 //  Copyright 2012 Cloud Pixies Ltd. All rights reserved.
 // 
-#ifndef _SWFMOVIECLIP_H_
-#define _SWFMOVIECLIP_H_
+#ifndef YOLK_GUI_SWFRUNTIME_MOVIECLIP_H_
+#define YOLK_GUI_SWFRUNTIME_MOVIECLIP_H_
 
 #include "frameitem.h"
 #include "displayobjectframeitem.h"
@@ -38,8 +38,17 @@ namespace Swf {
 		
 		void processFrame( const SwfFrame* _frame );
 
-		void play();
-		void stop();
+		virtual void display( Player* _player, Scene::RenderContext* _ctx ) override;
+		virtual void advance( float _elapsedInMs ) override;
+		virtual void play() override;
+		virtual void stop() override;
+		virtual void setRotation( const float angle ) override {
+			DisplayObjectFrameItem::setRotation(angle);
+			transformDirty = true;
+		}
+		
+		virtual MovieClip* getAsMovieClip() override { return this; }
+
 		void nextFrame();
 		void prevFrame();
 		void gotoFrame(uint16_t _frame);
@@ -55,16 +64,12 @@ namespace Swf {
 		Player* getPlayer() {
 			return player;
 		}
-		virtual void display( Player* _player, Scene::RenderContext* _ctx ) override;
-		virtual void advance( float _elapsedInMs ) override;
 
-		virtual void setRotation( float angle ) override {
-			DisplayObjectFrameItem::setRotation(angle);
-			transformDirty = true;
-		}
-		
-		virtual MovieClip* getAsMovieClip() { return this; }
+		// find global target
 		FrameItem* findTarget( const std::vector<std::string>& _target, int _depth );
+		
+		// quick find local target (target must be a direct child)
+		FrameItem* findLocalTarget( const std::string& _target );
 
 	private:
 		typedef Core::gcmap<uint16_t, FrameItem*> DepthMap;

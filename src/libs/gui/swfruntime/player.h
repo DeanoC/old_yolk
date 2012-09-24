@@ -23,9 +23,7 @@ namespace Swf {
 	class GradientTextureManager;
 	class Bitmap;
 	class Font;
-#if defined( USE_ACTIONSCRIPT )
 	class AsVM;
-#endif	
 
 	static const uint32_t PlayerType = RESOURCE_NAME('S','W','F','P');
 
@@ -56,14 +54,14 @@ namespace Swf {
 		
 		SwfParser* parser;
 		float frameRateInMs;
+
+		MovieClip* getRoot() const { return rootClip; }
 	
 		const Math::Matrix4x4& getTwipToNdx() const { return twipToNdx; }
 
 		// special use
 		void process();
-#if defined( USE_ACTIONSCRIPT )
 		AsVM*				virtualMachine;
-#endif	
 	private:
 		static const void* internalPreCreate( const char* name, const CreationInfo *creation );
 	

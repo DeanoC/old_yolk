@@ -9,8 +9,6 @@
 #ifndef ASVM_H_Z8J22E87
 #define ASVM_H_Z8J22E87
 
-#define AS_PREVIEW
-
 namespace Swf
 {
 	// forward decl

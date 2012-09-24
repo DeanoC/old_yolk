@@ -13,9 +13,7 @@
 #include <zlib.h>
 #include "gui/SwfParser/Parser.h"
 #include "gui/SwfParser/SwfRect.h"
-#if defined( USE_ACTIONSCRIPT )
-#	include "ActionScript/AsVM.h"
-#endif
+#include "ActionScript/AsVM.h"
 #include "swfman.h"
 #include "builder.h"
 #include "gradienttexturemanager.h"
@@ -25,18 +23,14 @@
 
 namespace Swf {
 	Player::Player() {
-#if defined( USE_ACTIONSCRIPT )
 		virtualMachine = NULL;
-#endif		
 	}
 
 	void Player::create( const std::string& _path, float _xscale, float _yscale ){
 		paused = false;
 		Core::FilePath path(_path);
 		
-#if defined( USE_ACTIONSCRIPT )
 		virtualMachine = CORE_NEW AsVM( path.BaseName().RemoveExtension().value() );		
-#endif
 
 		parser = CORE_NEW SwfParser();
 		parser->Parse( path.ReplaceExtension( ".swf" ).value() );
@@ -55,11 +49,9 @@ namespace Swf {
 	}
 	
 	Player::~Player() {
-#if defined( USE_ACTIONSCRIPT )
 		if( virtualMachine != NULL) {
 			CORE_DELETE( virtualMachine );
 		}
-#endif
 	}
 	
 	void Player::process() {

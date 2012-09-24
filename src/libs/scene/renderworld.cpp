@@ -130,11 +130,15 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 		pipeline->endGeomPass( context, i );
 	}
 
-	pipeline->start2DPass( context );
-	for( auto it : renderables2D ) {
-		(*it)( context );
+	{
+		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
+		pipeline->start2DPass( context );
+		for( auto it : renderables2D ) {
+			(*it)( context );
+		}
+		pipeline->end2DPass( context );
 	}
-	pipeline->end2DPass( context );
+
 
 	pipeline->resolve( context );
 }
@@ -147,6 +151,7 @@ void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineNam
 	renderRenderables( context, pipeline );
 
 	if( debugRenderCallback ) {
+		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
 		debugRenderCallback();
 	}
 }

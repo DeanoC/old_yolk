@@ -38,15 +38,16 @@ namespace Scene {
 		CORE_ASSERT( properties->getType( nameMap[ DYNAMICS_MESH_VERTICES ] ) == BinProperty::BPT_FLOAT );
 		float* vpnts = (float*)properties->getAs<float>( nameMap[ DYNAMICS_MESH_VERTICES ] );
 
-	    indexVertexArray = CORE_NEW btTriangleIndexVertexArray(
+		// use new as btTriangleIndexVertexArray has a class specific new
+	    indexVertexArray = new btTriangleIndexVertexArray(
 	    		properties->getCount( nameMap[ DYNAMICS_MESH_INDICES ] )/3,
 	            indices,
 	            indexStride * 3,
 	        	properties->getCount( nameMap[ DYNAMICS_MESH_VERTICES ] )/3, 
 	            vpnts, 
 	            sizeof(float)*3 );
-
-		trimeshShape  = CORE_NEW btBvhTriangleMeshShape( indexVertexArray, true );
+		// use new as btBvhTriangleMeshShape has a class specific new
+		trimeshShape  = new btBvhTriangleMeshShape( indexVertexArray, true );
 	}
 	MeshColShape::~MeshColShape() {
 		CORE_DELETE indexVertexArray;

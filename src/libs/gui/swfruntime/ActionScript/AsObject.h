@@ -6,8 +6,8 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-#ifndef ASOBJECT_H_4OQQI5Z0
-#define ASOBJECT_H_4OQQI5Z0
+#ifndef YOLK_GUI_SWFRUNTIME_ACTIONSCRIPT_ASOBJECT_H_
+#define YOLK_GUI_SWFRUNTIME_ACTIONSCRIPT_ASOBJECT_H_
 
 namespace Swf {
 	class AsFuncBase; 

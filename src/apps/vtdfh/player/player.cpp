@@ -1,4 +1,5 @@
 #include "vtdfh.h"
+#include <boost/lexical_cast.hpp>
 #include "core/debug_render.h"
 #include "core/development_context.h"
 #include "localworld/inputhandlercontext.h"
@@ -8,6 +9,7 @@
 #include "scene/physicsensor.h"
 #include "cameras/zarchcam.h"
 #include "cameras/objectcam.h"
+#include "gui/swfruntime/movieclip.h"
 #include "player.h"
 
 Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* startNode ) :
@@ -37,7 +39,6 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	updater.updateCallback = std::bind( &Player::update, this, arg::_1 );
 	myThingy->addComponent( &updater );
 
-
 	zarchCam = std::make_shared<ZarchCam>();
 	zarchCam->setTrackingThing( myThingy );
 	zarchCam->setOffset( Math::Vector3(0,20,0) );
@@ -60,6 +61,7 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	world->debugRenderCallback = std::bind( &Player::debugCallback, this );
 	world->add( myThingy );
 
+	speed = 0;
 }
 
 
@@ -95,11 +97,11 @@ bool Player::findHeightBelow( float& height ) {
 	}
 }
 
-void Player::update( float timeMS ) {
+void Player::update( float timeInSeconds ) {
 	InputFrame input;
 
 	auto fl = flashTest.acquire();
-	fl->advance( timeMS * 1000.0f );
+	fl->advance( timeInSeconds * 1000.0f );
 
 	if( inputContext->dequeueInputFrame( &input ) ) {
 		if( input.pad[0].debugButton1 ) {
@@ -128,8 +130,8 @@ void Player::update( float timeMS ) {
 		}
 	}
 	// manually drive camera updates TODO add back to updatables/things list??
-	zarchCam->update( timeMS );
-	objectCam->update( timeMS );
+	zarchCam->update( timeInSeconds );
+	objectCam->update( timeInSeconds );
 }
 
 void Player::freeControls( const InputFrame& input ) {
@@ -143,6 +145,7 @@ void Player::freeControls( const InputFrame& input ) {
 		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100000.f;
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
+
 	if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
 		Math::Vector3 xvec = Math::GetXAxis( rm );
 		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 1000.f;
@@ -169,16 +172,19 @@ void Player::gameControls( const InputFrame& input ) {
 	Math::Quaternion rot = transform->getLocalOrientation();
 	Math::Matrix4x4 rm = Math::CreateRotationMatrix( rot );
 	Math::Vector3 yvec = Math::GetYAxis( rm );
+	Math::Vector3 zvec = Math::GetZAxis( rm );
 
 	if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
-		Math::Vector3 zvec = Math::GetZAxis( rm );
-		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100.f;
-		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
+		speed += (1  * input.deltaTime) * input.pad[0].YAxisMovement; 
 	}
+	Math::Vector3 fv = zvec * speed;
+	transform->setLocalPosition( transform->getLocalPosition() + fv );
+//	speed *= 0.001f * input.deltaTime;
+
 	if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
 		Math::Vector3 xvec = Math::GetXAxis( rm );
 		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 100.f;
-		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
+		transform->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 	float mxdt = input.mouseX  * input.deltaTime;
 	if( fabsf(mxdt) > 0.0001f ) {
@@ -211,8 +217,8 @@ void Player::debugCallback( void ) {
 			if( !(rigid->getBroadphaseProxy()->m_collisionFilterGroup & TBC_WORLD) ) {
 				btVector3 minAABB, maxAABB;
 				rigid->getAabb( minAABB, maxAABB );
-				Core::g_pDebugRender->worldLine( Core::RGBAColour(i/2.f,i/4.f,0,0), Math::GetTranslation(sm), 
-						Math::Vector3((minAABB[0]+maxAABB[0])/2.f, maxAABB[1], (minAABB[2]+maxAABB[2])/2.0f ) );
+//				Core::g_pDebugRender->worldLine( Core::RGBAColour(i/2.f,i/4.f,0,0), Math::GetTranslation(sm), 
+//						Math::Vector3((minAABB[0]+maxAABB[0])/2.f, maxAABB[1], (minAABB[2]+maxAABB[2])/2.0f ) );
 			}
 		}
 	}
@@ -220,7 +226,9 @@ void Player::debugCallback( void ) {
 }
 
 void Player::renderable2DCallback( Scene::RenderContext* _ctx ) {
-	auto fl = flashTest.acquire();
-	fl->display( _ctx );
-
+	auto fl = flashTest.tryAcquire();
+	if( fl ) {
+		fl->getRoot()->setProperty( "speed", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( speed) + "m/s" ) );
+		fl->display( _ctx );
+	}
 }

@@ -14,9 +14,7 @@
 #include "gui/SwfParser/SwfFrame.h"
 #include "gui/SwfParser/SwfParser.h"
 #include "gui/SwfParser/SwfDictionary.h"
-#if defined( USE_ACTIONSCRIPT )
-#	include "ActionScript/AsVM.h"
-#endif
+#include "ActionScript/AsVM.h"
 #include "displayobjectframeitem.h"
 #include "player.h"
 #include "utils.h"
@@ -208,9 +206,7 @@ namespace Swf {
 	
 	void MovieClip::updateFrame( bool _hasMatrix, Math::Matrix4x4 _concat, bool _hasColourCx, SwfColourTransform* _concatCx) {
 		if(frameABC) {
-#if defined( USE_ACTIONSCRIPT )
 			player->virtualMachine->processByteCode( this, frameABC );	
-#endif
 			frameABC = NULL;
 		}
 				
@@ -271,9 +267,7 @@ namespace Swf {
 	void MovieClip::process() {
 		do {
 			if(frameABC) {
-#if defined( USE_ACTIONSCRIPT )
 				player->virtualMachine->processByteCode( this, frameABC );	
-#endif
 				frameABC = NULL;
 			}
 			sortArray();
@@ -335,8 +329,7 @@ namespace Swf {
 			return parent->findTarget(_target, _depth + 1);
 		}
 		if( _target[_depth] ==  "_root" ) {
-			assert(false);
-			return 0;//player.DisplayList.FindTarget(_target, _depth + 1);
+			return player->getRoot()->findTarget(_target, _depth + 1);
 		}
 		if( _target[_depth] ==  "this" ) {
 			return findTarget(_target, _depth + 1);
@@ -348,8 +341,23 @@ namespace Swf {
 				if (_depth >= (int)_target.size()) {
 					return item;
 				} else {
-					return item->getAsMovieClip()->findTarget(_target, _depth + 1);
+					if( item->getAsMovieClip() != nullptr ) {
+						return item->getAsMovieClip()->findTarget(_target, _depth + 1);
+					} else {
+						return nullptr;
+					}
 				}
+			}
+		}
+		return nullptr;
+	}
+
+	FrameItem* MovieClip::findLocalTarget( const std::string& _target ) {
+		// TODO replace linear array search with (hash) map
+		for ( size_t i = 0; i < sortedArray.size(); i++ ) {
+			FrameItem* item = sortedArray[ i ];
+			if ( item->name == _target ) {
+				return item;
 			}
 		}
 		return nullptr;

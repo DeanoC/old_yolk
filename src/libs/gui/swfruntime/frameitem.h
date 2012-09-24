@@ -35,38 +35,45 @@ namespace Swf {
 		virtual ~FrameItem (){};
 		virtual void display( Player* _player, Scene::RenderContext* _ctx ) = 0;
 		virtual void advance( float _elapsedMs ) {};
-		virtual MovieClip* getAsMovieClip() { return NULL; }
+		// play and stop control whether advance actually happens, a stopped item can be manually controlled
+		virtual void play(){};
+		virtual void stop(){};
+
+		virtual MovieClip* getAsMovieClip() { return nullptr; }
 		
 		// numeric property handling
-		virtual AsObjectHandle getProperty( int _index );
+		virtual AsObjectHandle getProperty( int _index ) const;
 		virtual void setProperty( int _index, AsObjectHandle _val );
 		
-		virtual float getXScale();
-		virtual void setXScale( float _xscale );
-		virtual float getYScale();
-		virtual void setYScale( float _yscale );
-		virtual float getRotation();
-		virtual void setRotation( float angle );
+		virtual float getXPosition() const;
+		virtual void setXPosition( const float _xpos );
+		virtual float getYPosition() const;
+		virtual void setYPosition( const float _ypos );
+		virtual float getXScale() const;
+		virtual void setXScale( const float _xscale );
+		virtual float getYScale() const;
+		virtual void setYScale( const float _yscale );
+		virtual float getRotation() const;
+		virtual void setRotation( const float angle );
 			
 		virtual AsObjectHandle getProperty( const std::string& _name );
 		virtual void setProperty( const std::string& _name, AsObjectHandle _handle );
 		
 	protected:
 		FrameItem ( uint16_t _depth, FrameItemType _type, uint16_t _id, MovieClip* _parent, const std::string& _name ) :
-			AsObject( APT_OBJECT ) {
-			depth = _depth;
-			type = _type;
-			id = _id;
-			parent = _parent;
-			name = _name;
-			visible = true;
-		}
-		
+			AsObject( APT_OBJECT ),
+			depth( _depth ),
+			type( _type ),
+			id( _id ),
+			parent( _parent ),
+			name( _name ),
+			visible( true ) {}		
 	public:		
-		uint16_t depth;
-		FrameItemType type;
-		uint16_t id;
+		const FrameItemType type;
+		const uint16_t id;
+
 		std::string name;
+		uint16_t depth;
 		Math::Matrix4x4 concatMatrix;
 		SwfColourTransform* colourTransform;
 		MovieClip* parent;

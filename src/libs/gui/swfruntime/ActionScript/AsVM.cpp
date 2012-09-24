@@ -17,14 +17,10 @@
 #include "AsObjectFunction.h"
 #include "AsVM.h"
 
-#if defined(AS_PREVIEW)
 bool g_doPreview = true;
 typedef void (Swf::AsAgRuntime::*AsAgRuntimeFunc)();
 AsAgRuntimeFunc g_AsAgRuntimeFuncs[256];
 #define DO_PREVIEW( x ) if(g_doPreview){ g_AsAgRuntime-> x; }
-#else
-#define DO_PREVIEW( x )
-#endif
 
 namespace Swf {
 	const char* s_AsByteCodeNames[256];
@@ -73,21 +69,16 @@ namespace Swf {
 //			LOG(INFO) << "namespace AutoGen {\n";
 //			LOG(INFO) << "\tclass AsAg_" << _name << " : public AsAgRuntime {\n";
 //			LOG(INFO) << "\tpublic:\n";
-#if defined(AS_PREVIEW)
 		#define DECLARE_BYTECODE( name, val ) g_AsAgRuntimeFuncs[val] = &AsAgRuntime:: name;
 				#include "AsByteCode_inc.h"
 		#undef DECLARE_BYTECODE
 
 		g_AsAgRuntime = CORE_GC_NEW_ROOT_ONLY AsAgRuntime();
-			
-#endif
 	}
 		
 	AsVM::~AsVM() {
-#if defined(AS_PREVIEW)
 		CORE_GC_DELETE( g_AsAgRuntime );
 		g_AsAgRuntime = NULL;
-#endif
 			
 //			LOG(INFO) << "\t};\n";
 			
@@ -138,11 +129,9 @@ namespace Swf {
 		std::ostringstream stream;
 		stream << GetUniqueName(_movieClip) << "_" << _movieClip->getCurrentFrameNumber();
 			
-#if defined(AS_PREVIEW)
 		g_AsAgRuntime->reset();
 		g_AsAgRuntime->setRoot( _movieClip );
 		g_AsAgRuntime->setTarget( _movieClip );
-#endif
 		AsFunctionBuilder* funcBuild = processFunctionByteCode( stream.str(), byteCode->byteCode, byteCode->lengthInBytes, byteCode->isCaseSensitive );
 
 		funcBuild->debugLogFunction();
@@ -150,10 +139,8 @@ namespace Swf {
 		AsFunction* func = CORE_NEW AsFunction( funcBuild );
 		func->call( g_AsAgRuntime, 0, NULL );
 			
-#if defined(AS_PREVIEW)
 		CORE_GC_DELETE( func );
 		CORE_GC_DELETE( funcBuild );
-#endif			
 	}		
 		
 		

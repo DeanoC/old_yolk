@@ -28,7 +28,6 @@ namespace Swf {
 
 SwfMan::SwfMan() {
 
-#if defined( USE_ACTIONSCRIPT )
 		FrameItem::s_asPropertyStringMap = CORE_NEW FrameItem::AsPropertyStringMap();
 		FrameItem::s_asPropertyStringMap->clear();
 		(*FrameItem::s_asPropertyStringMap)[ "_x" ] = 0;
@@ -55,7 +54,7 @@ SwfMan::SwfMan() {
 		(*FrameItem::s_asPropertyStringMap)[ "_quality" ] = 19;
 		(*FrameItem::s_asPropertyStringMap)[ "_xmouse" ] = 20;
 		(*FrameItem::s_asPropertyStringMap)[ "_ymouse" ] = 21;
-#endif
+
 		using namespace Scene;
 
 #define DECLARE_SHARED( x )				ProgramMan::get()->registerProgramSource( #x, binary_data_programs_ ## x  );

@@ -47,6 +47,8 @@ private:
 
 	Core::ScopedResourceHandle<Swf::PlayerHandle> 		flashTest;
 
+	float speed;
+
 };
 
 #endif
