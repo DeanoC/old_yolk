@@ -35,10 +35,6 @@ int __cdecl WinCrtReportHook(int type, char * msg, int * ret ) {
 }
 #endif
 
-#if defined(USE_GC)
-#include "private/gc_priv.h"
-#endif
-
 namespace Core 
 {
 
@@ -59,7 +55,6 @@ char* g_argv[ MAX_CMDLINE_ARGS ];	//!< The argv cmdline parameter
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Init( void ) {
-	Clock::init();
 	SystemMessage::init();
 	ResourceMan::init();
 	InstallResourceTypes();
@@ -76,8 +71,9 @@ void Init( void ) {
 #endif 
 	DevelopmentContext::init();
 #if defined(USE_GC)
-	GC_enable_incremental();
-	GC_init();
+	//GC_enable_incremental();
+	GC_init();		
+	GC_allow_register_threads();
 #endif
 }
 
@@ -94,7 +90,6 @@ void Shutdown( void ) {
 #endif
 	ResourceMan::shutdown();
 	SystemMessage::shutdown();
-	Clock::shutdown();
 	Keyboard::shutdown();
 #if PLATFORM == WINDOWS 
 	MouseWin::shutdown();
@@ -112,7 +107,7 @@ void Shutdown( void ) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void HouseKeep( void ) {
 #if defined(USE_GC)
-	GC_gcollect();
+//	GC_gcollect();
 #endif
 
 #if PLATFORM == WINDOWS
@@ -151,7 +146,3 @@ bool InitWindow( int width, int height, bool bFullscreen ) {
 }
 
 } // end namespace
-
-#if defined(USE_GC)
-#include "ThirdParty/gc/gc_cpp.cc"
-#endif

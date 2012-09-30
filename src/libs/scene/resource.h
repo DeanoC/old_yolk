@@ -5,10 +5,27 @@
 #include "scene/generictextureformat.h"
 
 namespace Scene {
+	// forward decl
+	class RenderContext;
 
 	// private class to renders but needs visibility at Scene lever
 	struct View{};
 	typedef std::shared_ptr<View> ViewPtr;
+
+
+	enum RESOURCE_MAP_ACCESS {
+		RMA_WRITE		= BIT(0),
+		RMA_READ		= BIT(1),
+		RMA_READ_WRITE	= RMA_READ | RMA_WRITE,
+		RMA_DISCARD		= BIT(2),
+		RMA_UNSYNC		= BIT(3),
+	};
+
+	struct ResourceMapAccess {
+		void* data;
+		uint32_t widthStride;
+		uint32_t depthStride;
+	};
 
 	///-------------------------------------------------------------------------------------------------
 	/// \enum	RESOURCE_CREATION_FLAGS
@@ -87,6 +104,13 @@ namespace Scene {
 
 		virtual ViewPtr getView( uint32_t viewType ) const = 0;
 
+		virtual void* map( RenderContext* scontext, const RESOURCE_MAP_ACCESS _access, const int _mip = 0, const int _slice = 0, ResourceMapAccess* _outAccess = nullptr ) = 0;
+		virtual void unmap( Scene::RenderContext* scontext, const int _mip = 0, const int _slice = 0 ) = 0;
+		virtual void update( Scene::RenderContext* scontext, const int _mip, const int _slice, const int dstX, const int dstY, const int dstZ, 
+													 const int dstWidth, const int dstHeight, const int dstDepth, 
+													 const Scene::ResourceMapAccess* _inAccess ) = 0;
+
+		// constructor helpers
 		static CreationInfo BufferCtor( 	uint32_t flags, uint32_t width, const void* prefillData = nullptr );
 
 		static CreationInfo ViewCtor( 	uint32_t flags, uint32_t width, uint32_t height = 0, uint32_t depth = 0, uint32_t slices = 0, 

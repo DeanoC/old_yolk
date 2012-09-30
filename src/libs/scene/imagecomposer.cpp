@@ -26,19 +26,19 @@ const uint32_t ImageComposer::SizeOfRenderType[ImageComposer::MAX_RENDER_TYPE] =
 const VertexInput::CreationInfo ImageComposer::VaoCS[ImageComposer::MAX_RENDER_TYPE] = {
 	{
 		3, 
-		{	{ Scene::VE_POSITION, 	Scene::VT_FLOAT2 },
-			{ Scene::VE_TEXCOORD0,	Scene::VT_FLOAT2 },
-			{ Scene::VE_COLOUR0, 	Scene::VT_BYTEARGB }, },
-		{	nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0,
-			nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0,
-			nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0, }
+		{	{ VE_POSITION, 	VT_FLOAT2 },
+			{ VE_TEXCOORD0,	VT_FLOAT2 },
+			{ VE_COLOUR0, 	VT_BYTEARGB }, },
+		{	{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM },
+			{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM },
+			{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM } }
 	},
 	{
 		2, 
-		{	{ Scene::VE_POSITION, Scene::VT_FLOAT2 },
-			{ Scene::VE_COLOUR0, Scene::VT_BYTEARGB }, },
-		{	nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0,
-			nullptr, Scene::VI_AUTO_OFFSET, Scene::VI_AUTO_STRIDE, 0, }
+		{	{ VE_POSITION, VT_FLOAT2 },
+			{ VE_COLOUR0, VT_BYTEARGB }, },
+		{	{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM },
+			{ nullptr, VI_AUTO_OFFSET, VI_AUTO_STRIDE, 0, VI_VERTEX_STREAM } }
 	}
 };
 
@@ -419,7 +419,7 @@ void ImageComposer::render( RenderContext* context ) {
 			page.unmap();
 			DataBufferPtr db = page.vertexBufferHandle->acquire();
 			if( !db ) { ++pmIt; continue; }
-			void* gpuVerts = (void*) db->map( context, DBMA_WRITE_ONLY, DBMF_DISCARD );
+			void* gpuVerts = (void*) db->map( context, (RESOURCE_MAP_ACCESS)( RMA_WRITE | RMA_DISCARD ) );
 			memcpy( gpuVerts, page.mapped.get(), page.numVertices * 6 * SizeOfRenderType[ pagekey.type ] );
 			db->unmap( context );
 			auto icProgram = program[ pagekey.type ].acquire();

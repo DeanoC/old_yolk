@@ -62,7 +62,8 @@ namespace Scene {
 		}
 	};
 	static const size_t VI_AUTO_OFFSET = ~0;
-	static const uint32_t VI_AUTO_STRIDE = 0xFFFFFF;
+	static const uint32_t VI_AUTO_STRIDE = 0xFFFF;
+	static const uint32_t VI_VERTEX_STREAM = 0;
 
 	class RenderContext;
 
@@ -71,7 +72,6 @@ namespace Scene {
 		friend class ResourceLoader;
 		virtual ~VertexInput(){}
 
-
 		static const int MAX_ELEMENT_COUNT = 16;
 
 		struct CreationInfo {
@@ -79,9 +79,10 @@ namespace Scene {
 			VinElement						elements[MAX_ELEMENT_COUNT];
 			struct {
 				Scene::DataBufferHandlePtr		buffer;
-				size_t							offset;				//!< AUTO_OFFSET == packed
-				uint32_t						stride : 24;		//!< AUTO_STRIDE == packed
-				uint32_t						stream : 8;			//!< stream number
+				size_t							offset;					//!< AUTO_OFFSET == packed
+				uint32_t						stride : 16;			//!< AUTO_STRIDE == packed
+				uint32_t						stream : 4;				//!< stream number
+				uint32_t						instanceCount : 12;		//!< 0 = vertex else number if instances to pass for each advance this stream
 			} data[MAX_ELEMENT_COUNT];
 		};
 

@@ -44,7 +44,7 @@ Gfx::Gfx() {
 	dx11CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	static const D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
+	static const D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 
 	// TODO proper device enumeration
 	// For now first device on first adaptor
@@ -70,87 +70,83 @@ Gfx::Gfx() {
 	SamplerState::CreationInfo pcsci = {
 		FM_MIN_MAG_MIP_POINT, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
 	};
-	SamplerStateHandle::create( "_SS_Point_Clamp", &pcsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( SAMPLER_STATE_POINT_CLAMP, &pcsci, Core::RMRF_DONTFLUSH );
 	SamplerState::CreationInfo lcsci = {
 		FM_MIN_MAG_MIP_LINEAR, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
 	};
-	SamplerStateHandle::create( "_SS_Linear_Clamp", &lcsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( SAMPLER_STATE_LINEAR_CLAMP, &lcsci, Core::RMRF_DONTFLUSH );
 	SamplerState::CreationInfo acsci = {
 		FM_ANISOTROPIC, AM_CLAMP, AM_CLAMP, AM_CLAMP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 16
 	};
-	SamplerStateHandle::create( "_SS_Aniso16_Clamp", &acsci, Core::RMRF_DONTFLUSH );
+	SamplerStateHandle::create( SAMPLER_STATE_ANISO16_CLAMP, &acsci, Core::RMRF_DONTFLUSH );
+	SamplerState::CreationInfo wpcsci = {
+		FM_MIN_MAG_MIP_POINT, AM_WRAP, AM_WRAP, AM_WRAP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
+	};
+	SamplerStateHandle::create( SAMPLER_STATE_POINT_WRAP, &wpcsci, Core::RMRF_DONTFLUSH );
+	SamplerState::CreationInfo wlcsci = {
+		FM_MIN_MAG_MIP_LINEAR, AM_WRAP, AM_WRAP, AM_WRAP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX
+	};
+	SamplerStateHandle::create( SAMPLER_STATE_LINEAR_WRAP, &wlcsci, Core::RMRF_DONTFLUSH );
+	SamplerState::CreationInfo wacsci = {
+		FM_ANISOTROPIC, AM_WRAP, AM_WRAP, AM_WRAP, CF_ALWAYS, 0.0f, -FLT_MAX, FLT_MAX, 16
+	};
+	SamplerStateHandle::create( SAMPLER_STATE_ANISO16_WRAP, &wacsci, Core::RMRF_DONTFLUSH );
+
 	RasteriserState::CreationInfo nrsci = {
 		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_BACK, 0, 0, 0
 	};
-	RasteriserStateHandle::create( "_RS_Normal", &nrsci, Core::RMRF_DONTFLUSH );
-	RasteriserState::CreationInfo nnmsrsci = {
-		RasteriserState::CreationInfo::NONE, FIM_FILL, CUM_BACK, 0, 0, 0
-	};
-	RasteriserStateHandle::create( "_RS_Normal_NoMS", &nnmsrsci, Core::RMRF_DONTFLUSH );	
-	RasteriserState::CreationInfo nnnmsrsci = {
+	RasteriserStateHandle::create( RENDER_STATE_NORMAL, &nrsci, Core::RMRF_DONTFLUSH );
+	RasteriserState::CreationInfo nncrsci = {
 		RasteriserState::CreationInfo::MULTISAMPLE, FIM_FILL, CUM_NONE, 0, 0, 0
 	};
-	RasteriserStateHandle::create( "_RS_Normal_NoMS_NoCull", &nnnmsrsci, Core::RMRF_DONTFLUSH );	
+	RasteriserStateHandle::create( RENDER_STATE_NORMAL_NOCULL, &nncrsci, Core::RMRF_DONTFLUSH );
 
-	RenderTargetStates::CreationInfo nrtci = {
-		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, 
-		{ (TargetState::FLAGS)0, TWE_ALL }
-	};
 	DepthStencilState::CreationInfo ndsci = {
 		(DepthStencilState::CreationInfo::FLAGS)(DepthStencilState::CreationInfo::DEPTH_ENABLE | DepthStencilState::CreationInfo::DEPTH_WRITE), 
 		CF_LESS
 	};
-	DepthStencilStateHandle::create( "_DSS_Normal", &ndsci );
+	DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_NORMAL, &ndsci, Core::RMRF_DONTFLUSH );
 
 	DepthStencilState::CreationInfo dlwdsci = {
 		(DepthStencilState::CreationInfo::FLAGS)(DepthStencilState::CreationInfo::DEPTH_ENABLE ), 
 		CF_LESS
 	};
-	DepthStencilStateHandle::create( "_DSS_Less_NoWrite", &dlwdsci );
+	DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_LESS_NOWRITE, &dlwdsci, Core::RMRF_DONTFLUSH );
 
-	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAll", &nrtci );
-	RenderTargetStates::CreationInfo nwcrtci = {
-		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, 
-		{ (TargetState::FLAGS)0, TWE_COLOUR }
-	};
-	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteColour", &nwcrtci );
-	RenderTargetStates::CreationInfo nwartci = {
-		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, 
-		{ (TargetState::FLAGS)0, TWE_ALPHA }
-	};
-	RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAlpha", &nwartci );
+	RenderTargetStates::CreationInfo nwnrtci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_NONE } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOWRITE, &nwnrtci, Core::RMRF_DONTFLUSH );
+	RenderTargetStates::CreationInfo nrtci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_ALL } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALL, &nrtci, Core::RMRF_DONTFLUSH );
+	RenderTargetStates::CreationInfo nwcrtci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_COLOUR } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITECOLOUR, &nwcrtci, Core::RMRF_DONTFLUSH );
+	RenderTargetStates::CreationInfo nwartci = { (RenderTargetStates::CreationInfo::FLAGS)0, 1, { (TargetState::FLAGS)0, TWE_ALPHA } };
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALPHA, &nwartci, Core::RMRF_DONTFLUSH );
 
 	RenderTargetStates::CreationInfo artci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, 
-		{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
+		1,	{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
 				BM_SRC_ALPHA, BM_INV_SRC_ALPHA, BO_ADD,		// colour blend
 				BM_SRC_ALPHA, BM_INV_SRC_ALPHA, BO_ADD,		// alpha blend
-		}
+			}
 	};
-	RenderTargetStatesHandle::create( "_RTS_Over_WriteAll", &artci );
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_OVER_WRITEALL, &artci, Core::RMRF_DONTFLUSH );
 	RenderTargetStates::CreationInfo pmartci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, 
-		{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
+		1,	{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
 				BM_ONE, BM_INV_SRC_ALPHA, BO_ADD,		// colour blend
 				BM_ONE, BM_INV_SRC_ALPHA, BO_ADD,		// alpha blend
-		}
+			}
 	};
-	RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll", &pmartci );
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_PMOVER_WRITEALL, &pmartci, Core::RMRF_DONTFLUSH );
 
 	RenderTargetStates::CreationInfo aartci = {
 		(RenderTargetStates::CreationInfo::FLAGS)0, 
-		1, 
-		{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
+		1,	{ TargetState::FLAGS::BLEND_ENABLE, TWE_ALL, 
 				BM_ONE, BM_ONE, BO_ADD,		// colour blend
 				BM_ONE, BM_ONE, BO_ADD,		// alpha blend
-		}
+			}
 	};
-	RenderTargetStatesHandle::create( "_RTS_Add_WriteAll", &aartci );
+	RenderTargetStatesHandle::create( RENDER_TARGET_STATES_ADD_WRITEALL, &aartci, Core::RMRF_DONTFLUSH );
 
 }
 

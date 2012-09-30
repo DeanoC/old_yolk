@@ -6,11 +6,12 @@
 
 namespace Scene {
 	SphereColShape::SphereColShape( float _radius ) :
-		sphereShape( nullptr ) 
-	{
-		sphereShape  = CORE_NEW btSphereShape( _radius );
+		sphereShape( nullptr ) {
+		// use new as btSphereShape as class specific new
+		sphereShape  = new btSphereShape( _radius );
 	}
 	SphereColShape::~SphereColShape() {
+		// use new as btSphereShape as class specific new
 		CORE_DELETE sphereShape;
 	}
 	btCollisionShape* SphereColShape::getBTCollisionShape() const { 

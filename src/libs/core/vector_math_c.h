@@ -11,7 +11,6 @@
 #ifndef WEIRD_CORE_VECTOR_MATHS_C_H
 #define WEIRD_CORE_VECTOR_MATHS_C_H
 
-
 //! Maths functions live in here
 namespace Math {
 	class Vector2 {
@@ -637,6 +636,24 @@ namespace Math {
 	CALL inline Quaternion CreateRotationQuat( const Vector3& axis, float angle ) {
 		return Quaternion( sinf(angle/2) * axis.x, sinf(angle/2) * axis.y, sinf(angle/2) * axis.z, cosf(angle/2) );
 	}
+	// from D3DX_DXGIFormatConvert.inl
+	CALL inline float float_to_SRGB(float val) { 
+		if( val < 0.0031308f )
+			val *= 12.92f;
+		else
+			val = 1.055f * powf(val,1.0f/2.4f) - 0.055f;
+		return val;
+	}
+	CALL inline float SRGB_to_float_inexact(float val) {
+		if( val < 0.04045f )
+			val /= 12.92f;
+		else
+			val = pow((val + 0.055f)/1.055f,2.4f);
+		return val;
+	}
+
+	float SRGB_to_float( uint32_t val );
+	float SRGB_to_float( float val );
 
 };
 

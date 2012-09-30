@@ -152,5 +152,25 @@ namespace Scene {
 	typedef RasteriserStateHandle* RasteriserStateHandlePtr;
 	typedef std::shared_ptr<RasteriserState> RasteriserStatePtr;
 
+	// standard states (can be got from the resource manager with just a name
 }
+
+#define SAMPLER_STATE_POINT_CLAMP					"_SS_Point_Clamp"
+#define SAMPLER_STATE_LINEAR_CLAMP					"_SS_Linear_Clamp"
+#define SAMPLER_STATE_ANISO16_CLAMP					"_SS_Aniso16_Clamp"
+#define SAMPLER_STATE_POINT_WRAP					"_SS_Point_Wrap"
+#define SAMPLER_STATE_LINEAR_WRAP					"_SS_Linear_Wrap"
+#define SAMPLER_STATE_ANISO16_WRAP					"_SS_Aniso16_Wrap"
+
+#define RENDER_STATE_NORMAL 						"_RS_Normal"
+#define RENDER_STATE_NORMAL_NOCULL 					"_RS_Normal_NoCull"
+#define DEPTH_STENCIL_STATE_NORMAL 					"_DSS_Normal"
+#define DEPTH_STENCIL_STATE_LESS_NOWRITE 			"_DSS_Less_NoWrite"
+#define RENDER_TARGET_STATES_NOWRITE		 		"_RTS_NoWrite"
+#define RENDER_TARGET_STATES_NOBLEND_WRITEALL 		"_RTS_NoBlend_WriteAll"
+#define RENDER_TARGET_STATES_NOBLEND_WRITECOLOUR	"_RTS_NoBlend_WriteColour"
+#define RENDER_TARGET_STATES_NOBLEND_WRITEALPHA		"_RTS_NoBlend_WriteAlpha"
+#define RENDER_TARGET_STATES_OVER_WRITEALL			"_RTS_Over_WriteAll"
+#define RENDER_TARGET_STATES_PMOVER_WRITEALL		"_RTS_PMOver_WriteAll"
+#define RENDER_TARGET_STATES_ADD_WRITEALL			"_RTS_Add_WriteAll"
 #endif

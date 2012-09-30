@@ -36,11 +36,7 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 		usage = D3D11_USAGE_STAGING; // CPU read-backs
 		cpuAccess = D3D11_CPU_ACCESS_READ;
 	} else if( creation->flags & RCF_ACE_CPU_WRITE ) {
-		if( creation->flags & RCF_ACE_ONCE ) {
-			usage = D3D11_USAGE_DEFAULT;
-		} else {
-			usage = D3D11_USAGE_DYNAMIC;
-		}
+		usage = D3D11_USAGE_DYNAMIC;
 		cpuAccess = D3D11_CPU_ACCESS_WRITE;
 	} else if( creation->flags & RCF_ACE_GPU_WRITE_ONLY ) {
 		usage = D3D11_USAGE_DEFAULT;
@@ -241,19 +237,5 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 
 	return tex;
 }
-/*
-void* Texture::Lock( RenderContext* context, Texture::CPU_ACCESS access, uint32_t& iOutPitch ) {
-	HRESULT hr;
-	D3D11_MAPPED_SUBRESOURCE mapper;
-	DXWARN( context->deviceContext->Map( m_baseTexture, 0, (D3D11_MAP) access, 0, &mapper ) );
-
-	iOutPitch = mapper.RowPitch;
-	return mapper.pData;
-}
-
-void Texture::Unlock( RenderContext* context ) {
-	context->deviceContext->Unmap( m_baseTexture, 0 );
-}
-*/
 
 }; // end namespace Dx11

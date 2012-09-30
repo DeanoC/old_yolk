@@ -13,7 +13,7 @@ class btCylinderShape;
 namespace Scene {
 	class CylinderColShape : public CollisionShape {
 	public:
-		CylinderColShape( const Core::AABB& extents );
+		CylinderColShape( const Core::AABB& extents, int axis = 1 /* X = 0, Y = 1, Z = 2 */ );
 		virtual ~CylinderColShape();	
 
 		virtual btCollisionShape* getBTCollisionShape() const override;

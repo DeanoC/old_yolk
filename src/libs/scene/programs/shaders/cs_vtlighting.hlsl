@@ -5,6 +5,8 @@
 Texture2DMS<uint4,NUM_MSAA_SAMPLES> gBufferOpaque : register( t0 );
 Texture2D<uint> fragmentCounter : register( t1 );
 StructuredBuffer<VtTransparentFragment> transparentFragments : register( t2 );
+Texture2DMS<float4,NUM_MSAA_SAMPLES> colour2DFragments : register( t3 );
+
 Texture2DMS<float,NUM_MSAA_SAMPLES> depthBuffer : register( t8 );
 
 StructuredBuffer<VtMaterial> materialStore : register( t10 );
@@ -261,7 +263,9 @@ void main(    	uint3 groupId : SV_GroupID,
 	}
 	float3 fcol = 0;
 	[unroll] for( uint fsample = 0; fsample < NUM_MSAA_SAMPLES; ++fsample ) {
-		fcol += col[fsample] * (1.0f / NUM_MSAA_SAMPLES);
+		float4 frag = colour2DFragments.Load( dispatchThreadId.xy, fsample );
+		frag.xyz = lerp( col[fsample], frag.xyz, frag.w ).xyz;
+		fcol += frag.xyz * (1.0f / NUM_MSAA_SAMPLES);
 	}
 
  	target[ dispatchThreadId.xy ] = float4( fcol, 1 );

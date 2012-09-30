@@ -10,7 +10,8 @@ namespace Scene {
 		boxShape( nullptr ) 
 	{
 		const auto& v = aabb.getHalfLength();
-		boxShape  = CORE_NEW btBoxShape( btVector3(v[0], v[1], v[2]) );
+		// use new as btBoxShape has a class specific new
+		boxShape  = new btBoxShape( btVector3(v[0], v[1], v[2]) );
 	}
 	BoxColShape::~BoxColShape() {
 		CORE_DELETE boxShape;

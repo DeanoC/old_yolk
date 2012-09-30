@@ -231,7 +231,6 @@ void RenderContext::bind( const Scene::SHADER_TYPES type, const uint32_t unit, c
 	}
 }
 
-
 void RenderContext::bind( const Scene::RenderTargetStatesPtr& stargetStates ) {
 	auto targetStates = std::static_pointer_cast<Dx11::RenderTargetStates>( stargetStates );
 	auto states = static_cast<ID3D11BlendState* const>( targetStates->renderTargetState.get() );
@@ -239,39 +238,78 @@ void RenderContext::bind( const Scene::RenderTargetStatesPtr& stargetStates ) {
 	float todo[4] = { 1,1,1,1 };
 	ctx->OMSetBlendState( states, todo, 0xFFFFFFFF );
 }
-void RenderContext::bind( const Scene::DepthStencilStatePtr& sdsState ) {
-	auto dsState = std::static_pointer_cast<Dx11::DepthStencilState>( sdsState );
+
+void RenderContext::bind( const Scene::DepthStencilStatePtr& _sdsState, uint32_t _stencilRef ) {
+	auto dsState = std::static_pointer_cast<Dx11::DepthStencilState>( _sdsState );
 	auto state = static_cast<ID3D11DepthStencilState* const>( dsState->depthStencilState.get() );
 	// todo stencil ref
-	ctx->OMSetDepthStencilState( state, 0 );
+	ctx->OMSetDepthStencilState( state, _stencilRef );
 }
+
 void RenderContext::bind( const Scene::RasteriserStatePtr& sraster ) {
 	auto raster = std::static_pointer_cast<Dx11::RasteriserState>( sraster );
 	auto state = static_cast<ID3D11RasterizerState* const>( raster->rasteriserState.get() );
 	ctx->RSSetState( state );
 }
+
 void RenderContext::bind( const Scene::VertexInputPtr& svertexInput ) {
 	auto vin = std::static_pointer_cast<Dx11::VertexInput>( svertexInput );
 
+IF_DEBUG_START
+	if( !vin->inputLayout ) {
+		LOG(INFO) << "VertexInput must be first validated with a gpu program that accepts this input\n";
+	}
+IF_DEBUG_END
 	CORE_ASSERT( vin->inputLayout );
 
 	std::shared_ptr<DataBuffer> buffers[ Scene::VertexInput::MAX_ELEMENT_COUNT ];
 	ID3D11Buffer* d3dBuffers[ Scene::VertexInput::MAX_ELEMENT_COUNT ];
 	UINT offsets[ Scene::VertexInput::MAX_ELEMENT_COUNT ] ;
+	int bufferCount = 0;
 	for( int i = 0; i < vin->streamCount; ++i ) {
 		// bind vertex buffers
-		buffers[ i ] = std::static_pointer_cast<Dx11::DataBuffer>( vin->streamBuffers[i]->acquire() );
-		d3dBuffers[ i ] = static_cast<ID3D11Buffer*>(buffers[i]->get().get() );
+		if( vin->streamBuffers[i] ) {
+			buffers[ bufferCount ] = std::static_pointer_cast<Dx11::DataBuffer>( vin->streamBuffers[i]->acquire() );
+			d3dBuffers[ bufferCount ] = static_cast<ID3D11Buffer*>(buffers[ bufferCount ]->get().get() );
+			bufferCount++;
+		} else {
+			d3dBuffers[ i ] = nullptr;
+		}
 		offsets[ i ] = 0;
 	}
-	ctx->IASetVertexBuffers( 0 , vin->streamCount, d3dBuffers, vin->streamStrides, offsets );
+
+	// an vertex input can just be the layout, with the buffers set letter (faster for same layout across many vbs)
+	if( bufferCount > 0 ) {
+		ctx->IASetVertexBuffers( 0 , bufferCount, d3dBuffers, vin->streamStrides, offsets );
+	}
 	ctx->IASetInputLayout( vin->inputLayout.get() );
 }
 
-void RenderContext::bindIndexBuffer( const Scene::DataBufferPtr& sib, int indexBytes ) {
+void RenderContext::bindCB( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& stex ) {
+	auto buf = std::static_pointer_cast<Dx11::DataBuffer>( stex );
+	auto buff = static_cast<ID3D11Buffer* const>( buf->get().get() );
+	switch( type ) {
+	case Scene::ST_VERTEX: ctx->VSSetConstantBuffers( unit,1, &buff ); break;
+	case Scene::ST_FRAGMENT: ctx->PSSetConstantBuffers( unit,1, &buff ); break;
+	case Scene::ST_GEOMETRY: ctx->GSSetConstantBuffers( unit,1, &buff ); break;
+	case Scene::ST_HULL: ctx->HSSetConstantBuffers( unit,1, &buff ); break;
+	case Scene::ST_DOMAIN: ctx->DSSetConstantBuffers( unit,1, &buff ); break;
+	case Scene::ST_COMPUTE: ctx->CSSetConstantBuffers( unit,1, &buff ); break;
+	default:;
+	}
+}
+
+void RenderContext::bindVB( const unsigned int _stream, const Scene::DataBufferPtr& svb, const unsigned int _stride, const unsigned int _offset ) {
+	auto vb = std::static_pointer_cast<Dx11::DataBuffer>( svb );
+	auto buf = static_cast<ID3D11Buffer* const>( vb->get().get() );
+	ctx->IASetVertexBuffers( _stream , 1, &buf, &_stride, &_offset );
+
+}
+
+void RenderContext::bindIB( const Scene::DataBufferPtr& sib, const unsigned int _stride ) {
 	auto ib = std::static_pointer_cast<Dx11::DataBuffer>( sib );
 	auto buf = static_cast<ID3D11Buffer* const>( ib->get().get() );
-	ctx->IASetIndexBuffer( buf, (indexBytes == 2) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0 );
+	ctx->IASetIndexBuffer( buf, (_stride == 2) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0 );
 }
 
 void RenderContext::clear( const Scene::TexturePtr& starget, const Core::Colour& colour ) {
@@ -287,8 +325,8 @@ void RenderContext::clear( const Scene::TexturePtr& starget, bool clearDepth, fl
 	ctx->ClearDepthStencilView( static_cast<ID3D11DepthStencilView*>(target->getDx11View( Scene::Resource::DEPTH_STENCIL_VIEW )->view.get() ),
 								(clearDepth ? D3D11_CLEAR_DEPTH : 0) | (clearStencil ? D3D11_CLEAR_STENCIL : 0),
 								depth, stencil );
-
 }
+
 void RenderContext::clear( const Scene::ViewPtr& starget ) {
 	static const uint32_t zeros[] = { 0,0,0,0 };
 	const std::shared_ptr<Dx11::Dx11View> target = 
@@ -296,17 +334,32 @@ void RenderContext::clear( const Scene::ViewPtr& starget ) {
 	ctx->ClearUnorderedAccessViewUint( static_cast<ID3D11UnorderedAccessView*>( target->view.get() ), zeros );
 }
 
-
-
 void RenderContext::copy( const Scene::DataBufferPtr& sdst, const Scene::DataBufferPtr& ssrc ) {
 	auto db = std::static_pointer_cast<Dx11::DataBuffer>( sdst );
 	auto sb = std::static_pointer_cast<Dx11::DataBuffer>( ssrc );
 	ctx->CopyResource( db->get().get(), sb->get().get() );
 }
+
 void RenderContext::copy( const Scene::TexturePtr& sdst, const Scene::TexturePtr& ssrc ) {
 	auto dt = std::static_pointer_cast<Dx11::Texture>( sdst );
 	auto st = std::static_pointer_cast<Dx11::Texture>( ssrc );
 	ctx->CopyResource( dt->get().get(), st->get().get() );
+}
+void RenderContext::copy(	const Scene::TexturePtr& sdst, const int dstX, const int dstY, const int dstZ, 
+							const Scene::TexturePtr& ssrc, const int srcX, const int srcY, const int srcZ, const int srcWidth, const int srcHeight, const int srcDepth ) {
+	auto dt = std::static_pointer_cast<Dx11::Texture>( sdst );
+	auto st = std::static_pointer_cast<Dx11::Texture>( ssrc );
+
+	D3D11_BOX box;
+	box.left = srcX;
+	box.top = srcY;
+	box.front = srcZ;
+	box.right = srcX + srcWidth;
+	box.bottom = srcY + srcHeight;
+	box.back = srcZ + srcDepth;
+
+	ctx->CopySubresourceRegion( dt->get().get(), 0, dstX, dstY, dstZ, st->get().get(), 0, &box );
+
 }
 
 static D3D11_PRIMITIVE_TOPOLOGY PT_Map[] = {
@@ -320,6 +373,7 @@ static D3D11_PRIMITIVE_TOPOLOGY PT_Map[] = {
 		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ,
 		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ,
 };
+
 void RenderContext::draw( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex ) {
 	ctx->IASetPrimitiveTopology( PT_Map[ topo ] );
 	ctx->Draw( vertexCount, startVertex );
@@ -329,6 +383,7 @@ void RenderContext::drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexC
 	ctx->IASetPrimitiveTopology( PT_Map[ topo ] );
 	ctx->DrawIndexed( indexCount, startIndex, baseOffset );
 }
+
 void RenderContext::dispatch( uint32_t xThreads, uint32_t yThreads, uint32_t zThreads ) {
 	ctx->Dispatch( xThreads / threadGroupXSize, yThreads / threadGroupYSize, zThreads / threadGroupZSize );
 }
@@ -336,6 +391,7 @@ void RenderContext::dispatch( uint32_t xThreads, uint32_t yThreads, uint32_t zTh
 void RenderContext::unbindRenderTargets() {
 	ctx->OMSetRenderTargetsAndUnorderedAccessViews( 0, nullptr, nullptr, 0, 0, nullptr, nullptr );
 }
+
 void RenderContext::unbindTexture( const Scene::SHADER_TYPES type, const uint32_t unit, const uint32_t count ) {
 	static ID3D11ShaderResourceView* const nadaArray[16] = { 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 };
 	switch( type ) {
@@ -348,8 +404,10 @@ void RenderContext::unbindTexture( const Scene::SHADER_TYPES type, const uint32_
 	default:;
 	}
 }
+
 void RenderContext::unbindUnorderedViews() {
 	static ID3D11UnorderedAccessView* const nadaArray[8] = { 0, 0, 0, 0,  0, 0, 0, 0 };
 	ctx->CSSetUnorderedAccessViews( 0, 8, nadaArray, nullptr );
 }
+
 }

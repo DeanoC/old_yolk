@@ -50,26 +50,30 @@ void RenderWorld::removeRenderable( uint32_t index ) {
 	*enIt = nullptr;
 }
 
-uint32_t RenderWorld::addCamera( CameraPtr camera ) {
+uint32_t RenderWorld::addRenderable2D( Renderable2DCallbackPtr renderable ) {
 	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
-	auto it = cameras.push_back( camera );
-	return (uint32_t) std::distance( cameras.begin(), it );
+	auto it = renderables2D.push_back( renderable );
+	const uint32_t index = (uint32_t) std::distance( renderables2D.begin(), it );
+
+	return index;
 }
 
-void RenderWorld::removeCamera( CameraPtr camera ) {
+void RenderWorld::removeRenderable2D( Renderable2DCallbackPtr renderable ) {
 	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
+
 	// currently the vector just grows, null entries and releasing memory but not actually
 	// shriking the vector. This could be done by a stop the world mutex by for now probably okay as only 4/8 byte per renderab le
-	CameraContainer::iterator enIt = std::find(cameras.begin(), cameras.end(), camera );
-	assert( (enIt != cameras.end()) && "Camera is not in this RenderWorld");
+	auto enIt = std::find(renderables2D.begin(), renderables2D.end(), renderable );
+	assert( (enIt != renderables2D.end()) && "Renderable2D is not in this RenderWorld");
 	*enIt = nullptr;
 //	renderables.erase( enIt );
 }
-void RenderWorld::removeCamera( uint32_t index ) {
+
+void RenderWorld::removeRenderable2D( uint32_t index ) {
 	Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
-	CameraContainer::iterator enIt = cameras.begin();
+	auto enIt = renderables2D.begin();
 	std::advance( enIt, index );
-	assert( (enIt != cameras.end()) && "Camera is not in this RenderWorld");
+	assert( (enIt != renderables2D.end()) && "Renderable2D is not in this RenderWorld");
 	*enIt = nullptr;
 }
 
@@ -100,7 +104,7 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 			}
 		}
 		++it;
-	}
+	}	
 }
 
 void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline ) {
@@ -126,8 +130,17 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 		pipeline->endGeomPass( context, i );
 	}
 
+	{
+		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
+		pipeline->start2DPass( context );
+		for( auto it : renderables2D ) {
+			(*it)( context );
+		}
+		pipeline->end2DPass( context );
+	}
 
-	pipeline->unbind( context );
+
+	pipeline->resolve( context );
 }
 
 void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, const std::shared_ptr<Scene::Camera> camera, RenderContext* context ) {
@@ -136,7 +149,9 @@ void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineNam
 	determineVisibles( camera );
 
 	renderRenderables( context, pipeline );
+
 	if( debugRenderCallback ) {
+		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
 		debugRenderCallback();
 	}
 }

@@ -5,7 +5,6 @@
 //  Created by Deano on 2012.
 //  Copyright 2012 Cloud Pixies Ltd. All rights reserved.
 // 
-
 #include "core/core.h"
 #include "core/platform_windows/mouse_win.h"
 #include "core/platform_windows/keyboard_win.h"
@@ -15,6 +14,8 @@
 #include <io.h>
 #include <iostream>
 #include <fstream>
+
+
 
 //--------------------------------------------------------------------------------------
 // Global Variables

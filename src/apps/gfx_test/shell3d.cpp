@@ -100,12 +100,13 @@ void Shell3D::run() {
 	DevelopmentContext::get()->activateContext( "DebugCam" );
 
 	// flush 'load' time from first time update
-	Clock::get()->update();
+	Core::Clock shellClock;
+	shellClock.update();
 
 	// Main loop
 	while( !s_quitFlag ) {
 
-		float deltaT = Clock::get()->update();
+		float deltaT = shellClock.update();
 
 		DevelopmentContext::get()->update( deltaT );
 		world->update( deltaT );

@@ -13,7 +13,8 @@ PhysicSensor::PhysicSensor( Core::TransformNode* _node,
 	transform( _node ),
 	shape( _shape )
 {
-	ghost = CORE_NEW btPairCachingGhostObject();
+	// use new as btPairCachingGhostObject has a class specific new
+	ghost = new btPairCachingGhostObject();
 	ghost->setCollisionShape( shape->getBTCollisionShape() );
 	ghost->setCollisionFlags( btCollisionObject::CF_NO_CONTACT_RESPONSE ); // ghost don't affect the world
 

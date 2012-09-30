@@ -28,12 +28,18 @@ namespace Scene {
 		virtual const char* getName() const override { return "VT"; };
 
 		virtual void bind( RenderContext* _context ) override;
-		virtual void unbind( RenderContext* _context ) override;
 
 		virtual int getGeomPassCount() override;
 		virtual bool isGeomPassOpaque( int pass ) override;
 		virtual void startGeomPass( RenderContext* _context, int pass ) override;
 		virtual void endGeomPass ( RenderContext* _context, int pass ) override;
+	
+		// 2D pass
+		virtual void start2DPass( RenderContext* _context ) override;
+		virtual void end2DPass( RenderContext* _context ) override;
+
+		// transfer into the result texture
+		virtual void resolve( RenderContext* _context ) override;
 
 		virtual TextureHandlePtr getResult() { return colourTargetHandle.get(); }
 
@@ -48,6 +54,7 @@ namespace Scene {
 		void endGeomRenderTransparentPass( RenderContext* ctx );
 
 		Core::ScopedResourceHandle<TextureHandle>			colourTargetHandle;
+		Core::ScopedResourceHandle<TextureHandle>			colour2DTargetHandle;
 
 		Core::ScopedResourceHandle<TextureHandle>			depthTargetMSHandle;
 		Core::ScopedResourceHandle<TextureHandle>			gBufferMSHandle0;
@@ -61,7 +68,7 @@ namespace Scene {
 		Core::ScopedResourceHandle<ProgramHandle>			transparentProgramHandle;
 
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
-		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateNoMSHandle;
+		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateNoCullHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilNoWriteStateHandle;
 		Core::ScopedResourceHandle<RenderTargetStatesHandle> renderTargetWriteHandle;

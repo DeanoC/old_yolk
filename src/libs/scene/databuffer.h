@@ -14,18 +14,6 @@ namespace Scene {
 	class RenderContext;
 	static const uint32_t DataBufferType = RESOURCE_NAME('G','D','A','T');
 
-	enum DATA_BUFFER_MAP_ACCESS {
-		DBMA_READ_ONLY,
-		DBMA_WRITE_ONLY,
-		DBMA_READ_WRITE,
-	};
-
-	enum DATA_BUFFER_MAP_FLAGS {
-		DBMF_NONE,
-		DBMF_DISCARD,
-		DBMF_UNSYNC,
-	};
-
 	class DataBuffer : public Core::Resource<DataBufferType>, public Resource {
 	public:	
 		friend class ResourceLoader;
@@ -38,12 +26,6 @@ namespace Scene {
 		};
 
 		virtual ~DataBuffer(){};
-		// default maps entire buffer;
-		virtual void* map( 	Scene::RenderContext* context,
-							DATA_BUFFER_MAP_ACCESS access, DATA_BUFFER_MAP_FLAGS flags = DBMF_NONE, 
-							size_t offset = 0, size_t bytes = 0 ) = 0;
-
-		virtual void unmap( Scene::RenderContext* context ) = 0;
 
 		size_t getSize() const { return size; }
 	protected:

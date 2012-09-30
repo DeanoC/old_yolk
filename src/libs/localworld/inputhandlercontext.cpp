@@ -10,7 +10,7 @@
 #include "inputhandlercontext.h"
 
 InputHandlerContext::InputHandlerContext() :
-	inputQueue( 3 ) {
+	inputQueue( 30 ) {
 	memset( &curFrame, 0, sizeof(InputFrame) );
 }
 

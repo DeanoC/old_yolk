@@ -32,7 +32,8 @@ add_library( scene ${src_files} ${header_files}  ${shader_files} )
 
 target_link_libraries( 	scene
 						BulletCollision
-						BulletDynamics )
+						BulletDynamics
+						swfruntime )
 
 # make a nice hierachy
 set_target_properties( scene PROPERTIES FOLDER "Libs")

@@ -16,6 +16,8 @@
 namespace Scene {
 	class Pipeline;
 
+	typedef std::shared_ptr< std::function< void (Scene::RenderContext*) > > Renderable2DCallbackPtr;
+
 	class RenderWorld {
 	public:
 		RenderWorld();
@@ -27,15 +29,12 @@ namespace Scene {
 		virtual const RenderablePtr getRenderable( uint32_t index ) const { return renderables[index]; }
 		virtual RenderablePtr getRenderable( uint32_t index ) { return renderables[index]; }
 
-		virtual uint32_t addCamera( CameraPtr camera );	//!< add an camera to the world
-		virtual void removeCamera( CameraPtr camera ); //!< remove this camera from the world
-		virtual void removeCamera( uint32_t index ); //!< remove this camera from the world
-		virtual const CameraPtr getCamera( uint32_t index ) const { return cameras[index]; }
-		virtual CameraPtr getCamera( uint32_t index ) { return cameras[index]; }
+		virtual uint32_t addRenderable2D(  Renderable2DCallbackPtr _callback );
+		virtual void removeRenderable2D( Renderable2DCallbackPtr _calllback ); //!< remove this Renderable2D from the world
+		virtual void removeRenderable2D( uint32_t index ); //!< remove this Renderable2D from the world
 
 		virtual void render( const ScreenPtr screen, const std::string& pipelineName, std::shared_ptr<Scene::Camera> camera, RenderContext* context );
 		virtual void displayRenderResults( const ScreenPtr screen, const std::string& pipelineName, RenderContext* context );
-
 
 		Core::mutex* getUpdateMutex() { return &updateMutex; }
 
@@ -43,15 +42,14 @@ namespace Scene {
 
 	protected:
 		typedef tbb::concurrent_vector< RenderablePtr > RenderableContainer;
-		typedef tbb::concurrent_vector< CameraPtr > 	CameraContainer;
 		typedef std::vector< Renderable* > 			STIndexContainer;
+		typedef tbb::concurrent_vector< Renderable2DCallbackPtr > Renderable2DCallbackContainer;
 
 		void determineVisibles( const std::shared_ptr<Scene::Camera>& camera );
 		void renderRenderables( RenderContext* context, Pipeline* pipeline );
 
 		RenderableContainer				renderables;
-		CameraContainer					cameras;
-
+		Renderable2DCallbackContainer	renderables2D;
 
 		Core::mutex 					updateMutex;
 		STIndexContainer				visibleRenderables;

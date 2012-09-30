@@ -13,6 +13,10 @@
 /// \todo	support iterator debugging in debug
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _DEBUG
+#define DEBUG_LEVEL DEBUG_MED
+#endif
+
 #define CORE_ALIGN(x)			__declspec(align(x))
 
 #define CORE_INLINE				inline

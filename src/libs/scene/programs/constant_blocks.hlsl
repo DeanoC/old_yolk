@@ -5,6 +5,15 @@
 #define CF_PER_TARGETS		4
 #define CF_STD_OBJECT		5
 #define CF_PER_MATERIAL		6
+#define CF_USER_BLOCK_0		7
+#define CF_USER_BLOCK_1		8
+#define CF_USER_BLOCK_2		9
+#define CF_USER_BLOCK_3		10
+#define CF_USER_BLOCK_4		11
+#define CF_USER_BLOCK_5		12
+#define CF_USER_BLOCK_6		13
+#define CF_USER_BLOCK_7		14
+#define CF_USER_BLOCK_8		15
 
 #if defined(D3D_SM5)
 #define VE_POSITION			POSITION
@@ -46,14 +55,15 @@ constant_buffer( PerViews, CF_PER_VIEWS )  {
 	float16		matrixProjection;
 	float16		matrixProjectionInverse;
 	float16		matrixProjectionIT;
-	float4		zPlanes;		//x = near, y = far, z = far - near
-	float4		fov;
 	float16		matrixView;
 	float16		matrixViewInverse;
 	float16		matrixViewIT;
 	float16		matrixViewProjection;
 	float16		matrixViewProjectionInverse;
 	float16		matrixViewProjectionIT;
+
+	float4		zPlanes;		//x = near, y = far, z = far - near
+	float4		fov;
 };
 
 constant_buffer( PerTargets, CF_PER_TARGETS ) {
@@ -71,6 +81,8 @@ constant_buffer( StdObject, CF_STD_OBJECT ) {
 	float16		matrixWorldViewProjectionInverse;
 	float16		matrixWorldViewProjectionIT;
 	float16		matrixPreviousWorldViewProjection;
+	float16		matrixUser0;
+	float16		matrixUser1;
 };
 
 constant_buffer( PerMaterial, CF_PER_MATERIAL ) {

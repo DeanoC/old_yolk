@@ -1,6 +1,14 @@
 cmake_minimum_required( VERSION 2.8 )
 
+add_subdirectory( bdwgc )
 add_subdirectory( binify )
+add_subdirectory( bullet )
+add_subdirectory( jpeg )
+add_subdirectory( tbb )
+add_subdirectory( zlib )
+add_subdirectory( json-spirit )
+add_subdirectory( protobuf )
+
 add_subdirectory( core )
 add_subdirectory( protocols )
 add_subdirectory( glog )
@@ -15,8 +23,6 @@ IF( USE_OPENCL )
 	add_subdirectory( cl )
 ENDIF( USE_OPENCL)
 
-add_subdirectory( bullet )
-
 add_subdirectory( meshmod )
 add_subdirectory( meshops )
 add_subdirectory( meshimport )
@@ -29,3 +35,4 @@ IF( USE_DWM )
 ENDIF( USE_DWM )
 
 add_subdirectory( localworld )
+add_subdirectory( gui )

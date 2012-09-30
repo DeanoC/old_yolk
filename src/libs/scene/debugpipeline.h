@@ -30,13 +30,19 @@ namespace Scene {
 		virtual const char* getName() const override { return "debug"; };
 
 		virtual void bind( RenderContext* _context ) override;
-		virtual void unbind( RenderContext* _context ) override;
 
 		virtual int getGeomPassCount() override { return 1; }
 		virtual bool isGeomPassOpaque( int pass ) override { return true; }
 
 		virtual void startGeomPass( RenderContext* _context, int i ) override {};
 		virtual void endGeomPass ( RenderContext* _context, int i ) override {};
+
+		// 2D pass
+		virtual void start2DPass( RenderContext* _context ) override {};
+		virtual void end2DPass( RenderContext* _context ) override {};
+
+		// transfer into the result texture
+		virtual void resolve( RenderContext* _context ) override;
 
 		virtual TextureHandlePtr getResult() { return colourTargetHandle.get(); }
 

@@ -71,7 +71,7 @@ void DebugPipeline::bind( Scene::RenderContext* ctx ) {
 	ctx->bind( depthStencilState );
 }
 
-void DebugPipeline::unbind( Scene::RenderContext* ctx) {
+void DebugPipeline::resolve( Scene::RenderContext* ctx) {
 	ctx->popDebugMarker();
 }
 
@@ -141,7 +141,7 @@ void DebugPipelineDataStore::render( Scene::RenderContext* rc ) {
 		auto ib = mds->indexBuffer->tryAcquire();
 		if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 		ctx->bind( vao );
-		ctx->bindIndexBuffer( ib, mds->indexSize );
+		ctx->bindIB( ib, mds->indexSize );
 		ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
 	}
 

@@ -27,6 +27,9 @@ if( UNIX )
 endif()
 
 list( APPEND targ_link_libs tbb_rml tbb )
+if( USE_GC )
+	list( APPEND targ_link_libs gc-lib )
+endif()
 
 if( UNIX )
 	list( APPEND targ_link_libs X11 )

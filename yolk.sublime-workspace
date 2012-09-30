@@ -4,6 +4,78 @@
 		"selected_items":
 		[
 			[
+				"Movi",
+				"MovieClip"
+			],
+			[
+				"Swf",
+				"SwfMan"
+			],
+			[
+				"CVN_M",
+				"CVN_MATERIAL_INDEX"
+			],
+			[
+				"en",
+				"EnemyThingComponent"
+			],
+			[
+				"Gen",
+				"GenericMarkerVector"
+			],
+			[
+				"wo",
+				"worldTrans"
+			],
+			[
+				"Text",
+				"TextureHandle"
+			],
+			[
+				"Re",
+				"RenderTargetStates"
+			],
+			[
+				"D3D11_DEP",
+				"D3D11_DEPTH_WRITE_MAKE_ALL"
+			],
+			[
+				"de",
+				"DepthStencilState"
+			],
+			[
+				"De",
+				"DepthStencilState"
+			],
+			[
+				"D3D11_",
+				"D3D11_FILL_LINE"
+			],
+			[
+				"inter",
+				"internalPreCreate"
+			],
+			[
+				"Wo",
+				"WobFileHeader"
+			],
+			[
+				"Sampler",
+				"SamplerStates"
+			],
+			[
+				"T",
+				"TWE_ALPHA"
+			],
+			[
+				"TW",
+				"TWE_RED"
+			],
+			[
+				"MAX_",
+				"MAX_RENDER_TARGETS"
+			],
+			[
 				"der",
 				"derivedOnly"
 			],
@@ -53,7 +125,7 @@
 			],
 			[
 				"in",
-				"internalPreCreate"
+				"internalLoad"
 			],
 			[
 				"sh",
@@ -190,10 +262,6 @@
 			[
 				"debug",
 				"debugCam"
-			],
-			[
-				"De",
-				"DebugCamContext"
 			],
 			[
 				"back",
@@ -446,162 +514,80 @@
 			[
 				"version_",
 				"version_rev"
-			],
-			[
-				"ver",
-				"version_minor"
-			],
-			[
-				"version",
-				"version_major"
-			],
-			[
-				"_a",
-				"_area"
-			],
-			[
-				"active",
-				"activeDWMsByAddr"
-			],
-			[
-				"po",
-				"possibleMatches"
-			],
-			[
-				"is",
-				"istring"
-			],
-			[
-				"pruneP",
-				"prunePossibles"
-			],
-			[
-				"new",
-				"newSymbol"
-			],
-			[
-				"Inpu",
-				"InputSymbol"
-			],
-			[
-				"InputS",
-				"InputString"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/libs/scene/resourceloader.h",
+			"file": "src/libs/gui/swfruntime/player.h",
 			"settings":
 			{
-				"buffer_size": 1893,
+				"buffer_size": 2149,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/scene/resourceloader.cpp",
+			"file": "src/libs/gui/swfruntime/movieclip.cpp",
 			"settings":
 			{
-				"buffer_size": 9011,
+				"buffer_size": 10664,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/core/singleton.h",
+			"file": "src/libs/gui/swfruntime/frameitem.h",
 			"settings":
 			{
-				"buffer_size": 1231,
+				"buffer_size": 2439,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/scene/programman.h",
+			"file": "src/libs/gui/swfruntime/movieclip.h",
 			"settings":
 			{
-				"buffer_size": 1734,
+				"buffer_size": 3242,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/dx11/resourceloader.cpp",
+			"file": "src/libs/gui/swfruntime/displayobjectframeitem.h",
 			"settings":
 			{
-				"buffer_size": 1480,
+				"buffer_size": 1441,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/dx11/vertexinput.h",
+			"file": "src/libs/gui/swfruntime/ActionScript/AsObject.h",
 			"settings":
 			{
-				"buffer_size": 794,
-				"line_ending": "Windows",
-				"name": "vertexinput.h"
-			}
-		},
-		{
-			"file": "src/libs/dx11/vertexinput.cpp",
-			"settings":
-			{
-				"buffer_size": 3268,
-				"line_ending": "Windows",
-				"name": "vertexinput.cpp"
-			}
-		},
-		{
-			"file": "src/libs/scene/vertexinput.h",
-			"settings":
-			{
-				"buffer_size": 2686,
+				"buffer_size": 6018,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/core/resources.h",
+			"file": "src/libs/core/memory.h",
 			"settings":
 			{
-				"buffer_size": 3931,
+				"buffer_size": 1986,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/core/core_utils.h",
+			"file": "src/libs/bdwgc/gc_cpp.cc",
 			"settings":
 			{
-				"buffer_size": 9575,
+				"buffer_size": 2658,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/core/resourcebase.h",
+			"file": "src/libs/bdwgc/include/gc_cpp.h",
 			"settings":
 			{
-				"buffer_size": 3080,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dx11/texture.cpp",
-			"settings":
-			{
-				"buffer_size": 8437,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "yolk_setup.cmake",
-			"settings":
-			{
-				"buffer_size": 3248,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cmake_modules/FindWierdBoost.cmake",
-			"settings":
-			{
-				"buffer_size": 1400,
+				"buffer_size": 13913,
 				"line_ending": "Windows"
 			}
 		}
@@ -609,19 +595,19 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 311.0,
 		"selected_items":
 		[
 			[
 				"Package Control: ",
-				"Package Control: Discover Packages"
+				"Package Control: Install Package"
 			],
 			[
 				"",
 				"Bookmarks: Clear All"
 			]
 		],
-		"width": 449.0
+		"width": 400.0
 	},
 	"console":
 	{
@@ -638,134 +624,134 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/resourcebase.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/gtfcracker.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/resourceman.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/resourceman.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/programman.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/dx11.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/screen.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderer.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dwm_client/clientworld.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dwm_client/client.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/rendercontext.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/rendercontext.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/rendercontext.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugpipeline.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugpipeline.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/wobfile.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/resourceloader.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/texture.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hierfile.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/textureatlas.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/program.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/program.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/databuffer.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/texture.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resource.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/texture.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/texture.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/vertexinput.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resourceloader.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resourceloader.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/databuffer.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/databuffer.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/wobfile.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/textureatlas.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hierfile.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programman.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programman.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/programman.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderloader.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/builtin_programs.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/program.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/program.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/debug.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programs/shared_structs.hlsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/gfx.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resource.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/gfx.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/screen.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/ogl.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/shaderman.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/shaderman.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/preprocessor.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/preprocessor.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/apps/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/resource.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/databuffer.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/dxgiformat_cracker.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/generictextureformat.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/gfx.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/gfx.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/windows/gfx.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugprims.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/debugprims.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/debugpipeline.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/imagecomposer.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/imagecomposer.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/glformat_cracker.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dwm_client/client.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderworld.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderworld.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/renderable.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/mesh.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/mesh.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/pipeline.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hie.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/hie.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/debugpipeline.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/screen.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/imagecomposer.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/rendercontext.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/rendercontext.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/vao.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/databuffer.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/constantcache.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/gfx_debug_render.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/shared_structs.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/programs/constant_blocks.hlsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/programs/2dcolour.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/vs_ndcpos_col.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/program.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/memory.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/vdeclmanager.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/vdeclmanager.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/vao.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/vertexinput.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/texture.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/texture.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/scene.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/constantcache.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/constantcache.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/gpu_constants.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/gpu_constants.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/constant_blocks.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/constant_blocks.hlsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/shared_structs.hlsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/clforgl.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/debugprims.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/imagecomposer.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/constantcache.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/programs/basic.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/fs_basic.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/fs_flat_basic.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/programs/flat_basic.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gl/programs/fragments/gs_makefullscreen.glsl",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/submodules/json-spirit/json_spirit/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/yolk.sublime-project",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/submodules/json-spirit/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/DeferredLightGBuffers11.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/dx11/dx11.cpp"
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfman.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfman.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/programs/programs/swfmain.hlsl",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/programs/shaders/vs_swfmain.hlsl",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/programs/shaders/fs_swfmain.hlsl",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fstexture.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fstexture.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsgradient.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsgradient.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/conffx/Examples/QJulia4D/qjulia4D.shd",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/conffx/Examples/QJulia4D/displayComputation.shd",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/builder.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fssolidcolour.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fssolidcolour.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsline.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsline.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fillstyle.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fillstyle.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/builder.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/shape.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/shape.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/character.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/basepath.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/basepath.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpupath.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpupath.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/utils.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/dynamictext.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/dynamictext.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/swfparser.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/font.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/submodules/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk.sublime-project",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/projects/wierd/source/core/standard.h",
+		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfBasePath.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfBasePath.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfDisplayObjectFrameItem.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfDisplayObjectFrameItem.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfFrameItem.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfFrameItem.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuLinePath.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuLinePath.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuPath.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuPath.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGradientTextureManager.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGradientTextureManager.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfMovieClip.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfMovieClip.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRFS_GLTnL_iPhone.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRFS_GLTnL_iPhone.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeBitmap.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeBitmap.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeBuilder.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeBuilder.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeCharacter.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeDynamicText.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeDynamicText.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeFillStyle.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeFont.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeShape.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeShape.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeText.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeText.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeUtils.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeUtils.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsVM.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsVM.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsFunction.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsFunction.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsFuncInstruction.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsObjectFunction.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsObjectFactory.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsObjectFactory.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsObject.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsObject.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsClass.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsClass.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsAgRuntime.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/autogen/AsAgRuntime.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/aslib/AsDate.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/aslib/AsArray.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfParser.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfParser.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfStream.h",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfStream.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeFillStyle.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeFont.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsFuncInstruction.cpp",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/CMakeLists.txt",
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfruntime.h"
 	],
 	"find":
 	{
@@ -773,7 +759,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 96.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"",
@@ -790,6 +776,22 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"cpp",
+			"#include \"pch.h\"",
+			"SwfParser",
+			"Zombie House Studios",
+			"2008 Zombie House Studios",
+			"Enemy",
+			"{\n",
+			"debug",
+			"debugf",
+			"vtdfh.h",
+			"RasteriserState",
+			"internalPreCreate",
+			"internalLoad",
+			"CreationInfo",
+			"PreCreateStruct",
+			"LoadStruct",
 			"GL_",
 			"YOLK_SCENE_PROGRAM_MAN_H_",
 			"TextureCtor",
@@ -901,30 +903,23 @@
 			"createTargetMachine",
 			"RelocModel",
 			"CMModel",
-			"setCodeModel",
-			"setOutputFormat",
-			"Relocation",
-			"_libc",
-			"JIT_REGISTER_FN",
-			"main",
-			"_start",
-			"sbrk",
-			"LowerToTLSExecModel",
-			"TAILJMPd64",
-			"le32",
-			"main",
-			".Linfo",
-			"BUNDLE_ALIGN_START",
-			"Invalid Switch Record",
-			"CXX_FLAGS",
-			"C_FLAGS"
+			"setCodeModel"
 		],
 		"highlight": true,
-		"in_selection": true,
+		"in_selection": false,
 		"preserve_case": false,
 		"regex": false,
 		"replace_history":
 		[
+			"#include \"swfruntime.h\"",
+			"Parser",
+			"2012 Cloud Pixies Ltd",
+			"Item",
+			"DepthStencilState",
+			"RenderTargetStates",
+			"internalPreCreate",
+			"CreationInfo",
+			"PreCreateStruct",
 			"GTF_",
 			"YOLK_VALIDATE_PRG_OFFSETS",
 			"MAX_SHADER_TYPES",
@@ -958,23 +953,22 @@
 	"groups":
 	[
 		{
-			"selected": 11,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/scene/resourceloader.h",
+					"file": "src/libs/gui/swfruntime/player.h",
 					"settings":
 					{
-						"buffer_size": 1893,
+						"buffer_size": 2149,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								428,
-								428
+								1478,
+								1478
 							]
 						],
 						"settings":
@@ -983,25 +977,25 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1089.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/scene/resourceloader.cpp",
+					"file": "src/libs/gui/swfruntime/movieclip.cpp",
 					"settings":
 					{
-						"buffer_size": 9011,
+						"buffer_size": 10664,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								122,
-								122
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1010,25 +1004,25 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 480.0,
+						"translation.y": 7432.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/core/singleton.h",
+					"file": "src/libs/gui/swfruntime/frameitem.h",
 					"settings":
 					{
-						"buffer_size": 1231,
+						"buffer_size": 2439,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								212,
-								243
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1037,25 +1031,25 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 145.0,
+						"translation.y": 706.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/libs/scene/programman.h",
+					"file": "src/libs/gui/swfruntime/movieclip.h",
 					"settings":
 					{
-						"buffer_size": 1734,
+						"buffer_size": 3242,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								573,
-								573
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1064,25 +1058,25 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 322.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "src/libs/dx11/resourceloader.cpp",
+					"file": "src/libs/gui/swfruntime/displayobjectframeitem.h",
 					"settings":
 					{
-						"buffer_size": 1480,
+						"buffer_size": 1441,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1065,
-								1065
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1091,30 +1085,29 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 379.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "src/libs/dx11/vertexinput.h",
+					"file": "src/libs/gui/swfruntime/ActionScript/AsObject.h",
 					"settings":
 					{
-						"buffer_size": 794,
+						"buffer_size": 6018,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								638,
-								638
+								17,
+								17
 							]
 						],
 						"settings":
 						{
-							"auto_name": "vertexinput.h",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
@@ -1126,217 +1119,82 @@
 				},
 				{
 					"buffer": 6,
-					"file": "src/libs/dx11/vertexinput.cpp",
+					"file": "src/libs/core/memory.h",
 					"settings":
 					{
-						"buffer_size": 3268,
+						"buffer_size": 1986,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								719,
-								730
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "vertexinput.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 601.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "src/libs/scene/vertexinput.h",
+					"file": "src/libs/bdwgc/gc_cpp.cc",
 					"settings":
 					{
-						"buffer_size": 2686,
+						"buffer_size": 2658,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2415,
-								2415
+								0,
+								0
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1025.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "src/libs/core/resources.h",
+					"file": "src/libs/bdwgc/include/gc_cpp.h",
 					"settings":
 					{
-						"buffer_size": 3931,
+						"buffer_size": 13913,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								538,
-								538
+								10662,
+								10662
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/libs/core/core_utils.h",
-					"settings":
-					{
-						"buffer_size": 9575,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								405,
-								405
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/libs/core/resourcebase.h",
-					"settings":
-					{
-						"buffer_size": 3080,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								334,
-								334
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "src/libs/dx11/texture.cpp",
-					"settings":
-					{
-						"buffer_size": 8437,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								507,
-								507
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "yolk_setup.cmake",
-					"settings":
-					{
-						"buffer_size": 3248,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1328,
-								1328
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1020.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "cmake_modules/FindWierdBoost.cmake",
-					"settings":
-					{
-						"buffer_size": 1400,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								867,
-								867
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2807.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1476,6 +1334,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 309.0,
+	"side_bar_width": 305.0,
 	"status_bar_visible": true
 }

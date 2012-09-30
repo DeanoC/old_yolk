@@ -48,12 +48,14 @@ namespace Dx11 {
 		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& sampler ) override;
 		virtual void bind( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::SamplerStatePtr& sampler ) override;
 
-		virtual void bind( const Scene::RenderTargetStatesPtr& targetStates ) override;
-		virtual void bind( const Scene::DepthStencilStatePtr& dsStates ) override;
-		virtual void bind( const Scene::RasteriserStatePtr& rasteriser ) override;
-		virtual void bind( const Scene::VertexInputPtr& vertexInput ) override;
+		virtual void bind( const Scene::RenderTargetStatesPtr& _targetStates ) override;
+		virtual void bind( const Scene::DepthStencilStatePtr& _dsStates, uint32_t _stencilRef = 0 ) override;
+		virtual void bind( const Scene::RasteriserStatePtr& _rasteriser ) override;
+		virtual void bind( const Scene::VertexInputPtr& _vertexInput ) override;
 
-		virtual void bindIndexBuffer( const Scene::DataBufferPtr& ib, int indexBytes ) override;
+		virtual void bindCB( const Scene::SHADER_TYPES type, const uint32_t unit, const Scene::DataBufferPtr& sampler ) override;
+		virtual void bindVB( const unsigned int _stream, const Scene::DataBufferPtr& vb, const unsigned int _stride, const unsigned int _offset = 0 ) override;
+		virtual void bindIB( const Scene::DataBufferPtr& ib, const unsigned int _stride ) override;
 
 		virtual void clear( const Scene::ViewPtr& target ) override;
 		virtual void clear( const Scene::TexturePtr& target, const Core::Colour& colour ) override;
@@ -61,6 +63,8 @@ namespace Dx11 {
 
 		virtual void copy( const Scene::DataBufferPtr& dst, const Scene::DataBufferPtr& src ) override;
 		virtual void copy( const Scene::TexturePtr& dst, const Scene::TexturePtr& src ) override;
+		virtual void copy(	const Scene::TexturePtr& dst, const int dstX, const int dstY, const int dstZ, 
+							const Scene::TexturePtr& src, const int srcX, const int srcY, const int srcZ, const int srcWidth, const int srcHeight, const int srcDepth ) override;
 
 		virtual void draw( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t vertexCount, uint32_t startVertex = 0 ) override;
 		virtual void drawIndexed( Scene::PRIMITIVE_TOPOLOGY topo, uint32_t indexCount, uint32_t startIndex = 0, uint32_t baseOffset = 0 ) override;

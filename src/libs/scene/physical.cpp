@@ -25,7 +25,8 @@ Physical::Physical( 	Core::TransformNode* _node,
 	rbInfo.m_restitution = restitution;
 	rbInfo.m_linearDamping = linearDamping;
 	rbInfo.m_angularDamping = angularDamping;
-	body = CORE_NEW btRigidBody( rbInfo );
+	// use new as btRigidBody has a class specific new
+	body = new btRigidBody( rbInfo );
 }
 
 Physical::Physical( 	Physical::INTERNAL,

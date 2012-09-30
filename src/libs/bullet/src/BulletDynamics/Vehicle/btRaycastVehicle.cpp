@@ -112,22 +112,21 @@ void	btRaycastVehicle::updateWheelTransform( int wheelIndex , bool interpolatedT
 //	up = right.cross(fwd);
 //	up.normalize();
 
-	//rotate around steering over de wheelAxleWS
-	btScalar steering = wheel.m_steering;
 	
-	btQuaternion steeringOrn(up,steering);//wheel.m_steering);
-	btMatrix3x3 steeringMat(steeringOrn);
+	btQuaternion steeringOrn( up, wheel.m_steering );
+	btMatrix3x3 steeringMat( steeringOrn );
 
 	btQuaternion rotatingOrn(right,-wheel.m_rotation);
 	btMatrix3x3 rotatingMat(rotatingOrn);
 
 	btMatrix3x3 basis2(
-		right[0],fwd[0],up[0],
-		right[1],fwd[1],up[1],
-		right[2],fwd[2],up[2]
+		right[0],up[0],fwd[0],
+		right[1],up[1],fwd[1],
+		right[2],up[2],fwd[2]
 	);
 	
 	wheel.m_worldTransform.setBasis(steeringMat * rotatingMat * basis2);
+//	wheel.m_worldTransform.setBasis(steeringMat * rotatingMat * btMatrix3x3(m_chassisBody->getOrientation()));
 	wheel.m_worldTransform.setOrigin(
 		wheel.m_raycastInfo.m_hardPointWS + wheel.m_raycastInfo.m_wheelDirectionWS * wheel.m_raycastInfo.m_suspensionLength
 	);
@@ -572,13 +571,14 @@ void	btRaycastVehicle::updateFriction(btScalar	timeStep)
 						wheelBasis0[2][m_indexRightAxis]);
 					
 					const btVector3& surfNormalWS = wheelInfo.m_raycastInfo.m_contactNormalWS;
+
 					btScalar proj = m_axle[i].dot(surfNormalWS);
 					m_axle[i] -= surfNormalWS * proj;
-					m_axle[i] = m_axle[i].normalize();
-					
+					m_axle[i] = m_axle[i].normalize();				
 					m_forwardWS[i] = surfNormalWS.cross(m_axle[i]);
-					m_forwardWS[i].normalize();
+//					m_forwardWS[i] = m_axle[i].cross( surfNormalWS );
 
+					m_forwardWS[i].normalize();
 				
 					resolveSingleBilateral(*m_chassisBody, wheelInfo.m_raycastInfo.m_contactPointWS,
 							  *groundObject, wheelInfo.m_raycastInfo.m_contactPointWS,
@@ -620,9 +620,6 @@ void	btRaycastVehicle::updateFriction(btScalar	timeStep)
 
 			//switch between active rolling (throttle), braking and non-active rolling friction (no throttle/break)
 			
-
-
-
 			m_forwardImpulse[wheel] = btScalar(0.);
 			m_wheelInfo[wheel].m_skidInfo= btScalar(1.);
 
@@ -732,12 +729,16 @@ void	btRaycastVehicle::debugDraw(btIDebugDraw* debugDrawer)
 
 		btVector3 wheelPosWS = getWheelInfo(v).m_worldTransform.getOrigin();
 
+		//debug wheels (cylinders)
+		debugDrawer->drawCylinder( 0.5f, 0.3f, 0, getWheelInfo(v).m_worldTransform, wheelColor );
 		btVector3 axle = btVector3(	
 			getWheelInfo(v).m_worldTransform.getBasis()[0][getRightAxis()],
 			getWheelInfo(v).m_worldTransform.getBasis()[1][getRightAxis()],
 			getWheelInfo(v).m_worldTransform.getBasis()[2][getRightAxis()]);
-
-		//debug wheels (cylinders)
+//		btVector3 dir = btVector3(	
+//			getWheelInfo(v).m_worldTransform.getBasis()[0][getForwardAxis()],
+//			getWheelInfo(v).m_worldTransform.getBasis()[1][getForwardAxis()],
+//			getWheelInfo(v).m_worldTransform.getBasis()[2][getForwardAxis()]);
 		debugDrawer->drawLine(wheelPosWS,wheelPosWS+axle,wheelColor);
 		debugDrawer->drawLine(wheelPosWS,getWheelInfo(v).m_raycastInfo.m_contactPointWS,wheelColor);
 

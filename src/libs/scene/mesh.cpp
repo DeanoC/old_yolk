@@ -57,8 +57,7 @@ void Mesh::render( RenderContext* context, Pipeline* pipeline ) {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
-	context->getConstantCache().changeObject( prevWVP, 
-							getTransformNode()->getRenderMatrix() );
+	context->getConstantCache().setObject( prevWVP, getTransformNode()->getRenderMatrix() );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
 	prevWVP = context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
@@ -75,8 +74,7 @@ void Mesh::renderTransparent( RenderContext* context, Pipeline* pipeline ) {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
-	context->getConstantCache().changeObject( prevWVP, 
-							getTransformNode()->getRenderMatrix() );
+	context->getConstantCache().setObject( prevWVP, getTransformNode()->getRenderMatrix() );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
 	prevWVP = context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
