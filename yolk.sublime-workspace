@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"Movi",
+				"MovieClip"
+			],
+			[
 				"Swf",
 				"SwfMan"
 			],
@@ -510,81 +514,24 @@
 			[
 				"version_",
 				"version_rev"
-			],
-			[
-				"ver",
-				"version_minor"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/libs/gui/swfruntime/swfman.h",
-			"settings":
-			{
-				"buffer_size": 1140,
-				"line_ending": "Windows",
-				"name": "swfman.h"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/swfman.cpp",
-			"settings":
-			{
-				"buffer_size": 3931,
-				"line_ending": "Windows",
-				"name": "swfman.cpp"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/programs/programs/swfmain.hlsl",
-			"settings":
-			{
-				"buffer_size": 98,
-				"line_ending": "Windows",
-				"name": "swfmain.hlsl"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/programs/shaders/vs_swfmain.hlsl",
-			"settings":
-			{
-				"buffer_size": 539,
-				"line_ending": "Windows",
-				"name": "vs_swfmain.hlsl"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/programs/shaders/fs_swfmain.hlsl",
-			"settings":
-			{
-				"buffer_size": 304,
-				"line_ending": "Windows",
-				"name": "fs_swfmain.hlsl"
-			}
-		},
-		{
 			"file": "src/libs/gui/swfruntime/player.h",
 			"settings":
 			{
-				"buffer_size": 2277,
+				"buffer_size": 2149,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/player.cpp",
+			"file": "src/libs/gui/swfruntime/movieclip.cpp",
 			"settings":
 			{
-				"buffer_size": 2951,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/gui/swfruntime/gradienttexturemanager.h",
-			"settings":
-			{
-				"buffer_size": 1625,
+				"buffer_size": 10664,
 				"line_ending": "Windows"
 			}
 		},
@@ -592,77 +539,75 @@
 			"file": "src/libs/gui/swfruntime/frameitem.h",
 			"settings":
 			{
-				"buffer_size": 2118,
+				"buffer_size": 2439,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/scene/CMakeLists.txt",
+			"file": "src/libs/gui/swfruntime/movieclip.h",
 			"settings":
 			{
-				"buffer_size": 1348,
+				"buffer_size": 3242,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/CMakeLists.txt",
+			"file": "src/libs/gui/swfruntime/displayobjectframeitem.h",
 			"settings":
 			{
-				"buffer_size": 1370,
+				"buffer_size": 1441,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfparser/CMakeLists.txt",
+			"file": "src/libs/gui/swfruntime/ActionScript/AsObject.h",
 			"settings":
 			{
-				"buffer_size": 436,
+				"buffer_size": 6018,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/vtdfh/CMakeLists.txt",
+			"file": "src/libs/core/memory.h",
 			"settings":
 			{
-				"buffer_size": 1106,
+				"buffer_size": 1986,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/fsgradient.h",
+			"file": "src/libs/bdwgc/gc_cpp.cc",
 			"settings":
 			{
-				"buffer_size": 670,
-				"line_ending": "Windows",
-				"name": "fsgradient.h"
+				"buffer_size": 2658,
+				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/gui/swfruntime/fsgradient.cpp",
+			"file": "src/libs/bdwgc/include/gc_cpp.h",
 			"settings":
 			{
-				"buffer_size": 3408,
-				"line_ending": "Windows",
-				"name": "fsgradient.cpp"
+				"buffer_size": 13913,
+				"line_ending": "Windows"
 			}
 		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 311.0,
 		"selected_items":
 		[
 			[
 				"Package Control: ",
-				"Package Control: Discover Packages"
+				"Package Control: Install Package"
 			],
 			[
 				"",
 				"Bookmarks: Clear All"
 			]
 		],
-		"width": 449.0
+		"width": 400.0
 	},
 	"console":
 	{
@@ -679,6 +624,25 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfman.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfman.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/programs/programs/swfmain.hlsl",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/programs/shaders/vs_swfmain.hlsl",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/programs/shaders/fs_swfmain.hlsl",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fstexture.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fstexture.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsgradient.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fsgradient.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/conffx/Examples/QJulia4D/qjulia4D.shd",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/conffx/Examples/QJulia4D/displayComputation.shd",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/builder.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fssolidcolour.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/fssolidcolour.cpp",
@@ -703,13 +667,9 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/player.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.cpp",
@@ -724,12 +684,10 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk.sublime-project",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/CMakeLists.txt",
 		"/C/Users/Artminer/Documents/projects/wierd/source/core/standard.h",
@@ -793,20 +751,7 @@
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfRuntimeFont.cpp",
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/codegen/AsFuncInstruction.cpp",
 		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfruntime.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfruntime.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/physicsensor.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/physicsensor.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/physical.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/physicsworld.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/physicsworld.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/player.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRect.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRect.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/SwfRGB.cpp"
+		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/swfruntime.h"
 	],
 	"find":
 	{
@@ -831,6 +776,7 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"cpp",
 			"#include \"pch.h\"",
 			"SwfParser",
 			"Zombie House Studios",
@@ -957,8 +903,7 @@
 			"createTargetMachine",
 			"RelocModel",
 			"CMModel",
-			"setCodeModel",
-			"setOutputFormat"
+			"setCodeModel"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1008,43 +953,41 @@
 	"groups":
 	[
 		{
-			"selected": 14,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/libs/gui/swfruntime/swfman.h",
+					"file": "src/libs/gui/swfruntime/player.h",
 					"settings":
 					{
-						"buffer_size": 1140,
+						"buffer_size": 2149,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1478,
+								1478
 							]
 						],
 						"settings":
 						{
-							"auto_name": "swfman.h",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1089.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/gui/swfruntime/swfman.cpp",
+					"file": "src/libs/gui/swfruntime/movieclip.cpp",
 					"settings":
 					{
-						"buffer_size": 3931,
+						"buffer_size": 10664,
 						"regions":
 						{
 						},
@@ -1057,22 +1000,21 @@
 						],
 						"settings":
 						{
-							"auto_name": "swfman.cpp",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 7432.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/gui/swfruntime/programs/programs/swfmain.hlsl",
+					"file": "src/libs/gui/swfruntime/frameitem.h",
 					"settings":
 					{
-						"buffer_size": 98,
+						"buffer_size": 2439,
 						"regions":
 						{
 						},
@@ -1085,21 +1027,21 @@
 						],
 						"settings":
 						{
-							"auto_name": "swfmain.hlsl",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 706.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/libs/gui/swfruntime/programs/shaders/vs_swfmain.hlsl",
+					"file": "src/libs/gui/swfruntime/movieclip.h",
 					"settings":
 					{
-						"buffer_size": 539,
+						"buffer_size": 3242,
 						"regions":
 						{
 						},
@@ -1112,22 +1054,21 @@
 						],
 						"settings":
 						{
-							"auto_name": "vs_swfmain.hlsl",
-							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 322.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "src/libs/gui/swfruntime/programs/shaders/fs_swfmain.hlsl",
+					"file": "src/libs/gui/swfruntime/displayobjectframeitem.h",
 					"settings":
 					{
-						"buffer_size": 304,
+						"buffer_size": 1441,
 						"regions":
 						{
 						},
@@ -1140,29 +1081,29 @@
 						],
 						"settings":
 						{
-							"auto_name": "fs_swfmain.hlsl",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 379.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "src/libs/gui/swfruntime/player.h",
+					"file": "src/libs/gui/swfruntime/ActionScript/AsObject.h",
 					"settings":
 					{
-						"buffer_size": 2277,
+						"buffer_size": 6018,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								17,
+								17
 							]
 						],
 						"settings":
@@ -1171,17 +1112,17 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1386.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 6,
-					"file": "src/libs/gui/swfruntime/player.cpp",
+					"file": "src/libs/core/memory.h",
 					"settings":
 					{
-						"buffer_size": 2951,
+						"buffer_size": 1986,
 						"regions":
 						{
 						},
@@ -1194,21 +1135,20 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 176.0,
+						"translation.y": 601.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "src/libs/gui/swfruntime/gradienttexturemanager.h",
+					"file": "src/libs/bdwgc/gc_cpp.cc",
 					"settings":
 					{
-						"buffer_size": 1625,
+						"buffer_size": 2658,
 						"regions":
 						{
 						},
@@ -1222,198 +1162,39 @@
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 396.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "src/libs/gui/swfruntime/frameitem.h",
+					"file": "src/libs/bdwgc/include/gc_cpp.h",
 					"settings":
 					{
-						"buffer_size": 2118,
+						"buffer_size": 13913,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2024,
-								2024
+								10662,
+								10662
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 604.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/libs/scene/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 1348,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1174,
-								1158
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/libs/gui/swfruntime/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 1370,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1164,
-								1164
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "src/libs/gui/swfparser/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 436,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								429,
-								429
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "src/apps/vtdfh/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 1106,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								759,
-								759
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "src/libs/gui/swfruntime/fsgradient.h",
-					"settings":
-					{
-						"buffer_size": 670,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_name": "fsgradient.h",
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "src/libs/gui/swfruntime/fsgradient.cpp",
-					"settings":
-					{
-						"buffer_size": 3408,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								14,
-								14
-							]
-						],
-						"settings":
-						{
-							"auto_name": "fsgradient.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2807.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

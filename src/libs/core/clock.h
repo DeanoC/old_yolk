@@ -16,9 +16,7 @@ namespace Core
 
 
 //! Clock Class using RDTSC on x86/x86-64
-class Clock : public Singleton< Clock >
-{
-
+class Clock {
 public:
 	Clock( float TimeScale = 1.0f );
 
@@ -69,7 +67,6 @@ private:
 	float m_TimeScale;
 
 };
-
 
 #include "clock.inl"
 

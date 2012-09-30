@@ -55,7 +55,6 @@ char* g_argv[ MAX_CMDLINE_ARGS ];	//!< The argv cmdline parameter
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Init( void ) {
-	Clock::init();
 	SystemMessage::init();
 	ResourceMan::init();
 	InstallResourceTypes();
@@ -91,7 +90,6 @@ void Shutdown( void ) {
 #endif
 	ResourceMan::shutdown();
 	SystemMessage::shutdown();
-	Clock::shutdown();
 	Keyboard::shutdown();
 #if PLATFORM == WINDOWS 
 	MouseWin::shutdown();

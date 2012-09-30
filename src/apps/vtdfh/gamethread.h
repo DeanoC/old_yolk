@@ -7,5 +7,6 @@ public:
 	~GameThread();
 protected:
 	Core::thread*		gameThread;
+	Core::thread*		inputThread;
 };
 #endif

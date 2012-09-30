@@ -8,11 +8,12 @@
 #include "scene/cylindercolshape.h"
 #include "scene/physicsensor.h"
 #include "cameras/zarchcam.h"
-#include "cameras/objectcam.h"
+#include "cameras/buggycam.h"
 #include "gui/swfruntime/movieclip.h"
+#include "buggy.h"
 #include "player.h"
 
-Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* startNode ) :
+Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* _startNode ) :
 	world( _world ),
 	localPlayerNum( _localPlayerNum ), 
 	playerTransform( transformMatrix ),
@@ -40,19 +41,16 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	myThingy->addComponent( &updater );
 
 	zarchCam = std::make_shared<ZarchCam>();
-	zarchCam->setTrackingThing( myThingy );
-	zarchCam->setOffset( Math::Vector3(0,20,0) );
-	objectCam = std::make_shared<ObjectCam>();
-	objectCam->setObject( myThingy );
+	buggyCam = std::make_shared<BuggyCam>();
 
 	inputContext = std::dynamic_pointer_cast<InputHandlerContext>( Core::DevelopmentContext::getr().getContext( "InputHandler" ) );
 //	inputContext->setCamera( zarchCam );
-	inputContext->setCamera( objectCam );
+	inputContext->setCamera( buggyCam );
 
 	Core::DevelopmentContext::get()->activateContext( "InputHandler" );
 	
-	myThingy->getTransform()->setLocalPosition( startNode->getLocalPosition() );
-	myThingy->getTransform()->setLocalOrientation( startNode->getLocalOrientation() );
+	myThingy->getTransform()->setLocalPosition( _startNode->getLocalPosition() );
+	myThingy->getTransform()->setLocalOrientation( _startNode->getLocalOrientation() );
 
 	for( int i = 0; i < myThingy->getPhysicSensorCount(); ++i ) {
 		myThingy->getPhysicSensor(i)->syncBulletTransform();
@@ -61,12 +59,17 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	world->debugRenderCallback = std::bind( &Player::debugCallback, this );
 	world->add( myThingy );
 
-	speed = 0;
+	buggy = std::make_shared<Buggy>( world, _startNode );
+	zarchCam->setOffset( Math::Vector3(0,20,0) );
+	zarchCam->setTrackingThing( buggy->myThingy );
+	buggyCam->setBuggy( buggy );
+	buggyCam->setOffset( Math::Vector3(0,3,0) );
+
 }
 
 
 Player::~Player() {
-	objectCam.reset();
+	buggyCam.reset();
 	zarchCam.reset();
 	world->remove( myThingy );
 
@@ -103,16 +106,16 @@ void Player::update( float timeInSeconds ) {
 	auto fl = flashTest.acquire();
 	fl->advance( timeInSeconds * 1000.0f );
 
-	if( inputContext->dequeueInputFrame( &input ) ) {
+	while( inputContext->dequeueInputFrame( &input ) ) {
 		if( input.pad[0].debugButton1 ) {
 			auto& pw = world->getPhysicsWorld();
 			pw.nextPhysicsDebugMode();
 		}
 		if( input.pad[0].debugButton2 ) {
-			if( inputContext->getCamera() == objectCam ) {
+			if( inputContext->getCamera() == buggyCam ) {
 				inputContext->setCamera( zarchCam );
 			} else {
-				inputContext->setCamera( objectCam );
+				inputContext->setCamera( buggyCam );
 			}
 		}
 		if( input.pad[0].debugButton3 ) {
@@ -131,7 +134,7 @@ void Player::update( float timeInSeconds ) {
 	}
 	// manually drive camera updates TODO add back to updatables/things list??
 	zarchCam->update( timeInSeconds );
-	objectCam->update( timeInSeconds );
+	buggyCam->update( timeInSeconds );
 }
 
 void Player::freeControls( const InputFrame& input ) {
@@ -168,36 +171,54 @@ void Player::freeControls( const InputFrame& input ) {
 }
 
 void Player::gameControls( const InputFrame& input ) {
+/*	
 	auto transform = myThingy->getTransform();
 	Math::Quaternion rot = transform->getLocalOrientation();
 	Math::Matrix4x4 rm = Math::CreateRotationMatrix( rot );
+	Math::Vector3 xvec = Math::GetXAxis( rm );
 	Math::Vector3 yvec = Math::GetYAxis( rm );
 	Math::Vector3 zvec = Math::GetZAxis( rm );
 
 	if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
-		speed += (1  * input.deltaTime) * input.pad[0].YAxisMovement; 
+		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100.f;
+		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
-	Math::Vector3 fv = zvec * speed;
-	transform->setLocalPosition( transform->getLocalPosition() + fv );
-//	speed *= 0.001f * input.deltaTime;
 
 	if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
-		Math::Vector3 xvec = Math::GetXAxis( rm );
-		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 100.f;
-		transform->setLocalPosition( transform->getLocalPosition() + fv );
+		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 10.f;
+		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 	float mxdt = input.mouseX  * input.deltaTime;
-	if( fabsf(mxdt) > 0.0001f ) {
-		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );
-		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt * 5.f );
-		transform->setLocalOrientation( rot );
+	if( fabsf(mxdt) > 0.000001f ) {
+//		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );
+		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt );
 	}
+	float mydt = input.mouseY  * input.deltaTime;
+	if( fabsf(mydt) > 0.000001f ) {
+//		mydt = Math::Clamp(mydt, -0.05f, 0.05f );
+		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt );
+	}
+	transform->setLocalOrientation( rot );
+*/	
+	float mxdt = input.mouseX  * input.deltaTime;
+	if( fabsf(mxdt) > 1e-5f ) {
+		buggy->turn( mxdt );
+	}
+	if( input.pad[0].YAxisMovement > 1e-5f ) {
+		buggy->accelerate( input.pad[0].YAxisMovement );
+	} else if( input.pad[0].YAxisMovement < -1e-5f ) {
+		buggy->breakk( -input.pad[0].YAxisMovement );
+	} else {
+		buggy->accelerate( 0 );
+		buggy->breakk( 0 );
+	}
+
 
 }
 
 void Player::debugCallback( void ) {
-
-/*	objectCam->getFrustum().debugDraw( Core::RGBAColour(1,0,0,1) );
+/*
+	objectCam->getFrustum().debugDraw( Core::RGBAColour(1,0,0,1) );
 	
 	Math::Matrix4x4 rm( myThingy->getTransform()->getWorldMatrix() );
 	Math::Vector3 xvec = Math::GetXAxis( rm );
@@ -228,7 +249,7 @@ void Player::debugCallback( void ) {
 void Player::renderable2DCallback( Scene::RenderContext* _ctx ) {
 	auto fl = flashTest.tryAcquire();
 	if( fl ) {
-		fl->getRoot()->setProperty( "speed", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( speed) + "m/s" ) );
+		fl->getRoot()->setProperty( "speed", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( (int)buggy->vehicle->getCurrentSpeedKmHour() ) + "km/h" ) );
 		fl->display( _ctx );
 	}
 }
