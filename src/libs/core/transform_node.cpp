@@ -68,7 +68,7 @@ const Math::Matrix4x4& TransformNode::getWorldMatrix() const {
 	if( !transformCached ) {
 		*transform = getLocalMatrix();
 		if( parent != 0  ) {
-			*transform = parent->getWorldMatrix() * *transform;
+			*transform = *transform * parent->getWorldMatrix();
 		}
 		transformCached = true;
 	} 

@@ -8,7 +8,7 @@ TestLvl::TestLvl( SceneWorldPtr _world ) :
 	world( _world ) {
     namespace arg = std::placeholders;
 
-	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "begin_luck" ), NewThingId(), 
+	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "cube_with_crude_tank_2_towers" ), NewThingId(), 
 						std::bind( &TestLvl::decodeLevelProperties, this, arg::_1, arg::_2, arg::_3, arg::_4 ) ) );
 	world->add( land ); // render object
 }
@@ -28,7 +28,7 @@ void TestLvl::spawnPlayer( int _localPlayerNum ) {
 		spawnPnt = playerStarts[0].transform;
 	}
 
-	player = std::make_shared<Player>( world, _localPlayerNum, spawnPnt );
+//	player = std::make_shared<Player>( world, _localPlayerNum, spawnPnt );
 }
 
 void TestLvl::decodeLevelProperties( LevelThing* thing, std::unordered_map<std::string, int>& nameMap, 

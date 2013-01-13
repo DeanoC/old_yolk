@@ -109,8 +109,9 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 							linkStream << "NodeTree" << nodeIndex << ":\n";
 							linkStream << (uint32_t)(childCount-1) << "\t\t\t\t\t // Number of Childen\n";
 							for( unsigned int i=0;i < childCount;++i ) {
+								int childNo = (int) std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
 								if( childCount < node->getChildCount() ) {
-									linkStream << "Node_" << std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
+									linkStream << "0, Node_" << childNo << " - beginLab\t\t\t\t\t // Pointer to child\n";
 								} else {
 									if( i == node->getChildCount() ) {
 										// skip as this is the node itself
@@ -120,15 +121,8 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 										// this takes the offset of the child and divides by the size of that
 										// child node structure, as this is the same for all nodes, this gives
 										// us the out child index
-										linkStream << "Node_" << nodeIndex << "_" << childCount << " / " <<
-											"(Node_" << nodeIndex << "_" << childCount << "_end - " <<
-											"Node_" << nodeIndex << "_" << childCount << ")";
+										linkStream << "0, Node_" << childNo << " - beginLab\t\t\t\t\t // Pointer to child\n";
 									}
-								}
-								if( i != childCount-1 ) {
-									linkStream << " , ";
-								} else {
-									linkStream << "\t\t\t\t\t //  32 bit indices to nodes\n";
 								}
 							}
 						} else {
@@ -179,20 +173,12 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 				if( childCount > 0 ) {
 					nodeStream << "0, NodeTree" << nodeIndex << " - beginLab"<< "\t\t\t\t\t // pointer to children node tree\n";
 					linkStream << "NodeTree" << nodeIndex << ":\n";
-					linkStream << (uint32_t) childCount << "\t\t\t\t\t // Number of Childen\n";
+					linkStream << (uint32_t) childCount << ", 0\t\t\t\t\t // Number of Childen and alignment dummy\n";
 					for( unsigned int i=0;i < (unsigned int) childCount;++i ) {
 						int childNo = (int) std::distance( nodeArray.begin(), std::find( nodeArray.begin(), nodeArray.end(), node->getChild(i) ) );
-						linkStream << "Node_" << childNo << " / " <<
-									"(Node_" << childNo << "_end - " <<
-									"Node_" << childNo << ")";
-
-						if( i != childCount-1 ) {
-							linkStream << " , ";
-						} else {
-							linkStream << "\t\t\t\t\t //  32 bit indices to nodes\n";
-						}
+						linkStream << "0, Node_" << childNo << " - beginLab\t\t\t\t\t // Pointer to child\n";
 					}
-				} else {
+				} else  {
 					nodeStream << "0,0" << "\t\t\t\t\t// no linkage\n";
 				}
 

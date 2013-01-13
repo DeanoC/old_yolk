@@ -12,6 +12,7 @@ public:
 	static Thing* createEmptyThing( const THING_BROAD_CATEGORIES _bc, const ThingId _id = NewThingId() );
 	static Thing* createThingFromHier( Scene::HierPtr hier, const THING_BROAD_CATEGORIES _bc, const ThingId _id = NewThingId(), boost::function< thingDecodeFuncPtr > callback = &decodePhysicProperties );
 	static LevelThing* createLevelFromHier( Scene::HierPtr hier, const ThingId _id = NewThingId(), boost::function< levelThingDecodeFuncPtr > callback = nullptr );
+	static LevelThing* createEmptyLevel( const ThingId _id = NewThingId() );
 private:
 	static void decodePhysicProperties( Thing* thing, std::unordered_map<std::string, int>& nameMap, 
 										const Core::BinPropertyResourcePtr& binProp, Core::TransformNode * transformNode );

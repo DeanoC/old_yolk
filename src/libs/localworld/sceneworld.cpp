@@ -25,6 +25,8 @@ void SceneWorld::reset() {
 }
 
 void SceneWorld::add( ThingPtr _thing ) {
+	if( !_thing ) return;
+
 	CORE_ASSERT( (std::find( things.cbegin(), things.cend(), _thing ) == things.cend()) && "thing added to world twice");
 
 	things.push_back( _thing );
@@ -67,6 +69,8 @@ void SceneWorld::add( ThingPtr _thing ) {
 }
 
 void SceneWorld::remove( ThingPtr _thing ) {
+	if( !_thing ) return;
+
 	auto t = std::find( things.begin(), things.end(), _thing );
 	CORE_ASSERT( (t != things.end()) && "thing is not in this world");
 

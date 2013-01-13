@@ -51,17 +51,21 @@ Thing* ThingFactory::createThingFromHier( Scene::HierPtr hier, const THING_BROAD
 	}
 	return thing;
 }
+LevelThing* ThingFactory::createEmptyLevel( const ThingId _id ) {
+	using namespace Core;	
+	LevelThing* lvl = CORE_NEW LevelThing( _id );
+	return lvl;
+}
 
 LevelThing* ThingFactory::createLevelFromHier( Scene::HierPtr hier, const ThingId _id, boost::function< levelThingDecodeFuncPtr > callback ) {
 	using namespace Core;
 	using namespace Scene;
 
-	auto nodeCount = hier->getNodeCount();
-
-	LevelThing* lvl = CORE_NEW LevelThing( _id );
+	LevelThing* lvl = createEmptyLevel(_id);
 
 	// single visual for entire hierachy, TODO structure pre-process or at load?
 	lvl->add( hier );
+	auto nodeCount = hier->getNodeCount();
 
 	// scan nodes looking for properties
 	for( auto i = 0; i < nodeCount; ++i ) {

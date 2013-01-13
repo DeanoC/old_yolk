@@ -181,7 +181,7 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 			++childIt;
 		}
 		TempNode* parent = node->parent;
-		if( node->dynamic == false && parent != 0) {
+/*		if( node->dynamic == false && parent != 0) {
 			node->UnlinkNode();
 			if( node->LWNode->type == LightWave::Node::OBJECT ) {
 				LightWave::Object* obj = (LightWave::Object*)( node->LWNode );
@@ -195,7 +195,7 @@ ScenePtr LWSImp::lightWaveScene2MeshMod( const LightWave::SceneLoader& in )
 				}
 				parent->mesh = LightWaveObject2GoMesh( *obj, parent->mesh, obj->layer, matrix );
 			}
-		} else {
+		} else */ {
 			if( node->LWNode->type == LightWave::Node::OBJECT ) {
 				LightWave::Object* obj = (LightWave::Object*)( node->LWNode );
 				if( obj->loader == NULL ) {

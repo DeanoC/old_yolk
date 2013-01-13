@@ -18,7 +18,7 @@ namespace Scene {
 	struct HierarchyTree;
 
 	static const uint32_t HieType = RESOURCE_NAME('H','I','E','R');
-	static const uint8_t HierVersion = 2;
+	static const uint8_t HierVersion = 3;
 
 	enum HierarchyNodeType {
 		HNT_NODE		= 0, //!< general unspecified node
@@ -61,8 +61,10 @@ namespace Scene {
 	};
 
 	struct HierarchyTree {
+		CORE_ALIGN(8)
 		uint32_t	numChildren;
-		// followed by numChildren HierarchyNode indices
+		uint32_t	dummy;
+		// followed by numChildren HierarchyNode pointers
 	};
 
 	//! Loads a hie file

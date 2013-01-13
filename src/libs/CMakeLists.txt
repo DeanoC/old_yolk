@@ -36,3 +36,7 @@ ENDIF( USE_DWM )
 
 add_subdirectory( localworld )
 add_subdirectory( gui )
+
+IF( USE_RAKNET )
+	add_subdirectory( raknet )	
+ENDIF( USE_RAKNET )

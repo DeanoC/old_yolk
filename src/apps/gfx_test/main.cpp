@@ -56,7 +56,7 @@ int Main() {
 //	world->add( stingr );
 	Scene::HierPtr mechh = std::make_shared<Scene::Hier>( "ogremech" );
 	ThingPtr mech = std::make_shared<Thing>( mechh );
-	world->add( mech );*/
+	world->add( mech );*/																																							
 
 	shell.run();
 	shell.end();

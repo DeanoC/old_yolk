@@ -120,7 +120,7 @@ Buggy::~Buggy() {
 }
 
 void Buggy::update( float timeInSeconds ) {
-	// 4 wheel steering and drive!
+	// 2 wheel steering and drive!
 
 //	vehicle->applyEngineForce( gEngineForce, 0 );
 //	vehicle->applyEngineForce( gEngineForce, 1 );

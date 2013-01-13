@@ -20,8 +20,8 @@
 #	include "scene/mesh.h"
 #endif
 
-#if !defined( YOLK_SCENE_ENVIRONMENT_H_ )
-#	include "scene/environment.h"
+#if !defined( YOLK_CORE_CORERESOURC_H_ )
+#	include "core/coreresources.h"
 #endif
 
 namespace Scene {
@@ -76,11 +76,10 @@ namespace Scene {
 			return propertyArray[ nodeId ].get();
 		}
 
-		const EnvironmentPtr getEnvironment() const {
-			return environment;
-		}
+		Hier*											cloneInstance() const;
 
 	protected:
+														Hier();
 		int												numNodes;
 		boost::scoped_array<uint8_t>					nodeArrayMem;
 		Core::TransformNode*							nodeArray;
@@ -91,7 +90,6 @@ namespace Scene {
 		typedef std::vector< std::shared_ptr< Mesh > >	OwnedMeshes;
 		OwnedMeshes										ownedMeshes;
 
-		EnvironmentPtr									environment;
 		typedef Core::ScopedResourceHandle<Core::BinPropertyResourceHandle> ScopedPropertyHandle;
 		boost::scoped_array<ScopedPropertyHandle> 		propertyArray;
 
