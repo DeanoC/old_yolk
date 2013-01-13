@@ -12,8 +12,6 @@ namespace Scene {
 
 class ZarchCam;
 class ObjectCam;
-class BuggyCam;
-class Buggy;
 
 class Player {
 public:
@@ -36,7 +34,6 @@ private:
 
 	std::shared_ptr<InputHandlerContext>	inputContext;
 	std::shared_ptr<ZarchCam>				zarchCam;
-	std::shared_ptr<BuggyCam>				buggyCam;
 	bool									freeControl; // debug free/god movement
 
 	Math::Matrix4x4							transformMatrix;
@@ -48,8 +45,6 @@ private:
 	std::shared_ptr<Scene::PhysicSensor>		bodySensor;
 
 	Core::ScopedResourceHandle<Swf::PlayerHandle> 		flashTest;
-
-	std::shared_ptr<Buggy>						buggy;
 };
 
 #endif

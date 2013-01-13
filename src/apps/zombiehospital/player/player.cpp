@@ -8,9 +8,7 @@
 #include "scene/cylindercolshape.h"
 #include "scene/physicsensor.h"
 #include "cameras/zarchcam.h"
-#include "cameras/buggycam.h"
 #include "gui/swfruntime/movieclip.h"
-#include "buggy.h"
 #include "player.h"
 
 Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* _startNode ) :
@@ -41,11 +39,9 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	myThingy->addComponent( &updater );
 
 	zarchCam = std::make_shared<ZarchCam>();
-	buggyCam = std::make_shared<BuggyCam>();
 
 	inputContext = std::dynamic_pointer_cast<InputHandlerContext>( Core::DevelopmentContext::getr().getContext( "InputHandler" ) );
-//	inputContext->setCamera( zarchCam );
-	inputContext->setCamera( buggyCam );
+	inputContext->setCamera( zarchCam );
 
 	Core::DevelopmentContext::get()->activateContext( "InputHandler" );
 	
@@ -60,18 +56,10 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 
 	world->debugRenderCallback = std::bind( &Player::debugCallback, this );
 	world->add( myThingy );
-
-	buggy = std::make_shared<Buggy>( world, _startNode );
-	zarchCam->setOffset( Math::Vector3(0,20,0) );
-	zarchCam->setTrackingThing( buggy->myThingy );
-	buggyCam->setBuggy( buggy );
-	buggyCam->setOffset( Math::Vector3(0, 3, 0) );
-
 }
 
 
 Player::~Player() {
-	buggyCam.reset();
 	zarchCam.reset();
 	world->remove( myThingy );
 
@@ -114,11 +102,6 @@ void Player::update( float timeInSeconds ) {
 			pw.nextPhysicsDebugMode();
 		}
 		if( input.pad[0].debugButton2 ) {
-			if( inputContext->getCamera() == buggyCam ) {
-				inputContext->setCamera( zarchCam );
-			} else {
-				inputContext->setCamera( buggyCam );
-			}
 		}
 		if( input.pad[0].debugButton3 ) {
 			freeControl ^= true;
@@ -136,7 +119,6 @@ void Player::update( float timeInSeconds ) {
 	}
 	// manually drive camera updates TODO add back to updatables/things list??
 	zarchCam->update( timeInSeconds );
-	buggyCam->update( timeInSeconds );
 }
 
 void Player::freeControls( const InputFrame& input ) {
@@ -202,20 +184,6 @@ void Player::gameControls( const InputFrame& input ) {
 	}
 	transform->setLocalOrientation( rot );
 */	
-	float mxdt = input.mouseX  * input.deltaTime;
-	if( fabsf(mxdt) > 1e-5f ) {
-		buggy->turn( mxdt );
-	}
-	if( input.pad[0].YAxisMovement > 1e-5f ) {
-		buggy->accelerate( input.pad[0].YAxisMovement );
-	} else if( input.pad[0].YAxisMovement < -1e-5f ) {
-		buggy->breakk( -input.pad[0].YAxisMovement );
-	} else {
-		buggy->accelerate( 0 );
-		buggy->breakk( 0 );
-	}
-
-
 }
 
 void Player::debugCallback( void ) {
@@ -251,7 +219,7 @@ void Player::debugCallback( void ) {
 void Player::renderable2DCallback( Scene::RenderContext* _ctx ) {
 	auto fl = flashTest.tryAcquire();
 	if( fl ) {
-		fl->getRoot()->setProperty( "speed", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( (int)buggy->vehicle->getCurrentSpeedKmHour() ) + "km/h" ) );
+//		fl->getRoot()->setProperty( "speed", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( (int)buggy->vehicle->getCurrentSpeedKmHour() ) + "km/h" ) );
 		fl->display( _ctx );
 	}
 }
