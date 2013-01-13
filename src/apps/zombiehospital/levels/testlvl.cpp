@@ -1,4 +1,4 @@
-#include "bowlball.h"
+#include "pch.h"
 #include "localworld/properties.h"
 #include "player/player.h"
 #include "testlvl.h"
@@ -7,9 +7,9 @@ TestLvl::TestLvl( SceneWorldPtr _world ) :
 	world( _world ) {
     namespace arg = std::placeholders;
 
-	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "emptybowl" ), NewThingId(), 
-						std::bind( &TestLvl::decodeLevelProperties, this, arg::_1, arg::_2, arg::_3, arg::_4 ) ) );
-	world->add( land ); // render object
+//	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "emptybowl" ), NewThingId(), 
+//						std::bind( &TestLvl::decodeLevelProperties, this, arg::_1, arg::_2, arg::_3, arg::_4 ) ) );
+//	world->add( land ); // render object
 }
 
 TestLvl::~TestLvl() {
@@ -21,7 +21,10 @@ void TestLvl::update( float timeMS ) {
 }
 
 void TestLvl::spawnPlayer( int _localPlayerNum ) {
-	Core::TransformNode* spawnPnt = land->getTransform();
+	Core::TransformNode* spawnPnt = nullptr;
+	if( land ) {
+		spawnPnt = land->getTransform();
+	}
 	// TODO proper spawn point select
 	if( !playerStarts.empty() ) {
 		spawnPnt = playerStarts[0].transform;

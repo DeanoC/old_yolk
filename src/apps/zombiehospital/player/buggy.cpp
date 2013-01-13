@@ -1,4 +1,4 @@
-#include "bowlball.h"
+#include "pch.h"
 #include "core/development_context.h"
 #include "localworld/inputhandlercontext.h"
 #include "btBulletCollisionCommon.h"
@@ -51,8 +51,10 @@ Buggy::Buggy( SceneWorldPtr _world, Core::TransformNode* _startNode ) :
 	compoundShape->getBTCollisionShape()->calculateLocalInertia( mass, inertiaTensor );
 	carChassis = std::make_shared<Scene::DynamicPhysical>( &buggyTransform, compoundShape , mass, Math::Vector3( inertiaTensor ) );
 	myThingy->add( carChassis, TBC_ENEMY | TBC_ITEM | TBC_WORLD );
-	myThingy->getTransform()->setLocalPosition( _startNode->getLocalPosition() );
-	myThingy->getTransform()->setLocalOrientation( _startNode->getLocalOrientation() );
+	if( _startNode ) {
+		myThingy->getTransform()->setLocalPosition( _startNode->getLocalPosition() );
+		myThingy->getTransform()->setLocalOrientation( _startNode->getLocalOrientation() );
+	}
 
 	for( int i = 0; i < myThingy->getPhysicalCount(); ++i ) {
 		myThingy->getPhysical(i)->syncBulletTransform();

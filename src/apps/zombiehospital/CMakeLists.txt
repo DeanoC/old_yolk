@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 2.8 )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
+set( APP_NAME zombiehospital )
 # source files
 file( GLOB camera_src_files cameras/*.cpp )
 file( GLOB enemies_src_files enemies/*.cpp )
@@ -34,14 +35,14 @@ file( GLOB hdr_files 	*.h *.inl *.hpp *.hxx
 
 # exe settings
 if( UNIX )
-	add_executable( bowlball ${src_files} ${hdr_files} )
+	add_executable( ${APP_NAME} ${src_files} ${hdr_files} )
 else()
-	add_executable( bowlball WIN32 ${src_files} ${hdr_files} )
-	SET_TARGET_PROPERTIES( bowlball PROPERTIES LINK_FLAGS "/SAFESEH:NO")	
+	add_executable( ${APP_NAME} WIN32 ${src_files} ${hdr_files} )
+	SET_TARGET_PROPERTIES( ${APP_NAME} PROPERTIES LINK_FLAGS "/SAFESEH:NO")	
 endif()
 
 # link settings
-list( APPEND targ_link_libs ${Core_LIBRARIES} json_spirit scene localworld BulletCollision BulletDynamics LinearMath swfruntime RakNetLibStatic )
+list( APPEND targ_link_libs ${Core_LIBRARIES} json_spirit scene localworld BulletCollision BulletDynamics LinearMath swfruntime )
 IF( USE_DWM )
 	list( APPEND targ_link_libs dwm_client )
 ENDIF( USE_DWM )
@@ -57,14 +58,14 @@ endif()
 if( UNIX )
 	list( APPEND targ_link_libs pthread dl GL X11 )
 endif()
-target_link_libraries( bowlball ${targ_link_libs} )
+target_link_libraries( ${APP_NAME} ${targ_link_libs} )
 
 
 # tidy project files
-ADD_MSVC_PRECOMPILED_HEADER( "bowlball.h" "${cpp_src_files}" )
+ADD_MSVC_PRECOMPILED_HEADER( "pch.h" "${cpp_src_files}" )
 SOURCE_GROUP( cameras FILES ${camera_src_files} ${camera_hdr_files}  )
 SOURCE_GROUP( enemies FILES ${enemies_src_files} ${enemies_hdr_files}  )
 SOURCE_GROUP( items FILES ${items_src_files} ${items_hdr_files}  )
 SOURCE_GROUP( levels FILES ${levels_src_files} ${levels_hdr_files}  )
 SOURCE_GROUP( player FILES ${player_src_files} ${player_hdr_files}  )
-set_target_properties( bowlball PROPERTIES FOLDER "Apps")
+set_target_properties( ${APP_NAME} PROPERTIES FOLDER "Apps")

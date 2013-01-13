@@ -1,4 +1,4 @@
-#include "bowlball.h"
+#include "pch.h"
 #include <boost/lexical_cast.hpp>
 #include "core/debug_render.h"
 #include "core/development_context.h"
@@ -49,8 +49,10 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 
 	Core::DevelopmentContext::get()->activateContext( "InputHandler" );
 	
-	myThingy->getTransform()->setLocalPosition( _startNode->getLocalPosition() );
-	myThingy->getTransform()->setLocalOrientation( _startNode->getLocalOrientation() );
+	if( _startNode ) {
+		myThingy->getTransform()->setLocalPosition( _startNode->getLocalPosition() );
+		myThingy->getTransform()->setLocalOrientation( _startNode->getLocalOrientation() );
+	}
 
 	for( int i = 0; i < myThingy->getPhysicSensorCount(); ++i ) {
 		myThingy->getPhysicSensor(i)->syncBulletTransform();
