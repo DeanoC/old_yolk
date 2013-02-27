@@ -4,7 +4,7 @@
 
 ZarchCam::ZarchCam() {
 	// TODO proper projection settings
-	setProjection( 90.0f * Math::degree_to_radian<float>(), 1.0, 1.0f, 200000.0f );
+	setProjection( 70.0f * Math::degree_to_radian<float>(), 4.0/3.0, 0.1f, 200.0f );
 }
 
 void ZarchCam::update( float deltaS ) {
@@ -19,7 +19,7 @@ void ZarchCam::update( float deltaS ) {
 	const Math::Matrix4x4 matrix = tr->getWorldMatrix();
 	const Math::Vector3 target = Math::GetTranslation( matrix );
 	const Math::Vector3 eye( target + offset );
-	setView( Math::Matrix4x4( Math::CreateLookAtMatrix( eye, target, Math::Vector3(1,0,0) ) ) );
+	setView( Math::Matrix4x4( Math::CreateLookAtMatrix( eye, target, Math::Vector3(0,1,0) ) ) );
 
 }
 

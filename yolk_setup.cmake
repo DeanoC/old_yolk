@@ -29,7 +29,7 @@ SET( USE_V8 false CACHE BOOL "Use Googles V8 Javascript system" )
 SET( USE_DWM false CACHE BOOL "Use C++ Sandbox" )
 SET( USE_RAIK false CACHE BOOL "Use RIAK cpp library" )
 SET( USE_RAKNET false CACHE BOOL "Use RAKNET library" )
-SET( USE_OPENCV true CACHE BOOL "Use OpenCV library" )
+SET( USE_OPENCV false CACHE BOOL "Use OpenCV library" )
 
 IF( USE_DOXYGEN_GENERATOR )
 	include( UseDoxygen.cmake )

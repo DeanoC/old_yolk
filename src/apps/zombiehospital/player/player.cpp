@@ -16,6 +16,7 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	localPlayerNum( _localPlayerNum ), 
 	playerTransform( transformMatrix ),
 	freeControl( false ) {
+
 	namespace arg = std::placeholders;
 
 	flashTest.reset( Swf::PlayerHandle::load( "simple_targetcircle" ) );
@@ -23,7 +24,7 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1 );
 	world->addRenderable2D( std::make_shared<std::function< void (Scene::RenderContext*)>>(r2d) );
 
-	myThingy.reset( ThingFactory::createEmptyThing( TBC_PLAYER ) );
+	myThingy.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "drtom" ), TBC_PLAYER )  );
 
 	Core::AABB aabb( Math::Vector3( -10, 0, -10 ), Math::Vector3( 10, 2, 10 ) );
 	rangedColShape = std::make_shared<Scene::CylinderColShape>( aabb );
@@ -39,6 +40,8 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 	myThingy->addComponent( &updater );
 
 	zarchCam = std::make_shared<ZarchCam>();
+	zarchCam->setTrackingThing( myThingy );
+	zarchCam->setOffset( Math::Vector3( 4.0, 6.0, -4.0 ) );
 
 	inputContext = std::dynamic_pointer_cast<InputHandlerContext>( Core::DevelopmentContext::getr().getContext( "InputHandler" ) );
 	inputContext->setCamera( zarchCam );
@@ -52,6 +55,9 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 
 	for( int i = 0; i < myThingy->getPhysicSensorCount(); ++i ) {
 		myThingy->getPhysicSensor(i)->syncBulletTransform();
+	}
+	for( int i = 0; i < myThingy->getPhysicalCount(); ++i ) {
+		myThingy->getPhysical(i)->syncBulletTransform();
 	}
 
 	world->debugRenderCallback = std::bind( &Player::debugCallback, this );
@@ -115,6 +121,10 @@ void Player::update( float timeInSeconds ) {
 			for( int i = 0; i < myThingy->getPhysicSensorCount(); ++i ) {
 				myThingy->getPhysicSensor(i)->syncBulletTransform();
 			}
+			
+			for( int i = 0; i < myThingy->getPhysicalCount(); ++i ) {
+				myThingy->getPhysical(i)->syncBulletTransform();
+			}
 		}
 	}
 	// manually drive camera updates TODO add back to updatables/things list??
@@ -129,13 +139,13 @@ void Player::freeControls( const InputFrame& input ) {
 
 	if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
 		Math::Vector3 zvec = Math::GetZAxis( rm );
-		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100000.f;
+		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 10.f;
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 
 	if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
 		Math::Vector3 xvec = Math::GetXAxis( rm );
-		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 1000.f;
+		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 10.f;
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 	float mxdt = input.mouseX  * input.deltaTime;
@@ -155,42 +165,28 @@ void Player::freeControls( const InputFrame& input ) {
 }
 
 void Player::gameControls( const InputFrame& input ) {
-/*	
+	
 	auto transform = myThingy->getTransform();
-	Math::Quaternion rot = transform->getLocalOrientation();
-	Math::Matrix4x4 rm = Math::CreateRotationMatrix( rot );
-	Math::Vector3 xvec = Math::GetXAxis( rm );
-	Math::Vector3 yvec = Math::GetYAxis( rm );
-	Math::Vector3 zvec = Math::GetZAxis( rm );
-
-	if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
-		Math::Vector3 fv = (zvec * input.pad[0].YAxisMovement  * input.deltaTime) * 100.f;
-		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
-	}
+	Math::Vector3 xvec = Math::Vector3(1,0,0);
+	Math::Vector3 zvec = Math::Vector3(0,0,-1);
 
 	if( fabsf(input.pad[0].XAxisMovement) > 1e-5f) {
-		Math::Vector3 fv = (xvec * input.pad[0].XAxisMovement  * input.deltaTime) * 10.f;
+		Math::Vector3 fv = (zvec * input.pad[0].XAxisMovement  * input.deltaTime) * 10.f;
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
-	float mxdt = input.mouseX  * input.deltaTime;
-	if( fabsf(mxdt) > 0.000001f ) {
-//		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );
-		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt );
+
+	if( fabsf(input.pad[0].YAxisMovement) > 1e-5f) {
+		Math::Vector3 fv = (xvec * input.pad[0].YAxisMovement  * input.deltaTime) * 10.f;
+		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
-	float mydt = input.mouseY  * input.deltaTime;
-	if( fabsf(mydt) > 0.000001f ) {
-//		mydt = Math::Clamp(mydt, -0.05f, 0.05f );
-		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt );
-	}
-	transform->setLocalOrientation( rot );
-*/	
+
 }
 
 void Player::debugCallback( void ) {
-/*
-	objectCam->getFrustum().debugDraw( Core::RGBAColour(1,0,0,1) );
+
+//	objectCam->getFrustum().debugDraw( Core::RGBAColour(1,0,0,1) );
 	
-	Math::Matrix4x4 rm( myThingy->getTransform()->getWorldMatrix() );
+/*	Math::Matrix4x4 rm( myThingy->getTransform()->getWorldMatrix() );
 	Math::Vector3 xvec = Math::GetXAxis( rm );
 	Math::Vector3 yvec = Math::GetYAxis( rm );
 	Math::Vector3 zvec = Math::GetZAxis( rm );

@@ -7,9 +7,9 @@ TestLvl::TestLvl( SceneWorldPtr _world ) :
 	world( _world ) {
     namespace arg = std::placeholders;
 
-//	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "emptybowl" ), NewThingId(), 
-//						std::bind( &TestLvl::decodeLevelProperties, this, arg::_1, arg::_2, arg::_3, arg::_4 ) ) );
-//	world->add( land ); // render object
+	land.reset(  ThingFactory::createLevelFromHier( std::make_shared<Scene::Hier>( "test_room" ), NewThingId(), 
+						std::bind( &TestLvl::decodeLevelProperties, this, arg::_1, arg::_2, arg::_3, arg::_4 ) ) );
+	world->add( land ); // render object
 }
 
 TestLvl::~TestLvl() {

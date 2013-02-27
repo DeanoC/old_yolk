@@ -520,10 +520,34 @@
 	"buffers":
 	[
 		{
-			"file": "src/apps/gfx_test/main.cpp",
+			"file": "src/apps/zombiehospital/levels/testlvl.cpp",
 			"settings":
 			{
-				"buffer_size": 1769,
+				"buffer_size": 2724,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/zombiehospital/player/player.cpp",
+			"settings":
+			{
+				"buffer_size": 7757,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/zombiehospital/player/player.h",
+			"settings":
+			{
+				"buffer_size": 1304,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/localworld/sceneworld.cpp",
+			"settings":
+			{
+				"buffer_size": 4548,
 				"line_ending": "Windows"
 			}
 		}
@@ -560,6 +584,25 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math_c.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/cameras/zarchcam.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.h",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/pch.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/shell3d.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/main.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/gamethread.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/CMakeLists.txt",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/cameras/buggycam.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/cameras/objectcam.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/cameras/trackingcam.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/levels/testlvl.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/player/buggy.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/player/player.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/gfx_test/main.cpp",
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/storagedevice.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/storagedevice.cpp",
@@ -575,7 +618,6 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/main.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/memoryblockstoragedevice_test.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/memoryblockstoragedevice.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/player/player.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/cyberhackerspace.h",
@@ -663,31 +705,13 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/font.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk_setup.cmake",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/submodules/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/resourceloader.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/yolk.sublime-project",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/CMakeLists.txt",
-		"/C/Users/Artminer/Documents/projects/wierd/source/core/standard.h",
-		"/C/Users/Dean/Desktop/SublimeText2/Data/Packages/Default/Preferences.sublime-settings",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfBasePath.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfBasePath.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfDisplayObjectFrameItem.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfDisplayObjectFrameItem.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfFrameItem.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfFrameItem.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuLinePath.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuLinePath.h",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuPath.cpp",
-		"/C/Users/Artminer/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfGpuPath.h"
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.cpp"
 	],
 	"find":
 	{
@@ -695,7 +719,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 102.0,
 		"where_history":
 		[
 			"",
@@ -889,31 +913,113 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/apps/gfx_test/main.cpp",
+					"file": "src/apps/zombiehospital/levels/testlvl.cpp",
 					"settings":
 					{
-						"buffer_size": 1769,
+						"buffer_size": 2724,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1261,
-								1261
+								890,
+								890
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 845.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/apps/zombiehospital/player/player.cpp",
+					"settings":
+					{
+						"buffer_size": 7757,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4043,
+								4043
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4180.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/apps/zombiehospital/player/player.h",
+					"settings":
+					{
+						"buffer_size": 1304,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/libs/localworld/sceneworld.cpp",
+					"settings":
+					{
+						"buffer_size": 4548,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4515,
+								4515
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1980.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -966,6 +1072,10 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"math",
+				"src/libs/core/vector_math.cpp"
+			],
 			[
 				"main",
 				"src/apps/convertmesh/main.cpp"
