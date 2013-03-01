@@ -550,6 +550,54 @@
 				"buffer_size": 4548,
 				"line_ending": "Windows"
 			}
+		},
+		{
+			"file": "yolk_setup.cmake",
+			"settings":
+			{
+				"buffer_size": 3909,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "cmake_modules/FindWierdBoost.cmake",
+			"settings":
+			{
+				"buffer_size": 1028,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/compiler_ms.h",
+			"settings":
+			{
+				"buffer_size": 1606,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
+			"settings":
+			{
+				"buffer_size": 10145,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 417,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/trade/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 2311,
+				"line_ending": "Windows"
+			}
 		}
 	],
 	"build_system": "",
@@ -584,6 +632,9 @@
 	},
 	"file_history":
 	[
+		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Preferences.sublime-settings",
+		"/G/Projects/yolk/yolk.sublime-project",
+		"/C/Users/Dean/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math_c.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/cameras/zarchcam.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.cpp",
@@ -708,10 +759,7 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/CMakeLists.txt",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/submodules/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/SwfPlayer.cpp"
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in"
 	],
 	"find":
 	{
@@ -719,7 +767,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 102.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"",
@@ -736,6 +784,7 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"\".\",",
 			"cpp",
 			"#include \"pch.h\"",
 			"SwfParser",
@@ -862,8 +911,7 @@
 			"ELF::R_X86_64_64",
 			"createTargetMachine",
 			"RelocModel",
-			"CMModel",
-			"setCodeModel"
+			"CMModel"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -913,7 +961,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 9,
 			"sheets":
 			[
 				{
@@ -965,7 +1013,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4180.0,
+						"translation.y": 3315.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1009,8 +1057,8 @@
 						"selection":
 						[
 							[
-								4515,
-								4515
+								3236,
+								3236
 							]
 						],
 						"settings":
@@ -1019,7 +1067,167 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1980.0,
+						"translation.y": 900.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "yolk_setup.cmake",
+					"settings":
+					{
+						"buffer_size": 3909,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2647,
+								2713
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Makefile/Makefile.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "cmake_modules/FindWierdBoost.cmake",
+					"settings":
+					{
+						"buffer_size": 1028,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								144,
+								144
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/libs/core/compiler_ms.h",
+					"settings":
+					{
+						"buffer_size": 1606,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								603,
+								603
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
+					"settings":
+					{
+						"buffer_size": 10145,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9659,
+								9659
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/hlsl/hlsl.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6804.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/apps/CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 417,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/apps/trade/CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 2311,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								109,
+								109
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

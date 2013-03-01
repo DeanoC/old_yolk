@@ -44,7 +44,7 @@ Gfx::Gfx() {
 	dx11CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	static const D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+	static const D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
 
 	// TODO proper device enumeration
 	// For now first device on first adaptor

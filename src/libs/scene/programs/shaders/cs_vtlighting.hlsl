@@ -14,7 +14,7 @@ StructuredBuffer<VtLight> lightStore : register( t11 );
 
 RWTexture2D<float4> target : register( u0 );
 
-void combSortTransparents( uint2 frags[TOTAL_TRANS_OR_AA_FRAGS], uint inputSize ) {
+void combSortTransparents( inout uint2 frags[TOTAL_TRANS_OR_AA_FRAGS], in uint inputSize ) {
 	uint gap = inputSize;
 	bool swapped = false;
 	while( gap > 1 && swapped == false ) {
@@ -36,22 +36,36 @@ void combSortTransparents( uint2 frags[TOTAL_TRANS_OR_AA_FRAGS], uint inputSize 
 		}
 	}
 }
-void shellSort( inout uint2 frags[TOTAL_TRANS_OR_AA_FRAGS], in uint inputSize ) {
-	static const uint gaps[] = { 17, 9, 5, 3, 1 };
-	[unroll] for( uint g = 0; g < 5; ++g ) {
-		const uint gap = gaps[g];
-		for( uint i = gap; i < inputSize; ++i ) {
-			uint2 tmp = frags[i];
-			uint j = i;
-			while(	(j >= gap) && 
-					(frags[j - gap].y & 0xFFFF) < (tmp.y & 0xFFFF) ) {
-				frags[j] = frags[j -gap]; 
-				j -= gap;
-			}
-			frags[j] = tmp;
-		}
+
+#define _shellSortBody( n ) 													\
+	[unroll] for( uint g = 0; g < (n); ++g ) {									\
+		const uint gap = gaps[g];												\
+		for( uint i = gap; i < inputSize; ++i ) {								\
+			uint2 tmp = frags[i];												\
+			uint j = i;															\
+			while(	(j >= gap) && 												\
+					(frags[j - gap].y & 0xFFFF) < (tmp.y & 0xFFFF) ) {			\
+				frags[j] = frags[j -gap]; 										\
+				j -= gap;														\
+			}																	\
+			frags[j] = tmp;														\
+		}																		\
+	}
+
+
+void shellSort( in int bitCount, inout uint2 frags[TOTAL_TRANS_OR_AA_FRAGS], in uint inputSize ) {
+	if( bitCount == 32 ) {
+		static const uint gaps[] = { 17, 9, 5, 3, 1 };
+		_shellSortBody( 5 );
+	} else if ( bitCount == 16 ) {
+		static const uint gaps[] = { 9, 5, 3, 1 };		
+		_shellSortBody( 4 );
+	} else if ( bitCount == 8 ) {
+		static const uint gaps[] = { 5, 3, 1 };		
+		_shellSortBody( 3 );		
 	}
 }
+
 // normal encoding and decoding function from Andrew Lauritzen Intel Deferred Shading Sample
 float3 decodeSphereMap(float2 e) {
     float2 tmp = e - e * e;
@@ -254,7 +268,9 @@ void main(    	uint3 groupId : SV_GroupID,
 										transparentFragments[ index + i ].cov_depth );
 			}
 
-			shellSort( tfrags, fragCount );
+			// win7 2012 compiler dies, seemed okay previously..
+			//shellSort( 16, tfrags, fragCount );
+			combSortTransparents( tfrags, fragCount );
 
 			for( uint j = 0;j < fragCount; ++j ) {
 				transparentFragment( positionScreen, tfrags[j], col );
