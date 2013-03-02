@@ -19,10 +19,12 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 
 	namespace arg = std::placeholders;
 
-	flashTest.reset( Swf::PlayerHandle::load( "simple_targetcircle" ) );
+	basicUI.reset( Scene::TextureAtlasHandle::load( "basic_ui" ) );
+
+	flashTest.reset( Swf::PlayerHandle::load( "testdialog" ) );
 	auto fl = flashTest.acquire();
-	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1 );
-	world->addRenderable2D( std::make_shared<std::function< void (Scene::RenderContext*)>>(r2d) );
+	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1, arg::_2 );
+	world->addRenderable2D( std::make_shared<std::function< void (const Scene::ScreenPtr, Scene::RenderContext*)>>(r2d) );
 
 	myThingy.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "drtom" ), TBC_PLAYER )  );
 
@@ -74,7 +76,7 @@ Player::~Player() {
 	rangedColShape.reset();
 	bodySensor.reset();
 	bodyColShape.reset();
-
+	flashTest.reset();
 }
 
 bool Player::findHeightBelow( float& height ) {
@@ -180,6 +182,8 @@ void Player::gameControls( const InputFrame& input ) {
 		myThingy->getTransform()->setLocalPosition( transform->getLocalPosition() + fv );
 	}
 
+	mousePos.x = input.absoluteMouseX;
+	mousePos.y = input.absoluteMouseY;
 }
 
 void Player::debugCallback( void ) {
@@ -212,10 +216,22 @@ void Player::debugCallback( void ) {
 
 }
 
-void Player::renderable2DCallback( Scene::RenderContext* _ctx ) {
+void Player::renderable2DCallback( const Scene::ScreenPtr _screen, Scene::RenderContext* _ctx ) {
 	auto fl = flashTest.tryAcquire();
 	if( fl ) {
-//		fl->getRoot()->setProperty( "speed", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( (int)buggy->vehicle->getCurrentSpeedKmHour() ) + "km/h" ) );
+//		fl->getRoot()->setMouseInput( mousePos.x,mousePos.y input.mouseLeftButton, input.mouseRightButton );
+//		fl->getRoot()->setProperty( "A", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( (int)buggy->vehicle->getCurrentSpeedKmHour() ) + "km/h" ) );
+		fl->getRoot()->setProperty( "Col1Row1", CORE_GC_NEW Swf::AsObjectString( "test" ) );
+		fl->getRoot()->setProperty( "Col1Row2", CORE_GC_NEW Swf::AsObjectString( "Dirt" ) );
+		fl->getRoot()->setProperty( "Col1Row3", CORE_GC_NEW Swf::AsObjectString( "Embegin" ) );
 		fl->display( _ctx );
 	}
+
+	// display mouse pointer
+	_screen->getComposer()->putSprite( basicUI.get(), 1, 
+						Scene::ImageComposer::ALPHA_BLEND, 
+						Math::Vector2( _screen->getNDCX( mousePos.x ), _screen->getNDCY( mousePos.y ) ),
+						Math::Vector2( 0.015f, 0.02f ),
+						Core::RGBAColour::unpackARGB(0xFFFFFFFF),
+						0 );
 }

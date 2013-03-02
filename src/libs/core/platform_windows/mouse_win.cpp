@@ -37,10 +37,11 @@ void MouseWin::update() {
 	if( hasFocus ) {
 		POINT pt;
 		GetOurCursorPos( &pt );
-		xPos = pt.x - midX;// / timeDelta;		
-		yPos = pt.y - midY;// / timeDelta;
-			
-		SetOurCursorPos( midX, midY );
+		xRel = pt.x - midX;
+		yRel = pt.y - midY;
+		midX -= pt.x;
+		midY -= pt.y;
+// TODO make this optional better for FPS direct mouse control		SetOurCursorPos( midX, midY );
 	}
 }
 
@@ -85,7 +86,12 @@ void MouseWin::processMouseMessages( UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 		bSideButton1 |= ( ( nMouseButtonState & MK_XBUTTON1 ) != 0 );
 		bSideButton2 |= ( ( nMouseButtonState & MK_XBUTTON2 ) != 0 );
 	} 
-
+    if( uMsg == WM_MOUSEMOVE ) {
+        int xPosAbsolute = LOWORD( lParam ); 
+        int yPosAbsolute = HIWORD( lParam );
+		xAbs = xPosAbsolute;
+		yAbs = yPosAbsolute;
+    }
 };
 
 void MouseWin::lockToWindow() {

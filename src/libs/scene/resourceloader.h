@@ -20,6 +20,9 @@
 #ifndef YOLK_SCENE_VERTEXINPUT_H_
 #include "scene/vertexinput.h"
 #endif
+#ifndef YOLK_SCENE_TEXTUREATLAS_H_
+#include "scene/textureatlas.h"
+#endif
 #ifndef YOLK_SCENE_WOB_H_
 #include "scene/wobfile.h"
 #endif

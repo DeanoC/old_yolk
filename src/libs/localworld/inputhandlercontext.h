@@ -35,6 +35,9 @@ public:
 	/// Right Mouse Button is down.
 	virtual void mouseRightButton() { curFrame.mouseRightButton = true; }
 
+	virtual void absoluteMouseX( float x ) { curFrame.absoluteMouseX = x; }
+	virtual void absoluteMouseY( float y ) { curFrame.absoluteMouseY = y; }
+
 	//! call when switched to and from this context.
 	virtual void enable( bool on );
 	//! called every frame this context is active

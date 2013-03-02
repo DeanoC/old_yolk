@@ -14,6 +14,15 @@ namespace Swf {
 		fillStyle = _style;
 		simplePolygon = false;
 	}
+	BasePath::~BasePath () {
+		for( auto i : polygons ) {
+			for( auto j : *i ) {
+				CORE_DELETE( j );
+			}
+			CORE_DELETE( i );
+		}
+	}
+
 	void BasePath::moveTo( const SwfVec2Twip& _v0 ) {
 	    currentPolygon = CORE_NEW std::vector<QuadraticEdge*>();
 	    polygons.push_back(currentPolygon);

@@ -26,6 +26,7 @@ namespace Swf {
         Shape( SwfShape* _shape ) {
             shape = _shape;
         }
+		virtual ~Shape();
 
         SwfShape* shape;
         std::vector<FillStyle*> fills;
@@ -34,8 +35,6 @@ namespace Swf {
 		typedef std::vector<BasePath*> GpuPathArray;
         GpuPathArray gpuPaths;
         GpuPathArray gpuLinePaths;
-
-		virtual ~Shape (){};
 
         virtual void display(	Player* _player,
 								Scene::RenderContext* _ctx, 

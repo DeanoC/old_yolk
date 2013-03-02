@@ -47,6 +47,7 @@ namespace Swf
 			keyCode(0),
 			byteCode(0)
 		{}
+		~SwfClipActionRecord();
 		
 		ClipEventFlags eventFlags;
 		uint8_t keyCode;
@@ -59,11 +60,15 @@ namespace Swf
 	public:
 		SwfClipActions() : 
 			allEventFlags((ClipEventFlags)0),
-			clipActionRecords(0)
+			clipActionRecords(0),
+			numClipActions(0)
 		{}
-		
-		ClipEventFlags allEventFlags;
-		SwfClipActionRecord** clipActionRecords;
+		~SwfClipActions();
+
+		ClipEventFlags			allEventFlags;
+		SwfClipActionRecord**	clipActionRecords;
+		int						numClipActions;
+
 		static SwfClipActions* Read(SwfStream& _stream);
 	};
     

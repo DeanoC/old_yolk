@@ -13,6 +13,7 @@
 #include "SwfClipActions.h"
 namespace Swf
 {
+
 	SwfRemoveObject* SwfRemoveObject::Read(SwfStream& _stream, int _removeVer) {
 		SwfRemoveObject* obj = CORE_NEW SwfRemoveObject();
 
@@ -83,4 +84,11 @@ namespace Swf
 		}
 		return obj;
 	}    
+
+	SwfDisplayObject::~SwfDisplayObject() {
+		CORE_DELETE( matrix );
+		CORE_DELETE( cxform );
+		CORE_DELETE( clipActions );
+	}
+
 } /* Swf */

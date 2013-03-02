@@ -19,6 +19,7 @@ namespace Swf {
 	public:
 		Font(const SwfFont* _font) 
 			: font(_font) {};
+		~Font();
 						
 		const SwfFont* font;
 		std::vector<Shape*> glyphShapes;

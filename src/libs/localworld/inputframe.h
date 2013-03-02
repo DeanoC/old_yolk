@@ -9,6 +9,7 @@ struct InputFrame {
 		float XAxisMovement;
 		/// movement along the Y axis.
 		float YAxisMovement;
+
 		/// Button 1 is down.
 		bool button1;
 		/// Button 2 is down.
@@ -33,6 +34,11 @@ struct InputFrame {
 	bool mouseLeftButton;
 	/// Right Mouse Button is down.
 	bool mouseRightButton;
+
+	// absolute mouse X position
+	float absoluteMouseX;
+	// absolute mouse Y position
+	float absoluteMouseY;
 
 	float deltaTime; // time since last input frame
 };

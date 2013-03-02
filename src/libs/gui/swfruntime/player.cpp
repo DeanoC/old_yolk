@@ -19,6 +19,9 @@
 #include "gradienttexturemanager.h"
 #include "movieclip.h"
 #include "utils.h"
+#include "bitmap.h"
+#include "font.h"
+#include "character.h"
 #include "player.h"
 
 namespace Swf {
@@ -51,6 +54,19 @@ namespace Swf {
 	Player::~Player() {
 		if( virtualMachine != NULL) {
 			CORE_DELETE( virtualMachine );
+		}
+		// kill the root frame list
+
+		CORE_DELETE( parser );
+		CORE_DELETE( rootClip );
+		for( auto i : runtimeBitmaps ) {
+			CORE_DELETE( i.second );
+		}
+		for( auto i : runtimeFonts ) {
+			CORE_DELETE( i.second );
+		}
+		for( auto i : characterPaths ) {
+			CORE_DELETE( i.second );
 		}
 	}
 	

@@ -14,7 +14,7 @@ namespace Swf {
 	
 	class SwfFrame {
 	public:
-		virtual ~SwfFrame (){};
+		virtual ~SwfFrame ();
 		
 		typedef std::list<SwfControlElement*> FrameElementList;
 		FrameElementList frameElements;

@@ -22,16 +22,24 @@ public:
 	void showCursor();
 	void hideCursor();
 
-	float getXPos() {
-		return (float)xPos;
+	float getRelX() const {
+		return (float)xRel;
 	}
-	float getYPos() {
-		return (float)yPos;
+	float getRelY() const {
+		return (float)yRel;
 	}
-	bool getLeftMouseButton() {
+
+	float getAbsX() const {
+		return (float) xAbs;
+	}
+	float getAbsY() const {
+		return (float) yAbs;
+	}
+
+	bool getLeftMouseButton() const {
 		return bLeftButton;
 	}
-	bool getRightMouseButton() {
+	bool getRightMouseButton() const {
 		return bRightButton;
 	}
 protected:
@@ -44,10 +52,14 @@ protected:
 	int nMouseWheelDelta;
 	int midX;
 	int midY;
-	int xPos;
-	int yPos;
+	int xRel;
+	int yRel;
 	bool hasFocus;
 	bool cursorVisible;
+
+	int xAbs;
+	int yAbs;
+
 
 };
 

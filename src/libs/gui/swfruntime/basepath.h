@@ -43,7 +43,7 @@ namespace Swf {
 	class BasePath {
 	public:
 		BasePath (FillStyle* _style);
-		virtual ~BasePath (){};
+		virtual ~BasePath ();
 		int numIndices;
 		Core::ScopedResourceHandle<Scene::DataBufferHandle>			vertexBufferHandle;
 		Core::ScopedResourceHandle<Scene::DataBufferHandle>			indexBufferHandle;

@@ -49,6 +49,10 @@ public:
 	/// Right Mouse Button is down.
 	virtual void mouseRightButton() {}
 
+	/// some games and device want and support absolute mouse positions)
+	virtual void absoluteMouseX( float x ) {}
+	virtual void absoluteMouseY( float y ) {}
+
 };
 
 

@@ -28,7 +28,7 @@ namespace Swf {
 	// ===================================================
 	class MovieClip : public DisplayObjectFrameItem {
 	public:
-		virtual ~MovieClip (){};
+		virtual ~MovieClip ();
 
 		static MovieClip* createRoot( Player* _player, std::vector<SwfFrame*>* _frames ) {
 			return CORE_NEW MovieClip( _player, _frames );
@@ -48,6 +48,8 @@ namespace Swf {
 		}
 		
 		virtual MovieClip* getAsMovieClip() override { return this; }
+
+		void setMouseInput( float x, float y, bool leftButton, bool rightButton );
 
 		void nextFrame();
 		void prevFrame();
@@ -104,6 +106,9 @@ namespace Swf {
 		bool 				colourDirty;
 		bool 				transformDirty;
 		SwfActionByteCode*	frameABC;
+
+		float				mouseX;
+		float				mouseY;
 	};
 } /* Swf */
 

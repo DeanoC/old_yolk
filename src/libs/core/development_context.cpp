@@ -129,8 +129,10 @@ void DevelopmentContext::update( float fTimeInSecs ) {
 		if( MouseWin::exists() ) {
 			MouseWin::get()->update();
 
-			dx += MouseWin::get()->getXPos();
-			dy += MouseWin::get()->getYPos();
+			pInterface->absoluteMouseX(  MouseWin::get()->getAbsX() );
+			pInterface->absoluteMouseY( MouseWin::get()->getAbsY() );
+			dx += MouseWin::get()->getRelX();
+			dy += MouseWin::get()->getRelY();
 
 			if( MouseWin::get()->getLeftMouseButton() )
 				pInterface->mouseLeftButton( );

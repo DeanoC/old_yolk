@@ -9,7 +9,7 @@
 #ifndef _SWFDISPLAYOBJECT_H_
 #define _SWFDISPLAYOBJECT_H_
 
-//#include <inttypes.h>
+#include "swfcontrolelement.h"
 namespace Swf
 {
 	// forward decl
@@ -18,21 +18,6 @@ namespace Swf
 	class SwfClipActions;
 	class SwfStream;
 	
-	enum ControlElementType{
-		CE_REMOVEOBJECT,
-		CE_DISPLAYOBJECT,
-		CE_ACTIONBYTECODE,
-	};
-	
-	class SwfControlElement
-	{
-	public:
-		virtual ~SwfControlElement (){};
-		ControlElementType type;
-	protected:
-		SwfControlElement( ControlElementType _type ) :
-			type(_type) {}
-	};
 	
 	class SwfRemoveObject : public SwfControlElement
     {
@@ -64,9 +49,9 @@ namespace Swf
 			depth(0),
 			hasMatrix(false),
 			hasColourTransform(false)
-		{
-			
+		{			
 		}
+		~SwfDisplayObject();
         bool hasClipDepth;
         bool hasMorphRatio;
         

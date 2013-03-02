@@ -18,6 +18,21 @@
 #include "shape.h"
 
 namespace Swf {
+	Shape::~Shape() {
+		for( auto i : fills ) {
+			CORE_DELETE( i );
+		}
+		for( auto i : lineFills ) {
+			CORE_DELETE( i );
+		}
+		for( auto i : gpuPaths ) {
+			CORE_DELETE( i );
+		}
+		for( auto i : gpuLinePaths ) {
+			CORE_DELETE( i );
+		}
+	}
+
 	void Shape::display(	Player* _player,
 							Scene::RenderContext* _ctx,
 							FrameItem* _parent,

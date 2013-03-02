@@ -115,7 +115,10 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case PlayerType: LOADER( Player ); break;
 	default:;
 	}
-	CORE_ASSERT( cs != nullptr );
+	if( cs == nullptr ) {
+		LOG(FATAL) << "Load failed " << pName <<"\n";
+		CORE_ASSERT( cs != nullptr );
+	}
 
 	// defines that the creation structure should be frees after ProcessRender
 	// TODO we are leaking
@@ -181,7 +184,7 @@ void ResourceLoaderImpl::installResourceTypes() {
 	#undef SO
 	#undef REG
 
-	loadTextureAtlas = TextureAtlasHandle::load( "base-ui.tat" );
+	loadTextureAtlas = TextureAtlasHandle::load( "basic_ui.tat" );
 }
 
 ResourceLoaderImpl::ResourceLoaderImpl() {
@@ -212,20 +215,21 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 	renderIo->poll();
 
 	if( composer != nullptr ) {
-		composer->putSprite( loadTextureAtlas, 1, 
+
+/*		composer->putSprite( loadTextureAtlas, 1, 
 						ImageComposer::ALPHA_BLEND, 
 						Math::Vector2( 0.85f, 0.95f ),
-						Math::Vector2( 0.15f, 0.05f ),
-						Core::RGBAColour::unpackARGB(0x80FFFFFF),
-						1 );
+						Math::Vector2( 0.015f, 0.02f ),
+						Core::RGBAColour::unpackARGB(0xFFFFFFFF),
+						0 );*/
 
 		if( ResourceLoaderImpl::workCounter > 0) {
 			composer->putSprite( loadTextureAtlas, 0, 
 							ImageComposer::ALPHA_BLEND, 
-							Math::Vector2( 0.85f, 0.95f ),
-							Math::Vector2( 0.15f, 0.05f ),
-							Core::RGBAColour::unpackARGB(0xFFFFFFFF),
-							0 );
+							Math::Vector2( 0.85f, 0.85f ),
+							Math::Vector2( 0.10f, 0.10f ),
+							Core::RGBAColour::unpackARGB(0x80FFFFFF),
+							1 );
 		}
 
 	}

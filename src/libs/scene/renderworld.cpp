@@ -129,18 +129,6 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 
 		pipeline->endGeomPass( context, i );
 	}
-
-	{
-		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
-		pipeline->start2DPass( context );
-		for( auto it : renderables2D ) {
-			(*it)( context );
-		}
-		pipeline->end2DPass( context );
-	}
-
-
-	pipeline->resolve( context );
 }
 
 void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, const std::shared_ptr<Scene::Camera> camera, RenderContext* context ) {
@@ -149,6 +137,17 @@ void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineNam
 	determineVisibles( camera );
 
 	renderRenderables( context, pipeline );
+
+	{
+		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );
+		pipeline->start2DPass( context );
+		for( auto it : renderables2D ) {
+			(*it)( screen, context );
+		}
+		pipeline->end2DPass( context );
+	}
+
+	pipeline->resolve( context );
 
 	if( debugRenderCallback ) {
 		Core::unique_lock<Core::mutex> updateLock( *getUpdateMutex() );

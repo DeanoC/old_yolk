@@ -72,29 +72,29 @@ void FrameItem::setRotation(float angle) {
 Swf::AsObjectHandle FrameItem::getProperty( int _index ) const {
 	switch( _index) {
 		case 0: // _X
-			return CORE_NEW AsObjectNumber( getXPosition() );
+			return CORE_GC_NEW AsObjectNumber( getXPosition() );
 		case 1: // _Y
-			return CORE_NEW AsObjectNumber( getYPosition() );
+			return CORE_GC_NEW AsObjectNumber( getYPosition() );
 		case 2: //_xscale 2 
-			return CORE_NEW AsObjectNumber( getXScale() );
+			return CORE_GC_NEW AsObjectNumber( getXScale() );
 		case 3: //_yscale 3 
-			return CORE_NEW AsObjectNumber( getYScale() );
+			return CORE_GC_NEW AsObjectNumber( getYScale() );
 		case 4: //_currentframe 4 
 		case 5: //_totalframes 5 
 		case 6: //_alpha 6 
 		break;
 		case 7: //_visible 7
-			return CORE_NEW AsObjectBool( visible );
+			return CORE_GC_NEW AsObjectBool( visible );
 		case 8: // _width 8 
 		case 9: //_height 9 
 		break;
 		case 10: //_rotation 10 
-			return CORE_NEW AsObjectNumber( getRotation() );
+			return CORE_GC_NEW AsObjectNumber( getRotation() );
 		case 11: //_target 11 
 		case 12: //_framesloaded 12 
 		break;
 		case 13: //_name 13 
-			return CORE_NEW AsObjectString( name );
+			return CORE_GC_NEW AsObjectString( name );
 		case 14: //_droptarget 14 
 		case 15: //_url 15			
 		case 16: //_highquality 16 

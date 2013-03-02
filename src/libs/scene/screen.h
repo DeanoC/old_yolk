@@ -43,6 +43,13 @@ namespace Scene {
 
 		virtual void display( TextureHandlePtr toDisplay ) = 0;
 
+		float getNDCX( int ptX ) const { 
+			return( ((float)ptX / (float)(width/2)) - 1.0f );
+		}
+		float getNDCY( int ptY ) const { 
+			return( ((float)ptY / (float)(height/2)) - 1.0f );
+		}
+
 		// only valid if the screen has an overlay plane
 		ImageComposer* 	getComposer() const { return imageComposer.get(); }
 		DebugPrims* 	getDebugPrims() const { return debugPrims.get(); }

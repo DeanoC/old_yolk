@@ -22,6 +22,7 @@ namespace Swf {
 	// ================================
 	class Character {
 	public:
+		virtual ~Character(){}
         virtual void display(	Player* _player,
 								Scene::RenderContext* _ctx, 
 								FrameItem* _parent,

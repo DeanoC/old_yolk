@@ -57,6 +57,19 @@ namespace Swf {
 		colourDirty = true;
 		transformDirty = true;
 	}
+
+	MovieClip::~MovieClip () {
+		if( frames != nullptr ) {
+			for( auto i : *frames ) {
+				CORE_DELETE( i );
+			}
+		}
+
+		for( auto i : depthToFrameItem ) {
+			CORE_DELETE( i.second );
+		}
+	}
+
 	
 	void MovieClip::processFrame( const SwfFrame* _frame ) {
 /*		if( _frame == (*frames)[0] ) {
@@ -139,7 +152,7 @@ namespace Swf {
 		newItem->name = name;
 		newItem->concatMatrix = mat;
 		newItem->colourTransform = colourTransform;
-//		CORE_DELETE item;
+		CORE_DELETE item;
 		
 		updateDisplayObject(_dobj, depthToFrameItem.find(_dobj->depth));
 	}
@@ -194,7 +207,7 @@ namespace Swf {
 		
 		depthToFrameItem.erase( dIt );
 		setProperty( ToLowerIfReq(oldItem->name,player->parser->fileVersion >= 7), AsObjectUndefined::get() );
-//		CORE_DELETE oldItem;
+		CORE_DELETE oldItem;
 	}
 
 	void MovieClip::processActionByteCode( const SwfFrame* _frame, SwfActionByteCode* _abc ) {
@@ -361,6 +374,13 @@ namespace Swf {
 			}
 		}
 		return nullptr;
+	}
+
+	void MovieClip::setMouseInput( float x, float y, bool leftButton, bool rightButton ) {
+		mouseX = x;
+		mouseY = y;
+
+		// TODO check buttons
 	}
     
 } /* Swf */
