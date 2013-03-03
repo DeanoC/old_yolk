@@ -130,7 +130,7 @@ namespace Swf {
 		}
 	}
 	
-	void DisplayObjectFrameItem::display(Player* _player, Scene::RenderContext* _ctx ) {
+	void DisplayObjectFrameItem::display( const Player* _player, Scene::RenderContext* _ctx ) {
 		Character* chara = _player->getCharacter(id);
 		if(chara == NULL) {
 			return;

@@ -9,11 +9,13 @@
 #include "swfruntime.h"
 #include "gui/SwfParser/parser.h"
 #include "gui/SwfParser/SwfShape.h"
+#include "gui/SwfParser/SwfMorphShape.h"
 #include "gui/SwfParser/SwfRGB.h"
 #include "gui/SwfParser/SwfFillStyle.h"
 #include "gui/SwfParser/SwfParser.h"
 #include "gui/SwfParser/SwfBitmap.h"
 #include "gui/SwfParser/SwfFont.h"
+#include "gui/SwfParser/SwfButton.h"
 
 #include "fillstyle.h"
 #include "fssolidcolour.h"
@@ -24,6 +26,7 @@
 #include "shape.h"
 #include "basepath.h"
 #include "bitmap.h"
+#include "button.h"
 #include "dynamictext.h"
 #include "font.h"
 #include "gpupath.h"
@@ -134,30 +137,47 @@ namespace Swf {
 				++i ) {
 			SwfCharacter* character = (*i).second;
 
-			if (character->type == CT_SHAPEOBJECT) {
+			switch( character->type ) {
+			case CT_SHAPEOBJECT: {
 				SwfShapeObject* shape = (SwfShapeObject*)character;
 				SwfShape* swfShape = shape->shape;
 				Shape* runtimeShape = CORE_NEW Shape(swfShape);
 				buildRuntimeShape(runtimeShape, swfShape);
 				_charPaths[character->id] = runtimeShape;
-			} else if (character->type == CT_SPRITE) {
+				break;
+			}
+			case CT_SPRITE: {
 				_charPaths[character->id] = NULL;
-			} else if (character->type == CT_TEXT) {
+				break;
+			}
+			case CT_TEXT: {
 				SwfText* text = (SwfText*)character;
 				_charPaths[character->id] = CORE_NEW Text(text);
-			} else if (character->type == CT_DYNAMICTEXT) {
+				break;
+			}
+			case CT_DYNAMICTEXT: {
 				SwfDynamicText* dtext = (SwfDynamicText*)character;
 				_charPaths[character->id] = CORE_NEW DynamicText(dtext);
+				break;
 			}
-/*        
-            else if (character is SwfMorphShape)
-            {
-                SwfMorphShape mshape = character as SwfMorphShape;
+			case CT_MORPHSHAPE: {
+/*                SwfMorphShape* mshape = (SwfMorphShape*) character;
                 SwfRuntimeMorphShape runtimeMShape = CORE_NEW SwfRuntimeMorphShape();
                 BuildRuntimeMorphShape(runtimeMShape, mshape);
 
-                characterPaths.Add(character.id, runtimeMShape);
-            }*/
+                characterPaths.Add(character.id, runtimeMShape);*/
+				break;
+			}
+			case CT_BUTTON: {
+//				SwfButton* button = (SwfButton*)character;
+//				_charPaths[character->id] = CORE_NEW Button(button);
+				_charPaths[character->id] = NULL;
+				break;
+			}
+			case CT_BITMAP:
+			default:
+				break;
+			}
         }
     }
 

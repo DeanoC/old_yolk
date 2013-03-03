@@ -519,86 +519,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "src/apps/zombiehospital/levels/testlvl.cpp",
-			"settings":
-			{
-				"buffer_size": 2724,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/zombiehospital/player/player.cpp",
-			"settings":
-			{
-				"buffer_size": 7757,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/zombiehospital/player/player.h",
-			"settings":
-			{
-				"buffer_size": 1304,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/localworld/sceneworld.cpp",
-			"settings":
-			{
-				"buffer_size": 4548,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "yolk_setup.cmake",
-			"settings":
-			{
-				"buffer_size": 3909,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cmake_modules/FindWierdBoost.cmake",
-			"settings":
-			{
-				"buffer_size": 1028,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/core/compiler_ms.h",
-			"settings":
-			{
-				"buffer_size": 1606,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
-			"settings":
-			{
-				"buffer_size": 10145,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/CMakeLists.txt",
-			"settings":
-			{
-				"buffer_size": 417,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/trade/CMakeLists.txt",
-			"settings":
-			{
-				"buffer_size": 2311,
-				"line_ending": "Windows"
-			}
-		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -632,6 +552,24 @@
 	},
 	"file_history":
 	[
+		"/G/Projects/yolk/misc/docs/swf-file-format-spec.pdf",
+		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.tao",
+		"/G/Projects/trade_runtime/live/Textures/basic_ui.tattxt",
+		"/G/Projects/yolk/src/apps/zombiehospital/levels/testlvl.cpp",
+		"/G/Projects/yolk/src/apps/zombiehospital/player/player.cpp",
+		"/G/Projects/yolk/src/apps/zombiehospital/player/player.h",
+		"/G/Projects/yolk/src/libs/localworld/sceneworld.cpp",
+		"/G/Projects/yolk/yolk_setup.cmake",
+		"/G/Projects/yolk/cmake_modules/FindWierdBoost.cmake",
+		"/G/Projects/yolk/src/libs/core/compiler_ms.h",
+		"/G/Projects/yolk/src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
+		"/G/Projects/yolk/src/apps/CMakeLists.txt",
+		"/Z/Projects/svn/short/source/short_win.cpp",
+		"/Z/Projects/svn/short/source/short.h",
+		"/Z/Projects/svn/short/source/short.cpp",
+		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.json",
+		"/G/Projects/yolk/src/apps/trade/CMakeLists.txt",
+		"/G/Projects/trade_runtime/live/Textures/base-ui.tattxt",
 		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Preferences.sublime-settings",
 		"/G/Projects/yolk/yolk.sublime-project",
 		"/C/Users/Dean/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
@@ -741,25 +679,7 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpupath.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpupath.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/utils.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/dynamictext.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/dynamictext.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/text.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/bitmap.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/swfparser.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfparser/parser.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/font.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/submodules/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/buildconfig.h.in"
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.cpp"
 	],
 	"find":
 	{
@@ -961,277 +881,8 @@
 	"groups":
 	[
 		{
-			"selected": 9,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "src/apps/zombiehospital/levels/testlvl.cpp",
-					"settings":
-					{
-						"buffer_size": 2724,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								890,
-								890
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/apps/zombiehospital/player/player.cpp",
-					"settings":
-					{
-						"buffer_size": 7757,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4043,
-								4043
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3315.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/apps/zombiehospital/player/player.h",
-					"settings":
-					{
-						"buffer_size": 1304,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/libs/localworld/sceneworld.cpp",
-					"settings":
-					{
-						"buffer_size": 4548,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3236,
-								3236
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 900.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "yolk_setup.cmake",
-					"settings":
-					{
-						"buffer_size": 3909,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2647,
-								2713
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Makefile/Makefile.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 765.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "cmake_modules/FindWierdBoost.cmake",
-					"settings":
-					{
-						"buffer_size": 1028,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								144,
-								144
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/libs/core/compiler_ms.h",
-					"settings":
-					{
-						"buffer_size": 1606,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								603,
-								603
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
-					"settings":
-					{
-						"buffer_size": 10145,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								9659,
-								9659
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/hlsl/hlsl.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 6804.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "src/apps/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 417,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/apps/trade/CMakeLists.txt",
-					"settings":
-					{
-						"buffer_size": 2311,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								109,
-								109
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -1371,6 +1022,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 305.0,
+	"side_bar_width": 193.0,
 	"status_bar_visible": true
 }

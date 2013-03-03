@@ -36,12 +36,12 @@ namespace Swf {
         GpuPathArray gpuPaths;
         GpuPathArray gpuLinePaths;
 
-        virtual void display(	Player* _player,
-								Scene::RenderContext* _ctx, 
-								FrameItem* _parent,
-								Math::Matrix4x4* _concatMatrix, 
-								SwfColourTransform* _colourTransform, 
-								uint16_t _depth, bool _clipLayer, float _morph) override;
+        void display(	const Player* _player,
+						Scene::RenderContext* _ctx, 
+						FrameItem* _parent,
+						Math::Matrix4x4* _concatMatrix, 
+						SwfColourTransform* _colourTransform, 
+						uint16_t _depth, bool _clipLayer, float _morph) override;
 
 	private:
         void displayFill(	Scene::RenderContext* _ctx,  

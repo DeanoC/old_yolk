@@ -105,7 +105,7 @@ namespace Math
 		float det = C_Determinant(mat);
 		Matrix4x4 ret;
 
-		if( fabsf(det) < 0.000001f )
+		if( fabsf(det) < 1e-8f )
 			ret = IdentityMatrix();
 		else
 		{

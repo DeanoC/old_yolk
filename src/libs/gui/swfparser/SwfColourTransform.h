@@ -26,7 +26,7 @@ namespace Swf
 		float add[4];
  		static SwfColourTransform* Read(SwfStream& _stream, bool _withAlpha)
 		{
-			SwfColourTransform* trans = CORE_NEW SwfColourTransform();
+			SwfColourTransform* trans = CORE_GC_NEW SwfColourTransform();
 
 			_stream.align();
 			bool hasAddTerms = _stream.readFlag();
@@ -57,7 +57,7 @@ namespace Swf
 		}
 
 		static SwfColourTransform* Multiply(SwfColourTransform* _b,SwfColourTransform* _a) {
-			SwfColourTransform* ret = CORE_NEW SwfColourTransform();
+			SwfColourTransform* ret = CORE_GC_NEW SwfColourTransform();
 			for(int i=0;i < 4;++i) {
 				ret->add[i] = _a->add[i] + (_a->mul[i] * _b->add[i]);
 				ret->mul[i] = _a->mul[i] * _b->mul[i];

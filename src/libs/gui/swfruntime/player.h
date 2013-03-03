@@ -48,9 +48,9 @@ namespace Swf {
 		void togglePause();
 		void display( Scene::RenderContext* _ctx );
 
-		Character* getCharacter(uint16_t _id) { return characterPaths[ _id ]; }
-		Bitmap* getBitmap(uint16_t _id) { return runtimeBitmaps[ _id ]; }
-		Font* getFont( uint16_t _id ) { return runtimeFonts[ _id ]; }
+		Character* getCharacter(uint16_t _id) const { return characterPaths.find( _id )->second; }
+		Bitmap* getBitmap(uint16_t _id) const { return runtimeBitmaps.find( _id )->second; }
+		Font* getFont( uint16_t _id ) const { return runtimeFonts.find( _id )->second; }
 		
 		SwfParser* parser;
 		float frameRateInMs;
@@ -58,6 +58,7 @@ namespace Swf {
 		MovieClip* getRoot() const { return rootClip; }
 	
 		const Math::Matrix4x4& getTwipToNdx() const { return twipToNdx; }
+		const Math::Matrix4x4& getNdxToTwip() const { return ndxToTwip; }
 
 		// special use
 		void process();
@@ -74,6 +75,7 @@ namespace Swf {
 		Fonts								runtimeFonts;
 		
 		Math::Matrix4x4 					twipToNdx;
+		Math::Matrix4x4 					ndxToTwip;
 	};
 
 	typedef const Core::ResourceHandle<PlayerType, Player> PlayerHandle;

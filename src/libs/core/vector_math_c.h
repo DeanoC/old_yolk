@@ -386,7 +386,7 @@ namespace Math {
 						matrix(0,3)*vec.x + matrix(1,3)*vec.y + matrix(2,3)*vec.z + matrix(3,3)*vec.w );
 	}
 	CALL inline Vector4 Transform( const Vector2& vec, const Matrix4x4& matrix ) {  //!< return Vector4(vec,0,1) * matrix
-		return Vector4( matrix(0,0)*vec.x + matrix(1,0)*vec.y + matrix(2,0),
+		return Vector4( matrix(0,0)*vec.x + matrix(1,0)*vec.y + matrix(3,0),
 						matrix(0,1)*vec.x + matrix(1,1)*vec.y + matrix(3,1),
 						matrix(0,2)*vec.x + matrix(1,2)*vec.y + matrix(3,2),
 						matrix(0,3)*vec.x + matrix(1,3)*vec.y + matrix(3,3) );
@@ -654,6 +654,20 @@ namespace Math {
 
 	float SRGB_to_float( uint32_t val );
 	float SRGB_to_float( float val );
+
+	CALL inline bool ptInPoly( int nvert, const Math::Vector2* vert, const Math::Vector2& test ) {
+		bool c = false;
+		int i, j;
+		for (i = 0, j = nvert-1; i < nvert; j = i++) {
+			if ( ((vert[i].y > test.y) != (vert[j].y > test.y)) &&
+				(test.x < (vert[j].x-vert[i].x) * (test.y-vert[i].y) / (vert[j].y-vert[i].y) + vert[i].x) )
+			{
+				c = !c;
+			}
+		}
+		return c;
+	}
+
 
 };
 

@@ -55,7 +55,7 @@ namespace Swf {
 
 	// Convert the characters in m_text into a series of
 	// text_glyph_records to be rendered.
-	void DynamicText::format_text(Player* _player, FrameItem* _parent) {
+	void DynamicText::format_text( const Player* _player, FrameItem* _parent) {
 		Font* font = _player->getFont(dynText->fontId);
 
 		std::vector<SwfTextRecord*> tempRecords;
@@ -168,7 +168,7 @@ namespace Swf {
 		}
 	}
 	
-   void DynamicText::display(	Player* _player,
+   void DynamicText::display(	const Player* _player,
 								Scene::RenderContext* _ctx,
 								FrameItem* _parent,
 								Math::Matrix4x4* _concatMatrix,

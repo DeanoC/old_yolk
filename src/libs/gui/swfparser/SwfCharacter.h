@@ -26,6 +26,8 @@ namespace Swf
 	class SwfCharacter
 	{
 	public:
+		virtual ~SwfCharacter(){};
+
 		CharacterTypes type;
 		uint16_t id;
 	protected:

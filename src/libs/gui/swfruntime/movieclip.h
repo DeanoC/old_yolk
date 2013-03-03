@@ -38,7 +38,7 @@ namespace Swf {
 		
 		void processFrame( const SwfFrame* _frame );
 
-		virtual void display( Player* _player, Scene::RenderContext* _ctx ) override;
+		virtual void display( const Player* _player, Scene::RenderContext* _ctx ) override;
 		virtual void advance( float _elapsedInMs ) override;
 		virtual void play() override;
 		virtual void stop() override;
@@ -107,8 +107,7 @@ namespace Swf {
 		bool 				transformDirty;
 		SwfActionByteCode*	frameABC;
 
-		float				mouseX;
-		float				mouseY;
+		Math::Vector2		mouseTwip;
 	};
 } /* Swf */
 

@@ -219,7 +219,7 @@ void Player::debugCallback( void ) {
 void Player::renderable2DCallback( const Scene::ScreenPtr _screen, Scene::RenderContext* _ctx ) {
 	auto fl = flashTest.tryAcquire();
 	if( fl ) {
-//		fl->getRoot()->setMouseInput( mousePos.x,mousePos.y input.mouseLeftButton, input.mouseRightButton );
+		fl->getRoot()->setMouseInput( _screen->getNDCX(mousePos.x), -_screen->getNDCY(mousePos.y), false, false );//input.mouseLeftButton, input.mouseRightButton );
 //		fl->getRoot()->setProperty( "A", CORE_GC_NEW Swf::AsObjectString( boost::lexical_cast<std::string>( (int)buggy->vehicle->getCurrentSpeedKmHour() ) + "km/h" ) );
 		fl->getRoot()->setProperty( "Col1Row1", CORE_GC_NEW Swf::AsObjectString( "test" ) );
 		fl->getRoot()->setProperty( "Col1Row2", CORE_GC_NEW Swf::AsObjectString( "Dirt" ) );

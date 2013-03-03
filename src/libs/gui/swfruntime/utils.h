@@ -39,13 +39,9 @@ namespace Swf {
 	inline int Magnitude(const SwfVec2Twip& _a, const SwfVec2Twip& _b){
 		return ((_a.x * _b.x) + (_a.y * _b.y));
 	}
-//	void CheckGL(const char* _call);
-//	void TestImage( int textNum, float xScale, float yScale );
 	
 	std::string ToLowerIfReq( const std::string& _name, bool _isCaseSensitive );
 	
 } /* Swf */
-
-//#define CALL_GL(call) call; Swf::CheckGL(#call);
 
 #endif /* YOLK_GUI_SWFRUNTIME_UTILS_H_ */

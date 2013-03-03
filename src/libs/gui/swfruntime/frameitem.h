@@ -23,6 +23,7 @@ namespace Swf {
 	enum FrameItemType {
 		FIT_DISPLAYOBJECT,
 		FIT_MOVIECLIP,
+		FIT_BUTTON,
 	};
 	
 	// ======================================================
@@ -33,7 +34,7 @@ namespace Swf {
 		typedef std::unordered_map<std::string, int> AsPropertyStringMap;
 		
 		virtual ~FrameItem (){};
-		virtual void display( Player* _player, Scene::RenderContext* _ctx ) = 0;
+		virtual void display( const Player* _player, Scene::RenderContext* _ctx ) = 0;
 		virtual void advance( float _elapsedMs ) {};
 		// play and stop control whether advance actually happens, a stopped item can be manually controlled
 		virtual void play(){};

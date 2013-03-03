@@ -33,7 +33,7 @@ namespace Swf {
 		}
 	}
 
-	void Shape::display(	Player* _player,
+	void Shape::display(	const Player* _player,
 							Scene::RenderContext* _ctx,
 							FrameItem* _parent,
 							Math::Matrix4x4* _concatMatrix, 

@@ -8,6 +8,7 @@
 
 #include "swfruntime.h"
 #include "gui/SwfParser/parser.h"
+#include "gui/SwfParser/SwfButton.h"
 #include "gui/SwfParser/SwfColourTransform.h"
 #include "gui/SwfParser/SwfSprite.h"
 #include "gui/SwfParser/SwfDisplayObject.h"
@@ -16,6 +17,7 @@
 #include "gui/SwfParser/SwfDictionary.h"
 #include "ActionScript/AsVM.h"
 #include "displayobjectframeitem.h"
+#include "button.h"
 #include "player.h"
 #include "utils.h"
 #include "movieclip.h"
@@ -163,13 +165,22 @@ namespace Swf {
 			return;
 	
 		FrameItem* item = NULL;
-		if( (*chIt).second->type == CT_SPRITE) {
+		switch( (*chIt).second->type ) {
+		case CT_SPRITE: {
 			SwfSprite* sprite = (SwfSprite*) (*chIt).second;
 			item = CORE_NEW MovieClip(_dobj, player, &sprite->frames, this, sprite);
-		} else {
+			break;
+			}
+		case CT_BUTTON: {
+			SwfButton* button = (SwfButton*) (*chIt).second;
+			item = CORE_NEW Button(_dobj, button, this);
+			break;
+			}
+		default:
 			item = CORE_NEW DisplayObjectFrameItem(_dobj, this);
+			break;
 		}
-		
+
 		depthToFrameItem[_dobj->depth] = item;
 		if( !item->name.empty() ) {
 			setProperty( ToLowerIfReq(item->name,player->parser->fileVersion >= 7), item );
@@ -227,8 +238,8 @@ namespace Swf {
 				i != depthToFrameItem.end();
 				++i ) {
 			FrameItem* item = i->second;
-
-			if( item->type == FIT_DISPLAYOBJECT ) {
+			// TODO why frameitem and displayobjectframeitem..?
+			if( item->type == FIT_BUTTON || item->type == FIT_DISPLAYOBJECT || item->type == FIT_MOVIECLIP ) {
 				DisplayObjectFrameItem* doi = (DisplayObjectFrameItem*) item;
 				if ( _hasMatrix ) {
 					doi->concatMatrix = Math::MultiplyMatrix(Convert(doi->displayObject->matrix),_concat);
@@ -236,14 +247,14 @@ namespace Swf {
 				if ( _hasColourCx) {
 					doi->colourTransform = SwfColourTransform::Multiply( doi->displayObject->cxform, _concatCx);
 				}
+			}
+
+			if( item->type == FIT_BUTTON ) {
+				Button* b = (Button*) item;
+				// TODO need a full event state updator...
+				b->updateState( player, mouseTwip, false, false ); /*leftButton, rightButton ); */
 			} else if (item->type == FIT_MOVIECLIP) {
 				MovieClip* litem = (MovieClip*) item;
-				if ( _hasMatrix ) {
-					litem->concatMatrix = Math::MultiplyMatrix(Convert(litem->displayObject->matrix), _concat );
-				}
-				if ( _hasColourCx) {
-					litem->colourTransform = SwfColourTransform::Multiply( litem->displayObject->cxform, _concatCx);
-				} 
 				litem->updateFrame(litem->displayObject->hasMatrix, litem->concatMatrix, litem->displayObject->hasColourTransform, litem->colourTransform);
 			}
 		}
@@ -301,7 +312,7 @@ namespace Swf {
 		currentFrameNumber = _frame;
 	}
 
-	void MovieClip::display( Player* _player, Scene::RenderContext* _ctx ) {
+	void MovieClip::display( const Player* _player, Scene::RenderContext* _ctx ) {
 		// render in depth order
 		for (size_t i = 0; i < sortedArray.size(); i++)	{
 			FrameItem* item = sortedArray[i];
@@ -377,8 +388,7 @@ namespace Swf {
 	}
 
 	void MovieClip::setMouseInput( float x, float y, bool leftButton, bool rightButton ) {
-		mouseX = x;
-		mouseY = y;
+		mouseTwip = Math::Vector2(x,y);// Math::TransformAndDropZ( Math::Vector2(x,y), player->getNdxToTwip() );
 
 		// TODO check buttons
 	}

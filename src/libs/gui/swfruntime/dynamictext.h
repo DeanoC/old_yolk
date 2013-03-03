@@ -19,7 +19,7 @@ namespace Swf {
 	public:
 		DynamicText ( SwfDynamicText* _text);
 		
-		virtual void display(	Player* _player, 
+		void display(	const Player* _player, 
 								Scene::RenderContext* _ctx,
 								FrameItem* _parent,
 								Math::Matrix4x4* _concatMatrix, 
@@ -29,7 +29,7 @@ namespace Swf {
 		SwfDynamicText* dynText;
 	private:
 		void align_line( SwfTextAlign _align, SwfTextRecord* _rec, float x );
-		void format_text(Player* _player, FrameItem* _parent);
+		void format_text( const Player* _player, FrameItem* _parent);
 	};
 } /* Swf */ 
 

@@ -14,19 +14,55 @@
 
 namespace Swf
 {
-	class SwfButtonRecord {
-		
+	class SwfMatrix;
+	class SwfColourTransform;
+	class SwfActionByteCode;
+
+	struct SwfButtonRecord {
+		bool buttonHasBlendMode;
+		bool buttonHasFilterList;
+		bool buttonStateHitTest;
+		bool buttonStateDown;
+		bool buttonStateOver;
+		bool buttonStateUp;
+		uint16_t characterId;
+		uint16_t placeDepth;
+		SwfMatrix* matrix;
+		SwfColourTransform* cxform;
 	};
-	
-	class SwfButtonObject : public SwfCharacter
+
+	struct SwfButtonCondAction {
+		bool idleToOverDown;
+		bool outDownToIdle;
+		bool outDownToOverDown;
+		bool overDownToOutDown;
+		bool overDownToOverUp;
+		bool overUpToOverDown;
+		bool overUpToIdle;
+		bool idleToOverUp;
+		bool overDownToIdle;
+		uint8_t keyCode;
+		SwfActionByteCode* actionScript;
+	};
+
+	class SwfButton : public SwfCharacter
 	{
 	public:
-		static SwfButtonObject* Read( SwfStream& _stream, int _length, int _version );
-
-	private:
-		SwfButtonObject(uint16_t _id) : 	
-			SwfCharacter(CT_BUTTON, _id)
+		virtual ~SwfButton();
+		static SwfButton* Read( SwfStream& _stream, int _length, int _version );
+		
+		SwfButton(uint16_t _id) : 	
+			SwfCharacter(CT_BUTTON, _id),
+			numRecords( 0 ),
+			records( nullptr ),
+			numCondActions( 0 ),
+			condActions( nullptr )
 		{}
+
+		int							numRecords;
+		SwfButtonRecord*			records;
+		int							numCondActions;
+		SwfButtonCondAction*		condActions;
 	};
 	
 } /* Swf */ 

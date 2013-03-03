@@ -65,6 +65,7 @@ namespace Swf {
 		
 		// button handlers
 		handlers[DefineButton] = TagHandler(&SwfParser::ProcessRawDefineButton);
+		handlers[DefineButton2] = TagHandler(&SwfParser::ProcessRawDefineButton);
 
 		frameList = CORE_NEW std::vector<SwfFrame*>();
 		currentFrame = CORE_NEW SwfFrame(); // initial frame, added on the show frame tag
@@ -662,8 +663,8 @@ namespace Swf {
 	}
 
 	void SwfParser::ProcessRawDefineButton(int _length) {
-//		SwfMorphShape* morph = SwfMorphShape::Read(stream, 2);
-//		dictionary.characters[morph->id] = morph;
+		SwfButton* button = SwfButton::Read(stream, _length, 2);
+		dictionary.characters[button->id] = button;
 	}
 
 	//-----------------------------

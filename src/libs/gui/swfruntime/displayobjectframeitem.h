@@ -20,18 +20,18 @@ namespace Swf {
 	public:
 		DisplayObjectFrameItem ( SwfDisplayObject* _object, MovieClip* _parent );
 
-		virtual float getXPosition() const override;
-		virtual void setXPosition( const float _xpos ) override;
-		virtual float getYPosition() const override;
-		virtual void setYPosition( const float _ypos ) override;
-		virtual float getXScale() const override;
-		virtual void setXScale( const float _xscale ) override;
-		virtual float getYScale() const override;
-		virtual void setYScale( const float _yscale ) override;
-		virtual float getRotation() const override;
-		virtual void setRotation( const float angle ) override;
+		float getXPosition() const override;
+		void setXPosition( const float _xpos ) override;
+		float getYPosition() const override;
+		void setYPosition( const float _ypos ) override;
+		float getXScale() const override;
+		void setXScale( const float _xscale ) override;
+		float getYScale() const override;
+		void setYScale( const float _yscale ) override;
+		float getRotation() const override;
+		void setRotation( const float angle ) override;
 
-		virtual void display( Player* _player, Scene::RenderContext* _ctx ) override;
+		void display( const Player* _player, Scene::RenderContext* _ctx ) override;
 		SwfDisplayObject* displayObject;
 	protected:
 		void setTransform(float _xscale, float _yscale, float _angle, float _x, float _y );

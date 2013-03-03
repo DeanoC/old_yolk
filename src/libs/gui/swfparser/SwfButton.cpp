@@ -14,13 +14,13 @@
 
 namespace Swf
 {
-	SwfButtonObject* SwfButtonObject::Read( SwfStream& _stream, int _length, int _version ) {
+	SwfButton* SwfButton::Read( SwfStream& _stream, int _length, int _version ) {
 		
 		uint64_t marker = _stream.marker();
 		
 		uint16_t id = _stream.readUInt16();
 
-		SwfButtonObject* button = CORE_NEW SwfButtonObject(id);
+		SwfButton* button = CORE_NEW SwfButton(id);
 		
 		bool trackAsMenu = false;
 		uint16_t actionOffset = 0;
@@ -31,41 +31,48 @@ namespace Swf
 			marker = _stream.marker();
 			actionOffset = _stream.readUInt16();
 		}
+
+		std::vector< SwfButtonRecord > records;
 		bool endRecord = false;
 		do 
 		{
+			SwfButtonRecord rec;
+			_stream.align();
 			_stream.readUInt(2);
-			bool buttonHasBlendMode = _stream.readFlag();
-			bool buttonHasFilterList = _stream.readFlag();
-			bool buttonStateHitTest = _stream.readFlag();
-			bool buttonStateDown = _stream.readFlag();
-			bool buttonStateOver = _stream.readFlag();
-			bool buttonStateUp = _stream.readFlag();
-			endRecord = buttonStateHitTest | buttonStateDown | buttonStateOver | buttonStateUp;
+			rec.buttonHasBlendMode = _stream.readFlag();
+			rec.buttonHasFilterList = _stream.readFlag();
+			rec.buttonStateHitTest = _stream.readFlag();
+			rec.buttonStateDown = _stream.readFlag();
+			rec.buttonStateOver = _stream.readFlag();
+			rec.buttonStateUp = _stream.readFlag();
+			endRecord = rec.buttonStateHitTest | rec.buttonStateDown | rec.buttonStateOver | rec.buttonStateUp;
 			if( endRecord ) {
-				uint16_t characterId = _stream.readUInt16();
-				uint16_t placeDepth  = _stream.readUInt16();
-				SwfMatrix* matrix = SwfMatrix::Read( _stream );
-				SwfColourTransform* cxform;
+				rec.characterId = _stream.readUInt16();
+				rec.placeDepth  = _stream.readUInt16();
+				rec.matrix = SwfMatrix::Read( _stream );
 				if( _version == 2) {
-					cxform = SwfColourTransform::Read( _stream, true );
-					if( buttonHasFilterList ) {
+					rec.cxform = SwfColourTransform::Read( _stream, true );
+					if( rec.buttonHasFilterList ) {
 						
 					}
-					if( buttonHasBlendMode ) {
+					if( rec.buttonHasBlendMode ) {
 						
 					}
 				} else {
-					cxform = CORE_NEW SwfColourTransform();
+					rec.cxform = CORE_NEW SwfColourTransform();
 				}
-			}			
-		} while( endRecord == false );
+				records.push_back( rec );
+			}
+		} while( endRecord == true );
 
+		std::vector<SwfButtonCondAction> condActions;
+		SwfButtonCondAction bca;
 		// version one only had one action press and release
 		if( _version == 1 ) {
 			// TODO 64 bit files
 			_length -= (int)(_stream.marker() - marker);
 		
+			memset( &bca, 0, sizeof( bca ) );
 			SwfActionByteCode* actionScript = CORE_NEW SwfActionByteCode();
 			actionScript->byteCode = CORE_NEW_ARRAY uint8_t[_length];
 			actionScript->lengthInBytes = _length;
@@ -75,47 +82,61 @@ namespace Swf
 				actionScript->isCaseSensitive = true;
 			}
 			_stream.readBytes(actionScript->byteCode, actionScript->lengthInBytes);
+						bca.overUpToOverDown = true;
+			bca.actionScript = actionScript;
+			condActions.push_back( bca );
+
 		} else {
 			while( actionOffset != 0 ) {
 				// version 2 has many...
 				_stream.setToMarker( marker + actionOffset );
 				marker = _stream.marker();
 				actionOffset = _stream.readUInt16();
-				bool idleToOverDown = _stream.readFlag();
-				bool outDownToIdle = _stream.readFlag();
-				bool outDownToOverDown = _stream.readFlag();
-				bool overDownToOutDown = _stream.readFlag();
-				bool overDownToOverUp = _stream.readFlag();
-				bool overUpToOverDown = _stream.readFlag();
-				bool overUpToIdle = _stream.readFlag();
-				bool idleToOverUp  = _stream.readFlag();
-				bool overDownToIdle = _stream.readFlag();
+				bca.idleToOverDown = _stream.readFlag();
+				bca.outDownToIdle = _stream.readFlag();
+				bca.outDownToOverDown = _stream.readFlag();
+				bca.overDownToOutDown = _stream.readFlag();
+				bca.overDownToOverUp = _stream.readFlag();
+				bca.overUpToOverDown = _stream.readFlag();
+				bca.overUpToIdle = _stream.readFlag();
+				bca.idleToOverUp  = _stream.readFlag();
+				bca.overDownToIdle = _stream.readFlag();
 				
-				uint8_t keyCode = _stream.readUInt(7);
+				bca.keyCode = _stream.readUInt(7);
 				
-				uint8_t temp[1024];
-				uint16_t byteCount = 0;
+				std::vector<uint8_t> temp;
 				uint8_t b = 0;
 				while( b = _stream.readUInt8() ) {
-					if( byteCount < 1024 ) {
-						temp[byteCount++] = b;
-					}
+					temp.push_back( b );
 				}
 				SwfActionByteCode* actionScript = CORE_NEW SwfActionByteCode();
-				actionScript->byteCode = CORE_NEW_ARRAY uint8_t[byteCount+1];
-				actionScript->lengthInBytes = byteCount;
+				actionScript->byteCode = CORE_NEW_ARRAY uint8_t[ temp.size() + 1 ];
+				actionScript->lengthInBytes = temp.size();
 				if( true /*fileVersion < 7*/ ) {
 					actionScript->isCaseSensitive = false;
 				} else {
 					actionScript->isCaseSensitive = true;
 				}
-				memcpy( actionScript->byteCode, temp, byteCount );
-				actionScript->byteCode[ byteCount ] = 0;
-				
+				memcpy( actionScript->byteCode, &temp[0], temp.size() );
+				actionScript->byteCode[ temp.size() ] = 0;
+				bca.actionScript = actionScript;
+				condActions.push_back( bca );
 			}
 			
 		}
+
+		button->records = CORE_NEW_ARRAY SwfButtonRecord[ records.size() ];
+		memcpy( button->records, &records[0], sizeof( SwfButtonRecord ) * records.size() );
+		button->numRecords = records.size();
+
+		button->condActions = CORE_NEW_ARRAY SwfButtonCondAction[ condActions.size() ];
+		memcpy( button->condActions, &condActions[0], sizeof( SwfButtonCondAction ) * condActions.size() );
+		button->numCondActions = condActions.size();
 		
 		return button;
+	}
+	SwfButton::~SwfButton() {
+		CORE_DELETE_ARRAY( records );
+		CORE_DELETE_ARRAY( condActions );
 	}
 } /* Swf */ 

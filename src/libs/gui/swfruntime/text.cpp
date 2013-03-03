@@ -18,7 +18,7 @@
 #include "text.h"
 
 namespace Swf {
-void Text::display(		Player* _player,
+void Text::display(		const Player* _player,
 						Scene::RenderContext* _ctx, 
 						FrameItem* _parent,
 						Math::Matrix4x4* _concatMatrix, 
