@@ -49,11 +49,10 @@ namespace Swf {
 	// ==========================================
 	// = Internal create used by both real ctor =
 	// ==========================================
-	void MovieClip::create( Player* _player, std::vector<SwfFrame*>*_frames ){
+	void MovieClip::create( Player* _player, std::vector<SwfFrame*>*_frames ) {
 		player = _player;
 		frames = _frames;
 		stopped = false;
-		frameABC = NULL;
 		currentFrameNumber = 1; // frame numbers are 1 indexed under flash
 		accumTimeInMs = 0.0f;
 		colourDirty = true;
@@ -225,14 +224,10 @@ namespace Swf {
 		// byte code might refer to items added this frame but not yet
 		// so we defer the byte code execution until after all add/remove/update this
 		// frame
-		frameABC = _abc;
+		player->scheduleActionByteCodeRun( _abc );
 	}
 	
 	void MovieClip::updateFrame( bool _hasMatrix, Math::Matrix4x4 _concat, bool _hasColourCx, SwfColourTransform* _concatCx) {
-		if(frameABC) {
-			player->virtualMachine->processByteCode( this, frameABC );	
-			frameABC = NULL;
-		}
 				
 		for( 	DepthMap::const_iterator i = depthToFrameItem.begin();
 				i != depthToFrameItem.end();
@@ -290,10 +285,10 @@ namespace Swf {
 	
 	void MovieClip::process() {
 		do {
-			if(frameABC) {
-				player->virtualMachine->processByteCode( this, frameABC );	
-				frameABC = NULL;
-			}
+//			if(frameABC) {
+//				player->virtualMachine->processByteCode( this, frameABC );	
+//				frameABC = NULL;
+//			}
 			sortArray();
 			for (size_t i = 0; i < sortedArray.size(); i++) {
 				FrameItem* item = sortedArray[i];
@@ -386,6 +381,8 @@ namespace Swf {
 		}
 		return nullptr;
 	}
+
+
 
 	void MovieClip::setMouseInput( float x, float y, bool leftButton, bool rightButton ) {
 		mouseTwip = Math::Vector2(x,y);// Math::TransformAndDropZ( Math::Vector2(x,y), player->getNdxToTwip() );

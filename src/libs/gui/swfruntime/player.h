@@ -24,6 +24,7 @@ namespace Swf {
 	class Bitmap;
 	class Font;
 	class AsVM;
+	class SwfActionByteCode;
 
 	static const uint32_t PlayerType = RESOURCE_NAME('S','W','F','P');
 
@@ -60,6 +61,8 @@ namespace Swf {
 		const Math::Matrix4x4& getTwipToNdx() const { return twipToNdx; }
 		const Math::Matrix4x4& getNdxToTwip() const { return ndxToTwip; }
 
+		void scheduleActionByteCodeRun( SwfActionByteCode* byteCode );
+
 		// special use
 		void process();
 		AsVM*				virtualMachine;
@@ -76,6 +79,9 @@ namespace Swf {
 		
 		Math::Matrix4x4 					twipToNdx;
 		Math::Matrix4x4 					ndxToTwip;
+
+		std::vector< SwfActionByteCode* >	codeToRun;
+
 	};
 
 	typedef const Core::ResourceHandle<PlayerType, Player> PlayerHandle;

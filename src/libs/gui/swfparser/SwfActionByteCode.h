@@ -19,6 +19,9 @@ namespace Swf
 			byteCode(0)
 		{
 		}
+		~SwfActionByteCode() {
+			CORE_DELETE_ARRAY( byteCode );
+		}
 
 		uint8_t* byteCode;
 		uint32_t lengthInBytes;

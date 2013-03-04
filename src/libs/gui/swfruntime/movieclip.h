@@ -105,7 +105,6 @@ namespace Swf {
 		double 				accumTimeInMs;
 		bool 				colourDirty;
 		bool 				transformDirty;
-		SwfActionByteCode*	frameABC;
 
 		Math::Vector2		mouseTwip;
 	};

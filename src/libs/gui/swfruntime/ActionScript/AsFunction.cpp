@@ -3,7 +3,7 @@
  *  SwfPreview
  *
  *  Created by Deano on 20/07/2009.
- *  Copyright 2009 __MyCompanyName__. All rights reserved.
+ *  Copyright 2013 CloudPixies Ltd. All rights reserved.
  *
  */
 #include "gui/swfruntime/swfruntime.h"
@@ -24,7 +24,7 @@ namespace Swf {
 
 	void AsFunctionBuilder::addInstruction( int _pc, AsFuncInstruction* _inst ) {
 		if( instMap.find(_pc) == instMap.end() ){
-			instMap[_pc] = new FuncInstVec;
+			instMap[_pc] = CORE_NEW FuncInstVec;
 		}
 		FuncInstVec* it = instMap[_pc];
 		it->push_back( _inst );

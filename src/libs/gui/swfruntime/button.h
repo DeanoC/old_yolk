@@ -18,6 +18,7 @@ namespace Swf {
 	class SwfButton;
 	class Player;
 	struct SwfButtonRecord;
+	struct SwfButtonCondAction;
 
 	// =====================================================
 	// = Button has several sprites in side based on state =
@@ -28,11 +29,13 @@ namespace Swf {
 		virtual ~Button ();
 
 		enum STATE {
-			DOWN = 0,
-			OVER,			
-			UP,
+			IDLE		=		0,
+			DOWN		=		BIT(0),
+			OVER		=		BIT(1),
+			MAX_STATES	=		4
 		};
-		void updateState( const Player* _player, const Math::Vector2& mouseTwip, bool leftButton, bool rightButton );
+
+		void updateState( Player* _player, const Math::Vector2& mouseTwip, bool leftButton, bool rightButton );
 		void display( const Player* _player, Scene::RenderContext* _ctx ) override;
 
 	private:
@@ -43,6 +46,8 @@ namespace Swf {
 		SwfButtonRecord* hitRecord;
 		SwfButton* button;
 		STATE currentState;
+
+		SwfButtonCondAction* transitionTable[MAX_STATES][MAX_STATES];
 	};
 	
 }

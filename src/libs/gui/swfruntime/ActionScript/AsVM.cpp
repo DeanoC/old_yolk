@@ -139,8 +139,8 @@ namespace Swf {
 		AsFunction* func = CORE_NEW AsFunction( funcBuild );
 		func->call( g_AsAgRuntime, 0, NULL );
 			
-		CORE_GC_DELETE( func );
-		CORE_GC_DELETE( funcBuild );
+		CORE_DELETE( func );
+		CORE_DELETE( funcBuild );
 	}		
 		
 		

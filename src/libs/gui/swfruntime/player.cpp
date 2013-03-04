@@ -85,6 +85,11 @@ namespace Swf {
 	void Player::advance(float _elapsedMs){
 		if( paused == false ){
 			rootClip->advance(_elapsedMs);
+
+			for( auto i : codeToRun ) {
+				virtualMachine->processByteCode( rootClip, i );	
+			}
+			codeToRun.resize( 0 );
 		}
 	}
 	void Player::togglePause(){
@@ -113,6 +118,9 @@ namespace Swf {
 		Player* player = CORE_NEW Player();
 		player->create( name, 1.0f, 1.0f );
 		return player;
+	}
+	void Player::scheduleActionByteCodeRun( SwfActionByteCode* byteCode ) {
+		codeToRun.push_back( byteCode );
 	}
 
 } /* Swf */

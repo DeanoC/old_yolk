@@ -23,7 +23,7 @@ namespace Swf {
 		DisplayObjectFrameItem( _dobj, _parent, FIT_BUTTON ),
 		hitRecord( nullptr ),
 		button( _button ),
-		currentState( UP )
+		currentState( IDLE )
 	{
 		// find the hit detect record (presume only one?)
 		for( int i = 0; i < button->numRecords; ++i ) {
@@ -31,6 +31,29 @@ namespace Swf {
 				hitRecord = &button->records[i];
 			}
 		}
+		for( int i = 0; i < MAX_STATES; ++i ) {
+			for( int j = 0; j < MAX_STATES; ++ j ) {
+				transitionTable[ i ] [ j ] = nullptr;
+			}
+		}
+
+#define TT( N, O, C ) if( button->condActions[i]. ## N ) { \
+						CORE_ASSERT( transitionTable[ (O) ][ (C) ] == nullptr ); \
+						transitionTable[ (O) ][ (C) ] = &button->condActions[i]; \
+		}
+
+		for( int i = 0; i < button->numCondActions; ++i ) {
+			TT( idleToOverDown, IDLE , OVER | DOWN );
+			TT( overDownToIdle, OVER | DOWN , IDLE );
+			TT( outDownToOverDown, DOWN , OVER | DOWN );
+			TT( overDownToOutDown, OVER | DOWN , DOWN  );
+			TT( overDownToOverUp, OVER | DOWN , OVER  );
+			TT( overUpToOverDown, OVER , OVER | DOWN );
+			TT( outDownToIdle, DOWN , IDLE  );
+			TT( overUpToIdle, OVER , IDLE  );
+			TT( idleToOverUp, IDLE , OVER  );
+		}
+#undef TT
 	}
 	Button::~Button() {
 		CORE_DELETE( button );
@@ -43,13 +66,16 @@ namespace Swf {
 			// ignore hitRecord
 			if( &button->records[i] == hitRecord ) continue;
 
-			if( button->records[i].buttonStateUp && (currentState == UP) ) {
+			// down inside
+			if( button->records[i].buttonStateDown && (currentState == (OVER|DOWN)) ) {
 				displayRecord( i, _player, _ctx );
-			}
+			} 
+			// over inside
 			if( button->records[i].buttonStateOver && (currentState == OVER) ) {
 				displayRecord( i, _player, _ctx );
 			}
-			if( button->records[i].buttonStateDown && (currentState == DOWN) ) {
+			// up or down outside hit rect
+			if( button->records[i].buttonStateUp && ((currentState == IDLE) || (currentState == DOWN)) ) {
 				displayRecord( i, _player, _ctx );
 			}
 		}
@@ -96,15 +122,21 @@ namespace Swf {
 			return false;
 		}
 	}
-	void Button::updateState( const Player* _player, const Math::Vector2& mouseTwip, bool leftButton, bool rightButton ) {
-		if( testHitRecord( _player, mouseTwip ) ) {
-			if( leftButton ) {
-				currentState = DOWN;
-			} else {
-				currentState = OVER;
-			}
+
+	void Button::updateState( Player* _player, const Math::Vector2& mouseTwip, bool leftButton, bool rightButton ) {
+		STATE lastState = currentState;
+		if( leftButton ) {
+			currentState = DOWN;
 		} else {
-			currentState = UP;
+			currentState = IDLE;
+		}
+
+		if( testHitRecord( _player, mouseTwip ) ) {
+			currentState = (STATE)( currentState | OVER );
+		}
+
+		if( transitionTable[ lastState ][ currentState ] != nullptr ) {
+			_player->scheduleActionByteCodeRun( transitionTable[ lastState ][ currentState ]->actionScript );
 		}
 	}
 
