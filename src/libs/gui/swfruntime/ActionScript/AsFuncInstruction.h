@@ -28,7 +28,7 @@ namespace Swf {
 		virtual AsFIType type() const { return AFI_NORMAL; }
 
 		virtual int call( Swf::AsAgRuntime* _this ) const = 0;
-		virtual void print() const = 0;
+		virtual void print( std::ostringstream& strBuilder ) const = 0;
 	protected:
 		const std::string instruction;
 	};
@@ -41,7 +41,7 @@ namespace Swf {
 			function( _func ) {}
 				
 		virtual int call( Swf::AsAgRuntime* _this ) const override;
-		virtual void print() const override;
+		virtual void print(  std::ostringstream& strBuilder ) const override;
 	protected:
 		const Function function;
 	};
@@ -55,7 +55,7 @@ namespace Swf {
 			param0( _param0 ) {}
 				
 		virtual int call( Swf::AsAgRuntime* _this ) const override;
-		virtual void print() const override;
+		virtual void print(  std::ostringstream& strBuilder  ) const override;
 	protected:
 		const Function function;
 		const Swf::AsObjectHandle param0;
@@ -70,7 +70,7 @@ namespace Swf {
 			param1( _param1 ) {}
 				
 		virtual int call( Swf::AsAgRuntime* _this ) const override;
-		virtual void print() const override;
+		virtual void print(  std::ostringstream& strBuilder ) const override;
 	protected:
 		const Function function;
 		const Swf::AsObjectHandle param0;
@@ -87,7 +87,7 @@ namespace Swf {
 		virtual AsFIType type() const override { return AFI_JUMP; }
 				
 		virtual int call( Swf::AsAgRuntime* _this ) const override;
-		virtual void print() const override;
+		virtual void print(  std::ostringstream& strBuilder ) const override;
 
 		int absJump;
 	};
@@ -101,7 +101,7 @@ namespace Swf {
 		virtual AsFIType type() const override { return AFI_JUMP; }
 				
 		virtual int call( Swf::AsAgRuntime* _this ) const override;
-		virtual void print() const override;
+		virtual void print(  std::ostringstream& strBuilder ) const override;
 
 		int absJump;
 	};

@@ -18,47 +18,47 @@ namespace Swf
 		(_this->*function)();
 		return 1;
 	}
-	void AsFuncInstruction0Param::print() const {
-		LOG(INFO) << "\t\t\t" << instruction << "();\n";
+	void AsFuncInstruction0Param::print(  std::ostringstream& strBuilder ) const {
+		strBuilder << "\t\t\t" << instruction << "();\n";
 	}
 
 	int AsFuncInstruction1Param::call( Swf::AsAgRuntime* _this ) const {
 		(_this->*function)(param0);
 		return 1;
 	}
-	void AsFuncInstruction1Param::print() const {
-		LOG(INFO) << "\t\t\t" << instruction << "( ";
+	void AsFuncInstruction1Param::print(  std::ostringstream& strBuilder ) const {
+		strBuilder << "\t\t\t" << instruction << "( ";
 		if( param0->type() == APT_STRING ) {
-			LOG(INFO) << "\"" << param0->toString() << "\"";
+			strBuilder << "\"" << param0->toString() << "\"";
 		} else {
-			LOG(INFO) << param0->toString();
+			strBuilder << param0->toString();
 		}
-		LOG(INFO) <<" );\n";
+		strBuilder <<" );\n";
 	}
 	int AsFuncInstruction2Param::call( Swf::AsAgRuntime* _this ) const {
 		(_this->*function)(param0,param1);
 		return 1;
 	}
-	void AsFuncInstruction2Param::print() const {
-		LOG(INFO) << "\t\t\t" << instruction << "( ";
+	void AsFuncInstruction2Param::print(  std::ostringstream& strBuilder ) const {
+		strBuilder << "\t\t\t" << instruction << "( ";
 		if( param0->type() == APT_STRING ) {
-			LOG(INFO) << "\"" << param0->toString() << "\"";
+			strBuilder << "\"" << param0->toString() << "\"";
 		} else {
-			LOG(INFO) << param0->toString();
+			strBuilder << param0->toString();
 		}
-		LOG(INFO) << ", ";
+		strBuilder << ", ";
 		if( param1->type() == APT_STRING ) {
-			LOG(INFO) << "\"" << param1->toString() << "\"";
+			strBuilder << "\"" << param1->toString() << "\"";
 		} else {
-			LOG(INFO) << param1->toString();
+			strBuilder << param1->toString();
 		}
-		LOG(INFO) <<" );\n";
+		strBuilder <<" );\n";
 	}
 	int AsFuncInstructionJump::call( Swf::AsAgRuntime* _this ) const {
 		return absJump;
 	}
-	void AsFuncInstructionJump::print() const {
-		LOG(INFO) << "\t\t\t" << instruction << "\n";
+	void AsFuncInstructionJump::print(  std::ostringstream& strBuilder ) const {
+		strBuilder << "\t\t\t" << instruction << "\n";
 	}
 	int AsFuncInstructionIf::call( Swf::AsAgRuntime* _this ) const {
 		if(_this->asPop()->toBoolean() == true ) {
@@ -67,8 +67,8 @@ namespace Swf
 			return 1;
 		}
 	}
-	void AsFuncInstructionIf::print() const {
-		LOG(INFO) << "\t\t\t" << instruction << "\n";
+	void AsFuncInstructionIf::print(  std::ostringstream& strBuilder ) const {
+		strBuilder << "\t\t\t" << instruction << "\n";
 	}
 }
 

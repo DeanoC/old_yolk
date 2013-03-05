@@ -204,11 +204,13 @@ namespace Swf {
 		void defineFunction( const AsObjectHandle& _name, const AsObjectHandle& _func );
 
 	protected:
+		// callable functions
 		// hasOwnProperty checks the target has the property specified
 		AsObjectHandle hasOwnProperty( int _numParams, AsObjectHandle* _params );
-			
+		AsObjectHandle trace( int _numParams, AsObjectHandle* _params );
+
 		bool equalEcma262_11_9_3(AsObjectHandle _x, AsObjectHandle _y);			
-			
+		
 		FrameItem* findTarget(const std::string& _path);
 			
 		typedef Core::gctraceablestack<AsObjectHandle> AsStack;

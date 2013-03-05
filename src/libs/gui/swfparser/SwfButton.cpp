@@ -17,6 +17,7 @@ namespace Swf
 	SwfButton* SwfButton::Read( SwfStream& _stream, int _length, int _version ) {
 		
 		uint64_t marker = _stream.marker();
+		uint64_t startMarker = marker;
 		
 		uint16_t id = _stream.readUInt16();
 
@@ -82,7 +83,7 @@ namespace Swf
 				actionScript->isCaseSensitive = true;
 			}
 			_stream.readBytes(actionScript->byteCode, actionScript->lengthInBytes);
-						bca.overUpToOverDown = true;
+			bca.overUpToOverDown = true;
 			bca.actionScript = actionScript;
 			condActions.push_back( bca );
 
@@ -100,15 +101,20 @@ namespace Swf
 				bca.overUpToOverDown = _stream.readFlag();
 				bca.overUpToIdle = _stream.readFlag();
 				bca.idleToOverUp  = _stream.readFlag();
-				bca.overDownToIdle = _stream.readFlag();
-				
 				bca.keyCode = _stream.readUInt(7);
-				
-				std::vector<uint8_t> temp;
-				uint8_t b = 0;
-				while( b = _stream.readUInt8() ) {
-					temp.push_back( b );
+				bca.overDownToIdle = _stream.readFlag();
+	
+				auto len = actionOffset - (marker - _stream.marker());
+				if( actionOffset == 0 ) {
+					len = (_length + startMarker)- _stream.marker();
 				}
+				std::vector<uint8_t> temp;
+				temp.reserve( (uint32_t)len + 1 );
+
+				for( int i = 0; i < len; ++i ) {
+					temp.push_back( _stream.readUInt8() );
+				}
+			
 				SwfActionByteCode* actionScript = CORE_NEW SwfActionByteCode();
 				actionScript->byteCode = CORE_NEW_ARRAY uint8_t[ temp.size() + 1 ];
 				actionScript->lengthInBytes = temp.size();

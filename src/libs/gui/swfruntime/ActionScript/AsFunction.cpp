@@ -31,14 +31,14 @@ namespace Swf {
 	}
 
 	void AsFunctionBuilder::debugLogFunction() const {
-			
-		LOG(INFO) << "\t\tvoid " << getName() << "() {\n";
+		std::ostringstream strBuilder;
+		strBuilder << "\t\tvoid " << getName() << "() {\n";
 			
 		int lineNo = 0;
 		for( int pc = 0; pc < maxAddrSpace;++pc) {
 			LabelMap::const_iterator lmit = labelMap.find(pc);
 			if( lmit != labelMap.end() ) {
-				LOG(INFO) << "\t\t" << lmit->second << ":;\n";
+				strBuilder << "\t\t" << lmit->second << ":;\n";
 			}
 			InstMap::const_iterator imit = instMap.find(pc);
 			if( imit != instMap.end() ) {
@@ -46,14 +46,15 @@ namespace Swf {
 				for( 	FuncInstVec::const_iterator i = it->begin(); 
 						i != it->end();
 						++i ) {
-					LOG(INFO) << "/* " << lineNo << " */ ";
-					(*i)->print();
+					strBuilder << "/* " << lineNo << " */ ";
+					(*i)->print( strBuilder );
 					lineNo++;
 				}
 			}
 		}
 			
-		LOG(INFO) << "\t\t}\n";
+		strBuilder << "\t\t}\n";
+		LOG(INFO) << strBuilder.str();
 	}
 				
 	void AsFunction::computeLabelAddress( const AsFunctionBuilder* _builder, std::map<int, int>& labels ) {

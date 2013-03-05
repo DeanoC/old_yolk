@@ -57,8 +57,12 @@ namespace Swf {
 		objectFactory = CORE_GC_NEW_ROOT_ONLY AsObjectFactory( this );
 		objectFactory->registerFunc( "Date", &AsDate::constructFunction );
 		objectFactory->registerFunc( "Array", &AsArray::constructFunction );
-			
+		
+		// global function/var table (need to work out what should be in here AND how
+		// things get added..)
 		functions[ "hasOwnProperty" ] = CORE_NEW AsAgFunction( &AsAgRuntime::hasOwnProperty );
+		functions[ "trace" ] = CORE_NEW AsAgFunction( &AsAgRuntime::trace );
+
 	}
 		
 	AsAgRuntime::~AsAgRuntime() {
@@ -531,6 +535,15 @@ namespace Swf {
 			pushUndefined();
 		}
 	}
+
+	AsObjectHandle AsAgRuntime::trace( int _numParams, AsObjectHandle* _params ) {
+		for( int i = 0; i < _numParams; ++i ) {
+			LOG(INFO) << _params[i]->toString() << "\n";
+		}
+
+		return AsObjectNull::get();
+	}
+
 	void AsAgRuntime::toNumber() {
 		push( asPop()->toNumber() );
 	}
