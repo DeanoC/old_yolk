@@ -385,8 +385,7 @@ namespace Swf {
 
 
 	void MovieClip::setMouseInput( float x, float y, bool leftButton, bool rightButton ) {
-		mouseTwip = Math::Vector2(x,y);// Math::TransformAndDropZ( Math::Vector2(x,y), player->getNdxToTwip() );
-
+		mouseTwip = Math::Vector2(x,y);
 		// TODO check buttons
 	}
     
