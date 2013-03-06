@@ -36,11 +36,28 @@ namespace Swf {
 		}
 	}
 
-	AsObjectHandle AsObject::getProperty( const std::string& _name ) const {
+	AsObjectHandle AsObject::getOwnProperty( const std::string& _name ) const {
 		Swf::AsObject::PropertyMap::const_iterator prop = properties.find( _name );
 		if( prop != properties.end() ) {
-			return prop->second;//properties[ _name ];
-		} else if( prototype != NULL ) {
+			return prop->second;
+		} else {
+			return AsObjectHandle( AsObjectUndefined::get() );
+		}
+	}
+
+	bool AsObject::hasOwnProperty( const std::string& _name ) const {
+		if( properties.find( _name ) != properties.end() ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	AsObjectHandle AsObject::getProperty( const std::string& _name ) const {
+		auto ownProp = getOwnProperty( _name );
+		if(  ownProp != AsObjectUndefined::get() ) {
+			return ownProp;
+		}else if( prototype != NULL ) {
 			return prototype->getProperty( _name );
 		} else {
 			return AsObjectHandle( AsObjectUndefined::get() );
@@ -50,34 +67,55 @@ namespace Swf {
 	void AsObject::setProperty( const std::string& _name, AsObjectHandle _handle ) {
 		properties[ _name ] = _handle;
 	}
-	
-	bool AsObject::hasOwnProperty( const std::string& _name ) {
-		if( properties.find( _name ) != properties.end() ) {
-			return true;
-		} else {
+
+	bool AsObject::hasProperty( const std::string& _name ) const {
+		if( getProperty( _name ) == AsObjectUndefined::get() ) {
 			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	// get also calls any accessor if specified so it requires the runtime
+	AsObjectHandle  AsObject::get( AsAgRuntime* _runtime, const std::string& _name ) const {
+		auto prop = AsObject::getProperty( _name );
+		if( prop->type() == APT_FUNCTION ) {
+			return prop->callMethodOn( _runtime, prop, "()", 0, nullptr );
+		} else {
+			return prop;
 		}
 	}
 	
 	void AsObject::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
-		setProperty( "hasOwnProperty", CORE_NEW AsObjectThisFunction( &AsObject::hasOwnProperty ) );
-		setProperty( "toString", CORE_NEW AsObjectThisFunction( &AsObject::toString ) );
-		setProperty( "toNumber", CORE_NEW AsObjectThisFunction( &AsObject::toNumber ) );
+		// it seems slightly odd to add the constructor function as a callable method but
+		// in practise is no different from calling a ctor in C++ manually
+		auto ctor = CORE_GC_NEW AsObjectThisFunction( &AsObject::ctor );
+		setProperty( "", ctor );
+		setProperty( "()", ctor );
+
+		setProperty( "hasOwnProperty", CORE_GC_NEW AsObjectThisFunction( &AsObject::hasOwnProperty ) );
+		setProperty( "toString", CORE_GC_NEW AsObjectThisFunction( &AsObject::toString ) );
+		setProperty( "toNumber", CORE_GC_NEW AsObjectThisFunction( &AsObject::toNumber ) );
 	}
 	
+	AsObjectHandle AsObject::ctor( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		construct( _runtime, _numParams, _params );
+		return this; // ??
+	}
+
 	AsObjectHandle AsObject::hasOwnProperty( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert( _numParams == 1 );
-		return CORE_NEW AsObjectBool( hasOwnProperty(_params[0]->toString()) );
+		return CORE_GC_NEW AsObjectBool( hasOwnProperty(_params[0]->toString()) );
 	}
 	
 	AsObjectHandle AsObject::toString( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert( _numParams == 0 );
-		return CORE_NEW AsObjectString( toString() );
+		return CORE_GC_NEW AsObjectString( toString() );
 	}
 	
 	AsObjectHandle AsObject::toNumber( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert( _numParams == 0 );
-		return CORE_NEW AsObjectNumber( toNumber() );
+		return CORE_GC_NEW AsObjectNumber( toNumber() );
 	}
 		
 	bool AsObject::is( AsObjectHandle _b ) const {
@@ -94,16 +132,26 @@ namespace Swf {
 			return false;
 		}
 	}
+
+	//=-=-=-=
+	// BOOL
+	//=-=-=-=
+	void AsObjectBool::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		prototype = s_objectPrototype;
+		if( _numParams >= 1 ) {
+			value = _params[0]->toBoolean();
+		}
+	}	
 	
-	std::string AsObjectNumber::toString() const {
-		std::ostringstream stream;
-		stream << value;
-		return stream.str();
-	}
-	
+	//=-=-=-=
+	// STRING
+	//=-=-=-=
 	void AsObjectString::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		prototype = s_objectPrototype;
-		setProperty( "length", CORE_NEW AsObjectThisFunction( &AsObjectString::length ) );
+		setProperty( "length", CORE_GC_NEW AsObjectThisFunction( &AsObjectString::length ) );
+		if( _numParams >= 1 ) {
+			value = _params[0]->toString();
+		}
 	}
 	bool AsObjectString::toBoolean() const {
 		if( value == "1" || value == "true" ||
@@ -116,7 +164,7 @@ namespace Swf {
 	
 	AsObjectHandle  AsObjectString::getProperty( const std::string& _name ) const {
 		if( _name == "length" ) {
-			return CORE_NEW AsObjectNumber( (int)value.length() );
+			return CORE_GC_NEW AsObjectNumber( (int)value.length() );
 		} else {
 			return AsObject::getProperty( _name );
 		}
@@ -124,7 +172,7 @@ namespace Swf {
 	
 	AsObjectHandle AsObjectString::length( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params ) {
 		assert(_numParams == 0);
-		return AsObjectHandle( CORE_NEW AsObjectNumber( (int)value.length() ) );
+		return AsObjectHandle( CORE_GC_NEW AsObjectNumber( (int)value.length() ) );
 	}
 	
 	double AsObjectString::toNumber() const {
@@ -133,4 +181,21 @@ namespace Swf {
 		stream >> d;
 		return d;
 	}		
+	
+	//=-=-=-=
+	// NUMBER
+	//=-=-=-=
+	void AsObjectNumber::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		prototype = s_objectPrototype;
+		if( _numParams >= 1 ) {
+			value = _params[0]->toNumber();
+		}
+	}	
+	std::string AsObjectNumber::toString() const {
+		std::ostringstream stream;
+		stream << value;
+		return stream.str();
+	}
+	
+
 }

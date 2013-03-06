@@ -15,6 +15,7 @@ namespace Swf {
 	class MovieClip;
 	class FrameItem;
 	class AsObjectFactory;
+	class AsFunction;
 		
 	class AsAgRuntime  {
 	public:		
@@ -26,9 +27,8 @@ namespace Swf {
 		bool isCaseSensitive() const {
 			return isCaseSens;
 		}
-			
-		// reset all VM state
-		void reset();
+
+		void callGlobalCode( AsFunction* _code, MovieClip* _movieClip );
 		
 		// Set the target to the specified item
 		void setTarget( FrameItem* _target) {
@@ -135,6 +135,7 @@ namespace Swf {
 		void decrement();
 		void pushDuplicate();
 		void swapStack();
+		void initObject();
 			
 		// As2 functions not yet implemented
 		#define AS_TODO { assert(false); } 
@@ -156,7 +157,6 @@ namespace Swf {
 		void asDelete() AS_TODO
 		void asReturn() AS_TODO
 		void modulo() AS_TODO
-		void initObject() AS_TODO
 		void typeOf() AS_TODO
 		void enumerate() AS_TODO
 		void newMethod() AS_TODO
@@ -195,9 +195,6 @@ namespace Swf {
 						
 		#undef AS_TODO
 
-		// some fake helpers that implement some thing via
-		// AsObjectHandle, just for function previews
-
 		// set the target via an AsObject
 		void gotoFrame( const AsObjectHandle& _frame );
 		void defineLocalFunction( const AsObjectHandle& _func );
@@ -214,10 +211,16 @@ namespace Swf {
 		FrameItem* findTarget(const std::string& _path);
 			
 		typedef Core::gctraceablestack<AsObjectHandle> AsStack;
-		typedef Core::gctraceablemap<std::string, AsObjectHandle> AsLocals;
-			
 		AsStack					stack;
-		AsLocals				locals;
+
+		typedef Core::gctraceablemap<std::string, AsObjectHandle> AsEnvironmentRecord;
+		AsEnvironmentRecord			globals;
+		AsObjectHandle				globalObject;
+
+		AsEnvironmentRecord*		variableEnvironment;
+		AsEnvironmentRecord*		lexicalEnvironment;
+		AsObjectHandle				thisObject;
+
 		FrameItem*				target;
 		FrameItem*				origTarget;
 		MovieClip*				root;

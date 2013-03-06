@@ -28,6 +28,11 @@ namespace Swf {
 
 		Constructors constructors;
 		AsAgRuntime* runtime;
+	private:
+		static AsObjectHandle objectConstructFunction( AsAgRuntime*, int, AsObjectHandle* );
+		static AsObjectHandle boolConstructFunction( AsAgRuntime*, int, AsObjectHandle* );
+		static AsObjectHandle stringConstructFunction( AsAgRuntime*, int, AsObjectHandle* );
+		static AsObjectHandle numberConstructFunction( AsAgRuntime*, int, AsObjectHandle* );
 	};
 } /* Swf */ 
 

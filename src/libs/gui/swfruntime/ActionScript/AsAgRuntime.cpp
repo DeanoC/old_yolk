@@ -57,6 +57,9 @@ namespace Swf {
 		objectFactory = CORE_GC_NEW_ROOT_ONLY AsObjectFactory( this );
 		objectFactory->registerFunc( "Date", &AsDate::constructFunction );
 		objectFactory->registerFunc( "Array", &AsArray::constructFunction );
+
+		// create the global object
+		globalObject = objectFactory->construct( "object", 0, nullptr );
 		
 		// global function/var table (need to work out what should be in here AND how
 		// things get added..)
@@ -66,16 +69,17 @@ namespace Swf {
 	}
 		
 	AsAgRuntime::~AsAgRuntime() {
-		reset();
 		CORE_GC_DELETE( objectFactory );
 	}
 		
-	void AsAgRuntime::reset() {
-		while ( !stack.empty() ) {
-			stack.pop();
-		}
-			
-//			locals.clear();
+	void AsAgRuntime::callGlobalCode( AsFunction* _code, MovieClip* _movieClip ) {
+		setRoot( _movieClip );
+		setTarget( _movieClip );
+		variableEnvironment = &globals;
+		lexicalEnvironment = &globals;
+//		thisObject
+		_code->call( this, 0, nullptr );
+
 	}
 	void AsAgRuntime::setRoot( MovieClip* _root ) {
 		root = _root;
@@ -114,8 +118,8 @@ namespace Swf {
 		std::string varS;
 		if (parseVarTarget(name, pathS, varS) == false) {
 			// try locals first
-			if( locals.find(name.c_str()) != locals.end()) {
-				push( locals[name.c_str()] );
+			if( variableEnvironment->find(name.c_str()) != variableEnvironment->end()) {
+				push(  (*variableEnvironment)[name.c_str()] );
 			} else {
 				// try members as not a local
 				if(target) {
@@ -138,8 +142,8 @@ namespace Swf {
 		std::string varS;
 		if (parseVarTarget(name, pathS, varS) == false) {
 			// try locals first
-			if( locals.find(name) != locals.end()) {
-				locals[ name ] = value;
+			if( variableEnvironment->find(name.c_str()) != variableEnvironment->end()) {
+				(*variableEnvironment)[ name ] = value;
 			} else {
 				// try members as not a local
 				if(target) {
@@ -169,13 +173,13 @@ namespace Swf {
 		AsObjectHandle val = asPop();
 		AsObjectHandle nameObj = asPop();
 		std::string name = nameObj->toString();
-		locals[ name.c_str() ] = val;
+		(*variableEnvironment)[ name.c_str() ] = val;
 	}
 		
 	void AsAgRuntime::defineLocal2() {
 		AsObjectHandle nameObj = asPop();
 		std::string name = nameObj->toString();
-		locals[ name.c_str() ] = AsObjectHandle( AsObjectUndefined::get() );
+		(*variableEnvironment)[ name.c_str() ] = AsObjectHandle( AsObjectUndefined::get() );
 	}
 		
 	void AsAgRuntime::newObject() {
@@ -551,10 +555,10 @@ namespace Swf {
 		push( asPop()->toString() );
 	}
 	void AsAgRuntime::increment() {
-		push( asPop()->toNumber()+1.0 );
+		push( asPop()->toNumber() + 1.0 );
 	}
 	void AsAgRuntime::decrement() {
-		push( asPop()->toNumber()-1.0 );
+		push( asPop()->toNumber() - 1.0 );
 	}
 	void AsAgRuntime::pushDuplicate() {
 		stack.push( stack.top() );
@@ -564,5 +568,19 @@ namespace Swf {
 		AsObjectHandle b = asPop();
 		push( a );
 		push( b );
+	}
+	void AsAgRuntime::initObject() {
+		AsObjectHandle argCountObj = asPop();
+		int numArgs = argCountObj->toInteger();
+		AsObjectHandle args[MAX_ARGS]; 
+		for(int i=0;i < numArgs;++i) {
+			if( i < MAX_ARGS ) {
+				args[i] = asPop();
+			} else {
+				pop();
+			}
+		}
+		AsObjectHandle no = objectFactory->construct( "object", numArgs, args );
+		push( no );
 	}
 } /* Swf */ 

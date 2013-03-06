@@ -23,43 +23,42 @@ namespace Swf
 		
 	class AsVM : public Core::GcBase {
 	public:
+		friend class AsFunctionBuilder;
 		AsVM ( const std::string& _name );
 		virtual ~AsVM ();
 
 		void processByteCode( MovieClip* _movieClip, SwfActionByteCode* byteCode );
 			
 	private:						
-		AsFunctionBuilder* processFunctionByteCode( const std::string& _name, 
-													const uint8_t* _byteCode, 
-													const int _programLength, 
-													const bool _isCaseSensitive );
+		std::string readString( const uint8_t* _byteCode, int& pc ) const;
 
 		static const uint32_t LONG_BYTECODE_MASK = 0x80;
 		static const EndianBitConverter& endianConverter;
 			
-		typedef void (AsVM::* ByteCodeDispatcher)(const uint8_t*, int&, AsFunctionBuilder*);		
+		typedef void (AsVM::* ByteCodeDispatcher)(const uint8_t*, int&, AsFunctionBuilder*) const;
 		ByteCodeDispatcher functionTable[256];		
 		ByteCodeDispatcher exploreTable[256];
 
-		void exploreShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void exploreOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void exploreIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void exploreJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void exploreDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
+		void exploreShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void exploreOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void exploreIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void exploreJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void exploreDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
 
-		std::string readString( const uint8_t* _byteCode, int& pc );
+		void fallbackShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void fallbackOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionConstantPool( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionPushData( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionSetTarget( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionGotoFrame( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
+		void actionDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const;
 
-		void fallbackShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void fallbackOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionConstantPool( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionPushData( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionSetTarget( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionGotoFrame( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
-		void actionDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func );
+		mutable std::vector<std::string> constantPool;
+		typedef Core::gctraceablemap< const uint8_t*, AsFunction*> FunctionCache;
+		mutable FunctionCache functionCache; 
 
-		std::string constantPool[ 100 ];
 		Swf::AsAgRuntime* g_AsAgRuntime;
 	};
 	

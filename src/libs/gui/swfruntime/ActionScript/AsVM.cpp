@@ -63,12 +63,6 @@ namespace Swf {
 		functionTable[Swf::constantPool] = &AsVM::actionConstantPool;
 		functionTable[Swf::defineFunction] = &AsVM::actionDefineFunction;
 						
-//			LOG(INFO) << "// Swf ActionScript AutoGen Source File\n";
-//			LOG(INFO) << "#include \"AsAgRuntime.h\"\n";
-//			LOG(INFO) << "namespace Swf {\n";
-//			LOG(INFO) << "namespace AutoGen {\n";
-//			LOG(INFO) << "\tclass AsAg_" << _name << " : public AsAgRuntime {\n";
-//			LOG(INFO) << "\tpublic:\n";
 		#define DECLARE_BYTECODE( name, val ) g_AsAgRuntimeFuncs[val] = &AsAgRuntime:: name;
 				#include "AsByteCode_inc.h"
 		#undef DECLARE_BYTECODE
@@ -79,10 +73,6 @@ namespace Swf {
 	AsVM::~AsVM() {
 		CORE_GC_DELETE( g_AsAgRuntime );
 		g_AsAgRuntime = NULL;
-			
-//			LOG(INFO) << "\t};\n";
-			
-//			LOG(INFO) << "} // end AutoGen\n} // end Swf\n";			
 	}
 		
 	static std::string GetUniqueName( const FrameItem* _fi ) {
@@ -95,60 +85,41 @@ namespace Swf {
 		}
 	}
 		
-	std::string AsVM::readString( const uint8_t* _byteCode, int& pc )
-	{
+	std::string AsVM::readString( const uint8_t* _byteCode, int& pc ) const {
 		int len = strlen( (char*) &_byteCode[pc] );
 		int origPc = pc;
 		pc += 1 + len;
 		return std::string( (char*) &_byteCode[origPc] );
 	}
 		
-	AsFunctionBuilder* AsVM::processFunctionByteCode( const std::string& _name, const uint8_t* _byteCode, const int _programLength, const bool _isCaseSensitive ) {
-			
-		AsFunctionBuilder* func = CORE_GC_NEW_ROOT_ONLY AsFunctionBuilder( _name, _programLength, _isCaseSensitive );
-			
-		// explore program structure (branch destinations etc.)
-		int pc = 0;
-		while( pc < _programLength ) {
-			int instruction = _byteCode[pc];
-			(this->*exploreTable[instruction])( _byteCode, pc, func );
-		}
-
-		// explore finished so now translate bytecode
-		pc = 0;
-		while( pc < _programLength ) {
-			int instruction = _byteCode[pc];
-			(this->*functionTable[instruction])( _byteCode, pc, func );
-		}
-			
-		return func;
-	}
-				
 	void AsVM::processByteCode( MovieClip* _movieClip, SwfActionByteCode* byteCode ) {
-			
-		std::ostringstream stream;
-		stream << GetUniqueName(_movieClip) << "_" << _movieClip->getCurrentFrameNumber();
-			
-		g_AsAgRuntime->reset();
-		g_AsAgRuntime->setRoot( _movieClip );
-		g_AsAgRuntime->setTarget( _movieClip );
-		AsFunctionBuilder* funcBuild = processFunctionByteCode( stream.str(), byteCode->byteCode, byteCode->lengthInBytes, byteCode->isCaseSensitive );
 
-		funcBuild->debugLogFunction();
+		AsFunction* func;
+		if( functionCache.find( byteCode->byteCode ) == functionCache.end() ) {
+		
+			std::ostringstream stream;
+			stream << GetUniqueName(_movieClip) << "_" << _movieClip->getCurrentFrameNumber();
 			
-		AsFunction* func = CORE_NEW AsFunction( funcBuild );
-		func->call( g_AsAgRuntime, 0, NULL );
-			
-		CORE_DELETE( func );
-		CORE_DELETE( funcBuild );
+			AsFunctionBuilder* funcBuild = CORE_GC_NEW AsFunctionBuilder( stream.str(), byteCode->lengthInBytes, byteCode->isCaseSensitive );
+			funcBuild->translateByteCode( this, byteCode->byteCode );
+			funcBuild->debugLogFunction();
+
+			func = CORE_GC_NEW AsFunction( funcBuild );
+			functionCache[ byteCode->byteCode ] = func;
+			CORE_DELETE( funcBuild );
+		} else {
+			func = functionCache.find( byteCode->byteCode )->second;
+		}
+
+		g_AsAgRuntime->callGlobalCode( func, _movieClip );
 	}		
 		
 		
-	void AsVM::exploreShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::exploreShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		pc++;
 	}
 
-	void AsVM::exploreOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::exploreOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		int instruction = _byteCode[pc];
 		if( (instruction & LONG_BYTECODE_MASK) == LONG_BYTECODE_MASK) {
 			// length next u16
@@ -159,7 +130,7 @@ namespace Swf {
 		}
 	}
 		
-	void AsVM::exploreIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::exploreIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		uint16_t len = endianConverter.ToInt16(_byteCode, pc+1);
 		uint16_t offset = endianConverter.ToInt16(_byteCode, pc+3);
 			
@@ -172,7 +143,7 @@ namespace Swf {
 		}
 	}
 		
-	void AsVM::exploreJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::exploreJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		uint16_t len = endianConverter.ToInt16(_byteCode, pc+1);
 		uint16_t offset = endianConverter.ToInt16(_byteCode, pc+3);
 			
@@ -185,7 +156,7 @@ namespace Swf {
 		}
 	}
 
-	void AsVM::exploreDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::exploreDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		// we need to skip over DefineFunction for explore, so as too 
 		// not generate false jump targets
 
@@ -205,14 +176,14 @@ namespace Swf {
 		pc += codeSize;
 	}
 		
-	void AsVM::fallbackShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::fallbackShortOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		int instruction = _byteCode[pc];
 		// short instruction can be decoded directly
 		func->addInstruction( pc, new AsFuncInstruction0Param( s_AsByteCodeNames[instruction], g_AsAgRuntimeFuncs[instruction] ) );
 		pc += 1;
 	}
 		
-	void AsVM::fallbackOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::fallbackOpCode( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		int instruction = _byteCode[pc];
 		// length next u16
 		uint16_t len = endianConverter.ToUInt16(_byteCode, pc+1);
@@ -221,7 +192,7 @@ namespace Swf {
 					<< instruction << ") - Length " << (int) len << "\n";
 	}
 		
-	void AsVM::actionJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::actionJump( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		uint16_t len = endianConverter.ToInt16( _byteCode, pc+1 );
 		uint16_t offset = endianConverter.ToInt16( _byteCode, pc+3 );
 		int origPc = pc;
@@ -234,7 +205,7 @@ namespace Swf {
 
 	}
 		
-	void AsVM::actionIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::actionIf( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		uint16_t len = endianConverter.ToInt16( _byteCode, pc+1 );
 		uint16_t offset = endianConverter.ToInt16( _byteCode, pc+3 );
 		int origPc = pc;
@@ -247,10 +218,12 @@ namespace Swf {
 				CORE_NEW AsFuncInstructionIf( stream.str(), pc + offset ) );
 	}
 		
-    void AsVM::actionConstantPool( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+    void AsVM::actionConstantPool( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		// Slip Length
 		uint16_t count = endianConverter.ToUInt16( _byteCode, pc+3 );
 		pc += 1 + 2 + 2;
+
+		constantPool.resize( 0 );
 			
 		for (uint16_t i = 0; i < count; ++i) {
 			std::string str = readString(_byteCode, pc);
@@ -258,12 +231,11 @@ namespace Swf {
 				std::transform(str.begin(), str.end(), str.begin(), tolower);
 			}
 				
-			assert( i < 100 );
-			constantPool[i] = str;
+			constantPool.push_back( str );
 		}
     }		
 
-	void AsVM::actionPushData( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::actionPushData( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		uint16_t len = endianConverter.ToUInt16(_byteCode, pc+1);
 
 		int origPc = pc;
@@ -358,7 +330,7 @@ namespace Swf {
 		}
 	}
 		
-    void AsVM::actionSetTarget( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+    void AsVM::actionSetTarget( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		// Slip Length
 		int origPc = pc;
 		pc += 1 + 2;
@@ -373,7 +345,7 @@ namespace Swf {
 			CORE_NEW AsFuncInstruction0Param( "SetTarget2", &AsAgRuntime::setTarget2 ) );
 	}
 		
-	void AsVM::actionGotoFrame( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::actionGotoFrame( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		// Slip Length
 		uint16_t frame = endianConverter.ToInt16( _byteCode, pc+1+2 );
 		int origPc = pc;
@@ -383,7 +355,7 @@ namespace Swf {
 			CORE_NEW AsFuncInstruction1Param( "GotoFrame", &AsAgRuntime::gotoFrame, CORE_NEW AsObjectNumber((float)frame) ) );
 
 	}
-	void AsVM::actionDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) {
+	void AsVM::actionDefineFunction( const uint8_t* _byteCode, int& pc, AsFunctionBuilder* func ) const {
 		// Slip Length
 		pc += 1 + 2;
 		int origPc = pc;
@@ -400,19 +372,28 @@ namespace Swf {
 		uint16_t codeSize = endianConverter.ToUInt16( _byteCode, pc );
 		pc += 2;
 
-		AsFunctionBuilder* newFuncBuild = processFunctionByteCode( name, &_byteCode[pc], codeSize, func->isCaseSensitive() );
-		newFuncBuild->debugLogFunction();
-		AsFunction* newFunc = CORE_NEW AsFunction( newFuncBuild );
+		AsFunction* newFunc;
 
+		if( functionCache.find( &_byteCode[pc] ) == functionCache.end() ) {
+			AsFunctionBuilder* funcBuild = CORE_GC_NEW AsFunctionBuilder( name, codeSize, func->isCaseSensitive() );
+			funcBuild->translateByteCode( this, &_byteCode[pc] );
+			funcBuild->debugLogFunction();
+
+			newFunc = CORE_GC_NEW AsFunction( funcBuild );
+			functionCache[ &_byteCode[pc] ] = newFunc;
+			CORE_DELETE( funcBuild );
+		} else {
+			newFunc = functionCache.find( &_byteCode[pc] )->second;
+		}
 		if( name.empty() ) {
 			func->addInstruction( origPc, 
 				CORE_NEW AsFuncInstruction1Param( "DefineLocalFunction", &AsAgRuntime::defineLocalFunction, CORE_NEW AsObjectFunction(newFunc) ) );
-				
+
 		} else {
 			func->addInstruction( origPc, 
 				CORE_NEW AsFuncInstruction2Param( "DefineFunction", &AsAgRuntime::defineFunction, CORE_NEW AsObjectString(name), CORE_NEW AsObjectFunction(newFunc) ) );
 		}
-			
+
 		pc += codeSize;
 	}
 } /* Swf */ 

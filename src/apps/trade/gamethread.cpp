@@ -10,11 +10,16 @@ extern bool g_quitFlag;
 
 std::atomic<int>	shutdownFinished;
 
+
 GameThread::GameThread( SceneWorldPtr _world ) {
 	SceneWorldPtr	world = _world;
 	shutdownFinished = 0;
 
 	inputThread = CORE_NEW Core::thread( [world] {
+		GC_stack_base stackBase;
+		GC_get_stack_base( &stackBase );
+		GC_register_my_thread( &stackBase );
+
 		shutdownFinished++;
 		Core::Clock inputClock;
 		inputClock.update();			
@@ -28,6 +33,10 @@ GameThread::GameThread( SceneWorldPtr _world ) {
 	} );
 
 	gameThread = CORE_NEW Core::thread( [world] {
+		GC_stack_base stackBase;
+		GC_get_stack_base( &stackBase );
+		GC_register_my_thread( &stackBase );
+
 		shutdownFinished++;
 		Core::Clock gameClock;
 		// flush 'load' time from first time update

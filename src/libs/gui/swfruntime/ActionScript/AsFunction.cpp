@@ -7,11 +7,14 @@
  *
  */
 #include "gui/swfruntime/swfruntime.h"
-#include "AsFunction.h"
+#include "gui/swfparser/SwfActionByteCode.h"
 #include "AsAgRuntime.h"
+#include "AsVM.h"
 #include "core/debug.h"
+#include "AsFunction.h"
 
 namespace Swf {
+
 	const std::string AsFunctionBuilder::getLabel( int _pc ) const {
 		LabelMap::const_iterator it = labelMap.find(_pc);
 		if( it != labelMap.end() ){
@@ -33,7 +36,7 @@ namespace Swf {
 	void AsFunctionBuilder::debugLogFunction() const {
 		std::ostringstream strBuilder;
 		strBuilder << "\t\tvoid " << getName() << "() {\n";
-			
+
 		int lineNo = 0;
 		for( int pc = 0; pc < maxAddrSpace;++pc) {
 			LabelMap::const_iterator lmit = labelMap.find(pc);
@@ -55,6 +58,22 @@ namespace Swf {
 			
 		strBuilder << "\t\t}\n";
 		LOG(INFO) << strBuilder.str();
+	}
+
+	void AsFunctionBuilder::translateByteCode( const AsVM* _vm, const uint8_t* byteCode ) {
+		// explore program structure (branch destinations etc.)
+		int pc = 0;
+		while( pc < maxAddrSpace ) {
+			int instruction = byteCode[pc];
+			(_vm->*(_vm->exploreTable[instruction]))( byteCode, pc, this );
+		}
+
+		// explore finished so now translate bytecode
+		pc = 0;
+		while( pc < maxAddrSpace ) {
+			int instruction = byteCode[pc];
+			(_vm->*(_vm->functionTable[instruction]))( byteCode, pc, this );
+		}
 	}
 				
 	void AsFunction::computeLabelAddress( const AsFunctionBuilder* _builder, std::map<int, int>& labels ) {
@@ -107,7 +126,7 @@ namespace Swf {
 			}
 		}
 	}
-		
+
 	Swf::AsObjectHandle AsFunction::call( Swf::AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) const {
 		// TODO handle parameter passed to a defined function...?
 		assert( _numParams == 0);
@@ -121,5 +140,5 @@ namespace Swf {
 		// doubt this correct...
 		//AsObjectHandle ret = _this->AsPop();
 		return AsObjectUndefined::get();
-	}	
+	}
 } /* Swf */ 

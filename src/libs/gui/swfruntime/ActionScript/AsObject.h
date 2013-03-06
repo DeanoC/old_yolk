@@ -55,9 +55,14 @@ namespace Swf {
 		AsObjectHandle callMethod( AsAgRuntime* _runtime, const std::string& _name, int _numParams, AsObjectHandle* _params ) {
 			return callMethodOn(_runtime, this, _name, _numParams, _params );
 		}
+		virtual AsObjectHandle getOwnProperty( const std::string& _name ) const;
+		virtual bool hasOwnProperty( const std::string& _name ) const;
+
 		virtual AsObjectHandle getProperty( const std::string& _name ) const;
 		virtual void setProperty( const std::string& _name, AsObjectHandle _handle );
-		virtual bool hasOwnProperty( const std::string& _name );
+		virtual bool hasProperty( const std::string& _name ) const;
+		virtual AsObjectHandle get( AsAgRuntime* _runtime, const std::string& _name ) const;
+
 		
 	protected:
 		friend class AsObjectFactory;
@@ -70,6 +75,7 @@ namespace Swf {
 		// use by prototypes to call there method on another object
 		virtual AsObjectHandle callMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params );
 	
+		AsObjectHandle ctor( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 		AsObjectHandle hasOwnProperty( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 		AsObjectHandle toString( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 		AsObjectHandle toNumber( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
@@ -88,14 +94,14 @@ namespace Swf {
 	public:
 		friend class AsObject;
 		
-		virtual AsPrimitiveType type()  const override {
+		AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_UNDEFINED );
 #endif
 			return APT_UNDEFINED;
 		}
 		
-		virtual std::string toString()  const override { return "undefined"; }
+		std::string toString()  const override { return "undefined"; }
 		
 		static AsObjectUndefined* get() {
 			static AsObjectUndefined* theOne = CORE_GC_NEW_ROOT_ONLY AsObjectUndefined();
@@ -110,14 +116,14 @@ namespace Swf {
 	
 	class AsObjectNull : public AsObject {
 	public:
-		virtual AsPrimitiveType type()  const override {
+		AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_NULL );
 #endif
 			return APT_NULL;
 		}
 
-		virtual std::string toString()  const override { return "null"; }
+		std::string toString()  const override { return "null"; }
 
 		static AsObjectNull* get() {
 			static AsObjectNull* theOne = CORE_GC_NEW_ROOT_ONLY AsObjectNull();
@@ -137,16 +143,17 @@ namespace Swf {
 			prototype = s_objectPrototype;			
 		}
 			
-		virtual AsPrimitiveType type() const override {
+		AsPrimitiveType type() const override {
 #if DEBUG
 			assert( type ==  APT_BOOLEAN );
 #endif
 			return APT_BOOLEAN;
 		}
 
-		virtual std::string toString()  const override { return value ? "true" : "false"; }
-		virtual bool toBoolean()  const override { return value; }
-		virtual double toNumber()  const override { return value ? 1.0 : 0.0; }
+		void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) override;
+		bool toBoolean()  const override { return value; }
+		std::string toString()  const override { return value ? "true" : "false"; }
+		double toNumber()  const override { return value ? 1.0 : 0.0; }
 		
 		bool value;
 	};
@@ -165,22 +172,19 @@ namespace Swf {
 				prototype = s_stringPrototype;				
 			}
 		
-		virtual AsPrimitiveType type()  const override {
+		AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_STRING );
 #endif
 			return APT_STRING;
 		}
 
-		virtual void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) override;
+		void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) override;
+		bool toBoolean() const override;
+		std::string toString()  const override { return value; }
+		double toNumber()  const override;	
 		
-		virtual std::string toString()  const override { return value; }
-		
-		virtual double toNumber()  const override;
-		
-		virtual bool toBoolean() const override;
-		
-		virtual AsObjectHandle getProperty( const std::string& _name ) const override;
+		AsObjectHandle getProperty( const std::string& _name ) const override;
 			
 		AsObjectHandle length( AsAgRuntime* _runtime, int _numParams,  AsObjectHandle* _params );
 		
@@ -209,25 +213,25 @@ namespace Swf {
 				prototype = s_objectPrototype;
 			}
 
-		virtual AsPrimitiveType type()  const override {
+		AsPrimitiveType type()  const override {
 #if DEBUG
 			assert( type ==  APT_NUMBER );
 #endif
 			return APT_NUMBER;
 		}
 
-		virtual std::string toString() const override ;
+		void construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) override;
 		
-		virtual bool toBoolean()  const override {
+		bool toBoolean()  const override {
 			// TODO epsilon
 			if( value == 0.0) 
 				return false;
 			else 
 				return true;
 		}
-
-		virtual double toNumber()  const override { return value; }
-		virtual int toInteger()  const override { return (int) value; }
+		std::string toString() const override ;
+		double toNumber()  const override { return value; }
+		int toInteger()  const override { return (int) value; }
 
  		double value;
 	};	

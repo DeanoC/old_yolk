@@ -14,25 +14,26 @@
 
 namespace Swf {
 	class AsAgRuntime;
+	class AsVM;
 	
 	class AsFuncBase : public Core::GcBase {
 	public:
-		virtual Swf::AsObjectHandle call( Swf::AsAgRuntime* _runtime, int _numParams, Swf::AsObjectHandle* _params ) const = 0;
+		virtual AsObjectHandle call( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) const = 0;
 	};
 
 	class AsFuncThisBase : public Core::GcBase {
 	public:
-		virtual Swf::AsObjectHandle call( Swf::AsAgRuntime* _runtime, Swf::AsObjectHandle _this, int _numParams, Swf::AsObjectHandle* _params ) const = 0;
+		virtual AsObjectHandle call( AsAgRuntime* _runtime, AsObjectHandle _this, int _numParams, AsObjectHandle* _params ) const = 0;
 	};
 
-	class AsAgFunction : public Swf::AsFuncBase {
+	class AsAgFunction : public AsFuncBase {
 	public:
-		typedef Swf::AsObjectHandle (Swf::AsAgRuntime::*AsFuncAsAgFunc)( int, Swf::AsObjectHandle* );
+		typedef AsObjectHandle (AsAgRuntime::*AsFuncAsAgFunc)( int, AsObjectHandle* );
 			
 		AsAgFunction(AsFuncAsAgFunc _func ) :
 			function(_func) {};
 				
-		virtual Swf::AsObjectHandle call( Swf::AsAgRuntime* _runtime, int _numParams, Swf::AsObjectHandle* _params ) const {
+		virtual AsObjectHandle call( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) const {
 				return (_runtime->*function)( _numParams, _params );
 			}
 				
@@ -41,20 +42,20 @@ namespace Swf {
 	};
 		
 	template<class T>
-	class AsObjFunction : public Swf::AsFuncThisBase {
+	class AsObjFunction : public AsFuncThisBase {
 	public:
-		typedef Swf::AsObjectHandle (T::*AsFuncAsObjFunc)( Swf::AsAgRuntime*, int, Swf::AsObjectHandle* );
+		typedef AsObjectHandle (T::*AsFuncAsObjFunc)( AsAgRuntime*, int, AsObjectHandle* );
 			
 		AsObjFunction(AsFuncAsObjFunc _func ) :
 			function( (BaseFunc)_func) {};
 				
-		virtual Swf::AsObjectHandle call( Swf::AsAgRuntime* _runtime, Swf::AsObjectHandle _this, int _numParams, Swf::AsObjectHandle* _params ) const {
-			assert( _this != NULL );
+		virtual AsObjectHandle call( AsAgRuntime* _runtime, AsObjectHandle _this, int _numParams, AsObjectHandle* _params ) const {
+			CORE_ASSERT( _this != NULL );
 			return (_this->*function)( _runtime, _numParams, _params );
 		}
 				
 	private:
-		typedef Swf::AsObjectHandle (Swf::AsObject::*BaseFunc)( Swf::AsAgRuntime*, int, Swf::AsObjectHandle* );
+		typedef AsObjectHandle (AsObject::*BaseFunc)( AsAgRuntime*, int, AsObjectHandle* );
 		BaseFunc 					function;
 	};
 				
@@ -74,10 +75,11 @@ namespace Swf {
 
 		void addInstruction( int _pc, AsFuncInstruction* _inst );
 
+		void translateByteCode( const AsVM* _vm, const uint8_t* byteCode );
+
 		const std::string getLabel( int pc ) const;
 			
 		void debugLogFunction() const;
-			
 	private:
 		friend class AsFunction;
 			
@@ -99,7 +101,7 @@ namespace Swf {
 		std::string getName() const { return name; }
 		bool isCaseSensitive() const { return isCaseSens; }
 			
-		virtual Swf::AsObjectHandle call( Swf::AsAgRuntime* _runtime, int _numParams, Swf::AsObjectHandle* _params ) const;
+		virtual AsObjectHandle call( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) const;
 
 	private:
 		void computeLabelAddress( const AsFunctionBuilder* _builder, std::map<int, int>& labels );

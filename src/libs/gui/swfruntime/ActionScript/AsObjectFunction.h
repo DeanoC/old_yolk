@@ -23,17 +23,15 @@ namespace Swf {
 #endif
 			return APT_FUNCTION;
 		}		
-		AsObjectFunction( const Swf::AsFuncBase* _func ) :
+		AsObjectFunction( const AsFuncBase* _func ) :
 	 		AsObject( APT_FUNCTION ),
 			value( _func ) {}
 
 		AsObjectFunction( AsObjectHandle (AsAgRuntime::*_func)( int, AsObjectHandle* ) ) :
 			AsObject( APT_FUNCTION ),
-			value( CORE_NEW Swf::AsAgFunction(_func) ) 
-		{	
-		}
+			value( CORE_GC_NEW AsAgFunction(_func) ) {}
 
-	 	const Swf::AsFuncBase* value;
+	 	const AsFuncBase* value;
 	};
 
 	class AsObjectThisFunction : public AsObject {
@@ -44,18 +42,16 @@ namespace Swf {
 #endif
 			return APT_FUNCTION;
 		}		
-		AsObjectThisFunction( const Swf::AsFuncThisBase* _func ) :
+		AsObjectThisFunction( const AsFuncThisBase* _func ) :
  			AsObject( APT_FUNCTION ),
 			value( _func ) {}
 		
 		template<class T>
 		AsObjectThisFunction( AsObjectHandle (T::*_func)( AsAgRuntime*, int, AsObjectHandle* ) ) :
 			AsObject( APT_FUNCTION ),
-			value( CORE_NEW Swf::AsObjFunction<T>(_func) ) 
-		{	
-		}
+			value( CORE_GC_NEW AsObjFunction<T>(_func) ) {}
 	
- 		const Swf::AsFuncThisBase* value;
+ 		const AsFuncThisBase* value;
 	};	
 } /* Swf */ 
 
