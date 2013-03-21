@@ -53,32 +53,39 @@ namespace Swf {
 	AsAgRuntime::AsAgRuntime() : 
 		target(0),
 		root(0),
-		isCaseSens( false )  {
+		isCaseSens( false ) {
+
 		objectFactory = CORE_GC_NEW_ROOT_ONLY AsObjectFactory( this );
 		objectFactory->registerFunc( "Date", &AsDate::constructFunction );
 		objectFactory->registerFunc( "Array", &AsArray::constructFunction );
 
 		// create the global object
 		globalObject = objectFactory->construct( "object", 0, nullptr );
-		
+		globals = CORE_GC_NEW_ROOT_ONLY AsObjectEnvironmentRecord( this, nullptr, globalObject );
 		// global function/var table (need to work out what should be in here AND how
 		// things get added..)
-		functions[ "hasOwnProperty" ] = CORE_NEW AsAgFunction( &AsAgRuntime::hasOwnProperty );
-		functions[ "trace" ] = CORE_NEW AsAgFunction( &AsAgRuntime::trace );
+		globalObject->put( "trace", CORE_GC_NEW AsObjectFunction( &AsAgRuntime::trace ) );
 
 	}
 		
 	AsAgRuntime::~AsAgRuntime() {
+		CORE_GC_DELETE( globals );
 		CORE_GC_DELETE( objectFactory );
 	}
 		
 	void AsAgRuntime::callGlobalCode( AsFunction* _code, MovieClip* _movieClip ) {
 		setRoot( _movieClip );
 		setTarget( _movieClip );
-		variableEnvironment = &globals;
-		lexicalEnvironment = &globals;
-//		thisObject
-		_code->call( this, 0, nullptr );
+
+		ExecutionContext tmp;
+		tmp.variableEnvironment = globals;
+		tmp.lexicalEnvironment = globals;
+		tmp.thisObject = globalObject;
+		activeExecContexts.push_back( tmp );
+		currentExecContext = &activeExecContexts.back();
+		currentFunction = _code;
+
+		_code->call( this, nullptr, 0, nullptr );
 
 	}
 	void AsAgRuntime::setRoot( MovieClip* _root ) {
@@ -118,10 +125,11 @@ namespace Swf {
 		std::string varS;
 		if (parseVarTarget(name, pathS, varS) == false) {
 			// try locals first
-			if( variableEnvironment->find(name.c_str()) != variableEnvironment->end()) {
-				push(  (*variableEnvironment)[name.c_str()] );
+			auto ob = getIdentifier( currentExecContext->variableEnvironment, name );
+			if( ob->type() != APT_UNDEFINED ) {
+				push( ob );
 			} else {
-				// try members as not a local
+				// try members as not a local?
 				if(target) {
 					push( target->getProperty(name) );
 				}
@@ -141,10 +149,8 @@ namespace Swf {
 		std::string pathS;
 		std::string varS;
 		if (parseVarTarget(name, pathS, varS) == false) {
-			// try locals first
-			if( variableEnvironment->find(name.c_str()) != variableEnvironment->end()) {
-				(*variableEnvironment)[ name ] = value;
-			} else {
+			bool success = setIdentifier( currentExecContext->variableEnvironment, name, value );
+			if( !success ) {
 				// try members as not a local
 				if(target) {
 					target->setProperty(ToLowerIfReq(name, isCaseSensitive()), value);
@@ -166,28 +172,29 @@ namespace Swf {
 		AsObjectHandle nameObj = asPop();
 		AsObjectHandle obj = asPop();
 		std::string name = nameObj->toString();
-		obj->setProperty( ToLowerIfReq(name, isCaseSensitive()), value);
+		obj->put( ToLowerIfReq(name, isCaseSensitive()), value);
 	}
 		
 	void AsAgRuntime::defineLocal() {
 		AsObjectHandle val = asPop();
 		AsObjectHandle nameObj = asPop();
 		std::string name = nameObj->toString();
-		(*variableEnvironment)[ name.c_str() ] = val;
+		currentExecContext->variableEnvironment->createMutableBinding( name );
+		currentExecContext->variableEnvironment->setMutableBinding( name, val );
 	}
 		
 	void AsAgRuntime::defineLocal2() {
 		AsObjectHandle nameObj = asPop();
 		std::string name = nameObj->toString();
-		(*variableEnvironment)[ name.c_str() ] = AsObjectHandle( AsObjectUndefined::get() );
+		currentExecContext->variableEnvironment->createMutableBinding( name );
 	}
 		
 	void AsAgRuntime::newObject() {
 		AsObjectHandle nameObj = asPop();
-		AsObjectHandle argCountObj = asPop();
 		std::string str = nameObj->toString();
-		int numArgs = argCountObj->toInteger();
 
+		AsObjectHandle argCountObj = asPop();
+		int numArgs = argCountObj->toInteger();
 		AsObjectHandle args[MAX_ARGS]; 
 		for(int i=0;i < numArgs;++i) {
 			if( i < MAX_ARGS ) {
@@ -200,7 +207,63 @@ namespace Swf {
 		AsObjectHandle no = objectFactory->construct( str.c_str(), numArgs, args );
 		push(no);
 	}
-		
+
+	void AsAgRuntime::newMethod() {
+		AsObjectHandle nameObj = asPop();
+		AsObjectHandle obj = asPop();
+
+		std::string str = nameObj->toString();
+
+		AsObjectHandle argCountObj = asPop();
+		int numArgs = argCountObj->toInteger();
+		AsObjectHandle args[MAX_ARGS]; 
+		for(int i=0;i < numArgs;++i) {
+			if( i < MAX_ARGS ) {
+				args[i] = asPop();
+			} else {
+				pop();
+			}
+		}
+		AsObjectHandle ret = objectFactory->construct( "object", 0, nullptr );
+		obj->callMethodOn( this, ret, str, numArgs, args );
+		push( ret );
+	}
+	
+	void AsAgRuntime::callFunction() {
+		AsObjectHandle nameObj = asPop();
+		AsObjectHandle argCountObj = asPop();
+		std::string str = nameObj->toString();
+			
+		int numArgs = argCountObj->toInteger();
+		AsObjectHandle args[MAX_ARGS]; 
+		for(int i=0;i < numArgs;++i) {
+			if( i < MAX_ARGS ) {
+				args[i] = asPop();
+			} else {
+				pop();
+			}
+		}
+
+		auto ob = getIdentifier( currentExecContext->lexicalEnvironment, str );
+		if( ob->type() == APT_FUNCTION ) {
+			activeExecContexts.resize( activeExecContexts.size() + 1 );
+			currentExecContext =  &activeExecContexts.back();
+			currentExecContext->variableEnvironment = globals;
+			currentExecContext->lexicalEnvironment = globals;
+			currentExecContext->thisObject = globalObject;
+
+			auto func = (AsObjectFunction*) ob;
+			currentFunction = func->value;
+			push( func->value->call( this, currentExecContext->thisObject, numArgs, args ) );
+
+			activeExecContexts.pop_back();
+			currentExecContext = &activeExecContexts.back();
+		} else 
+		{
+			pushUndefined();
+		}			
+	}
+				
 	void AsAgRuntime::callMethod() {
 		AsObjectHandle nameObj = asPop();
 		AsObjectHandle obj = asPop();
@@ -453,37 +516,22 @@ namespace Swf {
 		if(obj)
 			target = obj; 
 	}
-	void AsAgRuntime::callFunction() {
-		AsObjectHandle nameObj = asPop();
-		AsObjectHandle argCountObj = asPop();
-		std::string str = nameObj->toString();
-			
-		int numArgs = argCountObj->toInteger();
-		AsObjectHandle args[MAX_ARGS]; 
-		for(int i=0;i < numArgs;++i) {
-			if( i < MAX_ARGS ) {
-				args[i] = asPop();
-			} else {
-				pop();
-			}
-		}
-			
-		AsFunctions::iterator it = functions.find( str );
-		if( it != functions.end() ) {
-			push( it->second->call( this, numArgs, args ) );
-		} else {
-			pushUndefined();
-		}			
-	}
-		
-	AsObjectHandle AsAgRuntime::hasOwnProperty( int _numParams, AsObjectHandle* _params ) {
+	AsObjectHandle AsAgRuntime::hasOwnProperty( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		assert(_numParams == 1 );
 		AsObjectHandle nameObj = _params[0];
 		std::string name = nameObj->toString();
-		bool ret = target->hasOwnProperty( name );
+		bool ret = _runtime->target->hasOwnProperty( name );
 		return CORE_NEW AsObjectBool(ret);
 	}
-		
+
+	AsObjectHandle AsAgRuntime::trace( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
+		for( int i = 0; i < _numParams; ++i ) {
+			LOG(INFO) << _params[i]->toString() << "\n";
+		}
+
+		return AsObjectNull::get();
+	}
+
 	bool AsAgRuntime::equalEcma262_11_9_3(AsObjectHandle _x, AsObjectHandle _y) {
 		// Ecma 262 11.9.3 equality
 		if( _x->type() == _y->type() ) {
@@ -540,14 +588,6 @@ namespace Swf {
 		}
 	}
 
-	AsObjectHandle AsAgRuntime::trace( int _numParams, AsObjectHandle* _params ) {
-		for( int i = 0; i < _numParams; ++i ) {
-			LOG(INFO) << _params[i]->toString() << "\n";
-		}
-
-		return AsObjectNull::get();
-	}
-
 	void AsAgRuntime::toNumber() {
 		push( asPop()->toNumber() );
 	}
@@ -573,7 +613,8 @@ namespace Swf {
 		AsObjectHandle argCountObj = asPop();
 		int numArgs = argCountObj->toInteger();
 		AsObjectHandle args[MAX_ARGS]; 
-		for(int i=0;i < numArgs;++i) {
+		// name + value per arg
+		for(int i=(numArgs*2)-1;i >= 0;--i) {
 			if( i < MAX_ARGS ) {
 				args[i] = asPop();
 			} else {
@@ -583,4 +624,181 @@ namespace Swf {
 		AsObjectHandle no = objectFactory->construct( "object", numArgs, args );
 		push( no );
 	}
+
+	AsAgRuntime::AsEnvironmentRecord::AsEnvironmentRecord( AsAgRuntime* _owner, AsEnvironmentRecord* _outer ) :
+		owner( _owner ),
+		outer( _outer ) {
+	}
+
+	AsAgRuntime::AsDeclEnvironmentRecord::AsDeclEnvironmentRecord( AsAgRuntime* _owner, AsEnvironmentRecord* _outer ) :
+		AsEnvironmentRecord( _owner, _outer ) {
+	}
+
+	bool AsAgRuntime::AsDeclEnvironmentRecord::hasBinding( const std::string& _name ) const {
+		return( records.find( _name ) != records.end() );
+	}
+
+	void AsAgRuntime::AsDeclEnvironmentRecord::createMutableBinding( const std::string& _name, bool _deletable ) {
+		CORE_ASSERT( !hasBinding(_name) );
+		records[ _name ] = AsObjectUndefined::get();
+		deletable[ _name ] = _deletable;
+		immutable[ _name ] = false;
+		// TODO pack all properties and value together for efficiency
+	}
+
+	void AsAgRuntime::AsDeclEnvironmentRecord::setMutableBinding( const std::string& _name, AsObjectHandle _value, const bool _strict ) {
+		CORE_ASSERT( hasBinding(_name) );
+		if( immutable[ _name ] == true ) {
+			// TODO ECMA-262 Throw here
+		} else {
+			records[ _name ] = _value;
+		}
+	}
+	AsObjectHandle AsAgRuntime::AsDeclEnvironmentRecord::getBindingValue( const std::string& _name, const bool _strict ) const {
+		CORE_ASSERT( hasBinding(_name) );
+		auto imm = immutable.find( _name);
+		if( imm != immutable.end() ) {
+			if( imm->second == false ) {
+				if( _strict == false ) {
+					return AsObjectUndefined::get();
+				} else {
+					// TODO ECMA-262 Throw
+					return AsObjectUndefined::get();
+				}
+			}
+		}
+		auto ret = records.find( _name );
+		if( ret == records.end() ) {
+			return AsObjectUndefined::get();
+		} else {
+			return ret->second;
+		}
+	}
+
+	bool AsAgRuntime::AsDeclEnvironmentRecord::deleteBinding( const std::string& _name ) {
+		if( hasBinding( _name ) == false ) {
+			return true;
+		}
+		if( deletable[ _name ] == false ) {
+			return false;
+		}
+		records.erase( records.find( _name ) );
+		return true;
+	}
+
+	AsObjectHandle AsAgRuntime::AsDeclEnvironmentRecord::implicitThisValue() const {
+		return AsObjectUndefined::get();
+	}
+
+
+	void AsAgRuntime::AsDeclEnvironmentRecord::createImmutableBinding( const std::string& _name ) {
+		CORE_ASSERT( !hasBinding(_name) );
+		records[ _name ] = nullptr;
+		deletable[ _name ] = false;
+		immutable[ _name ] = true;
+	}
+
+	void AsAgRuntime::AsDeclEnvironmentRecord::initializeImmutableBinding( const std::string& _name, AsObjectHandle _value ) {
+		CORE_ASSERT( hasBinding(_name) );
+		CORE_ASSERT( immutable[ _name ] == true );
+		CORE_ASSERT( records[ _name ] == nullptr );
+		records[ _name ] = _value;
+	}
+
+	AsAgRuntime::AsObjectEnvironmentRecord::AsObjectEnvironmentRecord( AsAgRuntime* _owner, AsEnvironmentRecord* _outer, AsObjectHandle _bindingObject, bool _provideThis ) :
+		AsEnvironmentRecord( _owner, _outer ),
+		bindingObject( _bindingObject ),
+		provideThis( _provideThis ) {
+	}
+
+	bool AsAgRuntime::AsObjectEnvironmentRecord::hasBinding( const std::string& _name ) const {
+		return bindingObject->hasProperty( _name );
+	}
+
+	void AsAgRuntime::AsObjectEnvironmentRecord::createMutableBinding( const std::string& _name, bool _deletable ) {
+		CORE_ASSERT( !hasBinding( _name ) );
+		bindingObject->defineOwnProperty( _name, AsObjectUndefined::get(), true, true, _deletable, true );
+	}
+
+	void AsAgRuntime::AsObjectEnvironmentRecord::setMutableBinding( const std::string& _name, AsObjectHandle _value, const bool _strict  ) {
+		bindingObject->put( _name, _value, _strict );
+	}
+
+	AsObjectHandle AsAgRuntime::AsObjectEnvironmentRecord::getBindingValue( const std::string& _name, const bool _strict ) const {
+		if( bindingObject->hasProperty( _name ) ) {
+			return bindingObject->getProperty( _name );
+		} else {
+			if( _strict ) {
+				// TODO ECMA-262 Throw
+				return AsObjectUndefined::get();
+			} else {
+				return AsObjectUndefined::get();
+			}
+		}
+	}
+
+	bool AsAgRuntime::AsObjectEnvironmentRecord::deleteBinding( const std::string& _name ) {
+		bindingObject->deleteProperty( _name, false );
+		return true;
+	}
+
+	AsObjectHandle AsAgRuntime::AsObjectEnvironmentRecord::implicitThisValue() const {
+		if( provideThis ) {
+			return bindingObject;
+		} else {
+			return AsObjectUndefined::get();
+		}
+	}
+
+	AsObjectHandle AsAgRuntime::getIdentifier( const AsEnvironmentRecord* _lex, const std::string& _name ) const {
+		if( _lex == nullptr ) {
+			return AsObjectUndefined::get();
+		} else {
+			if( _lex->hasBinding( _name ) ) {
+				return _lex->getBindingValue( _name );
+			} else {
+				return getIdentifier( _lex->outer, _name );
+			}
+		}
+	}
+	bool AsAgRuntime::setIdentifier( AsEnvironmentRecord* _lex, const std::string& _name, const AsObjectHandle _value ) const {
+		if( _lex == nullptr ) {
+			return false;
+		} else {
+			if( _lex->hasBinding( _name ) ) {
+				_lex->setMutableBinding( _name, _value );
+				return true;
+			} else {
+				return setIdentifier( _lex->outer, _name, _value );
+			}
+		}
+	}
+
+	void AsAgRuntime::enterGlobalCode() {
+		CORE_ASSERT( activeExecContexts.empty() );
+		activeExecContexts.resize( 1 );
+		currentExecContext = &activeExecContexts.back();
+		currentExecContext->lexicalEnvironment = globals;
+		currentExecContext->variableEnvironment = globals;
+		currentExecContext->thisObject = globalObject;
+	}
+	void AsAgRuntime::enterFunctionCode( AsObjectFunction* _func, AsObjectHandle _this, int _numArgs, AsObjectHandle _args[MAX_ARGS] ) {
+		CORE_ASSERT( !activeExecContexts.empty() );
+
+		auto outerExec = currentExecContext;
+		activeExecContexts.resize( activeExecContexts.size() + 1 );
+		currentExecContext = &activeExecContexts.back();
+		if( _this == nullptr || _this->type() == APT_UNDEFINED || _this->type() == APT_NULL ) {
+			currentExecContext->thisObject = globalObject;
+		} else {
+			currentExecContext->thisObject = _this;
+		}
+		currentExecContext->lexicalEnvironment = CORE_GC_NEW AsDeclEnvironmentRecord( this, outerExec->lexicalEnvironment );
+		currentExecContext->variableEnvironment = currentExecContext->lexicalEnvironment;
+
+	}
+	void AsAgRuntime::asReturn() {
+		// TODO return logic currentFunction->asReturn();
+	}
+
 } /* Swf */ 

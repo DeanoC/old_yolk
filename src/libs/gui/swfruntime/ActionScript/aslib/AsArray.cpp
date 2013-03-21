@@ -20,7 +20,7 @@ namespace Swf {
 		for( int i=0; i < _numParams; ++i ) {
 			std::ostringstream stream;
 			stream << i;
-			setProperty( stream.str(), _params[i] );
+			put( stream.str(), _params[i] );
 		}
 	}
 		

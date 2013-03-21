@@ -163,7 +163,7 @@ void FrameItem::setProperty( const std::string& _name, AsObjectHandle _handle ) 
 	if( propIt != s_asPropertyStringMap->end() ) {
 		setProperty( propIt->second, _handle );
 	} else {
-		AsObject::setProperty( _name, _handle );
+		AsObject::put( _name, _handle );
 	}
 }
 

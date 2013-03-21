@@ -3,7 +3,7 @@
  *  SwfPreview
  *
  *  Created by Deano on 19/07/2009.
- *  Copyright 2009 __MyCompanyName__. All rights reserved.
+ *  Copyright 2013 Cloud Pixies Ltd. All rights reserved.
  *
  */
 
@@ -11,16 +11,15 @@
 #include "gui/SwfParser/EndianBitConverter.h"
 #include "gui/SwfParser/SwfActionByteCode.h"
 #include "gui/swfruntime/movieclip.h"
+#include "AsFunctionBuilder.h"
 #include "AsFunction.h"
 #include "AsByteCode.h"
 #include "AsAgRuntime.h"
 #include "AsObjectFunction.h"
 #include "AsVM.h"
 
-bool g_doPreview = true;
 typedef void (Swf::AsAgRuntime::*AsAgRuntimeFunc)();
 AsAgRuntimeFunc g_AsAgRuntimeFuncs[256];
-#define DO_PREVIEW( x ) if(g_doPreview){ g_AsAgRuntime-> x; }
 
 namespace Swf {
 	const char* s_AsByteCodeNames[256];
@@ -97,10 +96,7 @@ namespace Swf {
 		AsFunction* func;
 		if( functionCache.find( byteCode->byteCode ) == functionCache.end() ) {
 		
-			std::ostringstream stream;
-			stream << GetUniqueName(_movieClip) << "_" << _movieClip->getCurrentFrameNumber();
-			
-			AsFunctionBuilder* funcBuild = CORE_GC_NEW AsFunctionBuilder( stream.str(), byteCode->lengthInBytes, byteCode->isCaseSensitive );
+			AsFunctionBuilder* funcBuild = CORE_GC_NEW AsFunctionBuilder( byteCode->lengthInBytes, byteCode->isCaseSensitive );
 			funcBuild->translateByteCode( this, byteCode->byteCode );
 			funcBuild->debugLogFunction();
 
@@ -138,7 +134,7 @@ namespace Swf {
 		int jumpTo = pc + offset;
 		if( func->getLabel( jumpTo ).empty() ) {
 			std::ostringstream stream;
-			stream << func->getName() << "_" << "IfL" << jumpTo;
+			stream << "IfL" << jumpTo;
 			func->addLabel( jumpTo, stream.str()  );
 		}
 	}
@@ -151,7 +147,7 @@ namespace Swf {
 		int jumpTo = pc + offset;
 		if( func->getLabel( jumpTo ).empty() ) {
 			std::ostringstream stream;
-			stream << func->getName() << "_" << "JmpL" << jumpTo;
+			stream << "JmpL" << jumpTo;
 			func->addLabel( jumpTo, stream.str()  );
 		}
 	}
@@ -362,8 +358,8 @@ namespace Swf {
 		std::string name = readString(_byteCode, pc);
 		uint16_t numArgs = endianConverter.ToUInt16( _byteCode, pc );
 		pc += 2;
-		std::string argNames[16];
-		assert( numArgs < 16 );
+		std::string argNames[AsAgRuntime::MAX_ARGS];
+		assert( numArgs < AsAgRuntime::MAX_ARGS );
 
 		for( int i = 0;i < numArgs;i++) {
 			argNames[i] = readString(_byteCode, pc);
@@ -375,7 +371,7 @@ namespace Swf {
 		AsFunction* newFunc;
 
 		if( functionCache.find( &_byteCode[pc] ) == functionCache.end() ) {
-			AsFunctionBuilder* funcBuild = CORE_GC_NEW AsFunctionBuilder( name, codeSize, func->isCaseSensitive() );
+			AsFunctionBuilder* funcBuild = CORE_GC_NEW AsFunctionBuilder( codeSize, func->isCaseSensitive() );
 			funcBuild->translateByteCode( this, &_byteCode[pc] );
 			funcBuild->debugLogFunction();
 

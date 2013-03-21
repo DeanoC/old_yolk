@@ -16,9 +16,12 @@ namespace Swf {
 	class FrameItem;
 	class AsObjectFactory;
 	class AsFunction;
+	class AsObjectFunction;
 		
 	class AsAgRuntime  {
 	public:		
+		static const int MAX_ARGS = 64;
+
 		AsAgRuntime();
 			
 		~AsAgRuntime();
@@ -136,7 +139,9 @@ namespace Swf {
 		void pushDuplicate();
 		void swapStack();
 		void initObject();
-			
+		void newMethod();
+		void asReturn();
+		
 		// As2 functions not yet implemented
 		#define AS_TODO { assert(false); } 
 			
@@ -155,11 +160,9 @@ namespace Swf {
 		void MBOrd() AS_TODO
 		void MBChr() AS_TODO
 		void asDelete() AS_TODO
-		void asReturn() AS_TODO
 		void modulo() AS_TODO
 		void typeOf() AS_TODO
 		void enumerate() AS_TODO
-		void newMethod() AS_TODO
 		void bitwiseAnd() AS_TODO
 		void bitwiseEor() AS_TODO
 		void bitwiseXor() AS_TODO
@@ -203,8 +206,8 @@ namespace Swf {
 	protected:
 		// callable functions
 		// hasOwnProperty checks the target has the property specified
-		AsObjectHandle hasOwnProperty( int _numParams, AsObjectHandle* _params );
-		AsObjectHandle trace( int _numParams, AsObjectHandle* _params );
+		static AsObjectHandle hasOwnProperty(  AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
+		static AsObjectHandle trace(  AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 
 		bool equalEcma262_11_9_3(AsObjectHandle _x, AsObjectHandle _y);			
 		
@@ -213,24 +216,87 @@ namespace Swf {
 		typedef Core::gctraceablestack<AsObjectHandle> AsStack;
 		AsStack					stack;
 
-		typedef Core::gctraceablemap<std::string, AsObjectHandle> AsEnvironmentRecord;
-		AsEnvironmentRecord			globals;
-		AsObjectHandle				globalObject;
+		class AsEnvironmentRecord {
+		public:
+			AsEnvironmentRecord( AsAgRuntime* _owner, AsEnvironmentRecord* _outer );
+			virtual ~AsEnvironmentRecord() {};
 
-		AsEnvironmentRecord*		variableEnvironment;
-		AsEnvironmentRecord*		lexicalEnvironment;
-		AsObjectHandle				thisObject;
+			virtual bool hasBinding( const std::string& _name ) const = 0;
+			virtual void createMutableBinding( const std::string& _name, const bool _deletable = false ) = 0;
+			virtual void setMutableBinding( const std::string& _name, AsObjectHandle _value, const bool _strict = false ) = 0;
+			virtual AsObjectHandle getBindingValue( const std::string& _name, const bool _strict = false ) const = 0;
+			virtual bool deleteBinding( const std::string& _name ) = 0;
+			virtual AsObjectHandle implicitThisValue() const = 0;
+
+		public:
+			AsAgRuntime* owner;
+			AsEnvironmentRecord* outer;
+		};
+
+		class AsDeclEnvironmentRecord : public AsEnvironmentRecord {
+		public:
+			AsDeclEnvironmentRecord( AsAgRuntime* _owner, AsEnvironmentRecord* _outer );
+
+			bool hasBinding( const std::string& _name ) const override;
+			void createMutableBinding( const std::string& _name, const bool _deletable ) override;
+			void setMutableBinding( const std::string& _name, AsObjectHandle _value, const bool _strict  ) override;
+			AsObjectHandle getBindingValue( const std::string& _name, const bool _strict ) const override;
+			bool deleteBinding( const std::string& _name ) override;
+			AsObjectHandle implicitThisValue() const override;
+
+			void createImmutableBinding( const std::string& _name );
+			void initializeImmutableBinding( const std::string& _name, AsObjectHandle _value );
+
+		private:
+			typedef std::map< const std::string, bool > BooleanProperty;
+
+			Core::gctraceablemap<std::string, AsObjectHandle> records;
+			BooleanProperty deletable;
+			BooleanProperty immutable;
+		};
+
+		class AsObjectEnvironmentRecord : public AsEnvironmentRecord {
+		public:
+			AsObjectEnvironmentRecord( AsAgRuntime* _owner, AsEnvironmentRecord* _outer, AsObjectHandle _bindingObject, bool _provideThis = false );
+
+			bool hasBinding( const std::string& _name ) const override;
+			void createMutableBinding( const std::string& _name, const bool _deletable ) override;
+			void setMutableBinding( const std::string& _name, AsObjectHandle _value, const bool _strict  ) override;
+			AsObjectHandle getBindingValue( const std::string& _name, const bool _strict ) const override;
+			bool deleteBinding( const std::string& _name ) override;
+			AsObjectHandle implicitThisValue() const override;
+
+			void createImmutableBinding( const std::string& _name );
+			void initializeImmutableBinding( const std::string& _name, AsObjectHandle _value );
+		private:
+			AsObjectHandle bindingObject;
+			bool provideThis;
+		};
+		struct ExecutionContext {
+			AsEnvironmentRecord*		variableEnvironment;
+			AsEnvironmentRecord*		lexicalEnvironment;
+			AsObjectHandle				thisObject;
+		};
+		typedef std::vector<ExecutionContext> ActiveExecutionContexts;
+		ActiveExecutionContexts			activeExecContexts;
+		ExecutionContext*				currentExecContext;
+
+		AsObjectEnvironmentRecord*	globals;
+		AsObjectHandle				globalObject;
+		const AsFuncBase*			currentFunction;
 
 		FrameItem*				target;
 		FrameItem*				origTarget;
 		MovieClip*				root;
 		AsObjectFactory*		objectFactory;
-		bool 					isCaseSens;
+		bool 					isCaseSens;		
 			
-		typedef Core::gctraceablemap<std::string, Swf::AsFuncBase*> AsFunctions;
-		AsFunctions functions;
-			
-		static const int MAX_ARGS = 16;
+		AsObjectHandle getIdentifier( const AsEnvironmentRecord* _lex, const std::string& _name ) const;
+		bool setIdentifier( AsEnvironmentRecord* _lex, const std::string& _name, const AsObjectHandle _value ) const;
+
+		void enterGlobalCode();
+		void enterFunctionCode( AsObjectFunction* _func, AsObjectHandle	_this, int _numArgs, AsObjectHandle _args[MAX_ARGS] );
+
 	};
 } /* Swf */ 
 

@@ -55,13 +55,21 @@ namespace Swf {
 		AsObjectHandle callMethod( AsAgRuntime* _runtime, const std::string& _name, int _numParams, AsObjectHandle* _params ) {
 			return callMethodOn(_runtime, this, _name, _numParams, _params );
 		}
-		virtual AsObjectHandle getOwnProperty( const std::string& _name ) const;
-		virtual bool hasOwnProperty( const std::string& _name ) const;
+		// use by prototypes to call there method on another object
+		virtual AsObjectHandle callMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params );
 
+		virtual void defineOwnProperty( const std::string& _name, AsObjectHandle _value, 
+										bool _writable, bool _enumerable, bool _configurable, bool _args );
+		virtual void deleteProperty( const std::string& _name, bool _strict = false);
+
+		virtual AsObjectHandle getOwnProperty( const std::string& _name ) const;
 		virtual AsObjectHandle getProperty( const std::string& _name ) const;
-		virtual void setProperty( const std::string& _name, AsObjectHandle _handle );
+
+		virtual bool hasOwnProperty( const std::string& _name ) const;
 		virtual bool hasProperty( const std::string& _name ) const;
+
 		virtual AsObjectHandle get( AsAgRuntime* _runtime, const std::string& _name ) const;
+		virtual void put( const std::string& _name, AsObjectHandle _handle, bool _strict = false );
 
 		
 	protected:
@@ -72,8 +80,6 @@ namespace Swf {
 		#endif
 		{}
 
-		// use by prototypes to call there method on another object
-		virtual AsObjectHandle callMethodOn( AsAgRuntime* _runtime, AsObjectHandle _this, const std::string& _name, int _numParams, AsObjectHandle* _params );
 	
 		AsObjectHandle ctor( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );
 		AsObjectHandle hasOwnProperty( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params );

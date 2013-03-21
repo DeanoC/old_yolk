@@ -17,7 +17,7 @@ namespace Swf {
 
 	class AsObjectFunction : public AsObject {
 	public:	
-		virtual AsPrimitiveType type() {
+		AsPrimitiveType type() const override {
 #if DEBUG
 			assert( type ==  APT_FUNCTION );
 #endif
@@ -27,32 +27,17 @@ namespace Swf {
 	 		AsObject( APT_FUNCTION ),
 			value( _func ) {}
 
-		AsObjectFunction( AsObjectHandle (AsAgRuntime::*_func)( int, AsObjectHandle* ) ) :
+		AsObjectFunction( AsObjectHandle (*_func)( AsAgRuntime*, int, AsObjectHandle* ) ) :
 			AsObject( APT_FUNCTION ),
-			value( CORE_GC_NEW AsAgFunction(_func) ) {}
+			value( CORE_GC_NEW AsNativeFunction(_func) ) {}
+
+		template<class T>
+		AsObjectFunction( AsObjectHandle (T::*_func)( AsAgRuntime*, int, AsObjectHandle* ) ) :
+			AsObject( APT_FUNCTION ),
+			value( CORE_GC_NEW AsNativeMemberFunction<T>(_func) ) {}
 
 	 	const AsFuncBase* value;
 	};
-
-	class AsObjectThisFunction : public AsObject {
-	public:	
-		virtual AsPrimitiveType type() {
-#if DEBUG
-			assert( type ==  APT_FUNCTION );
-#endif
-			return APT_FUNCTION;
-		}		
-		AsObjectThisFunction( const AsFuncThisBase* _func ) :
- 			AsObject( APT_FUNCTION ),
-			value( _func ) {}
-		
-		template<class T>
-		AsObjectThisFunction( AsObjectHandle (T::*_func)( AsAgRuntime*, int, AsObjectHandle* ) ) :
-			AsObject( APT_FUNCTION ),
-			value( CORE_GC_NEW AsObjFunction<T>(_func) ) {}
-	
- 		const AsFuncThisBase* value;
-	};	
 } /* Swf */ 
 
 #endif /* end of include guard: ASOBJECTFUNCTION_H_KCNMNQOQ */

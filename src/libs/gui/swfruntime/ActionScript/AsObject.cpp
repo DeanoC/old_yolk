@@ -25,7 +25,7 @@ namespace Swf {
 		PropertyMap::const_iterator it = properties.find( _name );
 		if( it != properties.end() ) {
 			if( it->second->type() == APT_FUNCTION ) {
-				AsObjectThisFunction* func = (AsObjectThisFunction*)(it->second);
+				AsObjectFunction* func = (AsObjectFunction*)(it->second);
 				return func->value->call( _runtime, _this, _numParams, _params );
 			}
 		}
@@ -34,6 +34,11 @@ namespace Swf {
 		} else {
 			return AsObjectHandle( AsObjectUndefined::get() );
 		}
+	}		
+	void AsObject::defineOwnProperty( const std::string& _name, AsObjectHandle _value, 
+									bool _writable, bool _enumerable, bool _configurable, bool _args ) {
+		// todo do this properly
+		put( _name, _value );
 	}
 
 	AsObjectHandle AsObject::getOwnProperty( const std::string& _name ) const {
@@ -53,6 +58,11 @@ namespace Swf {
 		}
 	}
 
+	void AsObject::deleteProperty( const std::string& _name, bool _strict ) {
+		CORE_ASSERT( hasProperty( _name ) );
+		properties.erase( properties.find( _name ) );
+	}
+
 	AsObjectHandle AsObject::getProperty( const std::string& _name ) const {
 		auto ownProp = getOwnProperty( _name );
 		if(  ownProp != AsObjectUndefined::get() ) {
@@ -64,7 +74,7 @@ namespace Swf {
 		}
 	}
 
-	void AsObject::setProperty( const std::string& _name, AsObjectHandle _handle ) {
+	void AsObject::put( const std::string& _name, AsObjectHandle _handle, bool _strict ) {
 		properties[ _name ] = _handle;
 	}
 
@@ -89,13 +99,19 @@ namespace Swf {
 	void AsObject::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		// it seems slightly odd to add the constructor function as a callable method but
 		// in practise is no different from calling a ctor in C++ manually
-		auto ctor = CORE_GC_NEW AsObjectThisFunction( &AsObject::ctor );
-		setProperty( "", ctor );
-		setProperty( "()", ctor );
+		auto ctor = CORE_GC_NEW AsObjectFunction( &AsObject::ctor );
+		put( "", ctor );
+		put( "()", ctor );
 
-		setProperty( "hasOwnProperty", CORE_GC_NEW AsObjectThisFunction( &AsObject::hasOwnProperty ) );
-		setProperty( "toString", CORE_GC_NEW AsObjectThisFunction( &AsObject::toString ) );
-		setProperty( "toNumber", CORE_GC_NEW AsObjectThisFunction( &AsObject::toNumber ) );
+		put( "hasOwnProperty", CORE_GC_NEW AsObjectFunction( &AsObject::hasOwnProperty ) );
+		put( "toString", CORE_GC_NEW AsObjectFunction( &AsObject::toString ) );
+		put( "toNumber", CORE_GC_NEW AsObjectFunction( &AsObject::toNumber ) );
+
+		for( int i = 0;i < _numParams; ++i ) {
+			const std::string name = _params[ i*2 ]->toString();
+			AsObjectHandle val = _params[ (i*2)+1 ];
+			put( name, val );
+		}
 	}
 	
 	AsObjectHandle AsObject::ctor( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
@@ -148,7 +164,7 @@ namespace Swf {
 	//=-=-=-=
 	void AsObjectString::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		prototype = s_objectPrototype;
-		setProperty( "length", CORE_GC_NEW AsObjectThisFunction( &AsObjectString::length ) );
+		put( "length", CORE_GC_NEW AsObjectFunction( &AsObjectString::length ) );
 		if( _numParams >= 1 ) {
 			value = _params[0]->toString();
 		}

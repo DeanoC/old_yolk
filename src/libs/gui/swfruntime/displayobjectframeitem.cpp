@@ -19,7 +19,12 @@
 
 namespace Swf {
 	float DisplayObjectFrameItem::getXPosition() const {
-		return displayObject->matrix->translateX;
+		if( displayObject ) {
+			return displayObject->matrix->translateX; 
+		} else {
+			return 0.0f;
+		}
+
 	}
 
 	void DisplayObjectFrameItem::setXPosition( const float _xpos ) {
@@ -31,7 +36,11 @@ namespace Swf {
 	}
 
 	float DisplayObjectFrameItem::getYPosition() const {
-		return displayObject->matrix->translateY;
+		if( displayObject ) {
+			return displayObject->matrix->translateY;
+		} else {
+			return 0.0f;
+		}
 	}
 
 	void DisplayObjectFrameItem::setYPosition( const float _ypos ) {

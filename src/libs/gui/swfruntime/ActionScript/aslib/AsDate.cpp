@@ -18,13 +18,13 @@ namespace Swf {
 	void AsDate::construct( AsAgRuntime* _runtime, int _numParams, AsObjectHandle* _params ) {
 		AsObject::construct( _runtime, _numParams, _params );
 
-		setProperty( "getHours", CORE_NEW AsObjectThisFunction( &AsDate::getHours ) );
-		setProperty( "getMinutes", CORE_NEW AsObjectThisFunction( &AsDate::getMinutes ) );
-		setProperty( "getSeconds", CORE_NEW AsObjectThisFunction( &AsDate::getSeconds ) );
-		setProperty( "getDay", CORE_NEW AsObjectThisFunction( &AsDate::getDay ) );
-		setProperty( "getDate", CORE_NEW AsObjectThisFunction( &AsDate::getDate ) );
-		setProperty( "getMonth", CORE_NEW AsObjectThisFunction( &AsDate::getMonth ) );
-		setProperty( "getFullYear", CORE_NEW AsObjectThisFunction( &AsDate::getFullYear ) );
+		put( "getHours", CORE_GC_NEW AsObjectFunction( &AsDate::getHours ) );
+		put( "getMinutes", CORE_GC_NEW AsObjectFunction( &AsDate::getMinutes ) );
+		put( "getSeconds", CORE_GC_NEW AsObjectFunction( &AsDate::getSeconds ) );
+		put( "getDay", CORE_GC_NEW AsObjectFunction( &AsDate::getDay ) );
+		put( "getDate", CORE_GC_NEW AsObjectFunction( &AsDate::getDate ) );
+		put( "getMonth", CORE_GC_NEW AsObjectFunction( &AsDate::getMonth ) );
+		put( "getFullYear", CORE_GC_NEW AsObjectFunction( &AsDate::getFullYear ) );
 
 	}
 		
