@@ -10,6 +10,6 @@ add_subdirectory( convert )
 
 #add_subdirectory( vtdfh )
 #add_subdirectory( cyberhackerspace )
-#add_subdirectory( bowlball )
+add_subdirectory( bowlball )
 #add_subdirectory( zombiehospital )
-add_subdirectory( trade )
+#add_subdirectory( trade )

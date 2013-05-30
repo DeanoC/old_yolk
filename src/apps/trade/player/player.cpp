@@ -21,10 +21,10 @@ Player::Player( SceneWorldPtr _world, int _localPlayerNum, Core::TransformNode* 
 
 	basicUI.reset( Scene::TextureAtlasHandle::load( "basic_ui" ) );
 
-	flashTest.reset( Swf::PlayerHandle::load( "testdialog" ) );
-	auto fl = flashTest.acquire();
-	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1, arg::_2 );
-	world->addRenderable2D( std::make_shared<std::function< void (const Scene::ScreenPtr, Scene::RenderContext*)>>(r2d) );
+//	flashTest.reset( Swf::PlayerHandle::load( "testdialog" ) );
+//	auto fl = flashTest.acquire();
+//	auto r2d = std::bind( &Player::renderable2DCallback, this, arg::_1, arg::_2 );
+//	world->addRenderable2D( std::make_shared<std::function< void (const Scene::ScreenPtr, Scene::RenderContext*)>>(r2d) );
 
 	myThingy.reset( ThingFactory::createThingFromHier( std::make_shared<Scene::Hier>( "drtom" ), TBC_PLAYER )  );
 
@@ -101,8 +101,8 @@ bool Player::findHeightBelow( float& height ) {
 void Player::update( float timeInSeconds ) {
 	InputFrame input;
 
-	auto fl = flashTest.acquire();
-	fl->advance( timeInSeconds * 1000.0f );
+//	auto fl = flashTest.acquire();
+//	fl->advance( timeInSeconds * 1000.0f );
 
 	while( inputContext->dequeueInputFrame( &input ) ) {
 		if( input.pad[0].debugButton1 ) {

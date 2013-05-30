@@ -520,12 +520,11 @@
 	"buffers":
 	[
 		{
-			"contents": "<DIV align=left>Green base with offical Pendelfin&nbsp;label</DIV>",
+			"file": "/H/Biz/Government/Tax/EndOfYearConfirm12-13.txt",
 			"settings":
 			{
-				"buffer_size": 66,
-				"line_ending": "Windows",
-				"name": "<DIV align=left>Green base with offical Pendelfin&"
+				"buffer_size": 546,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -561,6 +560,7 @@
 	},
 	"file_history":
 	[
+		"/C/IT/Projects/MorningStar/UnrealEngine3/Engine/Shaders/Mobile/AOEdgePreservingFilterVertexShader.msf",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceIOS/ITAtomic_IOS.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITAtomic_Android.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITThread_Win.cpp",
@@ -687,8 +687,7 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsObject.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.h",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.cpp"
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h"
 	],
 	"find":
 	{
@@ -895,22 +894,22 @@
 			[
 				{
 					"buffer": 0,
+					"file": "/H/Biz/Government/Tax/EndOfYearConfirm12-13.txt",
 					"settings":
 					{
-						"buffer_size": 66,
+						"buffer_size": 546,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								66,
-								0
+								546,
+								546
 							]
 						],
 						"settings":
 						{
-							"auto_name": "<DIV align=left>Green base with offical Pendelfin&",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
