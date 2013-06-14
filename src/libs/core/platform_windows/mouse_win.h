@@ -5,7 +5,7 @@
 //!-----------------------------------------------------
 
 #pragma once
-#ifndef YOLK_ORE_MOUSE_WIN_H_
+#ifndef YOLK_CORE_MOUSE_WIN_H_
 #define YOLK_CORE_MOUSE_WIN_H_
 
 namespace Core {
@@ -21,6 +21,16 @@ public:
 	void unlockFromWindow();
 	void showCursor();
 	void hideCursor();
+
+	// on windows mouse can only be relative or absolute at any one time.
+	void setRelativeMode() {
+		relativeMode = true;
+		lockToWindow();		// no choice if you use relative mode on windows
+	}
+
+	void setAbsoluteMode() {
+		relativeMode = false;
+	}
 
 	float getRelX() const {
 		return (float)xRel;
@@ -56,6 +66,7 @@ protected:
 	int yRel;
 	bool hasFocus;
 	bool cursorVisible;
+	bool relativeMode;
 
 	int xAbs;
 	int yAbs;

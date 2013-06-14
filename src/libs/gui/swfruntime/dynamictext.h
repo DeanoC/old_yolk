@@ -9,7 +9,7 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-#include "gui/SwfParser/SwfText.h"
+#include "gui/swfparser/SwfText.h"
 #include "text.h"
 namespace Swf {
 	// forward decl

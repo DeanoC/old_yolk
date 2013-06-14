@@ -8,7 +8,7 @@
 #ifndef YOLK_GUI_SWFRUNTIME_GPULINEPATH_H_
 #define YOLK_GUI_SWFRUNTIME_GPULINEPATH_H_
 
-#include "gui/SwfParser/SwfVec2Twip.h"
+#include "gui/swfparser/SwfVec2Twip.h"
 #include "core/resources.h"
 #include "scene/databuffer.h"
 #include "basepath.h"

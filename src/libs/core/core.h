@@ -60,6 +60,7 @@
 #	error Not supported
 #endif
 
+#include <cstdint>
 // for now whilst performance isn't king allow exceptions
 #define USE_CPP_EXCEPTIONS
 

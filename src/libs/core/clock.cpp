@@ -84,7 +84,7 @@ void Clock::sleep( float fTimeInSecs )
 #if PLATFORM == WINDOWS	
 	::Sleep( (DWORD)(fTimeInSecs * 1000.f) );
 #else
-	Core::this_thread::sleep( boost::posix_time::milliseconds(fTimeInSecs*1000.f) );
+	std::this_thread::sleep_for( std::chrono::milliseconds( (int)(fTimeInSecs*1000.f) ) );
 #endif
 }
 

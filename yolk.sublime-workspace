@@ -4,6 +4,54 @@
 		"selected_items":
 		[
 			[
+				"uin",
+				"uint16_t"
+			],
+			[
+				"Pro",
+				"ProtoHeader"
+			],
+			[
+				"uint",
+				"uint32_t"
+			],
+			[
+				"Pr",
+				"ProtoHeader"
+			],
+			[
+				"Prot",
+				"ProtoQID"
+			],
+			[
+				"P",
+				"ProtoFID"
+			],
+			[
+				"n",
+				"namespace"
+			],
+			[
+				"Proto",
+				"ProtoString"
+			],
+			[
+				"plat",
+				"platform_posix"
+			],
+			[
+				"pl",
+				"platform_header_files"
+			],
+			[
+				"PL",
+				"platform_windows"
+			],
+			[
+				"HEADLESS",
+				"headless"
+			],
+			[
 				"tim",
 				"timespec"
 			],
@@ -300,10 +348,6 @@
 				"alreadyAcquiring"
 			],
 			[
-				"uint",
-				"uint32_t"
-			],
-			[
 				"qui",
 				"quitFlag"
 			],
@@ -408,10 +452,6 @@
 				"thunkSegSize"
 			],
 			[
-				"uin",
-				"uint32_t"
-			],
-			[
 				"encodeFuncWith",
 				"encodeFuncWithParam"
 			],
@@ -460,10 +500,6 @@
 				"yorkSandboxMem"
 			],
 			[
-				"Pro",
-				"PROT_EXEC"
-			],
-			[
 				"win",
 				"winSettings"
 			],
@@ -478,52 +514,67 @@
 			[
 				"map",
 				"mapFlags"
-			],
-			[
-				"mem",
-				"membase"
-			],
-			[
-				"Memo",
-				"MemoryBuffer"
-			],
-			[
-				"Free",
-				"FreeListNode"
-			],
-			[
-				"rodata",
-				"rodata_start"
-			],
-			[
-				"BitC",
-				"BitCoder	"
-			],
-			[
-				"BitCoder",
-				"BitCoderEnvironment	"
-			],
-			[
-				"getRaw",
-				"getRawElfSize"
-			],
-			[
-				"MC",
-				"MCContext"
-			],
-			[
-				"theTe",
-				"theTriple	llvm::Triple"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/H/Biz/Government/Tax/EndOfYearConfirm12-13.txt",
+			"file": "src/libs/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 546,
+				"buffer_size": 1177,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/styx/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 348,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/styx/styx.h",
+			"settings":
+			{
+				"buffer_size": 123,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/styx/styxprotocol.cpp",
+			"settings":
+			{
+				"buffer_size": 1110,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "#pragma once\n\n#if !defined(YOLK_STYX_STYXPROTOCOL_H_)\n#define YOLK_STYX_STYXPROTOCOL_H_\n#include <cstdint>\n\nnamespace styx {\n	static const uint16_t NO_TAG = ~0;\n	static const uint16_t NO_FID = ~0;\n\n	enum class ProtoType : uint8_t {\n		PT_Tversion = 101,	//!< Transmit version\n		PT_Rversion,		//!< Recieve version\n		PT_Tauth,			//!< Transmit authentication\n		PT_Rauth,			//!< Recieve authenticiation\n		PT_Tattach,			//!< Transmit attach to a filesystem\n		PT_Rattach,			//!< Receive attach with details of attachment\n		PT_Terror,			//!< Transmit error packet, NEVER implemented\n		PT_Rerror,			//!< Recieve error (sent in reply to any Transmit that fails)\n		PT_Tflush,			//!< Transmit msg to cancel a previous message\n		PT_Rflush,			//!< Recieve msg confirming cancellation\n		PT_Twalk,			//!< Trasmit a walk filesystem message\n		PT_Rwalk,			//!< Recive reply with files returned via walk\n		PT_Topen,			//!< Transmit open a file\n		PT_Ropen,			//!< Recieve fid for file just opened\n		PT_Tcreate,			//!< Transmit a create a new file msg\n		PT_Rcreate,			//!< Receive fid of new file\n		PT_Tread,			//!< Trasmit file read request\n		PT_Rread,			//!< Recieve data from file read\n		PT_Twrite,			//!< Transmit file write request\n		PT_Rwrite,			//!< Receive response for file write\n		PT_Tclunk,			//!< Transmit a Clunk AKA close a fid\n		PT_Rclunk,			//!< Receive response to a file Clunk AKA close\n		PT_Tremove,			//!< Transmit delete file request\n		PT_Rremove,			//!< Response to file delete\n		PT_Tstat,			//!< Trasmit a stat request for info on a file\n		PT_Rstat,			//!< Recieve the stat data for a file\n		PT_Twstat,			//!< Transmit a write stat\n		PT_Rwstat,			//!< Recieve a write state response\n	};\n	//! The wire format for strings is a uint16_t count in bytes followed by the data.\n	//! String format is always UTF-8 and NUL is not at the end or allowed anywhere\n	struct ProtoString {\n		uint16_t count;\n		//! Total size of payload and count in bytes (i.e. How much to allocate)\n		uint32_t getTotalSizeInBytes() const { return sizeof( uint16_t ) + count; }\n		//! count bytes of UTF-8 string data\n		const uint8_t* getData() const { return reinterpret_cast<const uint8_t*>(this+1); }\n	private:\n		ProtoString();\n		ProtoString& operator=( const ProtoString& _rhs );\n	};\n\n	struct ProtoQID {\n		uint8_t 	type;\n		uint32_t	version;\n		uint64_t	uniqueId;\n	};\n\n	typedef uint32_t ProtoFID;\n\n	struct ProtoStat {\n		uint16_t 	size; 	//!< Size of structure\n		uint16_t	type;	//!< Unused\n		uint32_t	dev;	//!< Unused\n		ProtoQID	qid;	//!< QID of file\n		uint32_t	mode;	//!< Permission and flags\n		uint32_t	atime;	//!< Last access time\n		uint32_t	mtime;	//!< Last modification time\n		uint64_t	length;	//!< Length of file\n		ProtoString name;	//!< Name of file\n		// ProtoString uid 	//!< Owners name\n		// ProtoString gid 	//!< Groups name\n		// ProtoString muid 	//!< Name of user who last modified file\n	};\n\n	//! All styx messages have the header at the start.\n	//! All styx message should have a create and no ctors function (by convention not virtual)\n	struct ProtoHeader {\n		uint32_t 	size; 	//!< size is inclusive\n		ProtoType 	type; 	//!< Message type enum\n		uint16_t 	tag; 	//!< client unique tag (used to match reply), NO_TAG if fire and forget\n	private:\n		ProtoHeader();\n	};\n\n	//! Object containing a version msg from the client to the server.\n	//! No ctors (use create) as variable size object\n	struct TVersion : public ProtoHeader {\n\n		uint32_t		maxSize; 	//!< max size of RVersion msg (inc header) the server can send\n		ProtoString		version; 	//!< clients version string\n\n		TVersion* create( const uint32_t _maxSize, const ProtoString& _clientVersion );\n\n	private:\n		TVersion();\n	};\n\n	struct RVersion : public ProtoHeader {\n		uint32_t		maxSize;	//!< must be less than or equal to clients maxSize\n		ProtoString		version; 	//!< servers version string\n\n		RVersion* create( const uint32_t _maxSize, const ProtoString& _serverVersion );\n	private:\n		RVersion();\n	};\n\n	//! NOTE: the second string is not located where the structure seems to indicate, do not use.\n	struct TAuth : public ProtoHeader {\n		ProtoFID afid;				//!< Authentication file ID\n		ProtoString uname;			//!< User name, must be the same as the attach message\n		//ProtoString aname;			//!< Access root, must be the same as the attach message\n	};\n\n	struct RAuth : public ProtoHeader {\n		ProtoQID aqid;				//!< Authentication QID\n	};\n\n	//! NOTE: the second string is not located where the structure seems to indicate, do not use.\n	struct TAttach : public ProtoHeader {\n		ProtoFID fid;				//!< File ID to attach remote file system too\n		ProtoFID afid; 				//!< A file ID from a previous authentication message NO_FID for no authentication\n		ProtoString uname;			//!< User name, must be the same as the authenticate message\n		//ProtoString aname;			//!< Access root, must be the same as the authenticate message\n	};\n\n	struct RAttach : public ProtoHeader {\n		ProtoQID	aqid;			//!< Root QID\n	};\n\n	struct RClunk : public ProtoHeader {\n		ProtoFID	fid;			//!< File to clunk a.k.a. close\n	};\n\n	struct TClunk : public ProtoHeader {\n	};\n\n	struct RError : public ProtoHeader {\n		ProtoString ename;			//!< error message\n	};\n\n	struct TFlush : public ProtoHeader {\n		uint16_t otag;				//!< tag of message to cancel\n	};\n\n	struct TFlush : public ProtoHeader {\n	};\n\n	struct TOpen : public ProtoHeader {\n		ProtoFID fid;				//!< file ID to open\n		uint8_t mode;				//!< Mode flags\n	};\n\n	struct ROpen : public ProtoHeader {\n		ProtoQID qid;				//!< QID of the open file\n		uint32_t iounit;			//!< Max read/write per read/write msg sent (0 == no limit)\n	};\n\n	struct TCreate : public ProtoHeader {\n		ProtoFID	fid;			//!< File ID to create\n		ProtoString name;			//!< Name of file to create\n		uint32_t	perm;			//!< Permissions\n		uint8_t		mode;			//!< Mode flags\n	};\n\n	struct RCreate : public ProtoHeader {\n		ProtoQID	qid;			//!< QID of the created file\n		uint32_t iounit;			//!< Max read/write per read/write msg sent (0 == no limit)\n	};\n\n	struct TRead : public ProtoHeader {\n		ProtoFID	fid;			//!< File ID to read\n		uint64_t	offset;			//!< Offset from beginning of the file to start the read from\n		uint32_t	count;			//!< Number of bytes to read\n	};\n\n	struct RRead : public ProtoHeader {\n		uint32_t	count;			//!< Number of bytes read\n	}; //!< Followed by count bytes of data\n\n	struct TWrite : public ProtoHeader {\n		ProtoFID	fid;			//!< File ID to write\n		uint64_t	offset;			//!< Offset from beginning of the file to start the write to\n		uint32_t	count;			//!< Number of bytes to write\n	};  //!< Followed by count bytes of data\n\n	struct RWrite : public ProtoHeader {\n		uint32_t	count;			//!< Number of bytes written\n	};\n\n	struct TRemove : public ProtoHeader {\n		ProtoFID	fid;			//!< File to be clunked and removed from the server\n	};\n\n	struct RRemove : public ProtoHeader {	\n	};\n\n	struct TStat : public ProtoHeader {\n		ProtoFID 	fid;			//!< File ID to stat\n	};\n\n	struct RStat : public ProtoHeader {\n		ProtoStat	stat;			//!< stat data for file\n	};\n\n	struct TWstat : public ProtoHeader {\n		ProtoFID 	fid;			//!< File ID to update stats\n		ProtoStat	stat;			//!< Stats to update to\n	};\n\n	struct RWstat : public ProtoHeader {\n	};\n\n	struct TWalk : public ProtoHeader {\n		uint32_t 	newfid;			//!< file to associate with the walk\n		uint16_t	nwnames;		//!< number of path elements in this msg (MAX 16)\n\n		// ProtoString wname[nwnames]\n	};\n\n	struct RWalk : public ProtoHeader {\n		uint16_t	nwqid;\n		// ProtoQID wqid[new qid]\n	};\n\n}\n\n#endif",
+			"file": "src/libs/styx/styxprotocol.h",
+			"file_size": 3279,
+			"file_write_time": 130152572903219378,
+			"settings":
+			{
+				"buffer_size": 7433,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/duatTMP/src/9p-server.c",
+			"settings":
+			{
+				"buffer_size": 15825,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/G/Projects/Aura2/MWare/LightPropagationVolumesClient/Models/sponza.mtl",
+			"settings":
+			{
+				"buffer_size": 7919,
 				"line_ending": "Windows"
 			}
 		}
@@ -539,6 +590,22 @@
 				"Package Control: Install Package"
 			],
 			[
+				"Package Control: inst",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: discover",
+				"Package Control: Discover Packages"
+			],
+			[
+				"Package Control: di",
+				"Package Control: Disable Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
 				"",
 				"Bookmarks: Clear All"
 			]
@@ -547,7 +614,10 @@
 	},
 	"console":
 	{
-		"height": 146.0
+		"height": 146.0,
+		"history":
+		[
+		]
 	},
 	"distraction_free":
 	{
@@ -560,6 +630,62 @@
 	},
 	"file_history":
 	[
+		"/F/PortableApps/SublimeTextPortable/Data/Packages/User/Default (Windows).sublime-keymap",
+		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Default (Windows).sublime-keymap",
+		"/G/Projects/yolk/src/libs/core/memory.h",
+		"/F/PortableApps/SublimeTextPortable/Data/Packages/User/Preferences.sublime-settings",
+		"/G/Projects/yolk/src/libs/styx/styx.cpp",
+		"/G/Projects/yolk/src/apps/convert/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/dwm/bitcoder.cpp",
+		"/Z/Projects/Cyberspace/vt_repo/CMakeToolchain.txt",
+		"/G/Projects/yolk/src/libs/styx/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/9P2000/CMakeLists.txt",
+		"/Z/Projects/Cyberspace/vt_repo/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/bitmap.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/builder.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/button.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/buttonframeitem.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/dynamictext.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/dynamictext.h",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.h",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/gpupath.h",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/movieclip.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/player.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/shape.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/text.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/utils.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/basepath.h",
+		"/G/Projects/yolk/src/libs/core/clock.cpp",
+		"/G/Projects/yolk/src/libs/core/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/gui/swfparser/SwfStream.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/utils.h",
+		"/G/Projects/yolk/yolk_setup.cmake",
+		"/G/Projects/yolk/src/apps/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/scene/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/rapidjson/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsAgRuntime.cpp",
+		"/G/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsVM.cpp",
+		"/C/Users/AndroidDev/AppData/Local/Temp/7zO4F39.tmp/README.txt",
+		"/G/Projects/yolk/src/libs/core/platform.h",
+		"/G/Projects/yolk/src/libs/core/buildconfig.h.in",
+		"/G/Projects/yolk/src/libs/core/keyboard.h",
+		"/G/Projects/yolk/src/libs/core/platform_windows/mouse_win.h",
+		"/G/Projects/yolk/src/libs/core/development_context.cpp",
+		"/G/Projects/yolk/src/libs/core/keyboard_null.h",
+		"/G/Projects/yolk/src/libs/core/resourceman.cpp",
+		"/G/Projects/yolk/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/tbb/include/tbb/tbb_machine.h",
+		"/G/Projects/yolk/src/libs/tbb/src/tbb/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/json-spirit/json_spirit/CMakeLists.txt",
+		"/C/Users/AndroidDev/AppData/Local/Temp/7zOE89B.tmp/makefile",
+		"/C/Users/AndroidDev/AppData/Local/Temp/7zOF2D9.tmp/JSONPreparse.h",
+		"/G/Projects/yolk/src/libs/tbb/src/rml/CMakeLists.txt",
+		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Preferences.sublime-settings",
+		"/G/Projects/yolk/src/libs/tbb/include/tbb/machine/ibm_aix51.h",
+		"/H/Biz/Government/Tax/EndOfYearConfirm12-13.txt",
 		"/C/IT/Projects/MorningStar/UnrealEngine3/Engine/Shaders/Mobile/AOEdgePreservingFilterVertexShader.msf",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceIOS/ITAtomic_IOS.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITAtomic_Android.cpp",
@@ -603,18 +729,15 @@
 		"/G/Projects/yolk/src/apps/zombiehospital/player/player.cpp",
 		"/G/Projects/yolk/src/apps/zombiehospital/player/player.h",
 		"/G/Projects/yolk/src/libs/localworld/sceneworld.cpp",
-		"/G/Projects/yolk/yolk_setup.cmake",
 		"/G/Projects/yolk/cmake_modules/FindWierdBoost.cmake",
 		"/G/Projects/yolk/src/libs/core/compiler_ms.h",
 		"/G/Projects/yolk/src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
-		"/G/Projects/yolk/src/apps/CMakeLists.txt",
 		"/Z/Projects/svn/short/source/short_win.cpp",
 		"/Z/Projects/svn/short/source/short.h",
 		"/Z/Projects/svn/short/source/short.cpp",
 		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.json",
 		"/G/Projects/yolk/src/apps/trade/CMakeLists.txt",
 		"/G/Projects/trade_runtime/live/Textures/base-ui.tattxt",
-		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Preferences.sublime-settings",
 		"/G/Projects/yolk/yolk.sublime-project",
 		"/C/Users/Dean/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math_c.h",
@@ -634,68 +757,15 @@
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/levels/testlvl.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/player/buggy.cpp",
 		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/player/player.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/gfx_test/main.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/storagedevice.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/storagedevice.cpp",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/MemoryStorageDevice.hx",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/memoryblockstoragedevice.h",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/StorageSystemTester.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/TestStorageSystem.hx",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/storagesystem.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/basestoragedevice.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/basestoragesystem.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/storagesystem_test.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/blockdevice.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/main.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/memoryblockstoragedevice_test.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/ercreinforce/memoryblockstoragedevice.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/player/player.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/CMakeLists.txt",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/cyberhackerspace.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/cyberhackerspace.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/levels/baselvl.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/cyberhackerspace/levels/baselvl.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/player/player.cpp",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/UnstructuredStorageSystemTodo.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/Main.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/Erc1.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/Erc1Tests.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/Debug.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/BlockAddressMapper.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/StorageDevice.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/BlockDevice.hx",
-		"/C/Users/Dean/Documents/CloudPixies/ERCReinforce/src/BlockStorageDevice.hx",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/player/buggy.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/player/buggy.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/cameras/buggycam.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/cameras/buggycam.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/compoundcolshape.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/compoundcolshape.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/cylindercolshape.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/scene/cylindercolshape.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/vtdfh/player/player.h",
-		"/C/Users/Dean/Documents/Nodes.nodes",
-		"/C/Users/Dean/Downloads/stl-01-square/Operators/72c0d6f1-ef64-4df6-b535-000b4b085b1e.mop",
-		"/C/Users/Dean/Downloads/stl-01-square/Operators/000c3499-9419-4b7a-8e8f-ddc802e8c0a5.mop",
-		"/C/Users/Dean/Downloads/stl-01-square/stl-01-square.exe.config",
-		"/C/Users/Dean/Documents/test.surface",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/include/gc_cpp.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/bdwgc/gc_cpp.cc",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/memory.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsObject.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/movieclip.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/gui/swfruntime/frameitem.h"
+		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/gfx_test/main.cpp"
 	],
 	"find":
 	{
-		"height": 38.0
+		"height": 49.0
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 135.0,
 		"where_history":
 		[
 			"",
@@ -712,6 +782,12 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"_clientVersion",
+			"SwfParser/",
+			"SwfParser",
+			"platform_windows",
+			"__TBB_machine_load8",
+			"__TBB_machine_cas_32",
 			"GenerateID",
 			".*;</",
 			"\".\",",
@@ -833,13 +909,7 @@
 			"resolveRelocation",
 			"createTargetMachine",
 			"ST_Debug",
-			"ST_Debug\"",
-			"ymbolRef::ST_Debug",
-			"main",
-			"PLT",
-			"R_X86_64_64",
-			"ELF::R_X86_64_64",
-			"createTargetMachine"
+			"ST_Debug\""
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -847,6 +917,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"_serverVersion",
+			"swfparser/",
 			"#include \"swfruntime.h\"",
 			"Parser",
 			"2012 Cloud Pixies Ltd",
@@ -889,23 +961,187 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 6,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/H/Biz/Government/Tax/EndOfYearConfirm12-13.txt",
+					"file": "src/libs/CMakeLists.txt",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 546,
+						"buffer_size": 1177,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								546,
-								546
+								1177,
+								1177
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 683.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/libs/styx/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 348,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								270,
+								270
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/libs/styx/styx.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 123,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								123,
+								123
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/libs/styx/styxprotocol.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1110,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								502,
+								502
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 198.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/libs/styx/styxprotocol.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7433,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6875,
+								6875
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"word_wrap": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6497.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/libs/duatTMP/src/9p-server.c",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 15825,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/G/Projects/Aura2/MWare/LightPropagationVolumesClient/Models/sponza.mtl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7919,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1573,
+								1573
 							]
 						],
 						"settings":
@@ -913,7 +1149,7 @@
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2024.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -923,7 +1159,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 34.0
+		"height": 49.0
 	},
 	"input":
 	{
@@ -956,9 +1192,14 @@
 	{
 		"height": 130.0
 	},
+	"output.unsaved_changes":
+	{
+		"height": 336.0
+	},
+	"project": "yolk.sublime-project",
 	"replace":
 	{
-		"height": 70.0
+		"height": 92.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1053,10 +1294,24 @@
 		],
 		"width": 380.0
 	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 193.0,
-	"status_bar_visible": true
+	"side_bar_width": 173.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
 }

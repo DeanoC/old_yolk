@@ -65,7 +65,7 @@
 #	define CPU_ENDIANESS		 			CPU_LITTLE_ENDIAN
 #	define CPU_BIT_SIZE						64
 #elif defined( __arm__ ) || defined( __thumb__ ) || defined( __TARGET_ARCH_ARM ) || defined( __TARGET_ARCH_THUMB ) || defined( _ARM )
-#	define CPU_ENDIANESS		 			CPU_ARM
+#	define CPU_FAMILY		 			CPU_ARM
 #	define CPU_ENDIANESS		 			CPU_BIG_ENDIAN
 #	define CPU_BIT_SIZE						32
 #endif

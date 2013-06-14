@@ -7,7 +7,7 @@
 // 
 
 #include "swfruntime.h"
-#include "gui/SwfParser/SwfColourTransform.h"
+#include "gui/swfparser/SwfColourTransform.h"
 #include "scene/rendercontext.h"
 #include "basepath.h"
 #include "fillstyle.h"

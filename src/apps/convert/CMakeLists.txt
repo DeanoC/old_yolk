@@ -6,7 +6,7 @@ file( GLOB header_files *.h *.inl *.hpp *.hxx )
 list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} meshimport meshmod meshops export binify json_spirit )
+list( APPEND targ_link_libs ${Core_LIBRARIES} meshimport meshmod meshops export binify )
 add_executable( convert ${src_files} ${header_files} )
 
 if( UNIX )

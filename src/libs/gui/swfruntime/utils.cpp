@@ -7,7 +7,7 @@
 // 
 
 #include "swfruntime.h"
-#include "gui/SwfParser/SwfMatrix.h"
+#include "gui/swfparser/SwfMatrix.h"
 #include "gui/swfparser/SwfColourTransform.h"
 #include "utils.h"
 

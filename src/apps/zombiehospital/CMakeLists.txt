@@ -42,7 +42,7 @@ else()
 endif()
 
 # link settings
-list( APPEND targ_link_libs ${Core_LIBRARIES} json_spirit scene localworld BulletCollision BulletDynamics LinearMath swfruntime )
+list( APPEND targ_link_libs ${Core_LIBRARIES} scene localworld BulletCollision BulletDynamics LinearMath swfruntime )
 IF( USE_DWM )
 	list( APPEND targ_link_libs dwm_client )
 ENDIF( USE_DWM )
@@ -59,7 +59,6 @@ if( UNIX )
 	list( APPEND targ_link_libs pthread dl GL X11 )
 endif()
 target_link_libraries( ${APP_NAME} ${targ_link_libs} )
-
 
 # tidy project files
 ADD_MSVC_PRECOMPILED_HEADER( "pch.h" "${cpp_src_files}" )

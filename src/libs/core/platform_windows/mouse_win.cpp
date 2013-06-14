@@ -20,7 +20,8 @@ namespace Core {
 MouseWin
 */
 MouseWin::MouseWin() : cursorVisible( true ) {
-//	lockToWindow();
+	setRelativeMode();
+
 	hideCursor();
 
 	POINT pt;
@@ -35,13 +36,17 @@ MouseWin::~MouseWin() {
 
 void MouseWin::update() {
 	if( hasFocus ) {
+		// we use the reset cursor trick as windows and relative mouse handling is just a bit shit (replace 'bit' with 'huge')
 		POINT pt;
 		GetOurCursorPos( &pt );
 		xRel = pt.x - midX;
 		yRel = pt.y - midY;
-		midX -= pt.x;
-		midY -= pt.y;
-// TODO make this optional better for FPS direct mouse control		SetOurCursorPos( midX, midY );
+		if( relativeMode ) {
+			SetOurCursorPos( midX, midY );
+		}
+	} else {
+		xRel = 0;
+		yRel = 0;
 	}
 }
 

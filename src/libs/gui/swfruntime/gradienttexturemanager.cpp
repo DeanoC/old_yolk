@@ -7,8 +7,8 @@
 // 
 
 #include "swfruntime.h"
-#include "gui/SwfParser/SwfGradient.h"
-#include "gui/SwfParser/SwfFillStyle.h"
+#include "gui/swfparser/SwfGradient.h"
+#include "gui/swfparser/SwfFillStyle.h"
 #include "scene/texture.h"
 #include "utils.h"
 #include "gradienttexturemanager.h"

@@ -31,7 +31,6 @@ LIST( APPEND tbb_src_files
   tbb_thread.cpp
 )
 IF( UNIX )
-
 ELSE()
 	IF( IS_HOST_64_BIT )
 		LIST( APPEND tbb_asm_files "intel64-masm/atomic_support.asm" "intel64-masm/intel64_misc.asm" )
@@ -63,7 +62,8 @@ add_definitions( "-D__TBB_BUILD=1")
 list( APPEND targ_link_libs tbb_rml )
 
 if( UNIX )
-	add_definitions( "-DUSE_PTHREAD")
+	add_definitions( "-D__TBB_USE_GENERIC_DWORD_LOAD_STORE=1" )
+	add_definitions( "-DUSE_PTHREAD -DTBB_USE_GCC_BUILTINS -D__TBB_GCC_BUILTIN_ATOMICS_PRESENT" )
 	list( APPEND targ_link_libs pthread dl )
 else()
 	add_definitions( "-DTBB_USE_CAPTURED_EXCEPTION -DUSE_WINTHREAD" )

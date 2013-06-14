@@ -2,7 +2,7 @@
 #include "core/coreresources.h"
 #include "core/fileio.h"
 #include "core/file_path.h"
-#include "json_spirit/json_spirit_reader.h"
+#include "core/rapidjson/document.h"
 #include <boost/algorithm/string.hpp> 
 #include "tof.h"
 #include "scene/generictextureformat.h"
@@ -30,23 +30,21 @@ Tof loadTof( const Core::FilePath& inPath ) {
 	if( ok ) {
 		auto filestring = std::string( (char*)file.takeBufferOwnership() );
 
-		json_spirit::Value value;
-		json_spirit::read( filestring, value );
-		if( value.is_null() ) {
-			tof.files.push_back( inPath.value() );
-			return tof;
-		}
+		using namespace rapidjson;
+		Document doc;
+		doc.Parse<0>( filestring.c_str() );
 
-		const auto& obj = value.get_obj();
-		for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
-			std::string attr = val->name_;
+		for (	Value::ConstMemberIterator val = doc.MemberBegin(); 
+				val != doc.MemberEnd(); 
+				++val ) {
+			std::string attr = val->name.GetString();
 			boost::algorithm::to_lower( attr );
 			if( attr == "format" ) {
-				if( val->value_.type() != json_spirit::str_type ) {
+				if( val->value.IsString() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				std::string valstr = val->value_.get_str();
+				std::string valstr = val->value.GetString();
 				boost::algorithm::to_upper( valstr );
 				for( int i =0; i < NUM_ARRAY_ELEMENTS(GtfStrings); ++i ) {
 					if( GtfStrings[i] == valstr ) {
@@ -57,11 +55,11 @@ Tof loadTof( const Core::FilePath& inPath ) {
 				continue;
 			}
 			if( attr == "width" ) {
-				if( val->value_.type() != json_spirit::int_type ) {
+				if( val->value.IsInt() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				int width = val->value_.get_int();
+				int width = val->value.GetInt();
 				if( width > 0 ) {
 					tof.width = width;
 				} else {
@@ -70,11 +68,11 @@ Tof loadTof( const Core::FilePath& inPath ) {
 				continue;
 			}
 			if( attr == "height" ) {
-				if( val->value_.type() != json_spirit::int_type ) {
+				if( val->value.IsInt() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				int height = val->value_.get_int();
+				int height = val->value.GetInt();
 				if( height > 0 ) {
 					tof.height = height;
 				} else {
@@ -83,11 +81,11 @@ Tof loadTof( const Core::FilePath& inPath ) {
 				continue;
 			}
 			if( attr == "depth" ) {
-				if( val->value_.type() != json_spirit::int_type ) {
+				if( val->value.IsInt() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				int depth = val->value_.get_int();
+				int depth = val->value.GetInt();
 				if( depth > 0 ) {
 					tof.depth = depth;
 				} else {
@@ -96,11 +94,11 @@ Tof loadTof( const Core::FilePath& inPath ) {
 				continue;
 			}
 			if( attr == "arraysize" ) {
-				if( val->value_.type() != json_spirit::int_type ) {
+				if( val->value.IsInt() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				int arraysize = val->value_.get_int();
+				int arraysize = val->value.GetInt();
 				if( arraysize > 0 ) {
 					tof.arraySize = arraysize;
 				} else {
@@ -109,56 +107,54 @@ Tof loadTof( const Core::FilePath& inPath ) {
 				continue;
 			}
 			if( attr == "filenames" || attr == "filename" ) {
-				switch( val->value_.type() ) {
-					case json_spirit::str_type: {
+				switch( val->value.GetType() ) {
+				case Type::kStringType: {
 						// simple single string
-						std::string valstr = val->value_.get_str();
+						std::string valstr = val->value.GetString();
 						boost::algorithm::to_upper( valstr );
 						tof.files.push_back( valstr );
 					} break;
-					case json_spirit::array_type: {
+				case Type::kArrayType: {
 						// array of filenames
-						const auto& arr = val->value_.get_array();
-						for( auto aval = arr.cbegin(); aval != arr.cend(); ++aval ) { 
-							if( aval->type() == json_spirit::str_type ) {
-								std::string avalstr = aval->get_str();
+						const auto& arr = val->value;
+						for( SizeType i = 0; i != arr.Size(); ++i ) { 
+							if( arr[i].IsString() != false ) {
+								std::string avalstr = arr[i].GetString();
 								boost::algorithm::to_upper( avalstr );
 								tof.files.push_back( avalstr );
 							}
 						}
 					} break;
-					default: {
-						LOG(INFO) << "Invalid " << attr << "type\n";
+				default: {
+					LOG(INFO) << "Invalid " << attr << "type\n";
 					} break;
 				}
 				continue;
 			}
 			if( attr == "cubemap" ) {
-				if( val->value_.type() != json_spirit::bool_type ) {
+				if( val->value.IsBool() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				bool b = val->value_.get_bool();
+				bool b = val->value.GetBool();
 				tof.cubeMap = b;
 				continue;
 			}
 			if( attr == "linear" ) {
-				if( val->value_.type() != json_spirit::bool_type ) {
+				if( val->value.IsBool() == false ) {
 					LOG(INFO) << "Invalid " << attr << "type\n";
 					continue;
 				}
-				bool b = val->value_.get_bool();
+				bool b = val->value.GetBool();
 				tof.linear = b;
 				continue;
 			}
 
 		}
-
 		// if no filenames in the tof, just use the passed in one
 		if( tof.files.empty() ) {
 			tof.files.push_back( inPath.value() );
 		}
-
 	} else {
 		tof.files.push_back( inPath.value() );
 	}
@@ -175,39 +171,47 @@ void loadTao( const Core::FilePath& inPath, std::vector<std::string>& outFilenam
 	if( ok ) {
 		auto filestring = std::string( (char*)file.takeBufferOwnership() );
 
-		json_spirit::Value value;
-		json_spirit::read( filestring, value );
-		if( value.is_null() ) {
-			return;
-		}
 		int texWidth = 0;
 		int texHeight = 0;
-		const auto& obj = value.get_obj();
-		for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
-			std::string attr = val->name_;
+
+		using namespace rapidjson;
+		Document doc;
+		doc.Parse<0>( filestring.c_str() );
+		for (	Value::ConstMemberIterator val = doc.MemberBegin(); 
+				val != doc.MemberEnd(); 
+				++val ) {
+			std::string attr = val->name.GetString();
 			boost::algorithm::to_lower( attr );
 
 			if( attr == "meta" ) {
-				const auto& mobj = val->value_.get_obj();
-				for( auto mval = mobj.cbegin(); mval != mobj.cend(); ++mval ) {
-					std::string mattr = mval->name_;
+				for (	Value::ConstMemberIterator mval = val->value.MemberBegin(); 
+						mval != val->value.MemberEnd(); 
+						++mval ) {
+					std::string mattr = mval->name.GetString();
 					boost::algorithm::to_lower( mattr );
 					if( mattr == "image" ) {
-						std::string mvalstr = mval->value_.get_str();
+						if( mval->value.IsString() == false ) {
+							continue;
+						}
+						std::string mvalstr = mval->value.GetString();
 						outFilenames.push_back( mvalstr );
 						continue;
 					}
 					if( mattr == "size" ) {
-						const auto& sobj = mval->value_.get_obj();
-						for( auto sval = sobj.cbegin(); sval != sobj.cend(); ++sval ) {
-							std::string sattr = sval->name_;
+						for (	Value::ConstMemberIterator sval = mval->value.MemberBegin(); 
+								sval != mval->value.MemberEnd(); 
+								++sval ) {
+							if( sval->value.IsInt() == false ) {
+								continue;
+							}
+							std::string sattr = sval->name.GetString();
 							boost::algorithm::to_lower( sattr );
 							if( sattr == "w" ) {
-								texWidth = sval->value_.get_int();
+								texWidth = sval->value.GetInt();
 								continue;
 							}
 							if( sattr == "h" ) {
-								texHeight = sval->value_.get_int();
+								texHeight = sval->value.GetInt();
 								continue;
 							}
 						}
@@ -217,41 +221,51 @@ void loadTao( const Core::FilePath& inPath, std::vector<std::string>& outFilenam
 			}
 
 			if( attr == "frames" ) {
-				const auto& arr = val->value_.get_array();
-				for( auto aval = arr.cbegin(); aval != arr.cend(); ++aval ) { 
+				for (	Value::ConstMemberIterator aval = val->value.MemberBegin(); 
+						aval != val->value.MemberEnd(); 
+						++aval ) {
 					Export::SubTexture st;
 					st.index = 0; // texpacker only supports one texture so far
 					bool rotated = false;
-					const auto& fobj = aval->get_obj();
-					for( auto fval = fobj.cbegin(); fval != fobj.cend(); ++fval ) {
-						std::string fattr = fval->name_;
+					for (	Value::ConstMemberIterator fval = aval->value.MemberBegin(); 
+							fval != aval->value.MemberEnd(); 
+							++fval ) {
+
+						std::string fattr = fval->name.GetString();
 						boost::algorithm::to_lower( fattr );
 						if( fattr == "frame" ) {
-							const auto& sobj = fval->value_.get_obj();
-							for( auto sval = sobj.cbegin(); sval != sobj.cend(); ++sval ) {
-								std::string sattr = sval->name_;
+							for (	Value::ConstMemberIterator sval = fval->value.MemberBegin(); 
+									sval != fval->value.MemberEnd(); 
+									++sval ) {
+								if( sval->value.IsInt() == false ) {
+									continue;
+								}
+								std::string sattr = sval->name.GetString();
 								boost::algorithm::to_lower( sattr );
 								if( sattr == "x" ) {
-									st.u0 = sval->value_.get_int();
+									st.u0 = (float) sval->value.GetDouble();
 									continue;
 								}
 								if( sattr == "y" ) {
-									st.v0 = sval->value_.get_int();
+									st.v0 = (float) sval->value.GetDouble();
 									continue;
 								}						
 								if( sattr == "w" ) {
-									st.u1 = sval->value_.get_int();
+									st.u1 = (float) sval->value.GetDouble();
 									continue;
 								}
 								if( sattr == "h" ) {
-									st.v1 = sval->value_.get_int();
+									st.v1 = (float) sval->value.GetDouble();
 									continue;
 								}
 							}
 							continue;
 						}
 						if( fattr == "rotated" ) {
-							rotated = fval->value_.get_bool();
+							if( fval->value.IsBool() == false ) {
+								continue;
+							}
+							rotated = fval->value.GetBool();
 							continue;
 						}
 					}

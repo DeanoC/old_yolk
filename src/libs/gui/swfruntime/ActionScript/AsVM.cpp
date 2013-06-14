@@ -8,8 +8,8 @@
  */
 
 #include "gui/swfruntime/swfruntime.h"
-#include "gui/SwfParser/EndianBitConverter.h"
-#include "gui/SwfParser/SwfActionByteCode.h"
+#include "gui/swfparser/EndianBitConverter.h"
+#include "gui/swfparser/SwfActionByteCode.h"
 #include "gui/swfruntime/movieclip.h"
 #include "AsFunctionBuilder.h"
 #include "AsFunction.h"

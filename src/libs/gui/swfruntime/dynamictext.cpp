@@ -8,9 +8,9 @@
  */
 #include "swfruntime.h"
 
-#include "gui/SwfParser/SwfRect.h"
-#include "gui/SwfParser/SwfTextRecord.h"
-#include "gui/SwfParser/SwfFont.h"
+#include "gui/swfparser/SwfRect.h"
+#include "gui/swfparser/SwfTextRecord.h"
+#include "gui/swfparser/SwfFont.h"
 #include "ActionScript/AsObject.h"
 #include "frameitem.h"
 #include "movieclip.h"

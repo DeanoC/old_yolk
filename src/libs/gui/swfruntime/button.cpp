@@ -6,12 +6,12 @@
  */
 
 #include "swfruntime.h"
-#include "gui/SwfParser/SwfDisplayObject.h"
-#include "gui/SwfParser/SwfButton.h"
-#include "gui/SwfParser/SwfColourTransform.h"
-#include "gui/SwfParser/parser.h"
-#include "gui/SwfParser/SwfCharacter.h"
-#include "gui/SwfParser/SwfShape.h"
+#include "gui/swfparser/SwfDisplayObject.h"
+#include "gui/swfparser/SwfButton.h"
+#include "gui/swfparser/SwfColourTransform.h"
+#include "gui/swfparser/parser.h"
+#include "gui/swfparser/SwfCharacter.h"
+#include "gui/swfparser/SwfShape.h"
 #include "player.h"
 #include "shape.h"
 #include "utils.h"

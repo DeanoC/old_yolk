@@ -11,8 +11,8 @@
 #include "scene/vertexinput.h"
 #include "scene/rendercontext.h"
 #include <zlib.h>
-#include "gui/SwfParser/Parser.h"
-#include "gui/SwfParser/SwfRect.h"
+#include "gui/swfparser/Parser.h"
+#include "gui/swfparser/SwfRect.h"
 #include "ActionScript/AsVM.h"
 #include "swfman.h"
 #include "builder.h"

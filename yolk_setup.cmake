@@ -4,20 +4,28 @@ cmake_policy( VERSION 2.8.2 )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set( LLVM_ROOT "${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm" CACHE PATH "Root of LLVM install.")
+# TODO work out HEADLESS from lack of X on UNIX??
+SET( HEADLESS_PLATFORM 1 CACHE STRING "Set to 1 if platform is headless and has no keyboard etc.")
+
+SET( LLVM_ROOT "${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm" CACHE PATH "Root of LLVM install.")
 
 LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 
 find_package( CMakeCommon REQUIRED )
 find_package( WierdBoost REQUIRED )
 
-if( WIN32 )
-	SET( USE_DX11 true CACHE BOOL "Use DirectX 11 render back end" )
-	SET( USE_OPENGL false CACHE BOOL "Use OpenGL render back end" )
-else( WIN32 )
+IF( NOT HEADLESS_PLATFORM )
+	IF( WIN32 )
+		SET( USE_DX11 true CACHE BOOL "Use DirectX 11 render back end" )
+		SET( USE_OPENGL false CACHE BOOL "Use OpenGL render back end" )
+	ELSE( WIN32 )
+		SET( USE_DX11 false CACHE BOOL "Use DirectX 11 render back end" )
+		SET( USE_OPENGL true CACHE BOOL "Use OpenGL render back end" )
+	ENDIF( WIN32 )
+ELSE( NOT HEADLESS_PLATFORM )
 	SET( USE_DX11 false CACHE BOOL "Use DirectX 11 render back end" )
-	SET( USE_OPENGL true CACHE BOOL "Use OpenGL render back end" )
-endif( WIN32 )
+	SET( USE_OPENGL false CACHE BOOL "Use OpenGL render back end" )	
+ENDIF( NOT HEADLESS_PLATFORM )
 
 SET( USE_GC true CACHE BOOL "Use BDW C/C++ Garbage Collection system (needed for Swf Runtime)" )
 

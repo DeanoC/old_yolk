@@ -7,8 +7,8 @@
 // 
 
 #include "swfruntime.h"
-#include "gui/SwfParser/SwfBitmap.h"
-#include "gui/SwfParser/SwfImage.h"
+#include "gui/swfparser/SwfBitmap.h"
+#include "gui/swfparser/SwfImage.h"
 #include "scene/texture.h"
 #include "core/core_utils.h"
 #include "utils.h"

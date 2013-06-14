@@ -2,6 +2,7 @@
 #if !defined( YOLK_BUILD_CONFIG_H )
 #define YOLK_BUILD_CONFIG_H
 
+#cmakedefine HEADLESS_PLATFORM
 #cmakedefine USE_DX11
 #cmakedefine USE_OPENGL
 #cmakedefine USE_OPENCL

@@ -1,21 +1,25 @@
 #ifndef _YOLK_CORE_KEYBOARD_H_
 #define _YOLK_CORE_KEYBOARD_H_ 1
 
-#if PLATFORM == WINDOWS
-#include "platform_windows/keyboard_win.h"
+#if defined( HEADLESS_PLATFORM )
+#		include "keyboard_null.h"
+#elif PLATFORM == WINDOWS
+#		include "platform_windows/keyboard_win.h"
 #elif PLATFORM == POSIX
-#include "platform_posix/keyboard_x11.h"
+#		include "platform_posix/keyboard_x11.h"
 #endif
 
 namespace Core {
 
 class Keyboard : public Singleton<Keyboard> {
 public:
-#if PLATFORM == WINDOWS
-	friend void KeyboardWinProcessKeyMessages( uint32_t message, uint16_t wParam, uint32_t lParam );
+#if defined( HEADLESS_PLATFORM )
+#elif PLATFORM == WINDOWS
+		friend void KeyboardWinProcessKeyMessages( uint32_t message, uint16_t wParam, uint32_t lParam );
 #elif PLATFORM == POSIX
-	friend void KeyboardX11ProcessKeyEvent( bool down, XKeyEvent* event );
-	#endif
+		friend void KeyboardX11ProcessKeyEvent( bool down, XKeyEvent* event );
+#endif
+
 	static const int MAX_KEY_CHARS = 256;
 
 	Keyboard() {

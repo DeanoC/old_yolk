@@ -6,24 +6,7 @@
 #include "localworld/thingfactory.h"
 
 //#include "boost/program_options.hpp"
-//#include "json_spirit/json_spirit_reader.h"
-/*
-void readConfig( std::string& hostname, int& port ) {
-   std::ifstream is( "./config.json" );
-   if( is.bad() || !is.is_open() )
-      return;
-   
-   json_spirit::Value value;
 
-   json_spirit::read( is, value );
-   if( value.is_null() )
-      return;
-
-   auto obj = value.get_obj();
-   for( auto val = obj.cbegin(); val != obj.cend(); ++val ) {
-   }
-}
-*/
 
 int Main() {
 	using namespace Core;
@@ -45,20 +28,27 @@ int Main() {
 	*/
 
 	Shell3D shell;
+
+	// set shell parameters here
+
+	// start the shell and grab the world
 	shell.start();
 	SceneWorldPtr world = shell.getSceneWorld();
 
-	Scene::HierPtr land = std::make_shared<Scene::Hier>( "basic" );
+	// some basic setup
+	Scene::HierPtr land = std::make_shared<Scene::Hier>( "test_room" );
 	ThingPtr tng( ThingFactory::createThingFromHier( land, TBC_WORLD ) );
 	world->add( tng );
-/*	Scene::HierPtr stinger = std::make_shared<Scene::Hier>( "stinger" );
-	ThingPtr stingr = std::make_shared<Thing>( stinger );
-//	world->add( stingr );
-	Scene::HierPtr mechh = std::make_shared<Scene::Hier>( "ogremech" );
-	ThingPtr mech = std::make_shared<Thing>( mechh );
-	world->add( mech );*/																																							
 
-	shell.run();
+	shell.run(); // will loop until exit is called
+
+	// cleanup
+	world->remove( tng );
+	tng.reset();
+	land.reset();
+
+	// shutdown
+	world.reset();
 	shell.end();
 
 //	auto gfxThread = std::make_shared<Core::thread>( 

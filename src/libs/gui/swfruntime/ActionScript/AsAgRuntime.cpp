@@ -8,7 +8,7 @@
  */
 
 #include "gui/swfruntime/swfruntime.h"
-#include "gui/SwfParser/parser.h"
+#include "gui/swfparser/parser.h"
 #include "AsFunction.h"
 #include "../movieclip.h"
 #include "../utils.h"

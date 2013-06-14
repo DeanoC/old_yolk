@@ -91,7 +91,6 @@ public:
 	typedef tbb::concurrent_vector<ResourceData*>								ListResourceData;
 	typedef tbb::concurrent_hash_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
 	typedef tbb::concurrent_hash_map<std::string, ResourceData*>				CacheIndex;
-	typedef tbb::concurrent_vector<ResourceData*>								ListResourceData;
 	typedef tbb::concurrent_hash_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
 	typedef tbb::concurrent_vector<ResourceMan::AcquirePumpCallback>			AcquirePumps;
 

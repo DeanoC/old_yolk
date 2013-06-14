@@ -8,9 +8,9 @@
  */
 
 #include "swfruntime.h"
-#include "gui/SwfParser/SwfDisplayObject.h"
-#include "gui/SwfParser/SwfColourTransform.h"
-#include "gui/SwfParser/SwfMatrix.h"
+#include "gui/swfparser/SwfDisplayObject.h"
+#include "gui/swfparser/SwfColourTransform.h"
+#include "gui/swfparser/SwfMatrix.h"
 #include "character.h"
 #include "movieclip.h"
 #include "player.h"

@@ -8,7 +8,7 @@
 #include "swfparser.h"
 #include "EndianBitConverter.h"
 #include "SwfStream.h"
-#include "core/FileIO.h"
+#include "core/fileio.h"
 #include <vector>
 
 namespace Swf{
