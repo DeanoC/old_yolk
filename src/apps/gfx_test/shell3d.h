@@ -1,3 +1,4 @@
+#pragma once
 #ifndef YOLK_3DSHELL_H_
 #define YOLK_3DSHELL_H_ 1
 

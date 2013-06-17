@@ -186,15 +186,15 @@ namespace Core {
 				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY> > {};	
 #endif
 
-	template<typename X> class poolvector : public std::vector<X, boost::pool_allocator<X> > {};
+	template<typename X> class poolvector : public std::vector<X, boost::fast_pool_allocator<X> > {};
 	template<typename KEY, typename VAL> class poolmap : public std::map<KEY, VAL, 
-				std::less<KEY>, boost::pool_allocator<std::pair<const KEY,VAL> > > {};	
+				std::less<KEY>, boost::fast_pool_allocator<std::pair<const KEY,VAL> > > {};	
 	template<typename X> class poolstack : public std::stack<X, poolvector<X> > {};
-	template<typename X> class poollist : public std::list<X, boost::pool_allocator<X> > {};
+	template<typename X> class poollist : public std::list<X, boost::fast_pool_allocator<X> > {};
 	template<typename KEY, typename VAL> class poolunordered_map : public 
 				std::unordered_map<KEY, VAL, std::hash<KEY>, std::equal_to<KEY>, 
-				boost::pool_allocator<std::pair<const KEY,VAL> >  > {};	
-	STRING_CTORS_DECLARE( poolstring, char, boost::pool_allocator );
+				boost::fast_pool_allocator<std::pair<const KEY,VAL> >  > {};	
+	STRING_CTORS_DECLARE( poolstring, char, boost::fast_pool_allocator );
 
 	STRING_CTORS_IMPL( gcstring )
 	STRING_CTORS_IMPL( poolstring )

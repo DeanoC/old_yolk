@@ -16,7 +16,7 @@ add_subdirectory( jpeg )
 add_subdirectory( protobuf )
 add_subdirectory( protocols )
 add_subdirectory( scene )
-add_subdirectory( styx )
+#add_subdirectory( styx )
 add_subdirectory( tbb )
 add_subdirectory( zlib )
 

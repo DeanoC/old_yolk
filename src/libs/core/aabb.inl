@@ -28,9 +28,8 @@ m_MaxExtent( -Math::infinity<float>(), -Math::infinity<float>(), -Math::infinity
 /// \param	max	The maximum extent of the box. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 CORE_INLINE AABB::AABB( const Math::Vector3& min, const Math::Vector3& max ) :
-m_MinExtent( min ),
-m_MaxExtent( max )
-{
+	m_MinExtent( min ),
+	m_MaxExtent( max ) {
 }
 
 ///-------------------------------------------------------------------------------------------------
@@ -40,9 +39,18 @@ m_MaxExtent( max )
 /// \param	max	The maximum extent of the box. 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 CORE_INLINE AABB::AABB( const float min[3], const float max[3] ) :
-m_MinExtent( min[0], min[1], min[2] ),
-m_MaxExtent( max[0], max[1], max[2] )
-{
+	m_MinExtent( min[0], min[1], min[2] ),
+	m_MaxExtent( max[0], max[1], max[2] ) {
+}
+
+///-------------------------------------------------------------------------------------------------
+/// \brief	Constructor, from center and the half length
+///
+/// \param	center	The center of the box. 
+/// \param	halfLength	The half lengths of the extent of the box. 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+CORE_INLINE AABB AABB::fromCenterAndHalfLength( const Math::Vector3& center, const Math::Vector3& halfLength ) {
+	return AABB( center - halfLength, center + halfLength );
 }
 
 ///-------------------------------------------------------------------------------------------------
@@ -193,6 +201,24 @@ CORE_INLINE bool AABB::intersects( const AABB& aabb ) const
 
 	// TODO replace with simd compare and collapse result
 	return( (minI[0] < maxI[0]) && (minI[1] < maxI[1]) && (minI[2] < maxI[2]) );
+}
+
+///-------------------------------------------------------------------------------------------------
+/// \fn	CORE_INLINE bool AABB::intersects( const Math::Vector3& _point ) const
+///
+/// \brief	Intersects. 
+///
+/// \todo	Fill in detailed method description. 
+///
+/// \param	_point	point to test. 
+///
+/// \return	true if it succeeds, false if it fails. 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+CORE_INLINE bool AABB::intersects( const Math::Vector3& _point ) const
+{
+	return( (_point[0] > m_MinExtent[0] && _point[0] < m_MaxExtent[0]) &&
+			(_point[1] > m_MinExtent[1] && _point[1] < m_MaxExtent[1]) &&
+			(_point[2] > m_MinExtent[2] && _point[2] < m_MaxExtent[2]) );
 }
 
 
