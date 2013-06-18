@@ -35,6 +35,9 @@ int Main() {
 	shell.start();
 	SceneWorldPtr world = shell.getSceneWorld();
 
+	extern void VoxTreeTest();
+	VoxTreeTest();
+
 	// some basic setup
 	Scene::HierPtr land = std::make_shared<Scene::Hier>( "test_room" );
 	ThingPtr tng( ThingFactory::createThingFromHier( land, TBC_WORLD ) );

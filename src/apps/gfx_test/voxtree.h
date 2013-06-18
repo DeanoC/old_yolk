@@ -3,6 +3,7 @@
 #define YOLK_VOXTREE_H_ 1
 
 #include "core/aabb.h"
+#include "freelist.h" // TODO move to Core
 
 namespace Vox {
 
@@ -11,19 +12,24 @@ static const float DEFAULT_BRICK_RESOLUTION		= 1.0f;
 
 static const int NODE_TYPE_BIT_SIZE 			= 4;
 static const int NODE_PAYLOAD_BIT_SIZE 			= 28;
-static const int PACKED_BINARY_LUT_BIT_SIZE 	= 10;
+static const int PACKED_BINARY_BIT_SIZE 		= 10;
 static const int NODE_LEAF_INDEX_BIT_SIZE	 	= 27;
+static const int NODE_INDEX_BIT_SIZE 			= 28;
+static const int NODE_ONLY_CHILD_INDEX_BIT_SIZE = 25;
+static const int NODE_TWO_CHILD_INDEX_BIT_SIZE = 11;
+
 static const uint32_t INVALID_INDEX				= ~0;
 
 // actually we only use 4 bits! but C++ doesn't have a nibble type which it makes it better to use the same base type
 // of the bitfield you are sticking it in
 enum class NodeType : uint32_t {
-	EMPTY = 0,				//!< nada, technically redudent as PACKED_BINARY_LEAF could be used
+	EMPTY = 0,				//!< nada, technically redudent as CONSTNAT_LEAF could be used
 	NODE,					//!< standard node, with an index to a children node tile
 	LEAF,					//!< leaf node, has an index to a brick
 	CONSTANT_LEAF,			//!< all children use the same brick
 	PACKED_BINARY_LEAF,		//!< children only use 2 bricks, so are packed here without a nodetile
-
+	ONLY_CHILD_NODE,		//!< the node only has 1 child, so we collapse it (if near enough) and mark the extra depth
+	TWO_CHILD_NODE,			//!< node has two children, if they are near enough in index space, collapse and mark extra depth
 	MAX_TYPES = (1 << NODE_TYPE_BIT_SIZE)
 };
 
@@ -65,14 +71,22 @@ union Node {
 	NodeType 		type			: NODE_TYPE_BIT_SIZE;
 	uint32_t		payload			: NODE_PAYLOAD_BIT_SIZE; //< payload is a 28 bit variable data
 	// each specific type has its own type and payload specific bitfield
-	struct Empty {
-		NodeType					: NODE_TYPE_BIT_SIZE;
-		uint32_t	nothing			: NODE_PAYLOAD_BIT_SIZE;	//!< nada
-	} empty;
 	struct NodePayload {
 		NodeType					: NODE_TYPE_BIT_SIZE;
-		uint32_t	nodeTileIndex 	: NODE_PAYLOAD_BIT_SIZE;	//!< node tile of this nodes children
+		uint32_t	nodeTileIndex 	: NODE_INDEX_BIT_SIZE;	//!< node tile of this nodes children
 	} node;
+	struct OnlyChildNodePayload {
+		NodeType					: NODE_TYPE_BIT_SIZE;
+		uint32_t	nodeCode		: 3; //!< where node resides
+		uint32_t	nodeTileIndex 	: NODE_ONLY_CHILD_INDEX_BIT_SIZE;	//!< node tile of this nodes children
+	} onlyChildNode;
+	struct TwoChildNodePayload {
+		NodeType					: NODE_TYPE_BIT_SIZE;
+		uint32_t	nodeATileIndex 	: NODE_TWO_CHILD_INDEX_BIT_SIZE;	//!< relative nodeA address
+		uint32_t	nodeACode		: 3; //!< where nodeA resides
+		uint32_t	nodeBTileIndex 	: NODE_TWO_CHILD_INDEX_BIT_SIZE;	//!< relative nodeA address
+		uint32_t	nodeBCode		: 3; //!< where nodeB resides
+	} twoChildNode;
 	struct LeafPayload {
 		NodeType					: NODE_TYPE_BIT_SIZE;
 		uint32_t	splitable 		: 1;	//!< can brick be split into 8 smaller version of itself
@@ -83,13 +97,16 @@ union Node {
 		uint32_t	splitable 		: 1;	//!< can each CHILD brick be split into 8 smaller versions
 		uint32_t	brickIndex 		: NODE_LEAF_INDEX_BIT_SIZE;	//!< brick its 8 children will use
 	} constantLeaf;
-
 	struct PackedBinaryLeaf {
 		NodeType					: NODE_TYPE_BIT_SIZE;
 		uint32_t	occupancy		: 8;	//!< 8 bits one for each octant
-		uint32_t	trueBrickIndex	: PACKED_BINARY_LUT_BIT_SIZE;	//!< index in LUT to get brick to replicate with true occupancy bit
-		uint32_t	falseBrickIndex	: PACKED_BINARY_LUT_BIT_SIZE;	//!< index in brick LUT for false occupancy, 0 == empty
+		uint32_t	trueBrickIndex	: PACKED_BINARY_BIT_SIZE;	//!< index of brick ( only the first 1024 bricks are packable) to replicate with true occupancy bit
+		uint32_t	falseBrickIndex	: PACKED_BINARY_BIT_SIZE;	//!< index of brick ( only the first 1024 bricks are packable) to replicate with false occupancy bit
 	} packedBinaryLeaf;
+	struct Empty {
+		NodeType					: NODE_TYPE_BIT_SIZE;
+		uint32_t	nothing			: NODE_PAYLOAD_BIT_SIZE;	//!< nada
+	} empty;
 
 	/// does this node have a child tile index (i.e. getChildrenTileIndex is valid)
 	bool hasChildren() const;
@@ -98,73 +115,12 @@ union Node {
 	/// is the a empty or brick leaf or have descendants (packed or via tile index pointers)
 	bool hasDescendants() const;
 
-	/// for nodes with children returns the child tile index 
-	uint32_t getChildrenTileIndex() const;
+	/// for nodes with children returns the child tile index, some splits can have two tile indices
+	uint32_t getChildrenTileIndex( uint32_t& _outSecondChildTile ) const;
 };
 
 static_assert( sizeof(Node) == (NODE_TYPE_BIT_SIZE + NODE_PAYLOAD_BIT_SIZE)/8, "Eeek vox::Node not 4 bytes in size" );
 
-// NOT MT safe in general
-// keeps freelist always big enough for all data
-// TODO make this std-a-like interface 
-template< typename TYPE, typename INDEX_TYPE = uintptr_t >
-class FreeList {
-public:
-	typedef typename std::vector< TYPE >::value_type value_type;
-	typedef typename std::vector< TYPE >::size_type size_type;
-	typedef typename std::vector< TYPE >::difference_type difference_type;
-	typedef typename std::vector< TYPE >::pointer pointer;
-	typedef typename std::vector< TYPE >::const_pointer const_pointer;
-	typedef typename std::vector< TYPE >::reference reference;
-	typedef typename std::vector< TYPE >::const_reference const_reference;	
-
-	FreeList() : capacity(0), current(0), currentFree(0) {}
-
-	explicit FreeList( size_type _count ) : data( _count), freelist( _count), currentFree( _count ) {
-				for( size_type i = 0; i < _count; ++i ) { 
-					freelist[i] = i; 
-				}
-
-			}
-
-	INDEX_TYPE push( const value_type& _val ) {
-		INDEX_TYPE index = alloc();
-		data[ index ] = _val;
-		return index;
-	}
-
-	INDEX_TYPE alloc() {
-		INDEX_TYPE index;
-		if( freelist.empty() ) {
-			index = data.size();
-			resize( index + 1 );
-		} else {
-			CORE_ASSERT( currentFree != 0 );
-			index = freelist[--currentFree];
-		}
-		return index;
-	}
-
-	void resize( const size_type _count ) {
-		data.resize( _count );
-		freelist.resize( _count );
-	}
-
-	bool empty() const { return currentFree == freelist.size(); }
-
-	void erase( const INDEX_TYPE _index ) {
-		CORE_ASSERT( _index < freelist.size() );
-		freelist[ currentFree++ ] = _index;
-	}
-
-	TYPE& get( const INDEX_TYPE _index ) { return data[_index]; }
-	const TYPE& get( const INDEX_TYPE _index ) const { return data[_index]; }
-
-private:
-	std::vector< TYPE >				data;
-	std::vector< INDEX_TYPE > 		freelist;
-	INDEX_TYPE						currentFree;
-};
 
 struct NodeTile { 
 	Node nodes[8];
@@ -184,7 +140,6 @@ enum class BrickSize : uint32_t {
 struct Brick {
 	uint16_t	type;				//!< game specific type data (material etc.)
 
-	uint16_t	packable 	: 1;	//!< whether this is a packable type (only 1024 types can be)
 	uint16_t	splitable 	: 1;	//!< can brick be split into 8 smaller version of itself
 	uint16_t	userData 	: 14;	//!< extra game data specific to each type.
 
@@ -234,6 +189,8 @@ public:
 	void visit( DescendConstFunc _func ) const;
 	void visit( DescendFunc _func );
 
+	void pack();
+
 	uint32_t allocateBrick( Brick** outBrick );
 
 	/// Insert a point into the vox tree. If a point occupying the same space already exists
@@ -247,18 +204,20 @@ public:
 						const float _res = DEFAULT_BRICK_RESOLUTION );
 private:
 	void freeNodeDescendants( Node& _node );
-	uint32_t splitNode( Node& _node );
+	/// splitNode may cause a resize, if so will update the _node pointer passed in, however other node pointers will be invalidated!
+	uint32_t splitNode( Node** _node );
 	void setNodeToBrick( Node& _node, uint32_t _brickIndex );
 	void packNode( Node& _node );
+	void packNodeAndDescendants( Node& _node );
 
-	typedef FreeList< NodeTile > NodeTileContainer;
-	typedef FreeList< Brick >	BrickContainer;
+	/// get the tile index the node lives in
+	uint32_t getTileIndex( Node& _node) const;
+
+	typedef Core::FreeList< NodeTile > NodeTileContainer;
+	typedef Core::FreeList< Brick >	BrickContainer;
 
 	NodeTileContainer				nodeTiles;
 	BrickContainer 					bricks;
-	Node 							rootNode;
-
-	uint32_t						packedBinaryLUT[ 1 << PACKED_BINARY_LUT_BIT_SIZE ];
 
 	const Core::AABB				boundingBox;
 };
