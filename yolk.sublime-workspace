@@ -4,12 +4,148 @@
 		"selected_items":
 		[
 			[
+				"on",
+				"onlyChildNode"
+			],
+			[
+				"T",
+				"TileNodeAndAABB"
+			],
+			[
+				"free",
+				"freeHead"
+			],
+			[
+				"fre",
+				"freeHead"
+			],
+			[
+				"node",
+				"nodeATileIndex"
+			],
+			[
+				"nodeB",
+				"nodeBTileIndex"
+			],
+			[
+				"til",
+				"nodeTileIndex"
+			],
+			[
+				"unp",
+				"unpackedNodeA"
+			],
+			[
+				"chil",
+				"childBearing"
+			],
+			[
+				"has",
+				"hasChildren"
+			],
+			[
+				"nodeA",
+				"nodeAIndex"
+			],
+			[
+				"getChildr",
+				"getChildrenTileIndex"
+			],
+			[
+				"get",
+				"getChildBoundingBox"
+			],
+			[
+				"lea",
+				"leafBrickAOccupancy"
+			],
+			[
+				"occ",
+				"occupancy"
+			],
+			[
+				"fal",
+				"falseBrickIndex"
+			],
+			[
+				"pac",
+				"packedBinaryLeaf"
+			],
+			[
+				"BIN",
+				"PACKED_BINARY_LEAF"
+			],
+			[
+				"con",
+				"constantLeaf"
+			],
+			[
+				"leafBr",
+				"leafBrickA"
+			],
+			[
+				"br",
+				"brickIndex"
+			],
+			[
+				"emp",
+				"emptyCount"
+			],
+			[
+				"leaf",
+				"leafBrickB"
+			],
+			[
 				"bri",
 				"brickIndex"
 			],
 			[
-				"br",
-				"bricks"
+				"no",
+				"nodeTileIndex"
+			],
+			[
+				"NodeT",
+				"NodeTile"
+			],
+			[
+				"Pack",
+				"packNode"
+			],
+			[
+				"pa",
+				"parentNode"
+			],
+			[
+				"_b",
+				"_brickIndex"
+			],
+			[
+				"CO",
+				"CONSTANT_LEAF"
+			],
+			[
+				"bo",
+				"boundingBox"
+			],
+			[
+				"brick",
+				"brickIndex"
+			],
+			[
+				"tile",
+				"tileIndex"
+			],
+			[
+				"getN",
+				"getNodeTile"
+			],
+			[
+				"Node",
+				"NodeType"
+			],
+			[
+				"m_M",
+				"m_MaxExtent"
 			],
 			[
 				"spl",
@@ -20,20 +156,8 @@
 				"BrickIndex"
 			],
 			[
-				"chil",
-				"childrenIndex"
-			],
-			[
-				"node",
-				"nodeTiles"
-			],
-			[
 				"INTE",
 				"INDEX_TYPE"
-			],
-			[
-				"NodeT",
-				"NodeType"
 			],
 			[
 				"cur",
@@ -170,10 +294,6 @@
 			[
 				"Sampler",
 				"SamplerStates"
-			],
-			[
-				"T",
-				"TWE_ALPHA"
 			],
 			[
 				"TW",
@@ -394,126 +514,6 @@
 			[
 				"ex",
 				"execEngine"
-			],
-			[
-				"COR_",
-				"CORE_ASSERT"
-			],
-			[
-				"an",
-				"anyValidLeft"
-			],
-			[
-				"Vertex",
-				"VertexIndex"
-			],
-			[
-				"m_p",
-				"m_pointRep"
-			],
-			[
-				"lightWave",
-				"lightWaveScene2MeshMod"
-			],
-			[
-				"res",
-				"resourceLoaderIo"
-			],
-			[
-				"RE",
-				"ResourceLoaderImpl"
-			],
-			[
-				"key",
-				"Keyboard"
-			],
-			[
-				"F",
-				"FatalX11"
-			],
-			[
-				"pO",
-				"pOutFilename"
-			],
-			[
-				"Mes",
-				"MeshCreateParams"
-			],
-			[
-				"TypedResourceHandle",
-				"ResourceHandleBase"
-			],
-			[
-				"Tex",
-				"TextResourceHandlePtr"
-			],
-			[
-				"trus",
-				"trustedAddrToHandle"
-			],
-			[
-				"unt",
-				"untrustedThread"
-			],
-			[
-				"un",
-				"untrustedThread"
-			],
-			[
-				"Render",
-				"RenderContext"
-			],
-			[
-				"x11",
-				"x11Window"
-			],
-			[
-				"tv_",
-				"tv_sec"
-			],
-			[
-				"stackS",
-				"stackStart"
-			],
-			[
-				"Tag",
-				"TargetName"
-			],
-			[
-				"VM",
-				"VmAlloc"
-			],
-			[
-				"Target",
-				"TargetName"
-			],
-			[
-				"thu",
-				"thunkSegSize"
-			],
-			[
-				"encodeFuncWith",
-				"encodeFuncWithParam"
-			],
-			[
-				"enc",
-				"encodeFuncWithStart"
-			],
-			[
-				"th",
-				"threadCtx"
-			],
-			[
-				"g_",
-				"g_ThreadIdx"
-			],
-			[
-				"thunk",
-				"thunkCodeSize"
-			],
-			[
-				"trustedS",
-				"trustedSize"
 			]
 		]
 	},
@@ -523,7 +523,15 @@
 			"file": "src/apps/gfx_test/voxtree.h",
 			"settings":
 			{
-				"buffer_size": 7334,
+				"buffer_size": 8742,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/voxtree_test.cpp",
+			"settings":
+			{
+				"buffer_size": 382,
 				"line_ending": "Windows"
 			}
 		},
@@ -531,23 +539,39 @@
 			"file": "src/apps/gfx_test/voxtree.cpp",
 			"settings":
 			{
-				"buffer_size": 4358,
+				"buffer_size": 19950,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/core/aabb.h",
+			"file": "src/libs/scene/renderable.h",
 			"settings":
 			{
-				"buffer_size": 2873,
+				"buffer_size": 3605,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/core/aabb.inl",
+			"file": "src/apps/gfx_test/voxtreerenderable.h",
 			"settings":
 			{
-				"buffer_size": 8827,
+				"buffer_size": 2145,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+			"settings":
+			{
+				"buffer_size": 580,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 1213,
 				"line_ending": "Windows"
 			}
 		}
@@ -603,13 +627,25 @@
 	},
 	"file_history":
 	[
+		"/G/Projects/yolk/src/libs/core/core_utils.h",
+		"/G/Projects/yolk/src/libs/core/resources.h",
+		"/G/Projects/yolk/src/libs/scene/mesh.h",
+		"/G/Projects/yolk/src/libs/core/aabb.inl",
+		"/G/Projects/yolk/src/apps/gfx_test/main.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/freelist.h",
+		"/G/minecraft/server.properties",
+		"/G/minecraft/ops.txt",
+		"/G/minecraft/banned-players.txt",
+		"/G/minecraft/banned-ips.txt",
+		"/G/minecraft/debug/profile-results-2013-06-18_12.56.21.txt",
+		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/core/aabb.h",
 		"/G/Projects/yolk/src/libs/core/standard.h",
 		"/G/Projects/yolk/src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
 		"/G/Projects/yolk/src/libs/CMakeLists.txt",
 		"/G/Projects/yolk/src/apps/CMakeLists.txt",
 		"/G/Projects/yolk/src/apps/Riftball/CMakeLists.txt",
 		"/G/Projects/yolk/src/apps/zombiehospital/CMakeLists.txt",
-		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
 		"/G/Projects/yolk/src/libs/scene/hier.cpp",
 		"/G/Projects/yolk/src/libs/scene/hierfile.cpp",
 		"/G/Projects/yolk/src/libs/scene/texture.h",
@@ -676,7 +712,6 @@
 		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITAtomic_Android.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITThread_Win.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/Header/ITAtomic.h",
-		"/G/Projects/yolk/src/libs/core/core_utils.h",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITThread_Android.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITWinConsoleGeneric.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITWinEmbedded.cpp",
@@ -719,18 +754,7 @@
 		"/Z/Projects/svn/short/source/short_win.cpp",
 		"/Z/Projects/svn/short/source/short.h",
 		"/Z/Projects/svn/short/source/short.cpp",
-		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.json",
-		"/G/Projects/yolk/src/apps/trade/CMakeLists.txt",
-		"/G/Projects/trade_runtime/live/Textures/base-ui.tattxt",
-		"/G/Projects/yolk/yolk.sublime-project",
-		"/C/Users/Dean/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math_c.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/cameras/zarchcam.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/libs/core/vector_math.h",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/pch.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/shell3d.cpp",
-		"/C/Users/Dean/Documents/Visual Studio 2012/Projects/yolk/src/apps/zombiehospital/main.cpp"
+		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.json"
 	],
 	"find":
 	{
@@ -755,6 +779,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"RESOURCE_NAME",
+			"AABB",
 			"_clientVersion",
 			"SwfParser/",
 			"SwfParser",
@@ -880,9 +906,7 @@
 			"reassignSectionAddress",
 			"resolveExternalSymbols",
 			"resolveRelocation",
-			"createTargetMachine",
-			"ST_Debug",
-			"ST_Debug\""
+			"createTargetMachine"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -934,7 +958,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -943,15 +967,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7334,
+						"buffer_size": 8742,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								128,
-								128
+								21,
+								36
 							]
 						],
 						"settings":
@@ -966,11 +990,11 @@
 				},
 				{
 					"buffer": 1,
-					"file": "src/apps/gfx_test/voxtree.cpp",
+					"file": "src/apps/gfx_test/voxtree_test.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4358,
+						"buffer_size": 382,
 						"regions":
 						{
 						},
@@ -993,19 +1017,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "src/libs/core/aabb.h",
+					"file": "src/apps/gfx_test/voxtree.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2873,
+						"buffer_size": 19950,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1503,
-								1516
+								16891,
+								16891
 							]
 						],
 						"settings":
@@ -1013,31 +1037,112 @@
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1409.0,
+						"translation.y": 14855.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/libs/core/aabb.inl",
+					"file": "src/libs/scene/renderable.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8827,
+						"buffer_size": 3605,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1410,
+								1410
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1419.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/apps/gfx_test/voxtreerenderable.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2145,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1900,
+								2047
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 848.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 580,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								420,
+								420
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/apps/gfx_test/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1213,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								38,
+								38
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1079,6 +1184,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.9o://G:\\Projects\\yolk\\src\\libs\\core":
+	{
+		"height": 208.0
+	},
 	"output.exec":
 	{
 		"height": 130.0

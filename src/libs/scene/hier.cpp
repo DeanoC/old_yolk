@@ -90,21 +90,6 @@ Hier::~Hier() {
 	}	
 }
 
-void Hier::render( RenderContext* context, Pipeline* pipeline ) {
-	OwnedMeshes::const_iterator it = ownedMeshes.begin();
-	while( it != ownedMeshes.end() ) {
-		(*it)->render( context, pipeline );
-		++it;
-	}
-}
-void Hier::renderTransparent( RenderContext* context, Pipeline* pipeline ) {
-	OwnedMeshes::const_iterator it = ownedMeshes.begin();
-	while( it != ownedMeshes.end() ) {
-		(*it)->renderTransparent( context, pipeline );
-		++it;
-	}
-}
-
 Hier* Hier::cloneInstance() const {
 	Hier* instance = CORE_NEW Hier();
 	instance->hie = this->hie;

@@ -188,7 +188,7 @@ namespace Core {
 
 			Core::RGBAColour col;
 			const Core::AABB& waabb = node->m_AABB;
-			if(localFrustum.cullAABB( waabb ) != Frustum::OUTSIDE ) {
+			if(localFrustum.cullAABB( waabb ) != Frustum::CULL_RESULT::OUTSIDE ) {
 				if( node->isLeaf() ) {
 					col = visLeaf;
 				} else {

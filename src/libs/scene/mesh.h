@@ -22,6 +22,8 @@ namespace Scene {
 
 	class Mesh : public Renderable {
 	public:
+		static const uint32_t MESH_TYPE = Core::GenerateID<'M','E','S','H'>::value;
+
 		//! Default ctor creates an empty mesh
 		Mesh();
 		//! loads the mesh provided and gives it an identity transform
@@ -33,18 +35,27 @@ namespace Scene {
 		//! dtor
 		~Mesh();
 
-		//! inherited from Renderable
-		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
-		virtual void renderTransparent( RenderContext* context, Pipeline* pipeline ) override;
+		//--------- RENDERABLE IMPLEMENTATION START -------------
 
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const override {
-			if( (_type == R_MESH || _type == R_ALL) && (arraySize > 0) && isEnabled() ) {
-				outArray[0] = (Scene::Renderable*) this;
-				return 1;
-			} else {
-				return 0;
+		//! inherited from Renderable
+		void render( RenderContext* context, const Pipeline* pipeline ) const override;
+		void renderTransparent( RenderContext* context, const Pipeline* pipeline ) const override;
+
+		void getRenderablesOfType( uint32_t _type, std::vector<Renderable*>& _out ) const override {
+			if( (_type == MESH_TYPE || _type == ALL_TYPES) && isEnabled() ) {
+				_out.push_back( (Scene::Renderable*) this );
 			}
 		}
+		void getVisibleRenderablesOfType( const Core::Frustum& _frustum, const uint32_t _type, std::vector< Renderable*>& _out ) const override {
+			if( (_type == MESH_TYPE || _type == ALL_TYPES) && isEnabled() ) {
+				Core::AABB waabb;
+				getWorldAABB( waabb );
+				if( _frustum.cullAABB( waabb ) != Core::Frustum::CULL_RESULT::OUTSIDE ) {
+					_out.push_back( (Scene::Renderable*) this );
+				}
+			}
+		}
+		//--------- RENDERABLE IMPLEMENTATION END -------------
 
 		WobPtr getResource() const {
 			return meshHandle->acquire();
@@ -53,7 +64,7 @@ namespace Scene {
 	protected:
 		WobHandlePtr				meshHandle;
 		Math::Matrix4x4*			ownedMatrix;
-		Math::Matrix4x4				prevWVP;
+		mutable Math::Matrix4x4		prevWVP;
 	};
 }; // end namespace Graphics
 

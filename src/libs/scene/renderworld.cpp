@@ -11,6 +11,7 @@
 #include "rendercontext.h"
 #include "pipeline.h"
 #include "screen.h"
+#include "mesh.h"
 
 #include "renderworld.h"
 
@@ -89,22 +90,13 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 	// a lock to ensure other thread updates of renderables transform
 	// isn't reflected to the renderer mid frame
 	visibleRenderables.clear();
-	Core::AABB waabb;
 
-	Scene::Renderable* gatherArray[100];
-	// get all meshes
+	// get all visible meshes
 	RenderableContainer::const_iterator it = renderables.cbegin();
 	while( it != renderables.cend() ) {
-		auto meshCount = (*it)->getActualRenderablesOfType( Renderable::R_MESH, 100, gatherArray );
-		for( unsigned int i = 0;i < meshCount; ++i ) {
-			gatherArray[i]->getTransformNode()->setRenderMatrix();
-			gatherArray[i]->getRenderAABB( waabb );
-			if( renderCamera->getFrustum().cullAABB( waabb ) != Core::Frustum::OUTSIDE ) {
-				visibleRenderables.push_back( gatherArray[i] );
-			}
-		}
+		(*it)->getVisibleRenderablesOfType( renderCamera->getFrustum(), Scene::Renderable::ALL_TYPES, visibleRenderables );
 		++it;
-	}	
+	}
 }
 
 void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline ) {
@@ -133,6 +125,13 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 
 void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, const std::shared_ptr<Scene::Camera> camera, RenderContext* context ) {
 	Pipeline* pipeline = screen->getRenderer()->getPipeline( pipelineName );
+
+	// render update (is this the right place? what about timing info...)
+	RenderableContainer::iterator it = renderables.begin();
+	while( it != renderables.end() ) {
+		(*it)->renderUpdate();
+		++it;
+	}
 
 	determineVisibles( camera );
 

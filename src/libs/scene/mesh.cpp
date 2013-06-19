@@ -35,8 +35,8 @@ Mesh::Mesh( const char* pFilename, Core::TransformNode* node ) :
 	ownedMatrix( nullptr ),
 	Renderable( node ) {
 
-	// for now 
-	WobPtr wob = meshHandle->tryAcquire();
+	// for now TODO on ready callback to set the localAabb before rendering
+	WobPtr wob = meshHandle->acquire();
 	if( wob ) {
 		localAabb = Core::AABB( wob->header->minAABB, wob->header->maxAABB );
 	}
@@ -53,7 +53,7 @@ Mesh::~Mesh() {
 	}
 }
 
-void Mesh::render( RenderContext* context, Pipeline* pipeline ) {
+void Mesh::render( RenderContext* context, const Pipeline* pipeline ) const {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
@@ -64,13 +64,12 @@ void Mesh::render( RenderContext* context, Pipeline* pipeline ) {
 
 	WobPtr wob = meshHandle->tryAcquire();
 	if( wob ) {
-		localAabb = Core::AABB( wob->header->minAABB, wob->header->maxAABB );
 		wob->pipelineDataStores[ pipeline->getIndex() ]->render( context );
 	} else {
 //		LOG(INFO) << "Mesh not ready yet\n";
 	}
 }
-void Mesh::renderTransparent( RenderContext* context, Pipeline* pipeline ) {
+void Mesh::renderTransparent( RenderContext* context, const Pipeline* pipeline ) const {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
@@ -81,7 +80,6 @@ void Mesh::renderTransparent( RenderContext* context, Pipeline* pipeline ) {
 
 	WobPtr wob = meshHandle->tryAcquire();
 	if( wob ) {
-		localAabb = Core::AABB( wob->header->minAABB, wob->header->maxAABB );
 		wob->pipelineDataStores[ pipeline->getIndex() ]->renderTransparent( context );
 	} else {
 //		LOG(INFO) << "Mesh not ready yet\n";

@@ -7,12 +7,14 @@
 
 #pragma once
 
-#ifndef WIERD_CORE_FRUSTUM_H
-#define WIERD_CORE_FRUSTUM_H
+#ifndef YOLK_CORE_FRUSTUM_H
+#define YOLK_CORE_FRUSTUM_H
 
 
 #include "vector_math.h"
-#include "aabb.h"
+#if !defined( YOLK_CORE_AABB_H )
+#	include "aabb.h"
+#endif
 
 
 namespace Core {
@@ -20,7 +22,7 @@ namespace Core {
 
 class Frustum {
 public:
-	enum CULL_RESULT {
+	enum class CULL_RESULT {
 		OUTSIDE = 0,
 		CROSSING = 1,
 		INSIDE = 2,
@@ -72,14 +74,14 @@ public:
 			}
 
 			if(  Math::DotPoint(planes[i], vMin) < 0) {
-				return OUTSIDE;
+				return CULL_RESULT::OUTSIDE;
 			}
 			if( Math::DotPoint(planes[i], vMax) <= 0) {
 				intersect = true;
 			}
 		}
 
-		return (intersect) ? CROSSING : INSIDE;
+		return (intersect) ? CULL_RESULT::CROSSING : CULL_RESULT::INSIDE;
 	}
 
 	CALL void createFromMatrix( const Math::Matrix4x4& _matrix ) {

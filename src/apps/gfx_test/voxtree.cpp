@@ -453,7 +453,6 @@ uint32_t Tree::getTileIndex( Node& _node) const {
 	return nodeIndex / 8; // truncate to nodeTile
 }
 
-
 Tree::VisitHelper::VisitHelper( Tree& _parent ) : 
 	parent( _parent )
 {

@@ -202,6 +202,7 @@ public:
 	bool insertPoint( 	const Math::Vector3& _treeSpacePos,
 						const uint32_t _brickIndex, 
 						const float _res = DEFAULT_BRICK_RESOLUTION );
+
 private:
 	void freeNodeDescendants( Node& _node );
 	/// splitNode may cause a resize, if so will update the _node pointer passed in, however other node pointers will be invalidated!
@@ -209,6 +210,7 @@ private:
 	void setNodeToBrick( Node& _node, uint32_t _brickIndex );
 	void packNode( Node& _node );
 	void packNodeAndDescendants( Node& _node );
+
 
 	/// get the tile index the node lives in
 	uint32_t getTileIndex( Node& _node) const;

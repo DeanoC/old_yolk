@@ -4,8 +4,8 @@
 /// \brief	A class representing a axis aligned bounding box
 
 #pragma once
-#ifndef WIERD_CORE_AABB_H
-#define WIERD_CORE_AABB_H
+#ifndef YOLK_CORE_AABB_H
+#define YOLK_CORE_AABB_H
 
 #include "vector_math.h"
 #include "mathconsts.h"

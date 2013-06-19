@@ -4,6 +4,8 @@
 #include "localworld/sceneworld.h"
 #include "localworld/thing.h"
 #include "localworld/thingfactory.h"
+#include "voxtree.h"
+#include "voxtreerenderable.h"
 
 //#include "boost/program_options.hpp"
 
@@ -35,8 +37,12 @@ int Main() {
 	shell.start();
 	SceneWorldPtr world = shell.getSceneWorld();
 
-	extern void VoxTreeTest();
-	VoxTreeTest();
+	extern Vox::Tree* VoxTreeTest();
+	Vox::Tree* tree = VoxTreeTest();
+	Vox::TreeRenderablePtr treeRender = std::make_shared<Vox::TreeRenderable>( *tree );
+	ThingPtr thing ( ThingFactory::createEmptyThing( TBC_WORLD, NewThingId() ) );
+	thing->add( treeRender );
+	world->add( thing );
 
 	// some basic setup
 	Scene::HierPtr land = std::make_shared<Scene::Hier>( "test_room" );

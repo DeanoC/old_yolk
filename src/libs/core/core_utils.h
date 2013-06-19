@@ -148,7 +148,7 @@ CORE_INLINE unsigned int getNextPow2( unsigned int iNum )
 /// To use just code Core::GenerateID<'A','B','C','D'>::value
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template< const char c0, const char c1, const char c2, const char c3>
+template< const char c0, const char c1 = ' ', const char c2 = ' ', const char c3 = ' '>
 struct GenerateID {
 	//! part of the generate ID template magic
 	template<unsigned int c, unsigned int shift, unsigned int last>

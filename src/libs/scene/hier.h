@@ -31,6 +31,7 @@ namespace Scene {
 
 	class Hier : public Renderable {
 	public:
+		static const uint32_t HIER_TYPE = Core::GenerateID<'H','I','E','R'>::value;
 		Hier( Core::TransformNode* pRootNode );
 		
 		// from a Hie resource file
@@ -39,25 +40,50 @@ namespace Scene {
 		//! dtor
 		virtual ~Hier();
 
-		virtual void render( RenderContext* context, Pipeline* pipeline ) override;
-		virtual void renderTransparent( RenderContext* context, Pipeline* pipeline ) override;
+		void renderUpdate() override {
+			Renderable::renderUpdate();
 
-		virtual uint32_t getActualRenderablesOfType( R_TYPE _type, uint32_t arraySize, Renderable** outArray ) const override {
-			if( !isEnabled() ) return 0;
-			if( _type == R_MESH || _type == R_ALL) {
-				uint32_t numMeshes = 0;
-				for( uint32_t i=0;i < ownedMeshes.size();++i ) {
-					if( ownedMeshes[i]->isEnabled() ) {
-						outArray[i] = ownedMeshes[i].get();
-						numMeshes++;
-						if( numMeshes >= arraySize ) return numMeshes;
-					}
-				}
-				return numMeshes;
-			} else {
-				return 0;
+			for( uint32_t i=0;i < ownedMeshes.size();++i ) {
+				ownedMeshes[i]->renderUpdate();
 			}
 		}
+
+
+		void getRenderablesOfType( uint32_t _type, std::vector<Renderable*>& _out ) const override {
+			if( !isEnabled() ) return;
+			// if someone specifically asked for hier types return us else send back our contained meshes
+			if( _type == Mesh::MESH_TYPE || _type == ALL_TYPES ) {
+				for( uint32_t i=0;i < ownedMeshes.size();++i ) {
+					if( ownedMeshes[i]->isEnabled() ) {
+						_out.push_back( ownedMeshes[i].get() );
+					}
+				}
+			} else if( _type == HIER_TYPE ) {
+				_out.push_back( (Renderable*) this );
+			}
+		}
+		void getVisibleRenderablesOfType( const Core::Frustum& _frustum, const uint32_t _type, std::vector< Renderable*>& _out ) const override {
+			if( !isEnabled() ) return;
+			Core::AABB waabb;
+
+			// if someone specifically asked for hier types return us else send back our contained meshes
+			if( _type == Mesh::MESH_TYPE || _type == ALL_TYPES ) {
+				for( uint32_t i=0;i < ownedMeshes.size();++i ) {
+					if( ownedMeshes[i]->isEnabled() ) {
+						ownedMeshes[i]->getRenderAABB( waabb );
+						if( _frustum.cullAABB( waabb ) != Core::Frustum::CULL_RESULT::OUTSIDE ) {
+							_out.push_back( ownedMeshes[i].get() );
+						}
+					}
+				}
+			} else if( _type == HIER_TYPE ) {
+				getRenderAABB( waabb );
+				if( _frustum.cullAABB( waabb ) != Core::Frustum::CULL_RESULT::OUTSIDE ) {
+					_out.push_back( (Renderable*) this );
+				}
+			}
+		}
+
 
 		int getNodeCount() const { return numNodes; }
 
