@@ -90,7 +90,7 @@ public:
 
 	typedef tbb::concurrent_vector<ResourceData*>								ListResourceData;
 	typedef tbb::concurrent_hash_map<ResourceHandleBase*, ResourceData*>		PtrIndex;
-	typedef tbb::concurrent_hash_map<std::string, ResourceData*>				CacheIndex;
+	typedef tbb::concurrent_hash_map<std::string, ResourceHandleBase*>			CacheIndex;
 	typedef tbb::concurrent_hash_map<uint32_t, ResourceTypeData>				ResourceTypeMap;
 	typedef tbb::concurrent_vector<ResourceMan::AcquirePumpCallback>			AcquirePumps;
 
@@ -100,10 +100,13 @@ public:
 	ResourceTypeMap		resourceTypeMap;
 	AcquirePumps		acquirePumps;
 
+	ResourceManImpl() {
+	}
+
 	~ResourceManImpl() {
 		bool anyValidLeft = false;
 
-		if(listResourceHandlePtrs.size() > 0) {
+		if(listResourceHandlePtrs.empty() == false ) {
 			auto rdIt = listResourceHandlePtrs.cbegin();
 			while( rdIt != listResourceHandlePtrs.cend() ) {
 				if( (*rdIt) != nullptr && (*rdIt)->handle != nullptr ) {
@@ -160,10 +163,17 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 
 	ResourceManImpl::CacheIndex::const_accessor rcacheIt;
 	if( impl.cacheMap.find( rcacheIt, cacheName ) ) {
-		ResourceData* pRD = rcacheIt->second;
-		CORE_ASSERT( pRD->handle->type == type );
-		pRD->refCount++;
-		return pRD->handle;
+		ResourceManImpl::PtrIndex::accessor acc;
+		if( impl.resourceHandleBaseMap.find( acc, rcacheIt->second )  ) {
+			ResourceData* pRD = acc->second;
+			CORE_ASSERT( pRD->handle->type == type );
+			pRD->refCount++;
+			return pRD->handle;
+		}
+		// potentially we can get here but the handle has been deleted...
+		// then we have a race condition, for now in this case remove the cache flag
+		// but this is a distinctly not great solution...
+		flags = (RESOURCE_FLAGS) (flags & ~RMRF_DONTCACHE);
 	}
 
 	char *pSafeData = NULL;
@@ -179,13 +189,16 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 	if( impl.resourceHandleBaseMap.insert( acc, pBase ) ) {	
 		char *pSafeName = CORE_NEW_ARRAY char[ actualName.size()+ 1 ]; // will be owned ResourceData
 		strcpy(pSafeName, actualName.c_str() );
-		auto lb = impl.listResourceHandlePtrs.push_back( CORE_NEW ResourceData( pSafeName, pSafeData, flags, pBase ) );
-		acc->second = *lb;
+
+		auto pRD = CORE_NEW ResourceData( pSafeName, pSafeData, flags, pBase );
+		CORE_ASSERT( pRD->resourceName.get() || pRD->resourceData.get() );
+		auto lb = impl.listResourceHandlePtrs.push_back( pRD );
+		acc->second = pRD;
 		if( !(flags & RMRF_DONTCACHE) ) {
 			ResourceManImpl::CacheIndex::accessor cacheIt;
 			if( impl.cacheMap.insert( cacheIt, cacheName ) ) {
-				cacheIt->second = *lb;
-				cacheIt->second->cacheName = cacheName;
+				cacheIt->second = pBase;
+				pRD->cacheName = cacheName;
 			}
 		}
 
@@ -315,7 +328,8 @@ std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBa
 		pHandle->acquiring += -1;	
 		return std::shared_ptr<ResourceBase>();
 	}
-	if( auto res = pHandle->resourceBase.lock() ) {
+	std::shared_ptr<ResourceBase> res = pHandle->resourceBase.lock();
+	if( res ) {
 		return res;
 	}
 
@@ -330,11 +344,14 @@ std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBa
 		CORE_ASSERT( false && "Invalid Resource require" );		
 	}
 	const ResourceData* pRD = rdIt->second;
+	CORE_ASSERT( pRD->resourceName.get() || pRD->resourceData.get() );
 	rdIt.release();
+
 
 	rtd.createCallback( pHandle, pRD->flags, pRD->resourceName.get(), pRD->resourceData.get() );
 
-	if( auto res = pHandle->resourceBase.lock() ) {
+	res = pHandle->resourceBase.lock();
+	if( res ) {
 		return res;
 	} else {
 		return std::shared_ptr<ResourceBase>();

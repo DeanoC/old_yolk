@@ -142,7 +142,7 @@ void Tree::freeNodeDescendants( Node& _node ) {
 	uint32_t tileIndexA;
 	uint32_t tileIndexB;
 	if( _node.hasChildren() ) {
-		tileIndexA = _node.getChildrenTileIndex( tileIndexB );
+		tileIndexA = _node.getChildrenTileIndex( 0, tileIndexB );
 		tileStack.push( tileIndexA );
 		if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 	}
@@ -153,7 +153,7 @@ void Tree::freeNodeDescendants( Node& _node ) {
 		NodeTile& tile = nodeTiles.get( index );
 		for( int i = 0;i < 8; ++i ) {
 			if( tile.nodes[i].hasChildren() ) {
-				tileIndexA = tile.nodes[i].getChildrenTileIndex( tileIndexB );
+				tileIndexA = tile.nodes[i].getChildrenTileIndex( index, tileIndexB );
 				tileStack.push( tileIndexA );
 				if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 			}
@@ -169,7 +169,7 @@ void Tree::packNodeAndDescendants( Node& _node ) {
 	uint32_t tileIndexA;
 	uint32_t tileIndexB;
 	if( _node.hasChildren() ) {
-		tileIndexA = _node.getChildrenTileIndex( tileIndexB );
+		tileIndexA = _node.getChildrenTileIndex( 0, tileIndexB );
 		tileStack.push( tileIndexA );
 		if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 	}
@@ -181,7 +181,7 @@ void Tree::packNodeAndDescendants( Node& _node ) {
 			if( tile.nodes[i].hasChildren() ) {
 				packNode( tile.nodes[i] );
 
-				tileIndexA = tile.nodes[i].getChildrenTileIndex( tileIndexB );
+				tileIndexA = tile.nodes[i].getChildrenTileIndex( index, tileIndexB );
 				tileStack.push( tileIndexA );
 				if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 			}
@@ -285,7 +285,7 @@ bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
 							tileIndex = nodeBIndex;
 						}
 					} else {
-						// hit the 6 or 7 virtual empty nodes, so requires a split						tileIndex = splitNode( &curNode );
+						// hit the 6 or 7 virtual empty nodes, so requires a split
 						tileIndex = splitNode( &curNode );
 						if( tileIndex == INVALID_INDEX ) {
 							return;
@@ -294,7 +294,7 @@ bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
 				} else {
 					// standard unpacked node
 					uint32_t dummy; // we have already accounted for the second tile index if any
-					tileIndex = curNode->getChildrenTileIndex( dummy );
+					tileIndex = curNode->getChildrenTileIndex( curIndex, dummy );
 				}
 			} else {
 				// need to split if possible (resize may occur, pointer may be invalid afterwards)
@@ -374,6 +374,7 @@ void Tree::packNode( Node& _node ) {
 			_node.type = NodeType::EMPTY;
 			return;
 		}
+		
 		if( unpackedNodeCount == 1 && 
 			emptyCount == 7 && 
 			unpackedNodeA < (1 << NODE_ONLY_CHILD_INDEX_BIT_SIZE)) {
@@ -403,7 +404,7 @@ void Tree::packNode( Node& _node ) {
 			_node.twoChildNode.nodeBTileIndex = unpackedNodeB - getTileIndex( _node );
 			return;
 		}
-
+		
 		// can we make it a constant node
 		if( leafBrickA != INVALID_INDEX && 
 			leafBrickB == INVALID_INDEX && 
@@ -416,7 +417,7 @@ void Tree::packNode( Node& _node ) {
 			_node.constantLeaf.brickIndex = leafBrickA;
 			return;
 		}
-
+		
 		// can we make it a packed binary with false == EMPTY
 		if( leafBrickA != INVALID_INDEX &&
 			leafBrickA < (1 << PACKED_BINARY_BIT_SIZE) &&
@@ -426,7 +427,7 @@ void Tree::packNode( Node& _node ) {
 			_node.type = NodeType::PACKED_BINARY_LEAF;
 			_node.packedBinaryLeaf.trueBrickIndex = leafBrickA;
 			_node.packedBinaryLeaf.falseBrickIndex = 0; // EMPTY
-			_node.packedBinaryLeaf.occupancy |= leafBrickAOccupancy;
+			_node.packedBinaryLeaf.occupancy = leafBrickAOccupancy;
 			return;
 		}
 
@@ -439,10 +440,10 @@ void Tree::packNode( Node& _node ) {
 			_node.type = NodeType::PACKED_BINARY_LEAF;
 			_node.packedBinaryLeaf.trueBrickIndex = leafBrickA;
 			_node.packedBinaryLeaf.falseBrickIndex = leafBrickB;
-			_node.packedBinaryLeaf.occupancy |= leafBrickAOccupancy;
+			_node.packedBinaryLeaf.occupancy = leafBrickAOccupancy;
 			return;
 		}
-
+		
 		//--- get here, its been unable to be packed
 	}
 
@@ -540,7 +541,7 @@ bool Node::hasDescendants() const {
 	}
 }
 
-uint32_t Node::getChildrenTileIndex( uint32_t& _outSecondChildTile ) const {
+uint32_t Node::getChildrenTileIndex( const uint32_t _thisIndex, uint32_t& _outSecondChildTile ) const {
 	_outSecondChildTile = INVALID_INDEX;
 	switch( type ) {
 	case NodeType::NODE:
@@ -548,8 +549,8 @@ uint32_t Node::getChildrenTileIndex( uint32_t& _outSecondChildTile ) const {
 	case NodeType::ONLY_CHILD_NODE:
 		return onlyChildNode.nodeTileIndex;
 	case NodeType::TWO_CHILD_NODE:
-		_outSecondChildTile = twoChildNode.nodeBTileIndex;
-		return twoChildNode.nodeATileIndex;
+		_outSecondChildTile = _thisIndex + twoChildNode.nodeBTileIndex;
+		return _thisIndex + twoChildNode.nodeATileIndex;
 	default:
 		return INVALID_INDEX;
 	}

@@ -728,7 +728,11 @@ bool WobbyWriter::Save( MeshMod::SceneNodePtr node, Core::ResourceManifestEntryV
 			MeshMod::MeshPtr pMesh = std::dynamic_pointer_cast<MeshMod::Mesh>(pObj);
 
 			WobbyWriter oWriter;
-			auto baseName = Core::FilePath( pOutFilename.BaseName().RemoveExtension().value() + "_" + pMesh->getName() );
+			auto name = pOutFilename.BaseName().RemoveExtension().value();
+			if( !pMesh->getName().empty() ) {
+				name += "_" + pMesh->getName();
+			}
+			auto baseName = Core::FilePath( name );
 			auto fileName = baseName.RemoveExtension();
 			oWriter.Save( pMesh, fileName );
 

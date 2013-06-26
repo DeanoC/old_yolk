@@ -139,7 +139,7 @@ void OutputScene( Core::FilePath outPath, std::shared_ptr<MeshImport::ImportInte
 	using namespace Export;
 
 	LOG(INFO) << "Output Path : " << outPath.DirName().value().c_str() << "\n";
-	boost::filesystem::current_path( outPath.DirName().value() .c_str() );
+	boost::filesystem::current_path( outPath.DirName().value().c_str() );
 
 	Core::ResourceManifestEntryVector manifest;
 	auto outBaseName = outPath.BaseName();

@@ -39,7 +39,7 @@ bool SaveHierachy( MeshMod::ScenePtr scene,
 		int nodeIndex = (int) std::distance<std::vector< MeshMod::SceneNodePtr >::const_iterator>( nodeArray.begin(), it );
 		std::string nodeName = Core::FilePath( node->name ).RemoveExtension().value();
 		std::replace( nodeName.begin(), nodeName.end(), ' ', '_' );
-		CORE_ASSERT( nodeName == node->name ); // this should have be handled by the higher layers now
+//		CORE_ASSERT( nodeName == node->name ); // this should have be handled by the higher layers now
 
 		std::ostringstream emitName;
 		emitName <<  "NodeName" << nodeIndex << "Str";

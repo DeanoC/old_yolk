@@ -72,6 +72,8 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	using namespace Swf;
 	std::shared_ptr<Core::ResourceBase> res;
 
+	CORE_ASSERT( name != nullptr || data != nullptr );
+
 	// route type to their specific creation functions 
 	switch( handle->getType() ) {
 	case WobType: RENDER( Wob ); break;
@@ -87,6 +89,7 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RasteriserStateType: RENDER( RasteriserState ); break;
 	case PlayerType: RENDER1( Player, SwfPlayer ); break;
 	default:;
+		LOG(FATAL) << "Process Resource Type Error\n";
 	}
 
 	--ResourceLoaderImpl::workCounter;
@@ -94,11 +97,14 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 }
 
 #undef RENDER
-#define LOADER( x ) cs = (void*) ResourceLoaderImpl::parent->preCreate( (flags & Core::RMRF_LOADOFFDISK) ? pName : nullptr, (const x ::CreationInfo*) pData )
+#define LOADER( x ) cs = (void*) ResourceLoaderImpl::parent->preCreate( (flags & Core::RMRF_LOADOFFDISK) ? name : nullptr, (const x ::CreationInfo*) data )
 
-void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* pName, const void* pData  ) {
+void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS flags, const char* name, const void* data  ) {
 	using namespace Swf;
 	void* cs = nullptr;
+
+	CORE_ASSERT( name != nullptr || data != nullptr );
+
 	// route type to their specific creation functions, they should alloc and fill a new creation struct
 	switch( handle->getType() ) {
 	case WobType: LOADER( Wob ); break;
@@ -116,7 +122,7 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	default:;
 	}
 	if( cs == nullptr ) {
-		LOG(FATAL) << "Load failed " << pName <<"\n";
+		LOG(FATAL) << "Load failed " << name <<"\n";
 		CORE_ASSERT( cs != nullptr );
 	}
 
@@ -124,7 +130,7 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	// TODO we are leaking
 //	flags = (Core::RESOURCE_FLAGS) (flags | Core::RMRF_SCENE_DEFINED);
 	
-	ResourceLoaderImpl::renderIo->post( std::bind<void>( ProcessRender, handle, flags, pName, cs ) );
+	ResourceLoaderImpl::renderIo->post( std::bind<void>( ProcessRender, handle, flags, name, cs ) );
 }
 
 #undef LOADER
@@ -198,9 +204,11 @@ ResourceLoaderImpl::ResourceLoaderImpl() {
 	loaderThread = CORE_NEW Core::thread( 
 		[&] {
 			loaderThreadId = std::this_thread::get_id();
+#if defined(USE_GC)
 			GC_stack_base stackBase;
 			GC_get_stack_base( &stackBase );
 			GC_register_my_thread( &stackBase );
+#endif
 			workUnit = std::unique_ptr<boost::asio::io_service::work>( CORE_NEW boost::asio::io_service::work( *loaderIo ) );
 			loaderIo->run();
 		}

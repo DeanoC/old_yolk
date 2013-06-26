@@ -116,7 +116,7 @@ union Node {
 	bool hasDescendants() const;
 
 	/// for nodes with children returns the child tile index, some splits can have two tile indices
-	uint32_t getChildrenTileIndex( uint32_t& _outSecondChildTile ) const;
+	uint32_t getChildrenTileIndex( const uint32_t _thisIndex, uint32_t& _outSecondChildTile ) const;
 };
 
 static_assert( sizeof(Node) == (NODE_TYPE_BIT_SIZE + NODE_PAYLOAD_BIT_SIZE)/8, "Eeek vox::Node not 4 bytes in size" );

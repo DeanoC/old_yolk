@@ -326,11 +326,6 @@ void VtPipeline::conditionWob( Scene::Wob* wob ) {
 
 	VtPipelineDataStore* pds =  CORE_NEW VtPipelineDataStore();
 
-	// count opaque and transparency/translucent surfaces
-	for( uint16_t i = 0; i < header->uiNumMaterials; ++i ) {
-		WobMaterial* mat = &header->pMaterials.p[i];
-	}
-
 	pds->numMaterials = header->uiNumMaterials;
 	pds->materials.reset( CORE_NEW_ARRAY VtPipelineDataStore::PerMaterial[ pds->numMaterials ] );
 	wob->pipelineDataStores[pipelineIndex] = std::unique_ptr<VtPipelineDataStore>( pds );

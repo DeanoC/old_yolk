@@ -8,8 +8,12 @@ Vox::Tree* VoxTreeTest() {
 	Vox::Brick* brick;
 	uint32_t brickIndex = test->allocateBrick( &brick );
 	brick->splitable = false;
-	for( float i = -4; i < 4; ++i ) {
-		test->insertPoint( Math::Vector3(i,i,i), brickIndex );
+	for( float k = 1; k < 21; ++k ) {
+		for( float j = 0; j < 8; ++j ) {
+			for( float i = 0; i < 20; ++i ) {
+				test->insertPoint( Math::Vector3(i,j,k), brickIndex );
+			}
+		}
 	}
 	test->pack();
 	return test;

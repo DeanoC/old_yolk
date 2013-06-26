@@ -94,6 +94,7 @@ void RenderWorld::determineVisibles( const std::shared_ptr<Scene::Camera>& camer
 	// get all visible meshes
 	RenderableContainer::const_iterator it = renderables.cbegin();
 	while( it != renderables.cend() ) {
+		(*it)->renderUpdate();
 		(*it)->getVisibleRenderablesOfType( renderCamera->getFrustum(), Scene::Renderable::ALL_TYPES, visibleRenderables );
 		++it;
 	}
@@ -109,14 +110,14 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 		pipeline->startGeomPass( context, i );
 
 		// output geometry
-		STIndexContainer::const_iterator rmit = visibleRenderables.cbegin();
-		while( rmit != visibleRenderables.cend() ) {
+		STIndexContainer::const_iterator rmIt = visibleRenderables.cbegin();
+		while( rmIt != visibleRenderables.cend() ) {
 			if( pipeline->isGeomPassOpaque( i ) ) {
-				(*rmit)->render( context, pipeline );
+				(*rmIt)->render( context, pipeline, (*rmIt)->getRenderMatrix() );
 			} else {
-				(*rmit)->renderTransparent( context, pipeline );
+				(*rmIt)->renderTransparent( context, pipeline, (*rmIt)->getRenderMatrix() );
 			}
-			++rmit;
+			++rmIt;
 		}
 
 		pipeline->endGeomPass( context, i );
@@ -125,13 +126,6 @@ void RenderWorld::renderRenderables( RenderContext* context, Pipeline* pipeline 
 
 void RenderWorld::render( const ScreenPtr screen, const std::string& pipelineName, const std::shared_ptr<Scene::Camera> camera, RenderContext* context ) {
 	Pipeline* pipeline = screen->getRenderer()->getPipeline( pipelineName );
-
-	// render update (is this the right place? what about timing info...)
-	RenderableContainer::iterator it = renderables.begin();
-	while( it != renderables.end() ) {
-		(*it)->renderUpdate();
-		++it;
-	}
 
 	determineVisibles( camera );
 

@@ -19,6 +19,8 @@
 
 namespace Vox {
 
+class WallRenderer;
+
 class TreeRenderable : public Scene::Renderable {
 public:
 	static const uint32_t VOXR_TYPE = Core::GenerateID<'V','O','X','R'>::value;
@@ -27,16 +29,6 @@ public:
 	virtual ~TreeRenderable();
 
 	//--------- RENDERABLE IMPLEMENTATION START -------------
-
-	//! called to render this things opaque parts.
-	//! note: if a compound type use getActual to pass the embedded objects, 
-	//! so this may never be called on the compound type (expect in debug situations) 
-//	void render( Scene::RenderContext* context, const Scene::Pipeline* pipeline ) const override;
-
-	//! called to render this things transparent parts.
-	//! note: if a compound type use getActual to pass the embedded objects, 
-	//! so this may never be called on the compound type (expect in debug situations) 
-//		void renderTransparent( RenderContext* context, Pipeline* pipeline ) override;
 
 	//! this is a method to get a flat array of renderables. For simple
 	//! renderable it will 0 or 1 entry, however for compound renderables
@@ -54,6 +46,8 @@ public:
 protected:
 	Tree 						tree;
 	Math::Matrix4x4				worldMatrix;
+
+	mutable WallRenderer*		wallRenderer;
 
 };
 typedef std::shared_ptr<TreeRenderable>						TreeRenderablePtr;

@@ -54,6 +54,7 @@ namespace Scene {
 		Core::ScopedResourceHandle<ProgramHandle>			programHandle;
 		Core::ScopedResourceHandle<RasteriserStateHandle>	rasterStateHandle;
 		Core::ScopedResourceHandle<DepthStencilStateHandle>	depthStencilStateHandle;
+		Core::ScopedResourceHandle<RenderTargetStatesHandle>	renderTargetStatesHandle;
 	};
 
 	class DebugPipelineDataStore : public PipelineDataStore {

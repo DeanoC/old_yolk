@@ -42,7 +42,7 @@ namespace Core
 #	define CORE_GC_NEW_NOT_ROOT 	new(PointerFreeGC)
 #	define CORE_GC_NEW_ROOT_ONLY 	new(NoGC)
 #	define CORE_GC_DELETE(x)		Core::GC_Delete(x)
-#	define CORE_NEW 				CORE_GC_NEW_NOT_ROOT
+#	define CORE_NEW 				CORE_GC_NEW_ROOT_ONLY
 #	define CORE_DELETE 				delete
 #	define CORE_NEW_ARRAY 			new
 #	define CORE_DELETE_ARRAY 		delete[]

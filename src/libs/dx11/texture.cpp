@@ -19,8 +19,8 @@ Scene::Texture* Texture::internalCreate( const void* data ) {
 	HRESULT hr;
 
 	// copy and point to TODO big ugly but quick...
-	auto copyTCS = *((Scene::Resource::CreationInfo*)data);
-	auto creation = &copyTCS;
+	Scene::Resource::CreationInfo copyTCS = *((Scene::Resource::CreationInfo*)data);
+	Scene::Resource::CreationInfo* creation = &copyTCS;
 
 	DXGI_FORMAT fmt = DXGIFormat::getDXGIFormat( creation->format );
 	CORE_ASSERT( (creation->flags & RCF_D3D_FROM_OS ) || (fmt != DXGI_FORMAT_UNKNOWN) );

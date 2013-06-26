@@ -38,8 +38,8 @@ namespace Scene {
 		//--------- RENDERABLE IMPLEMENTATION START -------------
 
 		//! inherited from Renderable
-		void render( RenderContext* context, const Pipeline* pipeline ) const override;
-		void renderTransparent( RenderContext* context, const Pipeline* pipeline ) const override;
+		void render( RenderContext* _context, const Pipeline* _pipeline, const Math::Matrix4x4 _renderMatrix ) const override;
+		void renderTransparent( RenderContext* _context, const Pipeline* _pipeline, const Math::Matrix4x4 _renderMatrix ) const override;
 
 		void getRenderablesOfType( uint32_t _type, std::vector<Renderable*>& _out ) const override {
 			if( (_type == MESH_TYPE || _type == ALL_TYPES) && isEnabled() ) {
@@ -66,6 +66,9 @@ namespace Scene {
 		Math::Matrix4x4*			ownedMatrix;
 		mutable Math::Matrix4x4		prevWVP;
 	};
+
+	typedef std::shared_ptr<Mesh>						MeshPtr;
+	
 }; // end namespace Graphics
 
 #endif

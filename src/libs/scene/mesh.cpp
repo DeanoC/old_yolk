@@ -53,34 +53,34 @@ Mesh::~Mesh() {
 	}
 }
 
-void Mesh::render( RenderContext* context, const Pipeline* pipeline ) const {
+void Mesh::render(  RenderContext* _context, const Pipeline* _pipeline, const Math::Matrix4x4 _renderMatrix ) const {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
-	context->getConstantCache().setObject( prevWVP, getTransformNode()->getRenderMatrix() );
+	_context->getConstantCache().setObject( prevWVP, _renderMatrix );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
-	prevWVP = context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
+	prevWVP = _context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
 
 	WobPtr wob = meshHandle->tryAcquire();
 	if( wob ) {
-		wob->pipelineDataStores[ pipeline->getIndex() ]->render( context );
+		wob->pipelineDataStores[ _pipeline->getIndex() ]->render( _context );
 	} else {
 //		LOG(INFO) << "Mesh not ready yet\n";
 	}
 }
-void Mesh::renderTransparent( RenderContext* context, const Pipeline* pipeline ) const {
+void Mesh::renderTransparent( RenderContext* _context, const Pipeline* _pipeline, const Math::Matrix4x4 _renderMatrix ) const {
 
 	// set the prev WVP stored last frame to into the constant cache
 	// and change our world matrix
-	context->getConstantCache().setObject( prevWVP, getTransformNode()->getRenderMatrix() );
+	_context->getConstantCache().setObject( prevWVP, _renderMatrix );
 
 	// grap WVP for next frame (will cause a re-evail of WVP this frame)
-	prevWVP = context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
+	prevWVP = _context->getConstantCache().getMatrix( CVN_WORLD_VIEW_PROJ );
 
 	WobPtr wob = meshHandle->tryAcquire();
 	if( wob ) {
-		wob->pipelineDataStores[ pipeline->getIndex() ]->renderTransparent( context );
+		wob->pipelineDataStores[ _pipeline->getIndex() ]->renderTransparent( _context );
 	} else {
 //		LOG(INFO) << "Mesh not ready yet\n";
 	}

@@ -39,8 +39,9 @@ DebugPipeline::DebugPipeline( ) {
 	static const std::string depthTargetName = "DebugPipe_DepthTarget";
 	depthTargetHandle.reset( TextureHandle::create( depthTargetName.c_str(), &dcs ) );
 
-	depthStencilStateHandle.reset( DepthStencilStateHandle::create( "_DSS_Normal" ) );
-	rasterStateHandle.reset( RasteriserStateHandle::create( "_RS_Normal" ) );
+	depthStencilStateHandle.reset( DepthStencilStateHandle::create( DEPTH_STENCIL_STATE_NORMAL ) );
+	rasterStateHandle.reset( RasteriserStateHandle::create( RENDER_STATE_NORMAL ) );
+	renderTargetStatesHandle.reset( RenderTargetStatesHandle::create( RENDER_TARGET_STATES_NOBLEND_WRITEALL ) );
 }
 	
 DebugPipeline::~DebugPipeline() {
@@ -59,8 +60,9 @@ void DebugPipeline::bind( Scene::RenderContext* ctx ) {
 	auto program = programHandle.acquire();
 	auto rasterState = rasterStateHandle.acquire();
 	auto depthStencilState = depthStencilStateHandle.acquire();
+	auto renderTargetStates = renderTargetStatesHandle.acquire();
 
-	ctx->clear( colourTarget, Core::RGBAColour(0,0,0,0) );
+	ctx->clear( colourTarget, Core::RGBAColour(0,0.1,0,0) );
 	ctx->clear( depthTarget, true, 1.0f, true, 0 );
 
 	ctx->bindRenderTargets( colourTarget, depthTarget );
@@ -69,6 +71,14 @@ void DebugPipeline::bind( Scene::RenderContext* ctx ) {
 	ctx->bind( program );
 	ctx->bind( rasterState );
 	ctx->bind( depthStencilState );
+
+	ctx->bind( renderTargetStates );
+	Scene::Viewport viewport = {
+		0.0f, 0.0f, (float) colourTarget->getWidth(), (float) colourTarget->getHeight(), 0.0f, 1.0f
+	};
+
+	// copy
+	ctx->bind( viewport );
 }
 
 void DebugPipeline::resolve( Scene::RenderContext* ctx) {
@@ -103,6 +113,7 @@ void DebugPipeline::conditionWob( Scene::Wob* wob ) {
 			RCF_ACE_IMMUTABLE | RCF_BUF_INDEX, mat->uiNumIndices * indexSize, mat->pIndexData.p
 		);
 		mds->indexBuffer = DataBufferHandle::create( (mds->name + "_ib").c_str(), &indbcs, Core::RESOURCE_FLAGS::RMRF_NONE );
+		mds->indexBuffer->acquire();
 
 		mds->vacs.elementCount = mat->numVertexElements;
 		for( int i = 0; i < mds->vacs.elementCount; ++i ) { 
@@ -114,6 +125,7 @@ void DebugPipeline::conditionWob( Scene::Wob* wob ) {
 			RCF_ACE_IMMUTABLE | RCF_BUF_VERTEX, (uint32_t)(mat->uiNumVertices *  vertexSize), mat->pVertexData.p
 		);
 		DataBufferHandlePtr vertexBuffer = DataBufferHandle::create( (mds->name + "_vb").c_str(), &vdbcs, Core::RESOURCE_FLAGS::RMRF_NONE );
+		vertexBuffer->acquire();
 
 		for( int i = 0; i < mds->vacs.elementCount; ++i ) { 
 			mds->vacs.data[i].buffer = vertexBuffer;

@@ -44,17 +44,17 @@ int Main() {
 	thing->add( treeRender );
 	world->add( thing );
 
-	// some basic setup
+/*	// some basic setup
 	Scene::HierPtr land = std::make_shared<Scene::Hier>( "test_room" );
 	ThingPtr tng( ThingFactory::createThingFromHier( land, TBC_WORLD ) );
 	world->add( tng );
-
+*/
 	shell.run(); // will loop until exit is called
 
 	// cleanup
-	world->remove( tng );
-	tng.reset();
-	land.reset();
+//	world->remove( tng );
+//	tng.reset();
+//	land.reset();
 
 	// shutdown
 	world.reset();

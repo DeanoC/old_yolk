@@ -37,6 +37,12 @@ namespace Scene {
 	class Renderable : public std::enable_shared_from_this<Renderable> {
 	public:
 		static const uint32_t ALL_TYPES = Core::GenerateID<'A','L','L'>::value;
+		Renderable() :
+			transformNode( nullptr ),
+			localAabb(),
+			enabled( true ) {
+		}
+
 		Renderable( Core::TransformNode* transNode ) :	
 		  	transformNode( transNode ),
 			localAabb(),
@@ -54,11 +60,11 @@ namespace Scene {
 		//! called to render this things opaque parts.
 		//! note: if a compound type use getActual to pass the embedded objects, 
 		//! so this may never be called on the compound type
-		virtual void render( Scene::RenderContext* _context, const Scene::Pipeline* _pipeline ) const {};
+		virtual void render( RenderContext* _context, const Pipeline* _pipeline, const Math::Matrix4x4 _renderMatrix ) const {};
 
 		//! called to render this things transparent parts.
 		//! note: if a compound type use getActual to pass the embedded objects, 
-		virtual void renderTransparent( Scene::RenderContext* _context, const Scene::Pipeline* _pipeline ) const {};
+		virtual void renderTransparent( RenderContext* _context, const Pipeline* _pipeline, const Math::Matrix4x4 _renderMatrix ) const {};
 
 		//! this is a method to get a flat array of renderables. For simple
 		//! renderable it will 0 or 1 entry, however for compound renderables
@@ -87,29 +93,37 @@ namespace Scene {
 
 
 		//! get the transform node directly for attaching
-		const Core::TransformNode* getTransformNode() const { return transformNode; }
-		Core::TransformNode* getTransformNode() { return transformNode; }
+		virtual const Core::TransformNode* getTransformNode() const { return transformNode; }
+		virtual Core::TransformNode* getTransformNode() { return transformNode; }
 
-		const Core::AABB& getLocalAabb() const { return localAabb; }
+		virtual const Core::AABB& getLocalAabb() const { return localAabb; }
 
-		void getWorldAABB( Core::AABB& waabb ) const {
-			if( transformNode != NULL ) {
-				waabb = localAabb.transform( transformNode->getWorldMatrix() );
+		virtual void getWorldAABB( Core::AABB& waabb ) const {
+			if( getTransformNode() != NULL ) {
+				waabb = getLocalAabb().transform( getWorldMatrix() );
 			} else{
-				waabb = localAabb;
+				waabb = getLocalAabb();
 			}
 		}
-		void getRenderAABB( Core::AABB& waabb ) const {
-			if( transformNode != NULL ) {
-				waabb = localAabb.transform( transformNode->getRenderMatrix() );
+		virtual void getRenderAABB( Core::AABB& waabb ) const {
+			if( getTransformNode() != NULL ) {
+				waabb = getLocalAabb().transform( getRenderMatrix() );
 			} else{
-				waabb = localAabb;
+				waabb = getLocalAabb();
 			}
 		}
 
-		void enable() { enabled = true; }
-		void disable() { enabled = false; }
-		bool isEnabled() const { return enabled; }
+		virtual const Math::Matrix4x4& getWorldMatrix() const {
+			return getTransformNode()->getWorldMatrix();
+		}
+
+		virtual const Math::Matrix4x4& getRenderMatrix() const {
+			return getTransformNode()->getRenderMatrix();
+		}
+
+		virtual void enable() { enabled = true; }
+		virtual void disable() { enabled = false; }
+		virtual bool isEnabled() const { return enabled; }
 	protected:
 		Core::TransformNode*		transformNode;
 		Core::AABB					localAabb;

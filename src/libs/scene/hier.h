@@ -113,7 +113,7 @@ namespace Scene {
 		Core::ScopedResourceHandle<HieHandle> 			hieHandle;
 		HiePtr											hie;
 
-		typedef std::vector< std::shared_ptr< Mesh > >	OwnedMeshes;
+		typedef std::vector< MeshPtr >	OwnedMeshes;
 		OwnedMeshes										ownedMeshes;
 
 		typedef Core::ScopedResourceHandle<Core::BinPropertyResourceHandle> ScopedPropertyHandle;
