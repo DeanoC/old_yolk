@@ -22,14 +22,91 @@ Tree::Tree( const Core::AABB& _box ) :
 Tree::~Tree() {
 }
 
-void Tree::visit( Tree::DescendConstFunc _func ) const {
+void Tree::descend( Tree::DescendConstFunc _func ) const {
 	const VisitHelper helper( *this ); 
 	_func( helper );
 }
 
-void Tree::visit( Tree::DescendFunc _func ) {
+void Tree::descend( Tree::DescendFunc _func ) {
 	VisitHelper helper( *this ); 
 	_func( helper );
+}
+
+void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bool _removeEmpty ) const {	
+	const VisitHelper helper( *this ); 
+	struct TileNodeAndAABB {
+		TileNodeAndAABB() {}
+		TileNodeAndAABB( uint32_t _index, const Core::AABB _aabb ) :
+			index(_index), aabb(_aabb) {}
+		uint32_t index;
+		Core::AABB aabb;
+	};
+	std::stack<TileNodeAndAABB> tileStack;
+
+	if( _cullFunc( helper, helper.getNodeTile(0).nodes[0], helper.getRootBoundingBox() ) )
+		return;
+
+	TileNodeAndAABB rootItem( helper.getNodeTile(0).nodes[0].node.nodeTileIndex, helper.getRootBoundingBox() );
+	tileStack.push( rootItem );
+
+	while( tileStack.empty() == false ) {
+		auto item = tileStack.top(); tileStack.pop();
+		CORE_ASSERT( item.index != INVALID_INDEX );
+		const NodeTile& nodeTile = helper.getNodeTile( item.index );
+		// check nodes children AABB
+		for(int i = 0;i < 8; ++i ) {
+			const Node& node = nodeTile.nodes[i];
+			// early out for empties
+			if( _removeEmpty && node.type == NodeType::EMPTY ) {
+				continue;
+			}
+
+			// cull node?
+			const auto bb = helper.getChildBoundingBox( (ChildName)i, item.aabb );
+			if( _cullFunc( helper, node, bb ) ) {
+				continue;
+			}
+
+			switch( node.type ) {
+				case NodeType::NODE: // push its children onto stack
+					tileStack.push( TileNodeAndAABB( node.node.nodeTileIndex, bb ));
+					break;
+				case NodeType::ONLY_CHILD_NODE: {
+					// another level to check
+					const auto cbb = helper.getChildBoundingBox( (ChildName)node.onlyChildNode.nodeCode, bb );
+					if( _cullFunc( helper, node, cbb ) ) { 
+						tileStack.push( TileNodeAndAABB( node.onlyChildNode.nodeTileIndex, cbb ));
+					}
+					break;
+				}
+				case NodeType::TWO_CHILD_NODE: {
+					// two nodes of a level down to check
+					const auto abb = helper.getChildBoundingBox( (ChildName)node.twoChildNode.nodeACode, bb );
+					if( _cullFunc( helper, node, abb ) ) {
+						tileStack.push( TileNodeAndAABB( item.index + node.twoChildNode.nodeATileIndex, abb ));
+					}
+					const auto bbb = helper.getChildBoundingBox( (ChildName)node.twoChildNode.nodeBCode, bb );
+					if( _cullFunc( helper, node, bbb ) ) {
+						tileStack.push( TileNodeAndAABB( item.index + node.twoChildNode.nodeBTileIndex, bbb ));
+					}
+					break;
+				}
+				case NodeType::LEAF:
+				case NodeType::CONSTANT_LEAF:
+				case NodeType::PACKED_BINARY_LEAF:
+					_leafFunc( helper, node, bb );
+					break;
+				default:
+					break;
+			}
+
+		}
+	}
+
+}
+
+void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitFunc _leafFunc, bool _removeEmpty ) {
+	TODO_ASSERT( "IMPLMENT NON CONST VISIT LEAVES");
 }
 
 void Tree::pack() {
@@ -165,28 +242,32 @@ void Tree::freeNodeDescendants( Node& _node ) {
 /// pack this node and descendants
 void Tree::packNodeAndDescendants( Node& _node ) {
 	std::stack<uint32_t> tileStack;
-
 	uint32_t tileIndexA;
 	uint32_t tileIndexB;
-	if( _node.hasChildren() ) {
-		tileIndexA = _node.getChildrenTileIndex( 0, tileIndexB );
-		tileStack.push( tileIndexA );
-		if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
-	}
-	while( tileStack.empty() == false ) {
-		uint32_t index = tileStack.top(); tileStack.pop();
-		CORE_ASSERT( index != INVALID_INDEX );
-		NodeTile& tile = nodeTiles.get( index );
-		for( int i = 0;i < 8; ++i ) {
-			if( tile.nodes[i].hasChildren() ) {
-				packNode( tile.nodes[i] );
 
-				tileIndexA = tile.nodes[i].getChildrenTileIndex( index, tileIndexB );
-				tileStack.push( tileIndexA );
-				if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
+	bool packHappened = false;
+	do { 
+		packHappened = false;
+		if( _node.hasChildren() ) {
+			tileIndexA = _node.getChildrenTileIndex( 0, tileIndexB );
+			if( tileIndexA != INVALID_INDEX ) tileStack.push( tileIndexA );
+			if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
+		}
+		while( tileStack.empty() == false ) {
+			uint32_t index = tileStack.top(); tileStack.pop();
+			CORE_ASSERT( index != INVALID_INDEX );
+			NodeTile& tile = nodeTiles.get( index );
+			for( int i = 0;i < 8; ++i ) {
+				if( tile.nodes[i].hasChildren() ) {
+					packHappened |= packNode( tile.nodes[i] );
+
+					tileIndexA = tile.nodes[i].getChildrenTileIndex( index, tileIndexB );
+					if( tileIndexA != INVALID_INDEX ) tileStack.push( tileIndexA );
+					if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
+				}
 			}
 		}
-	}
+	} while( packHappened );
 }
 
 
@@ -213,7 +294,7 @@ bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
 							const uint32_t _brickIndex, 
 							const float _volume ) {
 	bool ret = false;
-	visit( [&]( VisitHelper& _helper ) {
+	descend( [&]( VisitHelper& _helper ) {
 		// check point intersects the tree itself
 		if(  _helper.getRootBoundingBox().intersects( _treeSpacePos ) == false ) {
 			return;
@@ -318,13 +399,16 @@ bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
 	return ret;
 }
 
-void Tree::packNode( Node& _node ) {
+bool Tree::packNode( Node& _node ) {
 
 	if(_node.type == NodeType::NODE ) {
 		NodeTile& nodeTile = nodeTiles.get( _node.node.nodeTileIndex );
 
 		// --- gather data on this nodes and its children ---
 		int emptyCount = 0;
+		int constantCount = 0;
+		int constSameBrickCount = 0;
+		uint32_t constBrick = INVALID_INDEX;
 		int nonLeafCount = 0;
 		int leafBrickAOccupancy = 0;
 		int unpackedNodeCount = 0;
@@ -361,7 +445,16 @@ void Tree::packNode( Node& _node ) {
 						unpackedNodeBCode = i;
 					}
 					unpackedNodeCount++;
+				} else if( nodeTile.nodes[i].type == NodeType::CONSTANT_LEAF ) {
+					constantCount++;
+					if( constBrick == INVALID_INDEX ) {
+						constBrick = nodeTile.nodes[i].constantLeaf.brickIndex;
+						constSameBrickCount++;
+					} else if( constBrick == nodeTile.nodes[i].constantLeaf.brickIndex ) {
+						constSameBrickCount++;
+					}
 				}
+
 				nonLeafCount++;
 			}
 		}
@@ -372,8 +465,16 @@ void Tree::packNode( Node& _node ) {
 		if (emptyCount == 8) {
 			freeNodeDescendants( _node );
 			_node.type = NodeType::EMPTY;
-			return;
+			return true;
 		}
+
+		if (constSameBrickCount == 8) {
+			Node tmp = nodeTile.nodes[0];
+			freeNodeDescendants( _node );
+			_node = tmp;
+			return true;
+		}
+		
 		
 		if( unpackedNodeCount == 1 && 
 			emptyCount == 7 && 
@@ -386,7 +487,7 @@ void Tree::packNode( Node& _node ) {
 			_node.type = NodeType::ONLY_CHILD_NODE;
 			_node.onlyChildNode.nodeCode = unpackedNodeACode;
 			_node.onlyChildNode.nodeTileIndex = unpackedNodeA;
-			return;
+			return true;
 		}
 		if( unpackedNodeCount == 2 && 
 			emptyCount == 6 &&
@@ -402,7 +503,7 @@ void Tree::packNode( Node& _node ) {
 			_node.twoChildNode.nodeATileIndex = unpackedNodeA - getTileIndex( _node );
 			_node.twoChildNode.nodeBCode = unpackedNodeBCode;
 			_node.twoChildNode.nodeBTileIndex = unpackedNodeB - getTileIndex( _node );
-			return;
+			return true;
 		}
 		
 		// can we make it a constant node
@@ -410,12 +511,11 @@ void Tree::packNode( Node& _node ) {
 			leafBrickB == INVALID_INDEX && 
 			nonLeafCount == 0) {
 			// all nodes are leaves have the same brick
-			bool splitable = nodeTile.nodes[0].constantLeaf.splitable;
 			freeNodeDescendants( _node );
 			_node.type = NodeType::CONSTANT_LEAF;
-			_node.constantLeaf.splitable = splitable;
+			_node.constantLeaf.splitable = bricks.get( leafBrickA ).splitable;
 			_node.constantLeaf.brickIndex = leafBrickA;
-			return;
+			return true;
 		}
 		
 		// can we make it a packed binary with false == EMPTY
@@ -428,7 +528,7 @@ void Tree::packNode( Node& _node ) {
 			_node.packedBinaryLeaf.trueBrickIndex = leafBrickA;
 			_node.packedBinaryLeaf.falseBrickIndex = 0; // EMPTY
 			_node.packedBinaryLeaf.occupancy = leafBrickAOccupancy;
-			return;
+			return true;
 		}
 
 		// can we make it a packed binary node
@@ -441,11 +541,12 @@ void Tree::packNode( Node& _node ) {
 			_node.packedBinaryLeaf.trueBrickIndex = leafBrickA;
 			_node.packedBinaryLeaf.falseBrickIndex = leafBrickB;
 			_node.packedBinaryLeaf.occupancy = leafBrickAOccupancy;
-			return;
+			return true;
 		}
 		
 		//--- get here, its been unable to be packed
 	}
+	return false;
 
 }
 

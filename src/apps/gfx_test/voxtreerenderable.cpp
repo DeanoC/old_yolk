@@ -109,7 +109,7 @@ void TreeRenderable::getVisibleRenderablesOfType( const Core::Frustum& _frustum,
 	wallRenderer->beginInstanceGather();
 
 	WallRenderer& wallRender = *wallRenderer;
-	tree.visit( [&localFrustum, &wallRender ]( const Tree::VisitHelper& _helper ) {
+	tree.descend( [&localFrustum, &wallRender ]( const Tree::VisitHelper& _helper ) {
 		struct TileNodeAndAABB {
 			TileNodeAndAABB() {}
 			TileNodeAndAABB( uint32_t _index, const Core::AABB _aabb ) :

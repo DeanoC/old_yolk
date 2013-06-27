@@ -186,8 +186,17 @@ public:
 	Tree( const Core::AABB& _box );
 	~Tree();
 
-	void visit( DescendConstFunc _func ) const;
-	void visit( DescendFunc _func );
+	void descend( DescendConstFunc _func ) const;
+	void descend( DescendFunc _func );
+
+	// return true if node should be culled
+	typedef std::function< bool ( const VisitHelper& _helper, const Node& _node, const Core::AABB& _aabb ) > NodeCullFunc; 
+
+	typedef std::function< void ( const VisitHelper& _helper, const Node& _node, const Core::AABB& _aabb ) > LeafVisitConstFunc; 
+	typedef std::function< bool ( VisitHelper& _helper, Node& _node, const Core::AABB& _aabb ) > LeafVisitFunc; 
+
+	void visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bool _removeEmpty = true ) const;
+	void visitLeaves( NodeCullFunc _cullFunc, LeafVisitFunc _leafFunc, bool _removeEmpty = true );
 
 	void pack();
 
@@ -208,7 +217,7 @@ private:
 	/// splitNode may cause a resize, if so will update the _node pointer passed in, however other node pointers will be invalidated!
 	uint32_t splitNode( Node** _node );
 	void setNodeToBrick( Node& _node, uint32_t _brickIndex );
-	void packNode( Node& _node );
+	bool packNode( Node& _node );
 	void packNodeAndDescendants( Node& _node );
 
 
