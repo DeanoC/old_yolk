@@ -34,6 +34,32 @@ public:
 	virtual void worldLine( const Colour& colour, const Math::Vector3& a, const Math::Vector3& b ) = 0;
 	//! print some text onto some form of screen console
 	virtual void print( const char* pText ) = 0;
+
+	void printf( const char *pStr, ... ) {
+		char pBuffer[1024];
+		va_list marker;
+		va_start( marker, pStr );
+		vsprintf( pBuffer, pStr, marker );
+	
+		print( pBuffer );
+	
+		va_end( marker );
+	}
+
+	// supports a small number of prints (stay on screen until changed)
+	virtual int getNumberOfVarPrints() const = 0;
+	virtual void varPrint( const int _index, const Math::Vector2& _pos, const char* _text ) = 0;
+	virtual void varPrintf( const int _index, const Math::Vector2& _pos, const char* _text, ... ) {
+		char pBuffer[1024];
+		va_list marker;
+		va_start( marker, _text );
+		vsprintf( pBuffer, _text, marker );
+	
+		varPrint( _index, _pos, pBuffer );
+	
+		va_end( marker );
+	}
+
 	//! world sphere
 	virtual void worldSphere( const Core::Colour& colour, const Math::Vector3& localPos, const float radius, const Math::Matrix4x4& transform = Math::IdentityMatrix()  ) = 0;
 	//! world cylinder, cylinders are along the z

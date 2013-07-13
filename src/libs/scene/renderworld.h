@@ -16,7 +16,8 @@
 namespace Scene {
 	class Pipeline;
 
-	typedef std::shared_ptr< std::function< void (const ScreenPtr, Scene::RenderContext*) > > Renderable2DCallbackPtr;
+	typedef std::function< void (const ScreenPtr&, Scene::RenderContext*) > Renderable2DCallbackType;
+	typedef std::shared_ptr< Renderable2DCallbackType > Renderable2DCallbackPtr;
 
 	class RenderWorld {
 	public:

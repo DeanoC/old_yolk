@@ -10,6 +10,10 @@ namespace Core {
 class btRigidBody;
 namespace Scene {
 	class CollisionShape;
+	/**
+		Physical objects are static collision objects in the world
+	*/
+
 	class Physical : public btMotionState {
 	public:
 		explicit Physical( 	Core::TransformNode* node,

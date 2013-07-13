@@ -4,6 +4,9 @@
 
 #include "physical.h"
 namespace Scene {
+	/**
+		Dynamic physical objects that have rigid motions, standard physics are static
+	*/
 	class DynamicPhysical : public Physical {
 	public:
 

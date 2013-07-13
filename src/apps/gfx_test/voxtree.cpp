@@ -104,11 +104,11 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 	}
 
 }
-
+/*
 void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitFunc _leafFunc, bool _removeEmpty ) {
 	TODO_ASSERT( "IMPLMENT NON CONST VISIT LEAVES");
 }
-
+*/
 void Tree::pack() {
 	packNodeAndDescendants( nodeTiles.get(0).nodes[0] );
 }

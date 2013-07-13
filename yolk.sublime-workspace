@@ -523,7 +523,7 @@
 			"file": "src/apps/gfx_test/voxtree.h",
 			"settings":
 			{
-				"buffer_size": 8682,
+				"buffer_size": 9293,
 				"line_ending": "Windows"
 			}
 		},
@@ -531,7 +531,41 @@
 			"file": "src/apps/gfx_test/voxtree_test.cpp",
 			"settings":
 			{
-				"buffer_size": 511,
+				"buffer_size": 1077,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/gfxdbgconsole.h",
+			"settings":
+			{
+				"buffer_size": 1017,
+				"line_ending": "Windows",
+				"name": "gfxdbgconsole.h"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/gfxdbgconsole.cpp",
+			"settings":
+			{
+				"buffer_size": 3509,
+				"line_ending": "Windows",
+				"name": "gfxdbgconsole.cpp"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 1213,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/Riftball/player/player.cpp",
+			"settings":
+			{
+				"buffer_size": 8892,
 				"line_ending": "Windows"
 			}
 		},
@@ -539,7 +573,7 @@
 			"file": "src/apps/gfx_test/voxtree.cpp",
 			"settings":
 			{
-				"buffer_size": 17571,
+				"buffer_size": 20876,
 				"line_ending": "Windows"
 			}
 		},
@@ -563,23 +597,7 @@
 			"file": "src/apps/gfx_test/voxtreerenderable.cpp",
 			"settings":
 			{
-				"buffer_size": 7180,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/scene/debugpipeline.cpp",
-			"settings":
-			{
-				"buffer_size": 5688,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/CMakeLists.txt",
-			"settings":
-			{
-				"buffer_size": 1213,
+				"buffer_size": 7229,
 				"line_ending": "Windows"
 			}
 		}
@@ -635,6 +653,28 @@
 	},
 	"file_history":
 	[
+		"/G/Projects/yolk/src/libs/scene/physical.h",
+		"/G/Projects/yolk/src/libs/scene/dynamicphysical.h",
+		"/G/Projects/yolk/src/libs/scene/compoundcolshape.cpp",
+		"/G/Projects/yolk/src/apps/Riftball/levels/testlvl.cpp",
+		"/G/Projects/yolk/src/apps/Riftball/main.cpp",
+		"/G/Projects/yolk/src/apps/Riftball/bowlball.cpp",
+		"/G/Projects/yolk/src/apps/dvm_owned_dedi/main.cpp",
+		"/G/Projects/yolk/src/apps/cyberhackerspace/levels/baselvl.cpp",
+		"/G/Projects/yolk/src/apps/cyberhackerspace/shell3d.cpp",
+		"/G/Projects/yolk/src/apps/cyberhackerspace/gamethread.cpp",
+		"/G/Projects/yolk/src/apps/cyberhackerspace/cyberhackerspace.cpp",
+		"/G/Projects/yolk/src/apps/cyberhackerspace/main.cpp",
+		"//ANDROIDDEV/minecraft/MagicLauncher.cfg",
+		"//ANDROIDDEV/minecraft/temp.txt",
+		"/G/Projects/yolk/src/libs/scene/programs/shaders/vs_basic.hlsl",
+		"/F/PortableApps/SublimeTextPortable/Data/Packages/User/Preferences.sublime-settings",
+		"/G/test_export.gcode",
+		"/E/Public/3DprinterObjects/test.gcode",
+		"/G/Projects/yolk/src/libs/scene/debugpipeline.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/scene/programs/shaders/fs_basic.hlsl",
+		"/G/test.stl",
 		"/G/Projects/yolk/src/libs/core/core_utils.h",
 		"/G/Projects/yolk/src/libs/core/resources.h",
 		"/G/Projects/yolk/src/libs/scene/mesh.h",
@@ -646,7 +686,6 @@
 		"/G/minecraft/banned-players.txt",
 		"/G/minecraft/banned-ips.txt",
 		"/G/minecraft/debug/profile-results-2013-06-18_12.56.21.txt",
-		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
 		"/G/Projects/yolk/src/libs/core/aabb.h",
 		"/G/Projects/yolk/src/libs/core/standard.h",
 		"/G/Projects/yolk/src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
@@ -665,7 +704,6 @@
 		"/F/PortableApps/SublimeTextPortable/Data/Packages/User/Default (Windows).sublime-keymap",
 		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Default (Windows).sublime-keymap",
 		"/G/Projects/yolk/src/libs/core/memory.h",
-		"/F/PortableApps/SublimeTextPortable/Data/Packages/User/Preferences.sublime-settings",
 		"/G/Projects/yolk/src/libs/styx/styx.cpp",
 		"/G/Projects/yolk/src/apps/convert/CMakeLists.txt",
 		"/G/Projects/yolk/src/libs/dwm/bitcoder.cpp",
@@ -742,27 +780,7 @@
 		"/G/Projects/yolk/src/libs/dwm_client/clientworld.cpp",
 		"/G/Projects/yolk/src/libs/dwm/vmthreads.cpp",
 		"/C/NVPACK/android-ndk-r8b/README.TXT",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITThread_Win.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITFileSystem_Win.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITAtomic_Win.cpp",
-		"/G/Projects/yolk/src/libs/core/core.h",
-		"/C/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/Packages/Debugger/Visualizers/stl.natvis",
-		"/C/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/Packages/Debugger/Visualizers/default.natstepfilter",
-		"/C/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/Packages/Debugger/Visualizers/windows.natvis",
-		"/C/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/Packages/Debugger/Visualizers/CppAMP.natstepfilter",
-		"/G/Projects/yolk/misc/docs/swf-file-format-spec.pdf",
-		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.tao",
-		"/G/Projects/trade_runtime/live/Textures/basic_ui.tattxt",
-		"/G/Projects/yolk/src/apps/zombiehospital/levels/testlvl.cpp",
-		"/G/Projects/yolk/src/apps/zombiehospital/player/player.cpp",
-		"/G/Projects/yolk/src/apps/zombiehospital/player/player.h",
-		"/G/Projects/yolk/src/libs/localworld/sceneworld.cpp",
-		"/G/Projects/yolk/cmake_modules/FindWierdBoost.cmake",
-		"/G/Projects/yolk/src/libs/core/compiler_ms.h",
-		"/Z/Projects/svn/short/source/short_win.cpp",
-		"/Z/Projects/svn/short/source/short.h",
-		"/Z/Projects/svn/short/source/short.cpp",
-		"/G/builds/trade_runtime/Textures/basic_ui/basic_ui.json"
+		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITThread_Win.cpp"
 	],
 	"find":
 	{
@@ -966,7 +984,7 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -975,23 +993,24 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8682,
+						"buffer_size": 9293,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
+								62,
 								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4257.0,
+						"translation.y": 6003.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1002,20 +1021,50 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 511,
+						"buffer_size": 1077,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								929,
+								929
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 135.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/apps/gfx_test/gfxdbgconsole.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1017,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								482,
+								490
+							]
+						],
+						"settings":
+						{
+							"auto_name": "gfxdbgconsole.h",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1024,142 +1073,36 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "src/apps/gfx_test/voxtree.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 17571,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 4714.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
 					"buffer": 3,
-					"file": "src/libs/scene/renderable.h",
+					"file": "src/apps/gfx_test/gfxdbgconsole.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4739,
+						"buffer_size": 3509,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								64,
+								64
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"auto_name": "gfxdbgconsole.cpp",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1419.0,
+						"translation.y": 145.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "src/apps/gfx_test/voxtreerenderable.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1840,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 848.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/apps/gfx_test/voxtreerenderable.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7180,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6062,
-								6062
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 5346.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/libs/scene/debugpipeline.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5688,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1442,
-								1442
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1287.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
 					"file": "src/apps/gfx_test/CMakeLists.txt",
 					"semi_transient": false,
 					"settings":
@@ -1181,6 +1124,146 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/apps/Riftball/player/player.cpp",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 8892,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								405,
+								405
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/apps/gfx_test/voxtree.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 20876,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2078.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/libs/scene/renderable.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4739,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1419.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/apps/gfx_test/voxtreerenderable.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1840,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 848.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7229,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3483,
+								6734
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 5563.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

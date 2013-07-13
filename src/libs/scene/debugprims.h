@@ -32,20 +32,24 @@ namespace Scene {
 		~DebugPrims();
 
 		//! draw a NDC (projection) space line (resolution independent)
-		virtual void ndcLine( const Core::Colour& colour, const Math::Vector2& a, const Math::Vector2& b );
+		virtual void ndcLine( const Core::Colour& colour, const Math::Vector2& a, const Math::Vector2& b ) override;
 		//! draw a 3D world space line
-		virtual void worldLine( const Core::Colour& colour, const Math::Vector3& a, const Math::Vector3& b );
+		virtual void worldLine( const Core::Colour& colour, const Math::Vector3& a, const Math::Vector3& b ) override;
 		//! print some text onto some form of screen console
-		virtual void print( const char* pText );
+		virtual void print( const char* pText ) override;
 		//! world sphere
-		virtual void worldSphere( const Core::Colour& colour, const Math::Vector3& pos, const float radius, const Math::Matrix4x4& transform = Math::IdentityMatrix() );
+		virtual void worldSphere( const Core::Colour& colour, const Math::Vector3& pos, const float radius, const Math::Matrix4x4& transform = Math::IdentityMatrix() ) override;
 		//! world cylinder
-		virtual void worldCylinder( const Core::Colour& colour, const Math::Vector3& pos, const Math::Quaternion& orient, const float radius, const float height, const Math::Matrix4x4& transform = Math::IdentityMatrix() );
+		virtual void worldCylinder( const Core::Colour& colour, const Math::Vector3& pos, const Math::Quaternion& orient, const float radius, const float height, const Math::Matrix4x4& transform = Math::IdentityMatrix() ) override;
 		//! world box
-		virtual void worldBox( const Core::Colour& colour, const Math::Vector3& pos, const Math::Quaternion& orient, const float lx, const float ly, const float lz, const Math::Matrix4x4& transform = Math::IdentityMatrix() );
+		virtual void worldBox( const Core::Colour& colour, const Math::Vector3& pos, const Math::Quaternion& orient, const float lx, const float ly, const float lz, const Math::Matrix4x4& transform = Math::IdentityMatrix() ) override;
+
+		virtual int getNumberOfVarPrints() const override { return 0; };
+		virtual void varPrint( const int _index, const Math::Vector2& _pos, const char* _text ) override {};
+
 
 		// Actually draw the debug renderables
-		void render( RenderContext* context );
+		void render( RenderContext* context ) ;
 
 	private:
 

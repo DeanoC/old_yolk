@@ -57,6 +57,8 @@ namespace Swf {
 		runtimeBuilder.buildBitmaps(runtimeBitmaps);
 		runtimeBuilder.buildFonts(runtimeFonts);
 		runtimeBuilder.buildCharacterPaths(characterPaths);
+
+		rootClip->process();
 	}
 	
 	Player::~Player() {

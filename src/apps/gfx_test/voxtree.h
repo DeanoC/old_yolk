@@ -196,7 +196,7 @@ public:
 	typedef std::function< bool ( VisitHelper& _helper, Node& _node, const Core::AABB& _aabb ) > LeafVisitFunc; 
 
 	void visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bool _removeEmpty = true ) const;
-	void visitLeaves( NodeCullFunc _cullFunc, LeafVisitFunc _leafFunc, bool _removeEmpty = true );
+//	void visitLeaves( NodeCullFunc _cullFunc, LeafVisitFunc _leafFunc, bool _removeEmpty = true );
 
 	void pack();
 

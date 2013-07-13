@@ -289,6 +289,7 @@ namespace Swf {
 //				player->virtualMachine->processByteCode( this, frameABC );	
 //				frameABC = NULL;
 //			}
+			processFrame( (*frames)[currentFrameNumber-1] );
 			sortArray();
 			for (size_t i = 0; i < sortedArray.size(); i++) {
 				FrameItem* item = sortedArray[i];
@@ -298,8 +299,7 @@ namespace Swf {
 					mc->process();
 				}
 			}
-			processFrame( (*frames)[currentFrameNumber-1] );
-		} while(currentFrameNumber <= (int)frames->size());  
+		} while(currentFrameNumber < (int)frames->size());  
 	}
 
 	void MovieClip::gotoFrame(uint16_t _frame) {		

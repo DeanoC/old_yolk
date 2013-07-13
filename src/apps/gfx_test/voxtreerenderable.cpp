@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "core/debug_render.h"
 #include "scene/mesh.h"
 #include "voxtree.h"
 
@@ -195,6 +196,8 @@ void TreeRenderable::getVisibleRenderablesOfType( const Core::Frustum& _frustum,
 	});
 
 	wallRenderer->endInstanceGather( _out );
+
+	Core::g_pDebugRender->varPrintf( 0, Math::Vector2(-1, 0.9f), "bricks visible %i", _out.size() );
 
 }
 
