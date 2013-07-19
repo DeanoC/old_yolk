@@ -74,7 +74,7 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 				case NodeType::ONLY_CHILD_NODE: {
 					// another level to check
 					const auto cbb = helper.getChildBoundingBox( (ChildName)node.onlyChildNode.nodeCode, bb );
-					if( _cullFunc( helper, node, cbb ) ) { 
+					if( !_cullFunc( helper, node, cbb ) ) { 
 						tileStack.push( TileNodeAndAABB( node.onlyChildNode.nodeTileIndex, cbb ));
 					}
 					break;
@@ -82,11 +82,11 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 				case NodeType::TWO_CHILD_NODE: {
 					// two nodes of a level down to check
 					const auto abb = helper.getChildBoundingBox( (ChildName)node.twoChildNode.nodeACode, bb );
-					if( _cullFunc( helper, node, abb ) ) {
+					if( !_cullFunc( helper, node, abb ) ) {
 						tileStack.push( TileNodeAndAABB( item.index + node.twoChildNode.nodeATileIndex, abb ));
 					}
 					const auto bbb = helper.getChildBoundingBox( (ChildName)node.twoChildNode.nodeBCode, bb );
-					if( _cullFunc( helper, node, bbb ) ) {
+					if( !_cullFunc( helper, node, bbb ) ) {
 						tileStack.push( TileNodeAndAABB( item.index + node.twoChildNode.nodeBTileIndex, bbb ));
 					}
 					break;

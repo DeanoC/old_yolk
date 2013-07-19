@@ -29,7 +29,7 @@ public:
 	void getVisibleRenderablesOfType( const Core::Frustum& _frustum, const uint32_t _type, std::vector< Renderable*>& _out ) const override {};
 
 	const Math::Matrix4x4& getRenderMatrix() const override;
-
+//////////
 	WallRenderer*	owner;
 	uint32_t		number;
 };
@@ -46,7 +46,7 @@ class WallRenderer {
 public:
 	friend class BrickRenderable;
 
-	WallRenderer( Tree& _vtree ) : tree( _vtree ) {
+	WallRenderer( const Tree& _tree ) : tree( _tree ) {
 		brickMeshes.push_back( std::make_shared<Scene::Mesh>( "red_1x1cube"  ) );
 	}
 
@@ -84,19 +84,17 @@ protected:
 	std::vector< BrickInstanceData >	brickInstanceData;
 	std::vector< Math::Matrix4x4>		brickMatrix;
 
-	Tree 								tree;
-	Math::Matrix4x4						worldMatrix;
+	const Tree& 						tree;
 };
 
-TreeRenderable::TreeRenderable( Tree& _vtree ) : 
-	Renderable( CORE_NEW Core::TransformNode( worldMatrix ) ),
-	tree( _vtree ),
-	wallRenderer( CORE_NEW WallRenderer(_vtree ) ) {
+TreeRenderable::TreeRenderable( Core::TransformNode* _transform, const Tree& _tree ) : 
+	Renderable( _transform ),
+	tree( _tree ),
+	wallRenderer( CORE_NEW WallRenderer(_tree ) ) {
 }
 
 TreeRenderable::~TreeRenderable() {
 	CORE_DELETE( wallRenderer );
-	CORE_DELETE( transformNode );
 }
 
 void TreeRenderable::getRenderablesOfType( uint32_t _type, std::vector<Scene::Renderable*>& _out ) const {
@@ -104,7 +102,7 @@ void TreeRenderable::getRenderablesOfType( uint32_t _type, std::vector<Scene::Re
 
 void TreeRenderable::getVisibleRenderablesOfType( const Core::Frustum& _frustum, const uint32_t _type, std::vector< Scene::Renderable*>& _out ) const {
 
-	// for culling to work we want to move the frstum into local tree space
+	// for culling to work we want to move the frustum into local tree space
 	const Core::Frustum localFrustum( getTransformNode()->getRenderMatrix() * _frustum.matrix );
 
 	wallRenderer->beginInstanceGather();
@@ -171,8 +169,7 @@ void TreeRenderable::getVisibleRenderablesOfType( const Core::Frustum& _frustum,
 						wallRender.addInstance( BrickInstanceData( node.leaf.brickIndex, bb ) );
 						break;
 					case NodeType::CONSTANT_LEAF: {
-						wallRender.addInstance( 
-							BrickInstanceData( node.constantLeaf.brickIndex, bb ) );
+						wallRender.addInstance( BrickInstanceData( node.constantLeaf.brickIndex, bb ) );
 						break;
 					}
 					case NodeType::PACKED_BINARY_LEAF: {

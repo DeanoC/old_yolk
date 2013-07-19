@@ -82,6 +82,10 @@ void Shell3D::start() {
 
 	renderer->addPipeline( std::make_shared<Scene::DebugPipeline>() );
 
+	// camera stuff is stuffed needs refactor
+	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
+	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
+
 }
 
 void Shell3D::run() {
@@ -91,25 +95,9 @@ void Shell3D::run() {
 	RenderContext* ctx = renderer->getPrimaryContext();
 	// render context has been setup to use this thread by the same thread that created teh screen 
 
-	// camera stuff is stuffed needs refactor
-//	auto inputHandler = std::make_shared<InputHandlerContext>( world.get(), ctx );
-//	DevelopmentContext::get()->addContext( "InputHandler",  inputHandler );
-	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
-	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
-
-	DevelopmentContext::get()->activateContext( "DebugCam" );
-
-	// flush 'load' time from first time update
-	Core::Clock shellClock;
-	shellClock.update();
-
 	// Main loop
 	while( !s_quitFlag ) {
 
-		float deltaT = shellClock.update();
-
-		DevelopmentContext::get()->update( deltaT );
-		world->update( deltaT );
 		auto camera = DevelopmentContext::getr().getContext()->getCamera();
 		if( camera ) {
 			world->render( screen, "debug", camera, ctx );

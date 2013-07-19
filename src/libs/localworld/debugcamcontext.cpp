@@ -63,11 +63,11 @@ void DebugCamContext::debugButton1( unsigned int padNum ) {
 
 	std::stringstream buf;
 	buf << "Debug Mode : " << debugLevel;
-//	Graphics::ScrConsole::Get()->Print( buf.str() );
+	Core::g_pDebugRender->print( buf.str().c_str() );
 }
 
 void DebugCamContext::debugButton2( unsigned int padNum ) {
-//	Graphics::ScrConsole::Get()->Print( "Frustum Lock flipped" );
+	Core::g_pDebugRender->print( "Frustum Lock flipped" );
 	lockedFrustum ^= true;
 }
 
@@ -128,7 +128,7 @@ void DebugCamContext::update( float fTimeInSecs ) {
 	Vector3 zvec = Math::GetZAxis( mat );
 
 	// move along view direction
-	position -= (xvec * curSideMotion * fTimeInSecs);
+	position += (xvec * curSideMotion * fTimeInSecs);
 	position += (zvec * curForwardMotion * fTimeInSecs );
 
 	// make view matrix

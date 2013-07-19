@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"tra",
+				"TransformNode"
+			],
+			[
+				"Tree",
+				"TreePhysical"
+			],
+			[
+				"Tr",
+				"TreePhysicalPtr"
+			],
+			[
 				"getC",
 				"getBoxCenter"
 			],
@@ -502,18 +514,6 @@
 			[
 				"s_new",
 				"s_newWidth"
-			],
-			[
-				"s_",
-				"s_winHeight"
-			],
-			[
-				"alr",
-				"alreadyAcquiring"
-			],
-			[
-				"qui",
-				"quitFlag"
 			]
 		]
 	},
@@ -528,44 +528,35 @@
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/voxtree_test.cpp",
+			"file": "src/libs/localworld/thing.h",
 			"settings":
 			{
-				"buffer_size": 1077,
+				"buffer_size": 3123,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/gfxdbgconsole.h",
+			"file": "src/apps/gfx_test/voxtreerenderable.cpp",
 			"settings":
 			{
-				"buffer_size": 1017,
-				"line_ending": "Windows",
-				"name": "gfxdbgconsole.h"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/gfxdbgconsole.cpp",
-			"settings":
-			{
-				"buffer_size": 3509,
-				"line_ending": "Windows",
-				"name": "gfxdbgconsole.cpp"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/CMakeLists.txt",
-			"settings":
-			{
-				"buffer_size": 1213,
+				"buffer_size": 7190,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/Riftball/player/player.cpp",
+			"file": "src/apps/gfx_test/voxtreething.h",
 			"settings":
 			{
-				"buffer_size": 8892,
+				"buffer_size": 161,
+				"line_ending": "Windows",
+				"name": "voxtreething.h"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/voxtreerenderable.h",
+			"settings":
+			{
+				"buffer_size": 1886,
 				"line_ending": "Windows"
 			}
 		},
@@ -578,26 +569,44 @@
 			}
 		},
 		{
-			"file": "src/libs/scene/renderable.h",
+			"file": "src/libs/scene/compoundcolshape.h",
 			"settings":
 			{
-				"buffer_size": 4739,
+				"buffer_size": 622,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/voxtreerenderable.h",
+			"file": "src/apps/gfx_test/voxtreephysical.cpp",
 			"settings":
 			{
-				"buffer_size": 1840,
+				"buffer_size": 737,
+				"line_ending": "Windows",
+				"name": "voxtreephysical.cpp"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/voxtreephysical.h",
+			"settings":
+			{
+				"buffer_size": 452,
+				"line_ending": "Windows",
+				"name": "voxtreephysical.h"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/main.cpp",
+			"settings":
+			{
+				"buffer_size": 3735,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+			"file": "src/apps/gfx_test/voxtree_test.cpp",
 			"settings":
 			{
-				"buffer_size": 7229,
+				"buffer_size": 710,
 				"line_ending": "Windows"
 			}
 		}
@@ -605,12 +614,12 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 311.0,
+		"height": 312.0,
 		"selected_items":
 		[
 			[
 				"Package Control: ",
-				"Package Control: Install Package"
+				"Package Control: Discover Packages"
 			],
 			[
 				"Package Control: inst",
@@ -653,7 +662,14 @@
 	},
 	"file_history":
 	[
+		"/G/Projects/yolk/src/libs/scene/physical.cpp",
 		"/G/Projects/yolk/src/libs/scene/physical.h",
+		"/G/Projects/yolk/src/libs/localworld/levelthing.h",
+		"/G/Projects/yolk/src/libs/scene/renderable.h",
+		"/G/Projects/yolk/src/libs/scene/collisionshape.h",
+		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
+		"/G/Projects/yolk/src/apps/gfx_test/gfxdbgconsole.h",
+		"/G/Projects/yolk/src/apps/gfx_test/gfxdbgconsole.cpp",
 		"/G/Projects/yolk/src/libs/scene/dynamicphysical.h",
 		"/G/Projects/yolk/src/libs/scene/compoundcolshape.cpp",
 		"/G/Projects/yolk/src/apps/Riftball/levels/testlvl.cpp",
@@ -672,7 +688,6 @@
 		"/G/test_export.gcode",
 		"/E/Public/3DprinterObjects/test.gcode",
 		"/G/Projects/yolk/src/libs/scene/debugpipeline.cpp",
-		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
 		"/G/Projects/yolk/src/libs/scene/programs/shaders/fs_basic.hlsl",
 		"/G/test.stl",
 		"/G/Projects/yolk/src/libs/core/core_utils.h",
@@ -774,13 +789,7 @@
 		"/E/Public/Cuts2013/Exports/sqr_test.ls",
 		"/C/Users/AndroidDev/AppData/Local/Temp/7zO9286.tmp/README.txt",
 		"/C/Users/AndroidDev/Desktop/ITReadME.txt",
-		"/C/Users/AndroidDev/AppData/Local/Temp/WPDNSE/{00001144-0001-0001-0000-000000000000}/AndroidTOC.txt",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/IT_Android.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceIOS/IT_IOS.cpp",
-		"/G/Projects/yolk/src/libs/dwm_client/clientworld.cpp",
-		"/G/Projects/yolk/src/libs/dwm/vmthreads.cpp",
-		"/C/NVPACK/android-ndk-r8b/README.TXT",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITThread_Win.cpp"
+		"/C/Users/AndroidDev/AppData/Local/Temp/WPDNSE/{00001144-0001-0001-0000-000000000000}/AndroidTOC.txt"
 	],
 	"find":
 	{
@@ -805,6 +814,7 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"h",
 			"RESOURCE_NAME",
 			"AABB",
 			"_clientVersion",
@@ -931,8 +941,7 @@
 			"SectionRef",
 			"reassignSectionAddress",
 			"resolveExternalSymbols",
-			"resolveRelocation",
-			"createTargetMachine"
+			"resolveRelocation"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -984,7 +993,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1010,26 +1019,26 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 6003.0,
+						"translation.y": 1890.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/apps/gfx_test/voxtree_test.cpp",
+					"file": "src/libs/localworld/thing.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1077,
+						"buffer_size": 3123,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								929,
-								929
+								2210,
+								2210
 							]
 						],
 						"settings":
@@ -1038,111 +1047,82 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 135.0,
+						"translation.y": 961.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/apps/gfx_test/gfxdbgconsole.h",
+					"file": "src/apps/gfx_test/voxtreerenderable.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1017,
+						"buffer_size": 7190,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								482,
-								490
+								1069,
+								1069
 							]
 						],
 						"settings":
 						{
-							"auto_name": "gfxdbgconsole.h",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 540.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/apps/gfx_test/gfxdbgconsole.cpp",
+					"file": "src/apps/gfx_test/voxtreething.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3509,
+						"buffer_size": 161,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								64,
-								64
+								109,
+								109
 							]
 						],
 						"settings":
 						{
-							"auto_name": "gfxdbgconsole.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"auto_name": "voxtreething.h",
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 145.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "src/apps/gfx_test/CMakeLists.txt",
+					"file": "src/apps/gfx_test/voxtreerenderable.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1213,
+						"buffer_size": 1886,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								38,
-								38
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/apps/Riftball/player/player.cpp",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 8892,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								405,
-								405
+								665,
+								665
 							]
 						],
 						"settings":
@@ -1151,13 +1131,13 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 713.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "src/apps/gfx_test/voxtree.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1169,8 +1149,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								1766,
+								1766
 							]
 						],
 						"settings":
@@ -1179,82 +1159,111 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2078.0,
+						"translation.y": 1448.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/libs/scene/compoundcolshape.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 622,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								283,
+								299
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "src/libs/scene/renderable.h",
+					"file": "src/apps/gfx_test/voxtreephysical.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4739,
+						"buffer_size": 737,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								318,
+								318
 							]
 						],
 						"settings":
 						{
+							"auto_name": "voxtreephysical.cpp",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1419.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "src/apps/gfx_test/voxtreerenderable.h",
+					"file": "src/apps/gfx_test/voxtreephysical.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1840,
+						"buffer_size": 452,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								270,
+								270
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"auto_name": "voxtreephysical.h",
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 848.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 9,
-					"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+					"file": "src/apps/gfx_test/main.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7229,
+						"buffer_size": 3735,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3483,
-								6734
+								274,
+								274
 							]
 						],
 						"settings":
@@ -1263,7 +1272,35 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 5563.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "src/apps/gfx_test/voxtree_test.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 710,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								694,
+								694
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 450.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1414,11 +1451,15 @@
 	},
 	"select_symbol":
 	{
-		"height": 0.0,
+		"height": 392.0,
 		"selected_items":
 		[
+			[
+				"Thing",
+				"Thing"
+			]
 		],
-		"width": 0.0
+		"width": 624.0
 	},
 	"settings":
 	{

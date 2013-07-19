@@ -117,5 +117,5 @@ void SceneWorld::update( float delta ) {
 			it->updateCallback( delta );
 		}
 	}
-//	physicsWorld->doSim( delta );
+	physicsWorld->doSim( delta );
 }

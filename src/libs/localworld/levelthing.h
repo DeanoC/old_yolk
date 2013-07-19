@@ -3,8 +3,8 @@
 
 #include "thing.h"
 
-// level things don't have a lot todo, as the SceneWorld, actually has the stuff in it 
-// (and all things have a pointer to that, still stuff can go here as nessecary
+// level things don't have a lot to do, as the SceneWorld, actually has the stuff in it 
+// (and all things have a pointer to that, still stuff can go here as necessary
 // TODO maybe this is more a component...
 class LevelThing : public Thing {
 public:

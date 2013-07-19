@@ -25,7 +25,7 @@ class TreeRenderable : public Scene::Renderable {
 public:
 	static const uint32_t VOXR_TYPE = Core::GenerateID<'V','O','X','R'>::value;
 
-	TreeRenderable( Tree& _vtree );
+	TreeRenderable( Core::TransformNode* _transform, const Tree& _vtree );
 	virtual ~TreeRenderable();
 
 	//--------- RENDERABLE IMPLEMENTATION START -------------
@@ -44,9 +44,7 @@ public:
 	//--------- RENDERABLE IMPLEMENTATION END -------------
 
 protected:
-	Tree 						tree;
-	Math::Matrix4x4				worldMatrix;
-
+	const Tree& 						tree;
 	mutable WallRenderer*		wallRenderer;
 
 };

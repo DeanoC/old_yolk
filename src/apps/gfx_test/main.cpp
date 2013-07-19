@@ -1,16 +1,15 @@
 #include "core/core.h"
-#include "shell3d.h"
+#include "core/development_context.h"
 #include "scene/hier.h"
 #include "localworld/sceneworld.h"
 #include "localworld/thing.h"
 #include "localworld/thingfactory.h"
+#include "shell3d.h"
+#include "gamethread.h"
 #include "gfxdbgconsole.h"
 #include "voxtree.h"
 #include "voxtreerenderable.h"
-
-//#include "boost/program_options.hpp"
-
-
+#include "voxtreephysical.h"
 
 class PrintDebugPrims :	public Core::DebugRenderInterface {
 	public:
@@ -70,38 +69,39 @@ int Main() {
 
 	// start the shell and grab the world
 	shell.start();
+
+	Core::DevelopmentContext::get()->activateContext( "DebugCam" );
+
 	SceneWorldPtr world = shell.getSceneWorld();
 	std::unique_ptr<PrintDebugPrims> pdp( CORE_NEW PrintDebugPrims(world) );
 
+	ThingPtr thing ( ThingFactory::createEmptyThing( TBC_WORLD, NewThingId() ) );
+
 	extern Vox::Tree* VoxTreeTest();
 	Vox::Tree* tree = VoxTreeTest();
-	Vox::TreeRenderablePtr treeRender = std::make_shared<Vox::TreeRenderable>( *tree );
-	ThingPtr thing ( ThingFactory::createEmptyThing( TBC_WORLD, NewThingId() ) );
+	Vox::TreeRenderablePtr treeRender = std::make_shared<Vox::TreeRenderable>( thing->getTransform(), *tree );
+	Vox::TreePhysicalPtr treePhysical = std::make_shared<Vox::TreePhysical>( thing->getTransform(), *tree );
+
 	thing->add( treeRender );
+	thing->add( treePhysical, TBC_PLAYER | TBC_ENEMY );
 	world->add( thing );
 
-/*	// some basic setup
-	Scene::HierPtr land = std::make_shared<Scene::Hier>( "test_room" );
-	ThingPtr tng( ThingFactory::createThingFromHier( land, TBC_WORLD ) );
-	world->add( tng );
-*/
-	shell.run(); // will loop until exit is called
+	auto gameThread = std::make_shared<GameThread>( world );
+	shell.run(); // will loop until exit is called 
+	gameThread->exit();
+	gameThread = nullptr;
 
-	// cleanup
-//	world->remove( tng );
-//	tng.reset();
-//	land.reset();
+	world->remove( thing );
+	thing.reset();
+	treePhysical.reset();
+	treeRender.reset();
+	CORE_DELETE tree;
 
 	// shutdown
 	pdp.reset();
 	world.reset();
+
 	shell.end();
-
-//	auto gfxThread = std::make_shared<Core::thread>( 
-//			boost::bind( &DwmClient::run, &client ) 
-//		);
-
-//	gfxThread->join();
 
 	return 0;
 }

@@ -25,7 +25,7 @@ public:
 	}
 
 	void reportErrorWarning(const char* text) override {
-//		DbgStringOut( text );
+		Core::g_pDebugRender->print( text );
 	}
 
 	void draw3dText( const btVector3& location, const char* textString ) override {
@@ -63,7 +63,7 @@ PhysicsWorld::PhysicsWorld() :
 	debugDraw  = CORE_NEW BulletDebugDraw();
 	debugDraw->setDebugMode( 0 );
 	dynamicsWorld->setDebugDrawer( debugDraw );
-	//nextPhysicsDebugMode();
+	nextPhysicsDebugMode();
 
 	dynamicsWorld->setGravity(btVector3(0,-9.8f,0));
 }

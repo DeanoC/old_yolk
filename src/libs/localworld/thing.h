@@ -58,17 +58,14 @@ public:
 		return srepColMasks[nodeId];		
 	}
 
-	Core::TransformNode* getTransform() const {
-		if( vreps.size() > 0 ) {
-			return vreps[0]->getTransformNode();
-		} else if( preps.size() > 0 ) {
-			return preps[0]->getTransformNode();
-		} else if( sreps.size() > 0 ) {
-			return sreps[0]->getTransformNode();
-		} else {
-			return nullptr;
-		}
+	const Core::TransformNode* getTransform() const {
+		return &transformNode;
 	}
+
+	Core::TransformNode* getTransform() {
+		return &transformNode;
+	}
+
 	const ThingId getId() const { return id; }
 
 	size_t add( Scene::RenderablePtr vrep );
@@ -81,13 +78,13 @@ public:
 	ThingComponent* getComponent( const ThingComponentId id ) const { 
 		auto c = components.find(id);
 		return c == components.end() ? nullptr : c->second;
-	}
+	}	
 	void addComponent( ThingComponent* _component ) {
 		CORE_ASSERT( components.find( _component->getComponentId() ) == components.end() );
 		components[ _component->getComponentId() ] = _component;
 	}
 protected:
-	explicit Thing( uint32_t _bc, const ThingId _id ) : broadCategories( _bc ), id( _id ) {}
+	explicit Thing( uint32_t _bc, const ThingId _id ) : broadCategories( _bc ), id( _id ), transformNode( transformMatrix ) {}
 
 	typedef std::unordered_map< uint32_t, ThingComponent* > ComponentMap;
 
@@ -95,6 +92,9 @@ protected:
 
 	const ThingId						id;
 	const uint16_t						broadCategories;
+
+	Math::Matrix4x4						transformMatrix;
+	Core::TransformNode					transformNode;
 
 	std::vector<Scene::PhysicalPtr>		preps;
 	std::vector<uint16_t>				prepColMasks;

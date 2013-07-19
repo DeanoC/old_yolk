@@ -39,13 +39,24 @@ namespace Scene {
 	protected:
 		enum INTERNAL{ DERIVED };
 
+		/**
+		 * Derived CTOR that lets you create the bt*Body yourself
+		 * @param  INTERNAL marks it as an ctor different from the normal one (even tho same params)
+		 * @param  _node the transform node for this physical
+		 * @param  _shape the collision shape for this physical (use a compound for complex ones)
+		 * @param  _friction friction coefficient
+		 * @param  _restitution restitution value
+		 * @param  _linearDamping linear damping value
+		 * @param  _angularDamping angular damping value
+		 * @return
+		 */
 		explicit Physical( 	INTERNAL,
-							Core::TransformNode* node,
-							std::shared_ptr<CollisionShape> shape,
-							float _friction,
-							float _restitution,
-							float _linearDamping,
-							float _angularDamping );
+							Core::TransformNode* _node,
+							std::shared_ptr<CollisionShape> _shape,
+							float _friction = 0.5f,
+							float _restitution = 0.f,
+							float _linearDamping = 0.f,
+							float _angularDamping = 0.f );
 		Core::TransformNode* 					transform;
 		std::shared_ptr<CollisionShape>			shape;
 		btRigidBody* 							body;

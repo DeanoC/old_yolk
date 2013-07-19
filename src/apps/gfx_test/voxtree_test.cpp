@@ -25,15 +25,5 @@ Vox::Tree* VoxTreeTest() {
 
 	test->pack();
 
-	// make a test collision rep
-	test->visitLeaves( 
-		// cull func
-		[]( const Vox::Tree::VisitHelper& _helper, const Vox::Node& _node, const Core::AABB& _aabb ) -> bool {
-			return false; // no culling for static collision rep
-		}, 
-		// leaf visit func
-		[]( const Vox::Tree::VisitHelper& _helper, const Vox::Node& _node, const Core::AABB& _aabb ) -> void {
-		}
-	);
 	return test;
 }

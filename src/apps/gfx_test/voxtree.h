@@ -50,7 +50,7 @@ static const int 	FAR		= 0x4;
 //! x: - Left = L	 + Right = R
 //! y: + Up = U		 - Down = D
 //! z: - Near  = N	 + Far = F
-//! always that order, give you 8 combos, which are the consitant names of each node in an octree
+//! always that order, give you 8 combos, which are the consistent names of each node in an octree
 enum class ChildName {
 	LUN = LEFT | UP | NEAR,
 	RUN = RIGHT | UP | NEAR,
