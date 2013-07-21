@@ -43,6 +43,10 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 	};
 	std::stack<TileNodeAndAABB> tileStack;
 
+	// early out if empty
+	if( nodeTiles.get(0).nodes[0].type == NodeType::EMPTY )
+		return;
+
 	if( _cullFunc( helper, helper.getNodeTile(0).nodes[0], helper.getRootBoundingBox() ) )
 		return;
 

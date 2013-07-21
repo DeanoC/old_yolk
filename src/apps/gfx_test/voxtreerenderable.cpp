@@ -117,6 +117,8 @@ void TreeRenderable::getVisibleRenderablesOfType( const Core::Frustum& _frustum,
 			Core::AABB aabb;
 		};
 		std::stack<TileNodeAndAABB> tileStack;
+		if( _helper.getNodeTile(0).nodes[0].type == NodeType::EMPTY ) 
+			return;
 
 		if( localFrustum.cullAABB( _helper.getRootBoundingBox() ) == Core::Frustum::CULL_RESULT::OUTSIDE )
 			return;

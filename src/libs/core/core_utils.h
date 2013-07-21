@@ -75,15 +75,15 @@ namespace Core {
 
 
 ///-------------------------------------------------------------------------------------------------
-/// \fn	CORE_INLINE int integer( float value )
+/// \fn	CORE_INLINE int floor2Int( float value )
 ///
 /// \brief	float to ine. 
 ///
 /// \param	value	The float value to convert. 
 ///
-/// \return	the integer value of the float (truncate). 
+/// \return	the integer value of the float (truncate AKA floor). 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-CORE_INLINE int integer( float value )
+CORE_INLINE int floor2Int( float value )
 {
 	int output;
 #if CPU_FAMILY == CPU_X86 && COMPILER == MS_COMPILER
@@ -93,7 +93,7 @@ CORE_INLINE int integer( float value )
 		fistp output
 	}
 #else
-	output = static_cast<int>( value );
+	output = static_cast<int>( floorf(value) );
 #endif
 
 	return output;

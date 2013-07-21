@@ -329,40 +329,37 @@ namespace Math {
 	CALL inline float LengthSquared( const Vector4& vec ){ return Dot(vec,vec); }  	//!< Length^2 of a 4D Vector
 	CALL inline float LengthSquared( const Quaternion& q ){ return Dot(q,q); }  	//!< Length^2 of a 4D Vector
 
-	CALL inline float Length( const float& a ){ return sqrtf(LengthSquared(a)); } 	//!< Length of a 1D Vector
-	CALL inline float Length( const Vector2& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 2D Vector
-	CALL inline float Length( const Vector3& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 3D Vector
-	CALL inline float Length( const Vector4& vec ){ return sqrtf(LengthSquared(vec)); } 	//!< Length of a 4D Vector
-	
-	CALL inline float ReciprocalSqrt( const float& a ) { return 1.0f / Length(a); }
-	CALL inline float ReciprocalSqrt( const Vector2& vecA ){ return 1.0f / Length(vecA); } 
-	CALL inline float ReciprocalSqrt( const Vector3& vecA ){ return 1.0f / Length(vecA); } 
-	CALL inline float ReciprocalSqrt( const Vector4& vecA ){ return 1.0f / Length(vecA); } 
+	template<typename T>
+	CALL inline float Length( const T& a ){ return sqrtf(LengthSquared(a)); } 	//!< Length of a nD Vector
+	template<typename T>
+	CALL inline float ReciprocalSqrt( const T& a ) { return 1.0f / Length(a); }
+
+	CALL inline float Length( const float a ){ return a; } 						//!< Length of a 1D Vector is a no-op
+	CALL inline float ReciprocalSqrt( const float a ) { return 1.0f /a; }
 
 	CALL inline float Cross( const Vector2& vecA, const Vector2& vecB ){ return vecA.x*vecB.y - vecA.y*vecB.x; }   //!< Cross product of 2 2D Vectors (CCW this is actually vecA(x,y,0) cross vecB(x,y,0) )
 	CALL inline Vector3 Cross( const Vector3& vecA, const Vector3& vecB ) { 
 		return Vector3(	vecA.y*vecB.z - vecA.z*vecB.y, vecA.z*vecB.x - vecA.x*vecB.z, vecA.x*vecB.y - vecA.y*vecB.x );
 	}   //!< Cross product of 2 3D Vectors 
 
-	CALL inline Vector2 Normalise( const Vector2& vec )	{ return Vector2(vec/Length(vec)); }		//!< returns a normalise version of vec
-	CALL inline Vector3 Normalise( const Vector3& vec ){ return Vector3(vec/Length(vec)); }		//!< returns a normalise version of vec
-	CALL inline Vector4 Normalise( const Vector4& vec ){ return Vector4(vec/Length(vec)); }		//!< returns a normalise version of vec
+	template<typename T>
+	CALL inline T Normalise( const T& vec )	{ return T(vec/Length(vec)); }		//!< returns a normalise version of vec
+
 	CALL inline Plane Normalise( const Plane& plane ) {
 		float len = Length( Vector3(plane.a, plane.b, plane.c) );
 		return Plane( plane.a / len, plane.b / len, plane.c / len, plane.d / len ); 
 	}
 
-	CALL inline Vector2 Lerp( const Vector2& vecA, const Vector2& vecB, float t){ return vecA + t*(vecB-vecA); } 
-	CALL inline Vector3 Lerp( const Vector3& vecA, const Vector3& vecB, float t){ return vecA + t*(vecB-vecA); } 
-	CALL inline Vector4 Lerp( const Vector4& vecA, const Vector4& vecB, float t){ return vecA + t*(vecB-vecA); } 
+	template<typename T>
+	CALL inline T Lerp( const T& vecA, const T& vecB, float t){ return vecA + t*(vecB-vecA); } 
 //	inline Quaternion Slerp( const Quaternion& quatA, const Quaternion& quatB, float t ){ Quaternion quat; D3DXQuaternionSlerp( &quat, &quatA, &quatB, t ); return quat; }
 
 	template<typename T>
 	CALL inline T Max( const T a, const T b ) { return (a > b)? a : b; }
 	template<typename T>
-		CALL inline T Min( const T a, const T b ) { return (a < b)? a : b; }
-
-	CALL inline float Clamp( const float a, const float mi, const float ma ) { float r; r = Max(a, mi); r = Min(r, ma); return r; }
+	CALL inline T Min( const T a, const T b ) { return (a < b)? a : b; }
+	template<typename T>
+	CALL inline T Clamp( const T a, const T mi, const T ma ) { T r; r = Max(a, mi); r = Min(r, ma); return r; }
 
 	CALL inline Vector2 Abs( const Vector2& vector ) { return Vector2( fabsf( vector.x ), fabsf( vector.y ) ); }
 	CALL inline Vector2 Max( const Vector2& vecA, const Vector2& vecB ) { return Vector2( vecA.x > vecB.x ? vecA.x : vecB.x, vecA.y > vecB.y ? vecA.y : vecB.y ); }
