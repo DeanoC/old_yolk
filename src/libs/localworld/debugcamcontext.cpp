@@ -21,7 +21,7 @@ DebugCamContext::DebugCamContext( int scrWidth, int scrHeight, float degFov, flo
 	xRot = yRot = zRot = 0;
 	dxRot = dyRot = dzRot = 0;
 	curSideMotion = curForwardMotion = 0;
-	speed = 50.0f;
+	speed = 500.0f;
 	angularSpeed = 45.0f; // in degress
 	position = Math::Vector3(0,0,-10);
 	camera->setView( Math::IdentityMatrix() );

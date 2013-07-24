@@ -23,7 +23,7 @@ TreePhysical<TreeType>::TreePhysical( Core::TransformNode* _transform, const Tre
 		// cull function
 		[this]( const Core::AABB& _aabb ) -> Vox::CULL_FUNC_RETURN {
 			// no culling for static collision rep but a size hint to help procedurals
-			if( _aabb.getHalfLength()[0] < 1.0f ) {
+			if( _aabb.getHalfLength()[0] < 10000.0f ) {
 				return Vox::CULL_FUNC_RETURN::DEEP_ENOUGH;
 			} else {
 				return Vox::CULL_FUNC_RETURN::CONTINUE;

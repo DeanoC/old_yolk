@@ -83,7 +83,7 @@ void Shell3D::start() {
 	renderer->addPipeline( std::make_shared<Scene::DebugPipeline>() );
 
 	// camera stuff is stuffed needs refactor
-	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 5000.0f );
+	auto debugCam = std::make_shared<DebugCamContext>( s_screenWidth, s_screenHeight, 90.0f, 0.1f, 50000.0f );
 	DevelopmentContext::get()->addContext( "DebugCam",  debugCam );
 
 }

@@ -100,14 +100,14 @@ namespace Scene {
 
 		virtual void getWorldAABB( Core::AABB& waabb ) const {
 			if( getTransformNode() != NULL ) {
-				waabb = getLocalAabb().transform( getWorldMatrix() );
+				waabb = getLocalAabb().transformAffine( getWorldMatrix() );
 			} else{
 				waabb = getLocalAabb();
 			}
 		}
 		virtual void getRenderAABB( Core::AABB& waabb ) const {
 			if( getTransformNode() != NULL ) {
-				waabb = getLocalAabb().transform( getRenderMatrix() );
+				waabb = getLocalAabb().transformAffine( getRenderMatrix() );
 			} else{
 				waabb = getLocalAabb();
 			}

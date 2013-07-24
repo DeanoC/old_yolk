@@ -85,9 +85,10 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	CALL bool intersects( const Math::Vector3& _point ) const;
 
-	/// Transforms this AABB by the param.
-	/// \param	matrix	The matrix.
+	/// Transforms this AABB by the affine matrix parameter.
+	/// \param	matrix	An Affine matrix.
 	/// \return	The transformed AABB.
+	CALL AABB transformAffine( const Math::Matrix4x4& matrix ) const;
 	CALL AABB transform( const Math::Matrix4x4& matrix ) const;
 
 #if PLATFORM != GPU

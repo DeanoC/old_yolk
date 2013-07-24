@@ -81,8 +81,14 @@ reGoLabal:
 					}
 					break;
 				}
+				case NodeType::CONSTANT_LEAF: {
+					// just fake a leaf node as the AABB has already taken care of the size optimization
+					Node tmp = node;
+					tmp.type = NodeType::LEAF;
+					_leafFunc( helper, tmp, bb );
+					break;
+				}
 				case NodeType::LEAF:
-				case NodeType::CONSTANT_LEAF:
 				case NodeType::PACKED_BINARY_LEAF:
 					_leafFunc( helper, node, bb );
 					break;

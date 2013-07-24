@@ -121,7 +121,13 @@ void TreeRenderable<TreeType>::getVisibleRenderablesOfType( const Core::Frustum&
 			if( _frustum.cullAABB( _aabb ) == Core::Frustum::CULL_RESULT::OUTSIDE ) {
 				return Vox::CULL_FUNC_RETURN::CULL;
 			} else {
-				return Vox::CULL_FUNC_RETURN::CONTINUE;
+				Math::Vector3 minEx = Math::TransformAndProject( _aabb.getMinExtent(), _frustum.matrix );
+				Math::Vector3 maxEx = Math::TransformAndProject( _aabb.getMaxExtent(), _frustum.matrix );
+				if( Math::LengthSquared(maxEx - minEx) < (0.15f*0.15f) ) {
+					return Vox::CULL_FUNC_RETURN::DEEP_ENOUGH;
+				} else {
+					return Vox::CULL_FUNC_RETURN::CONTINUE;
+				}
 			}
 		}, 
 		// leaf visit function
@@ -130,10 +136,6 @@ void TreeRenderable<TreeType>::getVisibleRenderablesOfType( const Core::Frustum&
 				case NodeType::LEAF:
 					wallRender.addInstance( BrickInstanceData( _node.leaf.leafIndex, _aabb ) );
 					break;
-				case NodeType::CONSTANT_LEAF: {
-					wallRender.addInstance( BrickInstanceData( _node.constantLeaf.leafIndex, _aabb ) );
-					break;
-				}
 				case NodeType::PACKED_BINARY_LEAF: {
 					for( int i = 0; i < 8; i++ ) {
 						bool posiOcc = !!(_node.packedBinaryLeaf.occupancy & (1 << i));

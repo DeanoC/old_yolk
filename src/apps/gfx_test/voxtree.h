@@ -13,7 +13,7 @@ static const float DEFAULT_LEAF_RESOLUTION		= 1.0f;
 static const int NODE_TYPE_BIT_SIZE 			= 4;
 static const int NODE_PAYLOAD_BIT_SIZE 			= 28;
 static const int NODE_PACKED_BINARY_BIT_SIZE 	= 10;
-static const int NODE_LEAF_INDEX_BIT_SIZE	 	= 28;
+static const int NODE_LEAF_INDEX_BIT_SIZE	 	= 27;
 static const int NODE_INDEX_BIT_SIZE 			= 28;
 static const int NODE_ONLY_CHILD_INDEX_BIT_SIZE = 25;
 static const int NODE_TWO_CHILD_INDEX_BIT_SIZE = 11;
@@ -87,10 +87,12 @@ union Node {
 	} twoChildNode;
 	struct LeafPayload {
 		uint32_t					: NODE_TYPE_BIT_SIZE;
+		uint32_t	tmpFlag			: 1;						//!< indicates an extension can re-generate at will
 		uint32_t	leafIndex 		: NODE_LEAF_INDEX_BIT_SIZE;	//!< leaf this node uses
 	} leaf;
 	struct ConstantLeaf {
 		uint32_t					: NODE_TYPE_BIT_SIZE;
+		uint32_t	tmpFlag			: 1;
 		uint32_t	leafIndex 		: NODE_LEAF_INDEX_BIT_SIZE;	//!< leaf its 8 children will use
 	} constantLeaf;
 	struct PackedBinaryLeaf {

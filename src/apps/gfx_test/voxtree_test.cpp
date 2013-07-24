@@ -56,7 +56,7 @@ Vox::Tree* VoxTreeTest() {
 
 
 Vox::ProcVoxTree* VoxTreeTest() {
-	Core::AABB bound( Math::Vector3(-1280,-1280,-1280), Math::Vector3(1280,1280,1280) );
+	Core::AABB bound( Math::Vector3(-12800,-12800,-12800), Math::Vector3(12800,12800,12800) );
 	Vox::ProcVoxTree* test = CORE_NEW Vox::ProcVoxTree( bound );
 /*
 	uint32_t brickIndex = 1;

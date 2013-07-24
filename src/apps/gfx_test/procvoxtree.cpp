@@ -31,21 +31,23 @@ bool ProcVoxTree::generate( 	VisitHelper& _helper,
 								LeafVisitConstFunc _leafFunc ) {
 	std::stack<const Core::AABB> aabbStack;
 
+	const Math::Vector3 totalTranslate = _helper.getRootBoundingBox().getHalfLength();
 	const float totalSizeRecip = 1.f/_helper.getRootBoundingBox().getHalfLength()[0];
 	aabbStack.push( _aabb );
 
 	while( !aabbStack.empty() ) {
 		const Core::AABB aabb = aabbStack.top(); aabbStack.pop();
-		for( int i = 0; i <8; ++i ) {
+		for( int i = 0; i < 8; ++i ) {
 			const auto boundingBox = _helper.getChildBoundingBox( (ChildName)i, aabb );
 			CULL_FUNC_RETURN cullRet = _cullFunc( boundingBox );
 			if( cullRet == CULL_FUNC_RETURN::CULL ) {
-				continue;			
+				continue;
 			}
 
-			float val = FBm( boundingBox.getBoxCenter() * totalSizeRecip , 2.3f, 2 );
+			float val = FBm( (totalTranslate + boundingBox.getBoxCenter() )* totalSizeRecip , 2.3f, 5 );
 			if( val > 0.999f ) {
-				if( cullRet == CULL_FUNC_RETURN::CONTINUE && boundingBox.getHalfLength()[0] > 10.f ) {
+				if( cullRet == CULL_FUNC_RETURN::CONTINUE && 
+						boundingBox.getHalfLength()[0] > 1.f ) {
 					aabbStack.push( boundingBox );
 				} else {
 					Node node;
