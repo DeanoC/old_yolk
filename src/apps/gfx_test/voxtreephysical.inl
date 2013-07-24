@@ -12,7 +12,8 @@
 
 namespace Vox {
 
-TreePhysical::TreePhysical( Core::TransformNode* _transform, const Tree& _tree ) : 
+template< typename TreeType >
+TreePhysical<TreeType>::TreePhysical( Core::TransformNode* _transform, const TreeType& _tree ) : 
 	compoundShape( std::make_shared<Scene::CompoundColShape>() ),
 	Scene::Physical( Scene::Physical::DERIVED, _transform, compoundShape ), 
 	tree( _tree ) {
@@ -20,15 +21,20 @@ TreePhysical::TreePhysical( Core::TransformNode* _transform, const Tree& _tree )
 	// make a collision rep
 	tree.visitLeaves( 
 		// cull function
-		[this]( const Vox::Tree::VisitHelper& _helper, const Vox::Node& _node, const Core::AABB& _aabb ) -> bool {
-			return false; // no culling for static collision rep
+		[this]( const Core::AABB& _aabb ) -> Vox::CULL_FUNC_RETURN {
+			// no culling for static collision rep but a size hint to help procedurals
+			if( _aabb.getHalfLength()[0] < 1.0f ) {
+				return Vox::CULL_FUNC_RETURN::DEEP_ENOUGH;
+			} else {
+				return Vox::CULL_FUNC_RETURN::CONTINUE;
+			}
 		}, 
 		// leaf visit function
-		[this]( const Vox::Tree::VisitHelper& _helper, const Vox::Node& _node, const Core::AABB& _aabb ) -> void {
+		[this]( const TreeType::VisitHelper& _helper, const Vox::Node& _node, const Core::AABB& _aabb ) -> void {
 			if( _node.type == NodeType::PACKED_BINARY_LEAF ) {
 				for( int i = 0; i < 8; i++ ) {
 					bool posiOcc = !!(_node.packedBinaryLeaf.occupancy & (1 << i));
-					if(  posiOcc == true || ( posiOcc == false && _node.packedBinaryLeaf.falseBrickIndex != 0 ) ) {
+					if(  posiOcc == true || ( posiOcc == false && _node.packedBinaryLeaf.falseLeafIndex != 0 ) ) {
 						auto subAABB = _helper.getChildBoundingBox( (ChildName) i, _aabb );
 						auto cube = getCubeColShape( subAABB );
 
@@ -51,7 +57,8 @@ TreePhysical::TreePhysical( Core::TransformNode* _transform, const Tree& _tree )
 	body = new btRigidBody( rbInfo );
 }
 
-std::shared_ptr<Scene::BoxColShape> TreePhysical::getCubeColShape( const Core::AABB _aabb ) {
+template< typename TreeType >
+std::shared_ptr<Scene::BoxColShape> TreePhysical<TreeType>::getCubeColShape( const Core::AABB _aabb ) {
 	// check our box shape cache (we assume cubes so length.x == length.y == length.z )
 	auto cube = cubeShapes.find( _aabb.getHalfLength().x );
 	if( cube == cubeShapes.end() ) {

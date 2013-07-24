@@ -4,53 +4,38 @@
 
 namespace Vox {
 
-Tree::Tree( const Core::AABB& _box ) :
+template< typename Derived >
+Tree<Derived>::Tree( const Core::AABB& _box ) :
 	boundingBox( _box ),
-	nodeTiles( 1 ),
-	bricks( 1 )
+	nodeTiles( 1 )
 {
 	uint32_t rootIndex = nodeTiles.alloc();
 	CORE_ASSERT( rootIndex == 0 );
-	// the root node is the first child of the first tileIndex (the other 7 are not used)
-	nodeTiles.get(0).nodes[0].type = NodeType::EMPTY;
+	for( int i = 0;i < 8; ++i ) {
+		nodeTiles.get(0).nodes[i].type = NodeType::EMPTY;
+	}
 
-	// brick index 0 is the same as an EMPTY node (useful property for packers)
-	uint32_t emptyIndex = bricks.alloc();
-	CORE_ASSERT( emptyIndex == 0 )
+	// leaf index 0 is the same as an EMPTY node (useful property for packers)
 }
 
-Tree::~Tree() {
+template< typename Derived >
+Tree<Derived>::~Tree() {
+}
+template< typename Derived >
+void Tree<Derived>::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bool _removeEmpty ) const {
+	const_cast<Tree<Derived>*>(this)->visitLeaves( _cullFunc, _leafFunc, _removeEmpty );
 }
 
-void Tree::descend( Tree::DescendConstFunc _func ) const {
+template< typename Derived >
+void Tree<Derived>::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bool _removeEmpty ) {
 	const VisitHelper helper( *this ); 
-	_func( helper );
-}
 
-void Tree::descend( Tree::DescendFunc _func ) {
-	VisitHelper helper( *this ); 
-	_func( helper );
-}
-
-void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bool _removeEmpty ) const {	
-	const VisitHelper helper( *this ); 
-	struct TileNodeAndAABB {
-		TileNodeAndAABB() {}
-		TileNodeAndAABB( uint32_t _index, const Core::AABB _aabb ) :
-			index(_index), aabb(_aabb) {}
-		uint32_t index;
-		Core::AABB aabb;
-	};
 	std::stack<TileNodeAndAABB> tileStack;
 
-	// early out if empty
-	if( nodeTiles.get(0).nodes[0].type == NodeType::EMPTY )
+	if( _cullFunc( helper.getRootBoundingBox() ) == CULL_FUNC_RETURN::CULL)
 		return;
 
-	if( _cullFunc( helper, helper.getNodeTile(0).nodes[0], helper.getRootBoundingBox() ) )
-		return;
-
-	TileNodeAndAABB rootItem( helper.getNodeTile(0).nodes[0].node.nodeTileIndex, helper.getRootBoundingBox() );
+	TileNodeAndAABB rootItem( 0, helper.getRootBoundingBox() );
 	tileStack.push( rootItem );
 
 	while( tileStack.empty() == false ) {
@@ -67,10 +52,11 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 
 			// cull node?
 			const auto bb = helper.getChildBoundingBox( (ChildName)i, item.aabb );
-			if( _cullFunc( helper, node, bb ) ) {
+			const auto cullRet = _cullFunc( bb );
+			if( cullRet == CULL_FUNC_RETURN::CULL ) {
 				continue;
 			}
-
+reGoLabal:
 			switch( node.type ) {
 				case NodeType::NODE: // push its children onto stack
 					tileStack.push( TileNodeAndAABB( node.node.nodeTileIndex, bb ));
@@ -78,7 +64,7 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 				case NodeType::ONLY_CHILD_NODE: {
 					// another level to check
 					const auto cbb = helper.getChildBoundingBox( (ChildName)node.onlyChildNode.nodeCode, bb );
-					if( !_cullFunc( helper, node, cbb ) ) { 
+					if( _cullFunc( cbb ) != CULL_FUNC_RETURN::CULL ) { 
 						tileStack.push( TileNodeAndAABB( node.onlyChildNode.nodeTileIndex, cbb ));
 					}
 					break;
@@ -86,11 +72,11 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 				case NodeType::TWO_CHILD_NODE: {
 					// two nodes of a level down to check
 					const auto abb = helper.getChildBoundingBox( (ChildName)node.twoChildNode.nodeACode, bb );
-					if( !_cullFunc( helper, node, abb ) ) {
+					if( _cullFunc( abb ) != CULL_FUNC_RETURN::CULL ) {
 						tileStack.push( TileNodeAndAABB( item.index + node.twoChildNode.nodeATileIndex, abb ));
 					}
 					const auto bbb = helper.getChildBoundingBox( (ChildName)node.twoChildNode.nodeBCode, bb );
-					if( !_cullFunc( helper, node, bbb ) ) {
+					if( _cullFunc( bbb ) != CULL_FUNC_RETURN::CULL ) {
 						tileStack.push( TileNodeAndAABB( item.index + node.twoChildNode.nodeBTileIndex, bbb ));
 					}
 					break;
@@ -100,24 +86,27 @@ void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitConstFunc _leafFunc, bo
 				case NodeType::PACKED_BINARY_LEAF:
 					_leafFunc( helper, node, bb );
 					break;
-				default:
+				default: {
+					bool rego = derived()->visit( 	const_cast<VisitHelper&>( helper ), 
+													const_cast<Node&>( node ), 
+													bb, _cullFunc, _leafFunc );
+					if( rego ) goto reGoLabal;
 					break;
+				}
 			}
 
 		}
 	}
 
 }
-/*
-void Tree::visitLeaves( NodeCullFunc _cullFunc, LeafVisitFunc _leafFunc, bool _removeEmpty ) {
-	TODO_ASSERT( "IMPLMENT NON CONST VISIT LEAVES");
-}
-*/
-void Tree::pack() {
+
+template< typename Derived >
+void Tree<Derived>::pack() {
 	packNodeAndDescendants( nodeTiles.get(0).nodes[0] );
 }
 
-uint32_t Tree::splitNode( Node** _node ) {
+template< typename Derived >
+uint32_t Tree<Derived>::splitNode( Node** _node ) {
 	// nodes are already split, so can't be split again
 	Node* node = *_node;
 	CORE_ASSERT( node->type != NodeType::NODE );
@@ -133,24 +122,21 @@ uint32_t Tree::splitNode( Node** _node ) {
 
 	switch( type ) {
 		case NodeType::EMPTY: {
-			// propegate the emptiness down to the children
+			// propagate the emptiness down to the children
 			for( int i = 0; i < 8; ++i ) { children.nodes[i].type = NodeType::EMPTY; }
 			break;
 		}
 		case NodeType::LEAF: {
-			CORE_ASSERT( node->leaf.splitable )
 			for( int i = 0; i < 8; ++i ) { 
 				children.nodes[i].type = NodeType::LEAF;
-				children.nodes[i].leaf.splitable = true;
-				children.nodes[i].leaf.brickIndex = node->leaf.brickIndex;
+				children.nodes[i].leaf.leafIndex = node->leaf.leafIndex;
 			}			
 			break;
 		}
 		case NodeType::CONSTANT_LEAF: {
 			for( int i = 0; i < 8; ++i ) { 
 				children.nodes[i].type = NodeType::LEAF;
-				children.nodes[i].leaf.splitable = node->constantLeaf.splitable;
-				children.nodes[i].leaf.brickIndex = node->constantLeaf.brickIndex;
+				children.nodes[i].leaf.leafIndex = node->constantLeaf.leafIndex;
 			}
 			break;
 		}
@@ -158,21 +144,17 @@ uint32_t Tree::splitNode( Node** _node ) {
 			for( int i = 0; i < 8; ++i ) { 
 				uint32_t packedIndex;
 				if( node->packedBinaryLeaf.occupancy & (1 << i) ) {
-					packedIndex = node->packedBinaryLeaf.trueBrickIndex;
+					packedIndex = node->packedBinaryLeaf.trueLeafIndex;
 				} else {
-					packedIndex = node->packedBinaryLeaf.falseBrickIndex;			
+					packedIndex = node->packedBinaryLeaf.falseLeafIndex;			
 				}
 				// 0 is a special EMPTY index
 				if( packedIndex == 0 ) {
 					children.nodes[i].type = NodeType::EMPTY;
 				} else {
 					children.nodes[i].type = NodeType::LEAF;
-					int brickIndex = packedIndex;
-					children.nodes[i].leaf.brickIndex = brickIndex;
-					// have to get the splitable bit from the brick itself
-					// cache is potentially a sad bunny here but split operation
-					// are probably quite rare... hmm wonder if worth the replication
-					children.nodes[i].leaf.splitable = bricks.get( brickIndex ).splitable;
+					int leafIndex = packedIndex;
+					children.nodes[i].leaf.leafIndex = leafIndex;
 				}
 			}
 			break;
@@ -206,7 +188,7 @@ uint32_t Tree::splitNode( Node** _node ) {
 			break;
 		}
 		default: 
-			CORE_ASSERT( false );
+			derived()->split( _node, tileIndex );
 	}
 	// now replace the node with a node tile index indicate pointing to its children
 	node->type = NodeType::NODE;
@@ -214,16 +196,18 @@ uint32_t Tree::splitNode( Node** _node ) {
 
 	return tileIndex;
 }
+
 /// free this node descendants
-void Tree::freeNodeDescendants( Node& _node ) {
+template< typename Derived >
+void Tree<Derived>::freeNodeDescendants( Node& _node ) {
 	std::stack<uint32_t> tileStack;
-	if( _node.hasChildren() == false )
+	if( nodeHasChildren(_node) == false )
 		return;
 
 	uint32_t tileIndexA;
 	uint32_t tileIndexB;
-	if( _node.hasChildren() ) {
-		tileIndexA = _node.getChildrenTileIndex( 0, tileIndexB );
+	if( nodeHasChildren(_node) ) {
+		tileIndexA = nodeGetChildrenTileIndex( _node, 0, tileIndexB );
 		tileStack.push( tileIndexA );
 		if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 	}
@@ -233,8 +217,8 @@ void Tree::freeNodeDescendants( Node& _node ) {
 
 		NodeTile& tile = nodeTiles.get( index );
 		for( int i = 0;i < 8; ++i ) {
-			if( tile.nodes[i].hasChildren() ) {
-				tileIndexA = tile.nodes[i].getChildrenTileIndex( index, tileIndexB );
+			if( nodeHasChildren(tile.nodes[i]) ) {
+				tileIndexA = nodeGetChildrenTileIndex( tile.nodes[i], index, tileIndexB );
 				tileStack.push( tileIndexA );
 				if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 			}
@@ -243,8 +227,10 @@ void Tree::freeNodeDescendants( Node& _node ) {
 	}
 	_node.type = NodeType::EMPTY;
 }
+
 /// pack this node and descendants
-void Tree::packNodeAndDescendants( Node& _node ) {
+template< typename Derived >
+void Tree<Derived>::packNodeAndDescendants( Node& _node ) {
 	std::stack<uint32_t> tileStack;
 	uint32_t tileIndexA;
 	uint32_t tileIndexB;
@@ -252,8 +238,8 @@ void Tree::packNodeAndDescendants( Node& _node ) {
 	bool packHappened = false;
 	do { 
 		packHappened = false;
-		if( _node.hasChildren() ) {
-			tileIndexA = _node.getChildrenTileIndex( 0, tileIndexB );
+		if( nodeHasChildren(_node) ) {
+			tileIndexA = nodeGetChildrenTileIndex( _node, 0, tileIndexB );
 			if( tileIndexA != INVALID_INDEX ) tileStack.push( tileIndexA );
 			if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 		}
@@ -262,10 +248,10 @@ void Tree::packNodeAndDescendants( Node& _node ) {
 			CORE_ASSERT( index != INVALID_INDEX );
 			NodeTile& tile = nodeTiles.get( index );
 			for( int i = 0;i < 8; ++i ) {
-				if( tile.nodes[i].hasChildren() ) {
+				if( nodeHasChildren(tile.nodes[i]) ) {
 					packHappened |= packNode( tile.nodes[i] );
 
-					tileIndexA = tile.nodes[i].getChildrenTileIndex( index, tileIndexB );
+					tileIndexA = nodeGetChildrenTileIndex( tile.nodes[i], index, tileIndexB );
 					if( tileIndexA != INVALID_INDEX ) tileStack.push( tileIndexA );
 					if( tileIndexB != INVALID_INDEX ) tileStack.push( tileIndexB );
 				}
@@ -274,61 +260,46 @@ void Tree::packNodeAndDescendants( Node& _node ) {
 	} while( packHappened );
 }
 
-
-uint32_t Tree::allocateBrick( Brick** _outBrick ) {
-	uint32_t index = bricks.alloc();
-	*_outBrick = &bricks.get( index );
-	return index;
-}
-void Tree::setNodeToBrick( Node& _node, uint32_t _brickIndex ) {
+template< typename Derived >
+void Tree<Derived>::setNodeToLeaf( Node& _node, uint32_t _leafIndex ) {
 	// free the children if any
-	if( _node.hasChildren() ) {
+	if( nodeHasChildren(_node) ) {
 		freeNodeDescendants( _node );
 	}
 
 	// replace this node with the brick
 	_node.type = NodeType::LEAF;
-	// need to look up the brick to see if its splitable			
-	_node.leaf.splitable = bricks.get( _brickIndex ).splitable;
-	_node.leaf.brickIndex = _brickIndex;
+	_node.leaf.leafIndex = _leafIndex;
 }
 
-// insert a brick of _brickIndex as a point of volume into the tree at point _treeSpacePos
-bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
-							const uint32_t _brickIndex, 
+// insert a brick of _leafIndex as a point of volume into the tree at point _treeSpacePos
+template< typename Derived >
+bool Tree<Derived>::insertPoint( const Math::Vector3& _treeSpacePos,
+							const uint32_t _leafIndex, 
 							const float _volume ) {
-	bool ret = false;
-	descend( [&]( VisitHelper& _helper ) {
-		// check point intersects the tree itself
-		if(  _helper.getRootBoundingBox().intersects( _treeSpacePos ) == false ) {
-			return;
-		}
+	VisitHelper _helper( *this );
+	// check point intersects the tree itself
+	if(  _helper.getRootBoundingBox().intersects( _treeSpacePos ) == false ) {
+		return false;
+	}
 
+	// root index and code
+	for( int i = 0; i < 8; ++i ) {
+		uint32_t curIndex = 0;
+		uint32_t curCode = i;
 		uint32_t index = 0;
 		int level = 0;
-		// root index and code
-		uint32_t parentIndex = 0;
-		uint32_t parentCode = 0;
-		Node* curNode = &nodeTiles.get(parentIndex).nodes[ parentCode ];
-		uint32_t curIndex = parentIndex;
-		uint32_t curCode = parentCode;
 
-		Core::AABB boundingBox = _helper.getRootBoundingBox();
+		Core::AABB boundingBox = _helper.getChildBoundingBox( (ChildName) curCode, _helper.getRootBoundingBox() );
 
 		// descend until we can't (though we will create split as required if we can)
-		while( curNode->hasChildren() || curNode->isSplitable() ) {
+		while( nodeHasChildren( *curNode ) || nodeIsSplitable( *curNode ) ) {
+			Node* curNode = &nodeTiles.get(curIndex).nodes[ curCode ];
 			// is the points volume bigger than my children volume?
 			if( _volume  > _helper.getNodeVolume(level + 1) ) {
 				// replace this node
-				setNodeToBrick( *curNode, _brickIndex );
-
-				// as one of the parents children has changed, lets
-				// see if we can pack it
-				if( parentIndex != curIndex ) {
-					packNode( _helper.getNodeTile( parentIndex ).nodes[ parentCode ] );
-				}
-				ret = true; // success!
-				return;	
+				setNodeToLeaf( *curNode, _leafIndex );
+				return true;	
 			}
 			// find which child would contain the point
 			Math::Vector3 centerPoint = boundingBox.getBoxCenter();
@@ -340,7 +311,7 @@ bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
 
 			uint32_t tileIndex;
 			// still need to go deeper...
-			if( curNode->hasChildren() ) {
+			if( nodeHasChildren(*curNode) ) {
 				if( curNode->type == NodeType::ONLY_CHILD_NODE || curNode->type == NodeType::TWO_CHILD_NODE ) {
 					uint32_t nodeACode, nodeBCode;
 					uint32_t nodeAIndex, nodeBIndex;
@@ -373,37 +344,36 @@ bool Tree::insertPoint( const Math::Vector3& _treeSpacePos,
 						// hit the 6 or 7 virtual empty nodes, so requires a split
 						tileIndex = splitNode( &curNode );
 						if( tileIndex == INVALID_INDEX ) {
-							return;
+							break;
 						}
 					}
 				} else {
 					// standard unpacked node
 					uint32_t dummy; // we have already accounted for the second tile index if any
-					tileIndex = curNode->getChildrenTileIndex( curIndex, dummy );
+					tileIndex = nodeGetChildrenTileIndex( *curNode, curIndex, dummy );
 				}
 			} else {
 				// need to split if possible (resize may occur, pointer may be invalid afterwards)
 				tileIndex = splitNode( &curNode );
 				if( tileIndex == INVALID_INDEX ) {
-					return;
+					break;
 				}
 			}
 
 			// let us go round the loop again
-			parentIndex = curIndex;
-			parentCode = curCode;
 			curIndex = tileIndex;
 			curCode = code;
 			curNode = &_helper.getNodeTile( tileIndex ).nodes[ code ];
 			boundingBox = _helper.getChildBoundingBox( cn, boundingBox );
 			level++;
 		}
-		// failed couldn't insert the point for some reason
-	});
-	return ret;
+	}
+
+	return false;
 }
 
-bool Tree::packNode( Node& _node ) {
+template< typename Derived>
+bool Tree<Derived>::packNode( Node& _node ) {
 
 	if(_node.type == NodeType::NODE ) {
 		NodeTile& nodeTile = nodeTiles.get( _node.node.nodeTileIndex );
@@ -411,33 +381,33 @@ bool Tree::packNode( Node& _node ) {
 		// --- gather data on this nodes and its children ---
 		int emptyCount = 0;
 		int constantCount = 0;
-		int constSameBrickCount = 0;
-		uint32_t constBrick = INVALID_INDEX;
+		int constSameLeafCount = 0;
+		uint32_t constLeaf = INVALID_INDEX;
 		int nonLeafCount = 0;
-		int leafBrickAOccupancy = 0;
+		int leafAOccupancy = 0;
 		int unpackedNodeCount = 0;
-		uint32_t leafBrickA = INVALID_INDEX;
-		uint32_t leafBrickB = INVALID_INDEX;
+		uint32_t leafA = INVALID_INDEX;
+		uint32_t leafB = INVALID_INDEX;
 		uint32_t unpackedNodeA = INVALID_INDEX;
 		uint32_t unpackedNodeB = INVALID_INDEX;
 		int unpackedNodeACode = 0;
 		int unpackedNodeBCode = 0;
 
-		bool threeOrMoreLeafBricks = false;
+		bool threeOrMoreLeaves = false;
 		for( int i = 0;i < 8; i++ ) {
 			emptyCount += (nodeTile.nodes[i].type == NodeType::EMPTY);			
 			if( nodeTile.nodes[i].type == NodeType::LEAF ) {
-				if( leafBrickA == INVALID_INDEX ) {
-					leafBrickA = nodeTile.nodes[i].leaf.brickIndex;
-					leafBrickAOccupancy |= (1 << i);
-				} else if( nodeTile.nodes[i].leaf.brickIndex != leafBrickA ) {
-					if( leafBrickB == INVALID_INDEX ) {
-						leafBrickB = nodeTile.nodes[i].leaf.brickIndex;
-					} else if( nodeTile.nodes[i].leaf.brickIndex != leafBrickB ) {
-						threeOrMoreLeafBricks = true;
+				if( leafA == INVALID_INDEX ) {
+					leafA = nodeTile.nodes[i].leaf.leafIndex;
+					leafAOccupancy |= (1 << i);
+				} else if( nodeTile.nodes[i].leaf.leafIndex != leafA ) {
+					if( leafB == INVALID_INDEX ) {
+						leafB = nodeTile.nodes[i].leaf.leafIndex;
+					} else if( nodeTile.nodes[i].leaf.leafIndex != leafB ) {
+						threeOrMoreLeaves = true;
 					}
 				} else {
-					leafBrickAOccupancy |= (1 << i);
+					leafAOccupancy |= (1 << i);
 				}
 			} else {
 				if( nodeTile.nodes[i].type == NodeType::NODE ) {
@@ -451,11 +421,11 @@ bool Tree::packNode( Node& _node ) {
 					unpackedNodeCount++;
 				} else if( nodeTile.nodes[i].type == NodeType::CONSTANT_LEAF ) {
 					constantCount++;
-					if( constBrick == INVALID_INDEX ) {
-						constBrick = nodeTile.nodes[i].constantLeaf.brickIndex;
-						constSameBrickCount++;
-					} else if( constBrick == nodeTile.nodes[i].constantLeaf.brickIndex ) {
-						constSameBrickCount++;
+					if( constLeaf == INVALID_INDEX ) {
+						constLeaf = nodeTile.nodes[i].constantLeaf.leafIndex;
+						constSameLeafCount++;
+					} else if( constLeaf == nodeTile.nodes[i].constantLeaf.leafIndex ) {
+						constSameLeafCount++;
 					}
 				}
 
@@ -472,7 +442,7 @@ bool Tree::packNode( Node& _node ) {
 			return true;
 		}
 
-		if (constSameBrickCount == 8) {
+		if (constSameLeafCount == 8) {
 			Node tmp = nodeTile.nodes[0];
 			freeNodeDescendants( _node );
 			_node = tmp;
@@ -511,40 +481,39 @@ bool Tree::packNode( Node& _node ) {
 		}
 		
 		// can we make it a constant node
-		if( leafBrickA != INVALID_INDEX && 
-			leafBrickB == INVALID_INDEX && 
+		if( leafA != INVALID_INDEX && 
+			leafB == INVALID_INDEX && 
 			nonLeafCount == 0) {
 			// all nodes are leaves have the same brick
 			freeNodeDescendants( _node );
 			_node.type = NodeType::CONSTANT_LEAF;
-			_node.constantLeaf.splitable = bricks.get( leafBrickA ).splitable;
-			_node.constantLeaf.brickIndex = leafBrickA;
+			_node.constantLeaf.leafIndex = leafA;
 			return true;
 		}
 		
 		// can we make it a packed binary with false == EMPTY
-		if( leafBrickA != INVALID_INDEX &&
-			leafBrickA < (1 << PACKED_BINARY_BIT_SIZE) &&
-			leafBrickB == INVALID_INDEX && 
+		if( leafA != INVALID_INDEX &&
+			leafA < (1 << NODE_PACKED_BINARY_BIT_SIZE) &&
+			leafB == INVALID_INDEX && 
 			emptyCount == nonLeafCount ) {
 			freeNodeDescendants( _node );
 			_node.type = NodeType::PACKED_BINARY_LEAF;
-			_node.packedBinaryLeaf.trueBrickIndex = leafBrickA;
-			_node.packedBinaryLeaf.falseBrickIndex = 0; // EMPTY
-			_node.packedBinaryLeaf.occupancy = leafBrickAOccupancy;
+			_node.packedBinaryLeaf.trueLeafIndex = leafA;
+			_node.packedBinaryLeaf.falseLeafIndex = 0; // EMPTY
+			_node.packedBinaryLeaf.occupancy = leafAOccupancy;
 			return true;
 		}
 
 		// can we make it a packed binary node
-		if( leafBrickA != INVALID_INDEX &&
-			leafBrickA < (1 << PACKED_BINARY_BIT_SIZE) &&
-			leafBrickB != INVALID_INDEX && 
-			leafBrickB < (1 << PACKED_BINARY_BIT_SIZE) ) {
+		if( leafA != INVALID_INDEX &&
+			leafA < (1 << NODE_PACKED_BINARY_BIT_SIZE) &&
+			leafB != INVALID_INDEX && 
+			leafB < (1 << NODE_PACKED_BINARY_BIT_SIZE) ) {
 			freeNodeDescendants( _node );
 			_node.type = NodeType::PACKED_BINARY_LEAF;
-			_node.packedBinaryLeaf.trueBrickIndex = leafBrickA;
-			_node.packedBinaryLeaf.falseBrickIndex = leafBrickB;
-			_node.packedBinaryLeaf.occupancy = leafBrickAOccupancy;
+			_node.packedBinaryLeaf.trueLeafIndex = leafA;
+			_node.packedBinaryLeaf.falseLeafIndex = leafB;
+			_node.packedBinaryLeaf.occupancy = leafAOccupancy;
 			return true;
 		}
 		
@@ -554,29 +523,36 @@ bool Tree::packNode( Node& _node ) {
 
 }
 
-uint32_t Tree::getTileIndex( Node& _node) const {
+template< typename Derived>
+uint32_t Tree<Derived>::getTileIndex( const Node& _node) const  {
 	const auto nodeIndex = &_node - &nodeTiles.get(0).nodes[0];
 	return nodeIndex / 8; // truncate to nodeTile
 }
 
-Tree::VisitHelper::VisitHelper( Tree& _parent ) : 
+template< typename Derived>
+Tree<Derived>::VisitHelper::VisitHelper( Tree<Derived>& _parent ) : 
 	parent( _parent )
 {
 }
 
-Tree::VisitHelper::VisitHelper( const Tree& _parent ) : 
+template< typename Derived>
+Tree<Derived>::VisitHelper::VisitHelper( const Tree<Derived>& _parent ) : 
 	parent( const_cast<Tree&>(_parent) )
 {
 }
-NodeTile& Tree::VisitHelper::getNodeTile( const int _index ) {
+
+template< typename Derived>
+NodeTile& Tree<Derived>::VisitHelper::getNodeTile( const int _index ) {
 	return parent.nodeTiles.get( _index );
 }
 
-const NodeTile& Tree::VisitHelper::getNodeTile( const int _index ) const {
+template< typename Derived>
+const NodeTile& Tree<Derived>::VisitHelper::getNodeTile( const int _index ) const {
 	return parent.nodeTiles.get( _index );
 }
 
-Math::Vector3 Tree::VisitHelper::getNodeSize( int _level ) const {
+template< typename Derived>
+Math::Vector3 Tree<Derived>::VisitHelper::getNodeSize( int _level ) const {
 
 	Core::AABB box = parent.boundingBox;
 	Math::Vector3 len = box.getHalfLength();
@@ -588,7 +564,8 @@ Math::Vector3 Tree::VisitHelper::getNodeSize( int _level ) const {
 	return len * 2;
 }
 
-Core::AABB Tree::VisitHelper::getChildBoundingBox( const ChildName _childName, const Core::AABB& _parent ) const {
+template< typename Derived>
+Core::AABB Tree<Derived>::VisitHelper::getChildBoundingBox( const ChildName _childName, const Core::AABB& _parent ) const {
 	// size is easy same for all, position is ordered
 	auto c = _parent.getBoxCenter();
 	auto hl = _parent.getHalfLength();
@@ -609,55 +586,80 @@ Core::AABB Tree::VisitHelper::getChildBoundingBox( const ChildName _childName, c
 	return box;
 }
 
-bool Node::isSplitable() const {
-	switch( type ) {
+template< typename Derived>
+bool Tree<Derived>::nodeHasChildren( const Node& _node ) {
+	switch( _node.type ) {
+	case NodeType::NODE:
+	case NodeType::ONLY_CHILD_NODE:
+	case NodeType::TWO_CHILD_NODE:
+		return true;
+	case NodeType::EMPTY:
+	case NodeType::LEAF:
+	case NodeType::CONSTANT_LEAF:
+	case NodeType::PACKED_BINARY_LEAF:
+		return false;
+	default:
+		return Derived::nodeHasChildren( _node );
+	}
+}
+
+template< typename Derived>
+bool Tree<Derived>::nodeIsSplitable( const Node& _node ) {
+	switch( _node.type ) {
 	case NodeType::NODE:
 		return false;
 	case NodeType::LEAF:
-		return leaf.splitable;
+		return false; // TODO
+
+	case NodeType::EMPTY:
 	case NodeType::CONSTANT_LEAF:
 	case NodeType::PACKED_BINARY_LEAF:
-	default:
-		return true;
-	}
-}
-
-bool Node::hasChildren() const {
-	switch( type ) {
-	case NodeType::NODE:
 	case NodeType::ONLY_CHILD_NODE:
 	case NodeType::TWO_CHILD_NODE:
 		return true;
 	default:
-		return false;
+		return Derived::nodeIsSplitable( _node );
 	}
 }
 
-bool Node::hasDescendants() const {
-	switch( type ) {
+template< typename Derived>
+bool Tree<Derived>::nodeHasDescendants( const Node& _node )  {
+	switch( _node.type ) {
 	case NodeType::NODE:
 	case NodeType::ONLY_CHILD_NODE:
 	case NodeType::TWO_CHILD_NODE:
 	case NodeType::PACKED_BINARY_LEAF:
 	case NodeType::CONSTANT_LEAF:
 		return true;
-	default:
+
+	case NodeType::EMPTY:
+	case NodeType::LEAF:
 		return false;
+	default:
+		return Derived::nodeHasDescendants( _node );
 	}
 }
 
-uint32_t Node::getChildrenTileIndex( const uint32_t _thisIndex, uint32_t& _outSecondChildTile ) const {
+template< typename Derived>
+uint32_t Tree<Derived>::nodeGetChildrenTileIndex( const Node& _node, const uint32_t _thisIndex, uint32_t& _outSecondChildTile ) {
 	_outSecondChildTile = INVALID_INDEX;
-	switch( type ) {
+	switch( _node.type ) {
 	case NodeType::NODE:
-		return node.nodeTileIndex;
+		return _node.node.nodeTileIndex;
 	case NodeType::ONLY_CHILD_NODE:
-		return onlyChildNode.nodeTileIndex;
+		return _node.onlyChildNode.nodeTileIndex;
 	case NodeType::TWO_CHILD_NODE:
-		_outSecondChildTile = _thisIndex + twoChildNode.nodeBTileIndex;
-		return _thisIndex + twoChildNode.nodeATileIndex;
+		_outSecondChildTile = _thisIndex + _node.twoChildNode.nodeBTileIndex;
+		return _thisIndex + _node.twoChildNode.nodeATileIndex;
+
+	case NodeType::EMPTY:
+	case NodeType::LEAF:
+	case NodeType::CONSTANT_LEAF:
+	case NodeType::PACKED_BINARY_LEAF:
+		CORE_ASSERT(false); return INVALID_INDEX;
+
 	default:
-		return INVALID_INDEX;
+		return Derived::nodeGetChildrenTileIndex( _node, _thisIndex, _outSecondChildTile );
 	}
 }
 

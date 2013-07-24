@@ -19,13 +19,17 @@
 
 namespace Vox {
 
+template< typename TreeType >
 class WallRenderer;
 
+template< typename TreeType >
 class TreeRenderable : public Scene::Renderable {
 public:
+	typedef std::shared_ptr<TreeRenderable<TreeType>>	Ptr;
+
 	static const uint32_t VOXR_TYPE = Core::GenerateID<'V','O','X','R'>::value;
 
-	TreeRenderable( Core::TransformNode* _transform, const Tree& _vtree );
+	TreeRenderable( Core::TransformNode* _transform, const TreeType& _vtree );
 	virtual ~TreeRenderable();
 
 	//--------- RENDERABLE IMPLEMENTATION START -------------
@@ -44,12 +48,13 @@ public:
 	//--------- RENDERABLE IMPLEMENTATION END -------------
 
 protected:
-	const Tree& 						tree;
-	mutable WallRenderer*		wallRenderer;
+	const TreeType& 			tree;
+	mutable WallRenderer<TreeType>*		wallRenderer;
 
 };
-typedef std::shared_ptr<TreeRenderable>						TreeRenderablePtr;
 	
 } // end Vox namespace
+
+#include "voxtreerenderable.inl"
 
 #endif // end YOLK_VOXTREERENDERABLE_H_

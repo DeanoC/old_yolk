@@ -520,93 +520,111 @@
 	"buffers":
 	[
 		{
+			"file": "src/apps/gfx_test/voxtree_test.cpp",
+			"settings":
+			{
+				"buffer_size": 1938,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "src/apps/gfx_test/voxtree.h",
 			"settings":
 			{
-				"buffer_size": 9293,
+				"buffer_size": 9750,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/libs/localworld/thing.h",
+			"file": "src/apps/gfx_test/voxtree.inl",
 			"settings":
 			{
-				"buffer_size": 3123,
+				"buffer_size": 21301,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+			"file": "src/apps/gfx_test/procvoxtree.h",
 			"settings":
 			{
-				"buffer_size": 7190,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/voxtreething.h",
-			"settings":
-			{
-				"buffer_size": 161,
+				"buffer_size": 1145,
 				"line_ending": "Windows",
-				"name": "voxtreething.h"
+				"name": "procvoxtree.h"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/voxtreerenderable.h",
+			"file": "src/apps/gfx_test/procvoxtree.cpp",
 			"settings":
 			{
-				"buffer_size": 1886,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/voxtree.cpp",
-			"settings":
-			{
-				"buffer_size": 20876,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/scene/compoundcolshape.h",
-			"settings":
-			{
-				"buffer_size": 622,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/voxtreephysical.cpp",
-			"settings":
-			{
-				"buffer_size": 737,
+				"buffer_size": 408,
 				"line_ending": "Windows",
-				"name": "voxtreephysical.cpp"
+				"name": "procvoxtree.cpp"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/proceduraltextureutils.h",
+			"settings":
+			{
+				"buffer_size": 272,
+				"line_ending": "Windows",
+				"name": "proceduraltextureutils.h"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/proceduraltextureutils.cpp",
+			"settings":
+			{
+				"buffer_size": 6962,
+				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "src/apps/gfx_test/voxtreephysical.h",
 			"settings":
 			{
-				"buffer_size": 452,
-				"line_ending": "Windows",
-				"name": "voxtreephysical.h"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/main.cpp",
-			"settings":
-			{
-				"buffer_size": 3735,
+				"buffer_size": 709,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/voxtree_test.cpp",
+			"file": "src/apps/gfx_test/voxtreephysical.inl",
 			"settings":
 			{
-				"buffer_size": 710,
+				"buffer_size": 2553,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/apps/gfx_test/voxtreerenderable.h",
+			"settings":
+			{
+				"buffer_size": 1954,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Searching 5997 files for \"SmoothStep\" (case sensitive)\n\nG:\\Projects\\yolk\\src\\apps\\gfx_test\\proceduraltextureutils.cpp:\n   34  \n   35  // Texture Inline Functions\n   36: inline float SmoothStep(float min, float max, float value) {\n   37      float v = Clamp((value - min) / (max - min), 0.f, 1.f);\n   38      return v * v * (-2.f * v  + 3.f);\n   ..\n  228      }\n  229      float partialOctave = foctaves - octaves;\n  230:     sum += o * SmoothStep(.3f, .7f, partialOctave) * Noise(lambda * P);\n  231      return sum;\n  232  }\n  ...\n  248      }\n  249      float partialOctave = foctaves - octaves;\n  250:     sum += o * SmoothStep(.3f, .7f, partialOctave) *\n  251             fabsf(Noise(lambda * P));\n  252  \n\n3 matches in 1 file\n\n\nSearching 5997 files for \"Clamp\" (case sensitive)\n\nG:\\Projects\\yolk\\src\\apps\\cyberhackerspace\\player\\player.cpp:\n  109  	float mxdt = input.mouseX  * input.deltaTime;\n  110  	if( fabsf(mxdt) > 0.0001f ) {\n  111: 		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  112  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt * 5.f );\n  113  		transform->setLocalOrientation( rot );\n  ...\n  116  	float mydt = input.mouseY  * input.deltaTime;\n  117  	if( fabsf(mydt) > 0.0001f ) {\n  118: 		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  119  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt * 5.f );\n  120  		transform->setLocalOrientation( rot );\n\nG:\\Projects\\yolk\\src\\apps\\gfx_test\\proceduraltextureutils.cpp:\n   39  // Texture Inline Functions\n   40  inline float SmoothStep(float min, float max, float value) {\n   41:     float v = Clamp((value - min) / (max - min), 0.f, 1.f);\n   42      return v * v * (-2.f * v  + 3.f);\n   43  }\n\nG:\\Projects\\yolk\\src\\apps\\Riftball\\player\\buggy.cpp:\n   21  float	maxBreakingForce = 4.f;\n   22  float	steeringIncrement = 0.04f;\n   23: float	steeringClamp = 0.3f;\n   24  float	wheelRadius = 0.5f;\n   25  float	wheelWidth = 0.4f;\n   ..\n  143  void Buggy::turn( float force ) {\n  144  	gVehicleSteering += steeringIncrement * force;\n  145: 	if (gVehicleSteering < -steeringClamp)\n  146: 			gVehicleSteering = -steeringClamp;\n  147: 	if (gVehicleSteering > steeringClamp)\n  148: 			gVehicleSteering = steeringClamp;\n  149  \n  150  }\n\nG:\\Projects\\yolk\\src\\apps\\Riftball\\player\\player.cpp:\n  157  	float mxdt = input.mouseX  * input.deltaTime;\n  158  	if( fabsf(mxdt) > 0.0001f ) {\n  159: 		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  160  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt * 5.f );\n  161  		transform->setLocalOrientation( rot );\n  ...\n  164  	float mydt = input.mouseY  * input.deltaTime;\n  165  	if( fabsf(mydt) > 0.0001f ) {\n  166: 		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  167  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt * 5.f );\n  168  		transform->setLocalOrientation( rot );\n  ...\n  191  	float mxdt = input.mouseX  * input.deltaTime;\n  192  	if( fabsf(mxdt) > 0.000001f ) {\n  193: //		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  194  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt );\n  195  	}\n  196  	float mydt = input.mouseY  * input.deltaTime;\n  197  	if( fabsf(mydt) > 0.000001f ) {\n  198: //		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  199  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt );\n  200  	}\n\nG:\\Projects\\yolk\\src\\apps\\trade\\player\\player.cpp:\n  153  	float mxdt = input.mouseX  * input.deltaTime;\n  154  	if( fabsf(mxdt) > 0.0001f ) {\n  155: 		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  156  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt * 5.f );\n  157  		transform->setLocalOrientation( rot );\n  ...\n  160  	float mydt = input.mouseY  * input.deltaTime;\n  161  	if( fabsf(mydt) > 0.0001f ) {\n  162: 		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  163  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt * 5.f );\n  164  		transform->setLocalOrientation( rot );\n\nG:\\Projects\\yolk\\src\\apps\\vtdfh\\player\\buggy.cpp:\n   22  float	gVehicleSteering = 0.f;\n   23  float	steeringIncrement = 0.04f;\n   24: float	steeringClamp = 0.3f;\n   25  float	wheelRadius = 0.5f;\n   26  float	wheelWidth = 0.4f;\n   ..\n  144  void Buggy::turn( float force ) {\n  145  	gVehicleSteering += steeringIncrement * force;\n  146: 	if (gVehicleSteering < -steeringClamp)\n  147: 			gVehicleSteering = -steeringClamp;\n  148: 	if (gVehicleSteering > steeringClamp)\n  149: 			gVehicleSteering = steeringClamp;\n  150  \n  151  }\n\nG:\\Projects\\yolk\\src\\apps\\vtdfh\\player\\player.cpp:\n  157  	float mxdt = input.mouseX  * input.deltaTime;\n  158  	if( fabsf(mxdt) > 0.0001f ) {\n  159: 		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  160  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt * 5.f );\n  161  		transform->setLocalOrientation( rot );\n  ...\n  164  	float mydt = input.mouseY  * input.deltaTime;\n  165  	if( fabsf(mydt) > 0.0001f ) {\n  166: 		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  167  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt * 5.f );\n  168  		transform->setLocalOrientation( rot );\n  ...\n  191  	float mxdt = input.mouseX  * input.deltaTime;\n  192  	if( fabsf(mxdt) > 0.000001f ) {\n  193: //		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  194  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt );\n  195  	}\n  196  	float mydt = input.mouseY  * input.deltaTime;\n  197  	if( fabsf(mydt) > 0.000001f ) {\n  198: //		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  199  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt );\n  200  	}\n\nG:\\Projects\\yolk\\src\\apps\\zombiehospital\\player\\player.cpp:\n  151  	float mxdt = input.mouseX  * input.deltaTime;\n  152  	if( fabsf(mxdt) > 0.0001f ) {\n  153: 		mxdt = Math::Clamp(mxdt, -0.05f, 0.05f );\n  154  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 0, 1, 0 ), mxdt * 5.f );\n  155  		transform->setLocalOrientation( rot );\n  ...\n  158  	float mydt = input.mouseY  * input.deltaTime;\n  159  	if( fabsf(mydt) > 0.0001f ) {\n  160: 		mydt = Math::Clamp(mydt, -0.05f, 0.05f );\n  161  		rot = rot * Math::CreateRotationQuat( Math::Vector3( 1, 0, 0 ), mydt * 5.f );\n  162  		transform->setLocalOrientation( rot );\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\ChangeLog:\n  744  \n  745  2006 March 20 Erwin Coumans\n  746: 	Clamped the acculumated impulse rather then intermediate impulse (within the iteration)\n  747  	Use the persistent contacts for reusing the impulse\n  748  	Separated friction and normal solving for better stability\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\CDTestFramework\\AntTweakBar\\src\\TwBar.cpp:\n 2816  //	---------------------------------------------------------------------------\n 2817  \n 2818: static int ClampText(string& _Text, const CTexFont *_Font, int _WidthMax)\n 2819  {\n 2820  	int Len = (int)_Text.length();\n ....\n 2996  	else\n 2997  		Title = m_Name;\n 2998: 	m_TitleWidth = ClampText(Title, m_Font, (!m_IsMinimized)?(m_Width-5*m_Font->m_CharHeight):(16*m_Font->m_CharHeight));\n 2999  	Gr->BuildText(m_TitleTextObj, &Title, NULL, NULL, 1, m_Font, 0, 0);\n 3000  \n ....\n 3061  			}\n 3062  		}\n 3063: 		ClampText(Shortcut, m_Font, m_Width-3*m_Font->m_CharHeight);\n 3064  		Gr->BuildText(m_ShortcutTextObj, &Shortcut, NULL, NULL, 1, m_Font, 0, 0);\n 3065  	}\n ....\n 3496  				{\n 3497  					string Str = g_TwMgr->m_KeyPressedStr;\n 3498: 					ClampText(Str, m_Font, m_Width-2*m_Font->m_CharHeight);\n 3499  					g_TwMgr->m_Graph->BuildText(g_TwMgr->m_KeyPressedTextObj, &Str, NULL, NULL, 1, g_TwMgr->m_HelpBar->m_Font, 0, 0);\n 3500  					g_TwMgr->m_KeyPressedBuildText = false;\n ....\n 3517  					sprintf(Ver, \" (v%d.%02d)\", TW_VERSION/100, TW_VERSION%100);\n 3518  					Info += Ver;\n 3519: 					ClampText(Info, m_Font, m_Width-2*m_Font->m_CharHeight);\n 3520  					g_TwMgr->m_Graph->BuildText(g_TwMgr->m_InfoTextObj, &Info, NULL, NULL, 1, g_TwMgr->m_HelpBar->m_Font, 0, 0);\n 3521  					g_TwMgr->m_InfoBuildText = false;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\CDTestFramework\\AntTweakBar\\src\\TwColors.cpp:\n   87  	float32 h, l, s;\n   88  	ColorRGBToHLSf((1.0f/255.0f)*float32(_R), (1.0f/255.0f)*float32(_G), (1.0f/255.0f)*float32(_B), &h, &l, &s);\n   89: 	if(_Hue)		*_Hue		= (int32)TClamp(h*(256.0f/360.0f), 0.0f, 255.0f);\n   90: 	if(_Light)		*_Light		= (int32)TClamp(l*256.0f, 0.0f, 255.0f);\n   91: 	if(_Saturation) *_Saturation= (int32)TClamp(s*256.0f, 0.0f, 255.0f);\n   92  }\n   93  \n   ..\n  144  	float32 r, g, b;\n  145  	ColorHLSToRGBf((360.0f/255.0f)*float32(_Hue), (1.0f/255.0f)*float32(_Light), (1.0f/255.0f)*float32(_Saturation), &r, &g, &b);\n  146: 	if(_R) *_R = (int32)TClamp(r*256.0f, 0.0f, 255.0f);\n  147: 	if(_G) *_G = (int32)TClamp(g*256.0f, 0.0f, 255.0f);\n  148: 	if(_B) *_B = (int32)TClamp(b*256.0f, 0.0f, 255.0f);\n  149  }\n  150  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\CDTestFramework\\AntTweakBar\\src\\TwColors.h:\n   31     \n   32  \n   33: template <typename _T> inline const _T& TClamp(const _T& _X, const _T& _Limit1, const _T& _Limit2)\n   34  {\n   35  	if( _Limit1<_Limit2 )\n   ..\n   41  inline color32 Color32FromARGBi(int _A, int _R, int _G, int _B)\n   42  {\n   43: 	return (((color32)TClamp(_A, 0, 255))<<24) | (((color32)TClamp(_R, 0, 255))<<16) | (((color32)TClamp(_G, 0, 255))<<8) | ((color32)TClamp(_B, 0, 255));\n   44  }\n   45  \n   46  inline color32 Color32FromARGBf(float _A, float _R, float _G, float _B)\n   47  {\n   48: 	return (((color32)TClamp(_A*256.0f, 0.0f, 255.0f))<<24) | (((color32)TClamp(_R*256.0f, 0.0f, 255.0f))<<16) | (((color32)TClamp(_G*256.0f, 0.0f, 255.0f))<<8) | ((color32)TClamp(_B*256.0f, 0.0f, 255.0f));\n   49  }\n   50  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\CDTestFramework\\Opcode\\Ice\\_IceUtils.h:\n  185  	//! limited (abs(x) must be < ((1<<31u)-32767)), then you can use the\n  186  	//! following code to clamp the resulting value into [-32768,+32767] range:\n  187: 	inline_ int	ClampToInt16(int x)\n  188  	{\n  189  //		ASSERT(abs(x) < (int)((1<<31u)-32767));\n  ...\n  198  	// Generic functions\n  199  	template<class Type> inline_ void TSwap(Type& a, Type& b)								{ const Type c = a; a = b; b = c;			}\n  200: 	template<class Type> inline_ Type TClamp(const Type& x, const Type& lo, const Type& hi)	{ return ((x<lo) ? lo : (x>hi) ? hi : x);	}\n  201  \n  202  	template<class Type> inline_ void TSort(Type& a, Type& b)\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\CDTestFramework\\Opcode\\Ice\\IcePoint.h:\n  221  		inline_	Point&			Max(const Point& p)				{ x = MAX(x, p.x); y = MAX(y, p.y); z = MAX(z, p.z);	return *this;	}\n  222  \n  223: 		//! Clamps each element\n  224: 		inline_	Point&			Clamp(float min, float max)\n  225  								{\n  226  									if(x<min)	x=min;	if(x>max)	x=max;\n  ...\n  306  								}\n  307  \n  308: 		//! Clamps vector length\n  309: 		inline_	Point&			ClampLength(float limit_length)\n  310  								{\n  311  									if(limit_length>=0.0f)	// Magnitude must be positive\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\CDTestFramework\\Opcode\\Ice\\IceUtils.h:\n  242  	//! limited (abs(x) must be < ((1<<31u)-32767)), then you can use the\n  243  	//! following code to clamp the resulting value into [-32768,+32767] range:\"\n  244: 	inline_ int	ClampToInt16(int x)\n  245  	{\n  246  //		ASSERT(abs(x) < (int)((1<<31u)-32767));\n  ...\n  255  	// Generic functions\n  256  	template<class Type> inline_ void TSwap(Type& a, Type& b)								{ const Type c = a; a = b; b = c;			}\n  257: 	template<class Type> inline_ Type TClamp(const Type& x, const Type& lo, const Type& hi)	{ return ((x<lo) ? lo : (x>hi) ? hi : x);	}\n  258  \n  259  	template<class Type> inline_ void TSort(Type& a, Type& b)\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\ConvexDecomposition\\cd_vector.h:\n  729  			float delta = (point-line0).Dot(lineDelta) / (lineDelta).Dot(lineDelta);\n  730  \n  731: 			// Clamp the point to conform to the segment's endpoints\n  732  			if ( delta < 0 )\n  733  				delta = 0;\n  ...\n  773  \n  774  	// Given a point and a triangle (defined by three points), compute the closest point\n  775: 	// in the triangle.  Clamp the point so it's confined to the area of the triangle.\n  776  	void NearestPointInTriangle(const Vector3d &point,\n  777  															const Vector3d &triangle0,\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\glui\\glui_edittext.cpp:\n 1051  {\n 1052    if ( has_limits == GLUI_LIMIT_CLAMP ) {\n 1053:     /*** Clamp the new value to the existing limits ***/\n 1054  \n 1055      CLAMP( new_val, float_low, float_high );\n 1056    } \n 1057    else if ( has_limits == GLUI_LIMIT_WRAP ) {\n 1058:     /*** Clamp the value cyclically to the limits - that is, if the\n 1059        value exceeds the max, set it the the minimum, and conversely ***/\n 1060  \n ....\n 1077  {\n 1078    if ( has_limits == GLUI_LIMIT_CLAMP ) {\n 1079:     /*** Clamp the new value to the existing limits ***/\n 1080  \n 1081      CLAMP( new_val, int_low, int_high );\n 1082    }\n 1083    else if ( has_limits == GLUI_LIMIT_WRAP ) {\n 1084:     /*** Clamp the value cyclically to the limits - that is, if the\n 1085        value exceeds the max, set it the the minimum, and conversely ***/\n 1086  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\PhysicsEffects\\include\\BulletPhysicsEffects\\btLowLevelConstraintSolver.cpp:\n  155  	deltaImpulse -= constraint.m_jacDiagInv * dot(normal,dVA-dVB);\n  156  	btScalar oldImpulse = constraint.m_accumImpulse;\n  157: 	constraint.m_accumImpulse = btClamped(oldImpulse + deltaImpulse,constraint.m_lowerLimit,constraint.m_upperLimit);\n  158  	deltaImpulse = constraint.m_accumImpulse - oldImpulse;\n  159  	deltaLinearVelocityA += deltaImpulse * massInvA * normal;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\RigidBodyGpuPipeline\\dynamics\\testbed\\DemoApplication.cpp:\n   42  #define SHOW_NUM_DEEP_PENETRATIONS 1\n   43  \n   44: extern int gNumClampedCcdMotions;\n   45  \n   46  #ifdef SHOW_NUM_DEEP_PENETRATIONS \n   ..\n  645  }\n  646  \n  647: btScalar mousePickClamping = 30.f;\n  648  \n  649  \n  ...\n  801  									m_dynamicsWorld->addConstraint(p2p);\n  802  									m_pickConstraint = p2p;\n  803: 									p2p->m_setting.m_impulseClamp = mousePickClamping;\n  804  									//very weak constraint for picking\n  805  									p2p->m_setting.m_tau = 0.001f;\n  ...\n 1317  #endif //SHOW_NUM_DEEP_PENETRATIONS\n 1318  \n 1319: 	gNumClampedCcdMotions = 0;\n 1320  	int numObjects = 0;\n 1321  	int i;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\simdmathlibrary\\spu\\simdmath\\ldexpd2.h:\n   63    vec_int4 exp = spu_sel( dmy, exp0, (vec_uint4)inrange);\n   64    exp_in = exp;\n   65:   /* Clamp the specified exponent to the range -2044 to 2046.\n   66     */\n   67    cmp_min = spu_cmpgt(exp, min);\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\simdmathlibrary\\spu\\simdmath\\scalbllnd2.h:\n   65    vec_int4 exp = spu_sel( dmy, exp0, (vec_uint4)inrange);\n   66    exp_in = exp;\n   67:   /* Clamp the specified exponent to the range -2044 to 2046.\n   68     */\n   69    cmp_min = spu_cmpgt(exp, min);\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\sph\\common\\GLee.c:\n 2071    GLEEPFNGLGETTRANSFORMFEEDBACKVARYINGPROC GLeeFuncPtr_glGetTransformFeedbackVarying=GLee_Lazy_glGetTransformFeedbackVarying;\n 2072  #endif\n 2073: #ifndef GLEE_C_DEFINED_glClampColor\n 2074: #define GLEE_C_DEFINED_glClampColor\n 2075:   void __stdcall GLee_Lazy_glClampColor(GLenum target, GLenum clamp)  {if (GLeeInit()) glClampColor(target, clamp);}\n 2076:   GLEEPFNGLCLAMPCOLORPROC GLeeFuncPtr_glClampColor=GLee_Lazy_glClampColor;\n 2077  #endif\n 2078  #ifndef GLEE_C_DEFINED_glBeginConditionalRender\n ....\n 3476  \n 3477  #ifdef __GLEE_GL_ARB_color_buffer_float\n 3478: #ifndef GLEE_C_DEFINED_glClampColorARB\n 3479: #define GLEE_C_DEFINED_glClampColorARB\n 3480:   void __stdcall GLee_Lazy_glClampColorARB(GLenum target, GLenum clamp)  {if (GLeeInit()) glClampColorARB(target, clamp);}\n 3481:   GLEEPFNGLCLAMPCOLORARBPROC GLeeFuncPtr_glClampColorARB=GLee_Lazy_glClampColorARB;\n 3482  #endif\n 3483  #endif \n ....\n 11680      if ((GLeeFuncPtr_glTransformFeedbackVaryings = (GLEEPFNGLTRANSFORMFEEDBACKVARYINGSPROC) __GLeeGetProcAddress(\"glTransformFeedbackVaryings\"))!=0) nLinked++;\n 11681      if ((GLeeFuncPtr_glGetTransformFeedbackVarying = (GLEEPFNGLGETTRANSFORMFEEDBACKVARYINGPROC) __GLeeGetProcAddress(\"glGetTransformFeedbackVarying\"))!=0) nLinked++;\n 11682:     if ((GLeeFuncPtr_glClampColor = (GLEEPFNGLCLAMPCOLORPROC) __GLeeGetProcAddress(\"glClampColor\"))!=0) nLinked++;\n 11683      if ((GLeeFuncPtr_glBeginConditionalRender = (GLEEPFNGLBEGINCONDITIONALRENDERPROC) __GLeeGetProcAddress(\"glBeginConditionalRender\"))!=0) nLinked++;\n 11684      if ((GLeeFuncPtr_glEndConditionalRender = (GLEEPFNGLENDCONDITIONALRENDERPROC) __GLeeGetProcAddress(\"glEndConditionalRender\"))!=0) nLinked++;\n .....\n 12113      GLint nLinked=0;\n 12114  #ifdef __GLEE_GL_ARB_color_buffer_float\n 12115:     if ((GLeeFuncPtr_glClampColorARB = (GLEEPFNGLCLAMPCOLORARBPROC) __GLeeGetProcAddress(\"glClampColorARB\"))!=0) nLinked++;\n 12116  #endif\n 12117      if (nLinked==1) return GLEE_LINK_COMPLETE;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\sph\\common\\GLee.h:\n 3025    #define glGetTransformFeedbackVarying GLeeFuncPtr_glGetTransformFeedbackVarying\n 3026  #endif\n 3027: #ifndef GLEE_H_DEFINED_glClampColor\n 3028: #define GLEE_H_DEFINED_glClampColor\n 3029    typedef void (APIENTRYP GLEEPFNGLCLAMPCOLORPROC) (GLenum target, GLenum clamp);\n 3030:   GLEE_EXTERN GLEEPFNGLCLAMPCOLORPROC GLeeFuncPtr_glClampColor;\n 3031:   #define glClampColor GLeeFuncPtr_glClampColor\n 3032  #endif\n 3033  #ifndef GLEE_H_DEFINED_glBeginConditionalRender\n ....\n 5140  #define GL_CLAMP_READ_COLOR_ARB                            0x891C\n 5141  #define GL_FIXED_ONLY_ARB                                  0x891D\n 5142: #ifndef GLEE_H_DEFINED_glClampColorARB\n 5143: #define GLEE_H_DEFINED_glClampColorARB\n 5144    typedef void (APIENTRYP GLEEPFNGLCLAMPCOLORARBPROC) (GLenum target, GLenum clamp);\n 5145:   GLEE_EXTERN GLEEPFNGLCLAMPCOLORARBPROC GLeeFuncPtr_glClampColorARB;\n 5146:   #define glClampColorARB GLeeFuncPtr_glClampColorARB\n 5147  #endif\n 5148  #endif \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\Extras\\sph\\common\\glext.h:\n 4472  #define GL_ARB_color_buffer_float 1\n 4473  #ifdef GL_GLEXT_PROTOTYPES\n 4474: GLAPI void GLAPIENTRY glClampColorARB (GLenum, GLenum);\n 4475  #endif /* GL_GLEXT_PROTOTYPES */\n 4476  typedef void (GLAPIENTRYP PFNGLCLAMPCOLORARBPROC) (GLenum target, GLenum clamp);\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletCollision\\BroadphaseCollision\\btQuantizedBvh.cpp:\n  320  		unsigned short int quantizedQueryAabbMin[3];\n  321  		unsigned short int quantizedQueryAabbMax[3];\n  322: 		quantizeWithClamp(quantizedQueryAabbMin,aabbMin,0);\n  323: 		quantizeWithClamp(quantizedQueryAabbMax,aabbMax,1);\n  324  \n  325  		switch (m_traversalMode)\n  ...\n  581  	unsigned short int quantizedQueryAabbMin[3];\n  582  	unsigned short int quantizedQueryAabbMax[3];\n  583: 	quantizeWithClamp(quantizedQueryAabbMin,rayAabbMin,0);\n  584: 	quantizeWithClamp(quantizedQueryAabbMax,rayAabbMax,1);\n  585  \n  586  	while (curIndex < endNodeIndex)\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletCollision\\BroadphaseCollision\\btQuantizedBvh.h:\n  362  \n  363  		btVector3 v = (point - m_bvhAabbMin) * m_bvhQuantization;\n  364: 		///Make sure rounding is done in a way that unQuantize(quantizeWithClamp(...)) is conservative\n  365  		///end-points always set the first bit, so that they are sorted properly (so that neighbouring AABBs overlap properly)\n  366  		///@todo: double-check this\n  ...\n  415  \n  416  \n  417: 	SIMD_FORCE_INLINE void quantizeWithClamp(unsigned short* out, const btVector3& point2,int isMax) const\n  418  	{\n  419  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletCollision\\CollisionDispatch\\btInternalEdgeUtility.cpp:\n  402  		btScalar delta = (point-line0).dot(lineDelta) / (lineDelta).dot(lineDelta);\n  403  \n  404: 		// Clamp the point to conform to the segment's endpoints\n  405  		if ( delta < 0 )\n  406  			delta = 0;\n  ...\n  415  \n  416  \n  417: bool	btClampNormal(const btVector3& edge,const btVector3& tri_normal_org,const btVector3& localContactNormalOnB, btScalar correctedEdgeAngle, btVector3 & clampedLocalNormal)\n  418  {\n  419  	btVector3 tri_normal = tri_normal_org;\n  ...\n  609  					numConvexEdgeHits++;\n  610  					btVector3 clampedLocalNormal;\n  611: 					bool isClamped = btClampNormal(edge,swapFactor*tri_normal,localContactNormalOnB, info->m_edgeV0V1Angle,clampedLocalNormal);\n  612: 					if (isClamped)\n  613  					{\n  614  						if (((normalAdjustFlags & BT_TRIANGLE_CONVEX_DOUBLE_SIDED)!=0) || (clampedLocalNormal.dot(frontFacing*tri_normal)>0))\n  ...\n  697  					btVector3 localContactNormalOnB = colObj0->getWorldTransform().getBasis().transpose() * cp.m_normalWorldOnB;\n  698  					btVector3 clampedLocalNormal;\n  699: 					bool isClamped = btClampNormal(edge,swapFactor*tri_normal,localContactNormalOnB, info->m_edgeV1V2Angle,clampedLocalNormal);\n  700: 					if (isClamped)\n  701  					{\n  702  						if (((normalAdjustFlags & BT_TRIANGLE_CONVEX_DOUBLE_SIDED)!=0) || (clampedLocalNormal.dot(frontFacing*tri_normal)>0))\n  ...\n  782  					btVector3 localContactNormalOnB = colObj0->getWorldTransform().getBasis().transpose() * cp.m_normalWorldOnB;\n  783  					btVector3 clampedLocalNormal;\n  784: 					bool isClamped = btClampNormal(edge,swapFactor*tri_normal,localContactNormalOnB,info->m_edgeV2V0Angle,clampedLocalNormal);\n  785: 					if (isClamped)\n  786  					{\n  787  						if (((normalAdjustFlags & BT_TRIANGLE_CONVEX_DOUBLE_SIDED)!=0) || (clampedLocalNormal.dot(frontFacing*tri_normal)>0))\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletCollision\\CollisionShapes\\btHeightfieldTerrainShape.cpp:\n  261    axis-aligned bounding box.\n  262   */\n  263: void btHeightfieldTerrainShape::quantizeWithClamp(int* out, const btVector3& point,int /*isMax*/) const\n  264  {\n  265  	btVector3 clampedPoint(point);\n  ...\n  295  	int	quantizedAabbMin[3];\n  296  	int	quantizedAabbMax[3];\n  297: 	quantizeWithClamp(quantizedAabbMin, localAabbMin,0);\n  298: 	quantizeWithClamp(quantizedAabbMax, localAabbMax,1);\n  299  	\n  300  	// expand the min/max quantized values\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletCollision\\CollisionShapes\\btHeightfieldTerrainShape.h:\n  101  \n  102  	virtual btScalar	getRawHeightFieldValue(int x,int y) const;\n  103: 	void		quantizeWithClamp(int* out, const btVector3& point,int isMax) const;\n  104  	void		getVertex(int x,int y,btVector3& vertex) const;\n  105  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletDynamics\\ConstraintSolver\\btConeTwistConstraint.cpp:\n  470  				btScalar impulseMag = amplitude * m_kSwing;\n  471  \n  472: 				// Clamp the accumulated impulse\n  473  				btScalar temp = m_accSwingLimitImpulse;\n  474  				m_accSwingLimitImpulse = btMax(m_accSwingLimitImpulse + impulseMag, btScalar(0.0) );\n  ...\n  502  				btScalar impulseMag = amplitude * m_kTwist;\n  503  \n  504: 				// Clamp the accumulated impulse\n  505  				btScalar temp = m_accTwistLimitImpulse;\n  506  				m_accTwistLimitImpulse = btMax(m_accTwistLimitImpulse + impulseMag, btScalar(0.0) );\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletDynamics\\ConstraintSolver\\btPoint2PointConstraint.cpp:\n  151  	}\n  152  \n  153: 	btScalar impulseClamp = m_setting.m_impulseClamp;//\n  154  	for (j=0; j<3; j++)\n  155      {\n  156: 		if (m_setting.m_impulseClamp > 0)\n  157  		{\n  158: 			info->m_lowerLimit[j*info->rowskip] = -impulseClamp;\n  159: 			info->m_upperLimit[j*info->rowskip] = impulseClamp;\n  160  		}\n  161  	}\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletDynamics\\ConstraintSolver\\btPoint2PointConstraint.h:\n   37  		m_tau(btScalar(0.3)),\n   38  		m_damping(btScalar(1.)),\n   39: 		m_impulseClamp(btScalar(0.))\n   40  	{\n   41  	}\n   42  	btScalar		m_tau;\n   43  	btScalar		m_damping;\n   44: 	btScalar		m_impulseClamp;\n   45  };\n   46  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletDynamics\\Dynamics\\btDiscreteDynamicsWorld.cpp:\n  859  \n  860  ///internal debugging variable. this value shouldn't be too high\n  861: int gNumClampedCcdMotions=0;\n  862  \n  863  void	btDiscreteDynamicsWorld::integrateTransforms(btScalar timeStep)\n  ...\n  884  				if (body->getCollisionShape()->isConvex())\n  885  				{\n  886: 					gNumClampedCcdMotions++;\n  887  #ifdef USE_STATIC_ONLY\n  888  					class StaticOnlyCallback : public btClosestNotMeConvexResultCallback\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletDynamics\\Dynamics\\btRigidBody.cpp:\n  148  void btRigidBody::setDamping(btScalar lin_damping, btScalar ang_damping)\n  149  {\n  150: 	m_linearDamping = btClamped(lin_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));\n  151: 	m_angularDamping = btClamped(ang_damping, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));\n  152  }\n  153  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletMultiThreaded\\btParallelConstraintSolver.cpp:\n  114  	deltaImpulse -= constraint.m_jacDiagInv * dot(normal,dVA-dVB);\n  115  	btScalar oldImpulse = constraint.m_accumImpulse;\n  116: 	constraint.m_accumImpulse = btClamped(oldImpulse + deltaImpulse,constraint.m_lowerLimit,constraint.m_upperLimit);\n  117  	deltaImpulse = constraint.m_accumImpulse - oldImpulse;\n  118  	deltaLinearVelocityA += deltaImpulse * massInvA * normal;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletMultiThreaded\\GpuSoftBodySolvers\\DX11\\btSoftBodySolver_DX11.cpp:\n  983  }\n  984  \n  985: void btDX11SoftBodySolver::ApplyClampedForce( float solverdt, const Vectormath::Aos::Vector3 &force, const Vectormath::Aos::Vector3 &vertexVelocity, float inverseMass, Vectormath::Aos::Vector3 &vertexForce )\n  986  {\n  987  	float dtInverseMass = solverdt*inverseMass;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletMultiThreaded\\GpuSoftBodySolvers\\DX11\\btSoftBodySolver_DX11.h:\n  539  	Vectormath::Aos::Vector3 ProjectOnAxis( const Vectormath::Aos::Vector3 &v, const Vectormath::Aos::Vector3 &a );\n  540  \n  541: 	void ApplyClampedForce( float solverdt, const Vectormath::Aos::Vector3 &force, const Vectormath::Aos::Vector3 &vertexVelocity, float inverseMass, Vectormath::Aos::Vector3 &vertexForce );\n  542  \n  543  	virtual void applyForces( float solverdt );\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletMultiThreaded\\GpuSoftBodySolvers\\OpenCL\\btSoftBodySolver_OpenCL.cpp:\n 1011  }\n 1012  \n 1013: void btOpenCLSoftBodySolver::ApplyClampedForce( float solverdt, const Vectormath::Aos::Vector3 &force, const Vectormath::Aos::Vector3 &vertexVelocity, float inverseMass, Vectormath::Aos::Vector3 &vertexForce )\n 1014  {\n 1015  	float dtInverseMass = solverdt*inverseMass;\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletMultiThreaded\\GpuSoftBodySolvers\\OpenCL\\btSoftBodySolver_OpenCL.h:\n  405  	Vectormath::Aos::Vector3 ProjectOnAxis( const Vectormath::Aos::Vector3 &v, const Vectormath::Aos::Vector3 &a );\n  406  \n  407: 	void ApplyClampedForce( float solverdt, const Vectormath::Aos::Vector3 &force, const Vectormath::Aos::Vector3 &vertexVelocity, float inverseMass, Vectormath::Aos::Vector3 &vertexForce );\n  408  	\n  409  \n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletMultiThreaded\\SpuNarrowPhaseCollisionTask\\SpuGatheringCollisionTask.cpp:\n  552  	unsigned short int quantizedQueryAabbMin[3];\n  553  	unsigned short int quantizedQueryAabbMax[3];\n  554: 	lsMemPtr->bvhShapeData.getOptimizedBvh()->quantizeWithClamp(quantizedQueryAabbMin,aabbMin,0);\n  555: 	lsMemPtr->bvhShapeData.getOptimizedBvh()->quantizeWithClamp(quantizedQueryAabbMax,aabbMax,1);\n  556  \n  557  	QuantizedNodeArray&	nodeArray = lsMemPtr->bvhShapeData.getOptimizedBvh()->getQuantizedNodeArray();\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletSoftBody\\btSoftBody.cpp:\n  523  						force	+=	nrm*(-c1*kLF);\n  524  						force	+=	rel_v.normalized() * (-c1 * kDG);\n  525: 						ApplyClampedForce(n, force, dt);\n  526  					}\n  527  				}	\n  ...\n  607  					force	+=	rel_v.normalized()*(-c1*kDG);\n  608  					force	/=	3;\n  609: 					for(int j=0;j<3;++j) ApplyClampedForce(*f.m_n[j],force,dt);\n  610  				}\n  611  			}\n  ...\n 2296  		if(m_cfg.maxvolume>1)\n 2297  		{\n 2298: 			const btScalar	idet=Clamp<btScalar>(	1/pose.m_scl.determinant(),\n 2299  				1,m_cfg.maxvolume);\n 2300  			pose.m_scl=Mul(pose.m_scl,idet);\n ....\n 2658  	m_rpos[0]		=	m_bodies[0].xform()*m_refs[0];\n 2659  	m_rpos[1]		=	m_bodies[1].xform()*m_refs[1];\n 2660: 	m_drift			=	Clamp(m_rpos[0]-m_rpos[1],maxdrift)*m_erp/dt;\n 2661  	m_rpos[0]		-=	m_bodies[0].xform().getOrigin();\n 2662  	m_rpos[1]		-=	m_bodies[1].xform().getOrigin();\n ....\n 2703  	m_axis[1]	=	m_bodies[1].xform().getBasis()*m_refs[1];\n 2704  	m_drift		=	NormalizeAny(btCross(m_axis[1],m_axis[0]));\n 2705: 	m_drift		*=	btMin(maxdrift,btAcos(Clamp<btScalar>(btDot(m_axis[0],m_axis[1]),-1,+1)));\n 2706  	m_drift		*=	m_erp/dt;\n 2707  	m_massmatrix=	AngularImpulseMatrix(m_bodies[0].invWorldInertia(),m_bodies[1].invWorldInertia());\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletSoftBody\\btSoftBodyHelpers.cpp:\n  192  				int count = vertices.size();\n  193  				btScalar shrink=0.f;\n  194: 				btScalar shrinkClamp=0.f;\n  195: 				computer.compute(&vertices[0].getX(),stride,count,shrink,shrinkClamp);\n  196  				for (int i=0;i<computer.faces.size();i++)\n  197  				{\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\BulletSoftBody\\btSoftBodyInternals.h:\n  203  }\n  204  //\n  205: static inline btVector3		Clamp(const btVector3& v,btScalar maxlength)\n  206  {\n  207  	const btScalar sql=v.length2();\n  ...\n  213  //\n  214  template <typename T>\n  215: static inline T				Clamp(const T& x,const T& l,const T& h)\n  216  { return(x<l?l:x>h?h:x); }\n  217  //\n  ...\n  355  	if(m2>SIMD_EPSILON)\n  356  	{	\n  357: 		const btScalar	t=Clamp<btScalar>(-btDot(a,d)/m2,0,1);\n  358  		const btVector3	p=a+d*t;\n  359  		const btScalar	l2=p.length2();\n  ...\n  523  \n  524  //\n  525: static inline void			ApplyClampedForce(	btSoftBody::Node& n,\n  526  											  const btVector3& f,\n  527  											  btScalar dt)\n  ...\n  529  	const btScalar	dtim=dt*n.m_im;\n  530  	if((f*dtim).length2()>n.m_v.length2())\n  531: 	{/* Clamp	*/ \n  532  		n.m_f-=ProjectOnAxis(n.m_v,f.normalized())/dtim;						\n  533  	}\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\LinearMath\\btConvexHullComputer.cpp:\n 2639  }\n 2640  \n 2641: btScalar btConvexHullComputer::compute(const void* coords, bool doubleCoords, int stride, int count, btScalar shrink, btScalar shrinkClamp)\n 2642  {\n 2643  	if (count <= 0)\n ....\n 2653  \n 2654  	btScalar shift = 0;\n 2655: 	if ((shrink > 0) && ((shift = hull.shrink(shrink, shrinkClamp)) < 0))\n 2656  	{\n 2657  		vertices.clear();\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\LinearMath\\btConvexHullComputer.h:\n   25  {\n   26  	private:\n   27: 		btScalar compute(const void* coords, bool doubleCoords, int stride, int count, btScalar shrink, btScalar shrinkClamp);\n   28  \n   29  	public:\n   ..\n   79  		between the addresses of consecutive vertices. If \"shrink\" is positive, the convex hull is shrunken\n   80  		by that amount (each face is moved by \"shrink\" length units towards the center along its normal).\n   81: 		If \"shrinkClamp\" is positive, \"shrink\" is clamped to not exceed \"shrinkClamp * innerRadius\", where \"innerRadius\"\n   82  		is the minimum distance of a face to the center of the convex hull.\n   83  \n   ..\n   87  		The output convex hull can be found in the member variables \"vertices\", \"edges\", \"faces\".\n   88  		*/\n   89: 		btScalar compute(const float* coords, int stride, int count, btScalar shrink, btScalar shrinkClamp)\n   90  		{\n   91: 			return compute(coords, false, stride, count, shrink, shrinkClamp);\n   92  		}\n   93  \n   94  		// same as above, but double precision\n   95: 		btScalar compute(const double* coords, int stride, int count, btScalar shrink, btScalar shrinkClamp)\n   96  		{\n   97: 			return compute(coords, true, stride, count, shrink, shrinkClamp);\n   98  		}\n   99  };\n\nG:\\Projects\\yolk\\src\\libs\\bullet\\src\\LinearMath\\btMinMax.h:\n   33  \n   34  template <class T>\n   35: SIMD_FORCE_INLINE const T& btClamped(const T& a, const T& lb, const T& ub) \n   36  {\n   37  	return a < lb ? lb : (ub < a ? ub : a); \n   ..\n   57  \n   58  template <class T>\n   59: SIMD_FORCE_INLINE void btClamp(T& a, const T& lb, const T& ub) \n   60  {\n   61  	if (a < lb) \n\nG:\\Projects\\yolk\\src\\libs\\core\\colour.h:\n   61  	//! returns a PC endian-ness specific ARGB colour\n   62  	static uint32_t packARGB( const RGBAColour& colour ) {\n   63: 		uint32_t R = uint32_t( Math::Clamp( colour.x * 255.0f, 0.0f, 255.0f ) );\n   64: 		uint32_t G = uint32_t( Math::Clamp( colour.y * 255.0f, 0.0f, 255.0f ) );\n   65: 		uint32_t B = uint32_t( Math::Clamp( colour.z * 255.0f, 0.0f, 255.0f ) );\n   66: 		uint32_t A = uint32_t( Math::Clamp( colour.w * 255.0f, 0.0f, 255.0f ) );\n   67  \n   68  		return uint32_t( (A << 24) | (R << 16) | (G << 8) | B );\n\nG:\\Projects\\yolk\\src\\libs\\core\\vector_math.cpp:\n  154  	}\n  155  	float SRGB_to_float( float val ) {\n  156: 		return *(float*)&SRGBTable[ (uint8_t)(Clamp( val, 0.0f, 1.0f ) * 255.1f) ];\n  157  	}\n  158  \n\nG:\\Projects\\yolk\\src\\libs\\core\\vector_math.h:\n   94  		Math::Vector3 temp = Math::ComponentMultiply( Math::Reciprocal(max*2.0f), coord ) + \n   95  														Math::Vector3(0.5f,0.5f,0.5f);\n   96: 		temp = Math::Clamp( temp, Math::Vector3(0,0,0), Math::Vector3(1,1,1) );\n   97  \n   98  		const int NUM_BITS = 21;\n\nG:\\Projects\\yolk\\src\\libs\\core\\vector_math_c.h:\n  363  		CALL inline T Min( const T a, const T b ) { return (a < b)? a : b; }\n  364  \n  365: 	CALL inline float Clamp( const float a, const float mi, const float ma ) { float r; r = Max(a, mi); r = Min(r, ma); return r; }\n  366  \n  367  	CALL inline Vector2 Abs( const Vector2& vector ) { return Vector2( fabsf( vector.x ), fabsf( vector.y ) ); }\n  368  	CALL inline Vector2 Max( const Vector2& vecA, const Vector2& vecB ) { return Vector2( vecA.x > vecB.x ? vecA.x : vecB.x, vecA.y > vecB.y ? vecA.y : vecB.y ); }\n  369  	CALL inline Vector2 Min( const Vector2& vecA, const Vector2& vecB ) { return Vector2( vecA.x < vecB.x ? vecA.x : vecB.x, vecA.y < vecB.y ? vecA.y : vecB.y ); }\n  370: 	CALL inline Vector2 Clamp( const Vector2& vecA, const Vector2& vecB, const Vector2& vecC ) { Vector2 vec; vec = Max(vecA, vecB); vec = Min(vec, vecC); return vec; }\n  371  \n  372  	CALL inline Vector3 Abs( const Vector3& vector ) { return Vector3( fabsf( vector.x ), fabsf( vector.y ), fabsf( vector.z ) ); }\n  373  	CALL inline Vector3 Max( const Vector3& vecA, const Vector3& vecB ) { return Vector3( vecA.x > vecB.x ? vecA.x : vecB.x, vecA.y > vecB.y ? vecA.y : vecB.y, vecA.z > vecB.z ? vecA.z : vecB.z ); }\n  374  	CALL inline Vector3 Min( const Vector3& vecA, const Vector3& vecB ) { return Vector3( vecA.x < vecB.x ? vecA.x : vecB.x, vecA.y < vecB.y ? vecA.y : vecB.y, vecA.z < vecB.z ? vecA.z : vecB.z ); }\n  375: 	CALL inline Vector3 Clamp( const Vector3& vecA, const Vector3& vecB, const Vector3& vecC ) { Vector3 vec; vec = Max(vecA, vecB); vec = Min(vec, vecC); return vec; }\n  376  \n  377  	CALL inline Vector4 Abs( const Vector4& vector ) { return Vector4( fabsf( vector.x ), fabsf( vector.y ), fabsf( vector.z ), fabsf( vector.w ) ); }\n  378  	CALL inline Vector4 Max( const Vector4& vecA, const Vector4& vecB ) { return Vector4( vecA.x > vecB.x ? vecA.x : vecB.x, vecA.y > vecB.y ? vecA.y : vecB.y, vecA.z > vecB.z ? vecA.z : vecB.z, vecA.w > vecB.w ? vecA.w : vecB.w ); }\n  379  	CALL inline Vector4 Min( const Vector4& vecA, const Vector4& vecB ) { return Vector4( vecA.x < vecB.x ? vecA.x : vecB.x, vecA.y < vecB.y ? vecA.y : vecB.y, vecA.z < vecB.z ? vecA.z : vecB.z, vecA.w < vecB.w ? vecA.w : vecB.w ); }\n  380: 	CALL inline Vector4 Clamp( const Vector4& vecA, const Vector4& vecB, const Vector4& vecC ) { Vector4 vec; vec = Max(vecA, vecB); vec = Min(vec, vecC); return vec; }\n  381  \n  382  	CALL inline Vector4 Transform( const Vector4& vec, const Matrix4x4& matrix ) { \n\nG:\\Projects\\yolk\\src\\libs\\core\\vector_math_dx10.h:\n   79  	inline T Min( const T a, const T b ) { return (a < b)? a : b; }\n   80  \n   81: 	inline float Clamp( const float a, const float mi, const float ma ) { float r; r = Max(a, mi); r = Min(r, ma); return r; }\n   82  \n   83  	inline Vector2 Abs( const Vector2& vector ) { return Vector2( fabsf( vector.x ), fabsf( vector.y ) ); }\n   84  	inline Vector2 Max( const Vector2& vecA, const Vector2& vecB ) { Vector2 vec; D3DXVec2Maximize( &vec, &vecA, &vecB ); return vec; }\n   85  	inline Vector2 Min( const Vector2& vecA, const Vector2& vecB ) { Vector2 vec; D3DXVec2Minimize( &vec, &vecA, &vecB ); return vec; }\n   86: 	inline Vector2 Clamp( const Vector2& vecA, const Vector2& vecB, const Vector2& vecC ) { Vector2 vec; vec = Max(vecA, vecB); vec = Min(vec, vecC); return vec; }\n   87  \n   88  	inline Vector3 Abs( const Vector3& vector ) { return Vector3( fabsf( vector.x ), fabsf( vector.y ), fabsf( vector.z ) ); }\n   89  	inline Vector3 Max( const Vector3& vecA, const Vector3& vecB ) { Vector3 vec; D3DXVec3Maximize( &vec, &vecA, &vecB ); return vec; }\n   90  	inline Vector3 Min( const Vector3& vecA, const Vector3& vecB ) { Vector3 vec; D3DXVec3Minimize( &vec, &vecA, &vecB ); return vec; }\n   91: 	inline Vector3 Clamp( const Vector3& vecA, const Vector3& vecB, const Vector3& vecC ) { Vector3 vec; vec = Max(vecA, vecB); vec = Min(vec, vecC); return vec; }\n   92  \n   93  	inline Vector4 Abs( const Vector4& vector ) { return Vector4( fabsf( vector.x ), fabsf( vector.y ), fabsf( vector.z ), fabsf( vector.w ) ); }\n   94  	inline Vector4 Max( const Vector4& vecA, const Vector4& vecB ) { Vector4 vec; D3DXVec4Maximize( &vec, &vecA, &vecB ); return vec; }\n   95  	inline Vector4 Min( const Vector4& vecA, const Vector4& vecB ) { Vector4 vec; D3DXVec4Minimize( &vec, &vecA, &vecB ); return vec; }\n   96: 	inline Vector4 Clamp( const Vector4& vecA, const Vector4& vecB, const Vector4& vecC ) { Vector4 vec; vec = Max(vecA, vecB); vec = Min(vec, vecC); return vec; }\n   97  \n   98  	inline Vector4 Transform( const Vector2& vec, const Matrix4x4& matrix ) { Vector4 res; D3DXVec2Transform(&res, &vec, &matrix); return res; }	//!< return Vector4(vec,0,1) * matrix\n\nG:\\Projects\\yolk\\src\\libs\\dx11\\gfx.cpp:\n  209  	screen->renderer = this;\n  210  	screen->backHandle.reset( backHandle );\n  211: 	screen->pointClampSamplerHandle.reset( 	SamplerStateHandle::create( \"_SS_Point_Clamp\" ) );\n  212  	screen->renderTargetWriteHandle.reset( RenderTargetStatesHandle::create( \"_RTS_NoBlend_WriteAll\" ) );\n  213  	screen->copyProgramHandle.reset( ProgramHandle::load( \"rendertarget_copy\" ) );\n  ...\n  242  	ctx->bindRenderTarget( backBuffer );\n  243  \n  244: 	auto sampler = pointClampSamplerHandle.acquire();\n  245  	auto tex = toDisplay->acquire();\n  246  	auto prg = copyProgramHandle.acquire();\n\nG:\\Projects\\yolk\\src\\libs\\dx11\\renderstates.cpp:\n  198  	desc.CullMode = CUM_Map[ creation->cullMode ];\n  199  	desc.DepthBias = creation->depthBias;\n  200: 	desc.DepthBiasClamp = creation->depthBiasClamp;\n  201  	desc.SlopeScaledDepthBias = creation->depthScaledSlopeBias;\n  202  \n\nG:\\Projects\\yolk\\src\\libs\\dx11\\screen.h:\n   26  \n   27  	protected:\n   28: 		Core::ScopedResourceHandle<Scene::SamplerStateHandle>		pointClampSamplerHandle;\n   29  		Core::ScopedResourceHandle<Scene::RenderTargetStatesHandle>	renderTargetWriteHandle;\n   30  		Core::ScopedResourceHandle<Scene::ProgramHandle>			copyProgramHandle;\n\nG:\\Projects\\yolk\\src\\libs\\gl\\glew.c:\n  525  PFNGLBEGINTRANSFORMFEEDBACKPROC __glewBeginTransformFeedback = NULL;\n  526  PFNGLBINDFRAGDATALOCATIONPROC __glewBindFragDataLocation = NULL;\n  527: PFNGLCLAMPCOLORPROC __glewClampColor = NULL;\n  528  PFNGLCLEARBUFFERFIPROC __glewClearBufferfi = NULL;\n  529  PFNGLCLEARBUFFERFVPROC __glewClearBufferfv = NULL;\n  ...\n  695  PFNGLCLEARNAMEDBUFFERSUBDATAEXTPROC __glewClearNamedBufferSubDataEXT = NULL;\n  696  \n  697: PFNGLCLAMPCOLORARBPROC __glewClampColorARB = NULL;\n  698  \n  699  PFNGLDISPATCHCOMPUTEPROC __glewDispatchCompute = NULL;\n  ...\n 3388    r = ((glBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC)glewGetProcAddress((const GLubyte*)\"glBeginTransformFeedback\")) == NULL) || r;\n 3389    r = ((glBindFragDataLocation = (PFNGLBINDFRAGDATALOCATIONPROC)glewGetProcAddress((const GLubyte*)\"glBindFragDataLocation\")) == NULL) || r;\n 3390:   r = ((glClampColor = (PFNGLCLAMPCOLORPROC)glewGetProcAddress((const GLubyte*)\"glClampColor\")) == NULL) || r;\n 3391    r = ((glClearBufferfi = (PFNGLCLEARBUFFERFIPROC)glewGetProcAddress((const GLubyte*)\"glClearBufferfi\")) == NULL) || r;\n 3392    r = ((glClearBufferfv = (PFNGLCLEARBUFFERFVPROC)glewGetProcAddress((const GLubyte*)\"glClearBufferfv\")) == NULL) || r;\n ....\n 3963    GLboolean r = GL_FALSE;\n 3964  \n 3965:   r = ((glClampColorARB = (PFNGLCLAMPCOLORARBPROC)glewGetProcAddress((const GLubyte*)\"glClampColorARB\")) == NULL) || r;\n 3966  \n 3967    return r;\n\nG:\\Projects\\yolk\\src\\libs\\gl\\glew.h:\n 2201  #define glBeginTransformFeedback GLEW_GET_FUN(__glewBeginTransformFeedback)\n 2202  #define glBindFragDataLocation GLEW_GET_FUN(__glewBindFragDataLocation)\n 2203: #define glClampColor GLEW_GET_FUN(__glewClampColor)\n 2204  #define glClearBufferfi GLEW_GET_FUN(__glewClearBufferfi)\n 2205  #define glClearBufferfv GLEW_GET_FUN(__glewClearBufferfv)\n ....\n 3264  typedef void (GLAPIENTRY * PFNGLCLAMPCOLORARBPROC) (GLenum target, GLenum clamp);\n 3265  \n 3266: #define glClampColorARB GLEW_GET_FUN(__glewClampColorARB)\n 3267  \n 3268  #define GLEW_ARB_color_buffer_float GLEW_GET_VAR(__GLEW_ARB_color_buffer_float)\n ....\n 14491  GLEW_FUN_EXPORT PFNGLBEGINTRANSFORMFEEDBACKPROC __glewBeginTransformFeedback;\n 14492  GLEW_FUN_EXPORT PFNGLBINDFRAGDATALOCATIONPROC __glewBindFragDataLocation;\n 14493: GLEW_FUN_EXPORT PFNGLCLAMPCOLORPROC __glewClampColor;\n 14494  GLEW_FUN_EXPORT PFNGLCLEARBUFFERFIPROC __glewClearBufferfi;\n 14495  GLEW_FUN_EXPORT PFNGLCLEARBUFFERFVPROC __glewClearBufferfv;\n .....\n 14661  GLEW_FUN_EXPORT PFNGLCLEARNAMEDBUFFERSUBDATAEXTPROC __glewClearNamedBufferSubDataEXT;\n 14662  \n 14663: GLEW_FUN_EXPORT PFNGLCLAMPCOLORARBPROC __glewClampColorARB;\n 14664  \n 14665  GLEW_FUN_EXPORT PFNGLDISPATCHCOMPUTEPROC __glewDispatchCompute;\n\nG:\\Projects\\yolk\\src\\libs\\jpeg\\jquant2.c:\n 1129      table[in] = out; table[-in] = -out;\n 1130    }\n 1131:   /* Clamp the rest to final out value (which is (MAXJSAMPLE+1)/8) */\n 1132    for (; in <= MAXJSAMPLE; in++) {\n 1133      table[in] = out; table[-in] = -out;\n\nG:\\Projects\\yolk\\src\\libs\\LibOVR\\Src\\Kernel\\OVR_Alg.h:\n   39  { return (b < a) ? a : b; }\n   40  \n   41: template <typename T> OVR_FORCE_INLINE const T Clamp(const T v, const T minVal, const T maxVal)\n   42  { return Max<T>(minVal, Min<T>(v, maxVal)); }\n   43  \n\nG:\\Projects\\yolk\\src\\libs\\LibOVR\\Src\\Util\\Util_LatencyTest.cpp:\n  511      OldTime = newTime;\n  512  \n  513:     elapsedMilliS = Alg::Min(elapsedMilliS, (UInt32) 100);   // Clamp at 100mS in case we're not being called very often.\n  514  \n  515  \n\nG:\\Projects\\yolk\\src\\libs\\scene\\imagecomposer.cpp:\n   49  	program[ SOLID_COLOUR ].reset( ProgramHandle::load( \"2dcolour\" ) );\n   50  \n   51: 	linearClampSampler.reset( SamplerStateHandle::create( \"_SS_Linear_Clamp\" ) );\n   52  	for( int i = 0; i < MAX_LAYERS; ++i ) {\n   53  		layers[i].layerNum = i;\n   ..\n  405  //	glDisable( GL_DEPTH_TEST );\n  406  \n  407: 	auto samplerState = linearClampSampler.acquire();\n  408  \n  409  	for( unsigned int i=0;i < MAX_LAYERS;++i) {\n\nG:\\Projects\\yolk\\src\\libs\\scene\\imagecomposer.h:\n  231  \n  232  	Core::ScopedResourceHandle<ProgramHandle>					program[MAX_RENDER_TYPE];\n  233: 	Core::ScopedResourceHandle<SamplerStateHandle>				linearClampSampler;\n  234  	Core::ScopedResourceHandle<RenderTargetStatesHandle>		blendState[MAX_RENDER_STATES];\n  235  \n\nG:\\Projects\\yolk\\src\\libs\\scene\\renderstates.h:\n  143  \n  144  			int					depthBias;\n  145: 			float				depthBiasClamp;\n  146  			float				depthScaledSlopeBias;\n  147  		};\n  ...\n  156  }\n  157  \n  158: #define SAMPLER_STATE_POINT_CLAMP					\"_SS_Point_Clamp\"\n  159: #define SAMPLER_STATE_LINEAR_CLAMP					\"_SS_Linear_Clamp\"\n  160: #define SAMPLER_STATE_ANISO16_CLAMP					\"_SS_Aniso16_Clamp\"\n  161  #define SAMPLER_STATE_POINT_WRAP					\"_SS_Point_Wrap\"\n  162  #define SAMPLER_STATE_LINEAR_WRAP					\"_SS_Linear_Wrap\"\n\nG:\\Projects\\yolk\\src\\libs\\scene\\programs\\shaders\\vs_vtlightdraw.hlsl:\n   84      \n   85      // Work out nearest depth for quad Z\n   86:     // Clamp to near plane in case this light intersects the near plane... don't want our quad to be clipped\n   87      float quadDepth = max(zPlanes.x, lightPositionView.z - light.attenuationEnd );\n   88  \n\nG:\\Projects\\yolk\\src\\libs\\tbb\\examples\\common\\gui\\macvideo.cpp:\n  105      Boolean f_ext_texture_edge_clamp; // is SGI texture edge clamp extension supported\n  106      Boolean f_gl_texture_edge_clamp; // is OpenGL texture edge clamp support (1.2+)\n  107:     unsigned long edgeClampParam; // the param that is passed to the texturing parmeteres\n  108      long maxTextureSize; // the minimum max texture size across all GPUs\n  109      long maxNOPTDTextureSize; // the minimum max texture size across all GPUs that support non-power of two texture dimensions\n  ...\n  898                          glTexParameteri (textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);\n  899                          glTexParameteri (textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);\n  900:                         glTexParameteri (textureTarget, GL_TEXTURE_WRAP_S, gpOpenGLCaps->edgeClampParam);\n  901:                         glTexParameteri (textureTarget, GL_TEXTURE_WRAP_T, gpOpenGLCaps->edgeClampParam);\n  902                          glReportError (); // report any errors so far\n  903                          glTexImage2D (textureTarget, 0, GL_RGBA, currWidth, currHeight, 0,\n  ...\n 1194          // set clamp param based on retrieved capabilities\n 1195          if (pOpenGLCaps->f_gl_texture_edge_clamp) // if OpenGL 1.2 or later and texture edge clamp is supported natively\n 1196:                     pOpenGLCaps->edgeClampParam = GL_CLAMP_TO_EDGE;  // use 1.2+ constant to clamp texture coords so as to not sample the border color\n 1197          else if (pOpenGLCaps->f_ext_texture_edge_clamp) // if GL_SGIS_texture_edge_clamp extension supported\n 1198:             pOpenGLCaps->edgeClampParam = GL_CLAMP_TO_EDGE_SGIS; // use extension to clamp texture coords so as to not sample the border color\n 1199          else\n 1200:             pOpenGLCaps->edgeClampParam = GL_CLAMP; // clamp texture coords to [0, 1]\n 1201  \n 1202          aglDestroyPixelFormat( fmt );\n\n209 matches across 64 files\n",
+			"settings":
+			{
+				"buffer_size": 46093,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "src/libs/core/vector_math_c.h",
+			"settings":
+			{
+				"buffer_size": 30808,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/core/core_utils.h",
+			"settings":
+			{
+				"buffer_size": 9615,
 				"line_ending": "Windows"
 			}
 		}
@@ -662,12 +680,30 @@
 	},
 	"file_history":
 	[
-		"/G/Projects/yolk/src/libs/scene/physical.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
+		"/C/Users/AndroidDev/Downloads/PerlinNoise.1.0.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtreerenderable.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtreerenderable.h",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtree.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtreephysical.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtreephysical.h",
+		"/G/Projects/yolk/src/libs/scene/physicsworld.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/main.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtree.h",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtree_test.cpp",
+		"/G/Projects/yolk/src/libs/localworld/sceneworld.cpp",
+		"/G/Projects/yolk/src/libs/scene/compoundcolshape.h",
 		"/G/Projects/yolk/src/libs/scene/physical.h",
+		"/G/Projects/yolk/src/apps/gfx_test/shell3d.cpp",
+		"/G/Projects/yolk/src/libs/localworld/inputhandlercontext.cpp",
+		"/G/Projects/yolk/src/libs/localworld/debugcamcontext.cpp",
+		"/G/Projects/yolk/src/libs/core/development_context.cpp",
+		"/G/Projects/yolk/src/libs/localworld/thing.h",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtreething.h",
+		"/G/Projects/yolk/src/libs/scene/physical.cpp",
 		"/G/Projects/yolk/src/libs/localworld/levelthing.h",
 		"/G/Projects/yolk/src/libs/scene/renderable.h",
 		"/G/Projects/yolk/src/libs/scene/collisionshape.h",
-		"/G/Projects/yolk/src/apps/gfx_test/CMakeLists.txt",
 		"/G/Projects/yolk/src/apps/gfx_test/gfxdbgconsole.h",
 		"/G/Projects/yolk/src/apps/gfx_test/gfxdbgconsole.cpp",
 		"/G/Projects/yolk/src/libs/scene/dynamicphysical.h",
@@ -694,7 +730,6 @@
 		"/G/Projects/yolk/src/libs/core/resources.h",
 		"/G/Projects/yolk/src/libs/scene/mesh.h",
 		"/G/Projects/yolk/src/libs/core/aabb.inl",
-		"/G/Projects/yolk/src/apps/gfx_test/main.cpp",
 		"/G/Projects/yolk/src/apps/gfx_test/freelist.h",
 		"/G/minecraft/server.properties",
 		"/G/minecraft/ops.txt",
@@ -755,7 +790,6 @@
 		"/G/Projects/yolk/src/libs/core/buildconfig.h.in",
 		"/G/Projects/yolk/src/libs/core/keyboard.h",
 		"/G/Projects/yolk/src/libs/core/platform_windows/mouse_win.h",
-		"/G/Projects/yolk/src/libs/core/development_context.cpp",
 		"/G/Projects/yolk/src/libs/core/keyboard_null.h",
 		"/G/Projects/yolk/src/libs/core/resourceman.cpp",
 		"/G/Projects/yolk/CMakeLists.txt",
@@ -773,27 +807,11 @@
 		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITAtomic_Android.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITThread_Win.cpp",
 		"/C/IT/Common/SourceCode/ITPlatform/Header/ITAtomic.h",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITThread_Android.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITWinConsoleGeneric.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITWinEmbedded.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceWin/ITRealTime_Win.cpp",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/IT_AndroidEmbedded.cpp",
-		"/C/Users/AndroidDev/Downloads/config-parag0n.txt",
-		"/C/Users/AndroidDev/Downloads/config (2).txt",
-		"/C/Users/AndroidDev/Downloads/config_1_for_wiki_laos_3020_green_power_plug_mainboard_v03.txt",
-		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITRealTime_Android.cpp",
-		"/C/Users/AndroidDev/Downloads/config (1).txt",
-		"/C/Users/AndroidDev/Downloads/config (3).txt",
-		"/C/Users/AndroidDev/Downloads/config-parag0n (1).txt",
-		"/C/Users/AndroidDev/Documents/ybracproject.dxf.txt",
-		"/E/Public/Cuts2013/Exports/sqr_test.ls",
-		"/C/Users/AndroidDev/AppData/Local/Temp/7zO9286.tmp/README.txt",
-		"/C/Users/AndroidDev/Desktop/ITReadME.txt",
-		"/C/Users/AndroidDev/AppData/Local/Temp/WPDNSE/{00001144-0001-0001-0000-000000000000}/AndroidTOC.txt"
+		"/C/IT/Common/SourceCode/ITPlatform/SourceAndroid/ITThread_Android.cpp"
 	],
 	"find":
 	{
-		"height": 49.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -814,6 +832,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"Clamp",
+			"SmoothStep",
 			"h",
 			"RESOURCE_NAME",
 			"AABB",
@@ -939,9 +959,7 @@
 			"DT_NULL",
 			"setMemoryWritable",
 			"SectionRef",
-			"reassignSectionAddress",
-			"resolveExternalSymbols",
-			"resolveRelocation"
+			"reassignSectionAddress"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -993,52 +1011,53 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 4,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/apps/gfx_test/voxtree.h",
+					"file": "src/apps/gfx_test/voxtree_test.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9293,
+						"buffer_size": 1938,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								62,
+								104,
 								0
 							]
 						],
 						"settings":
 						{
+							"spell_check": false,
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1890.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/libs/localworld/thing.h",
+					"file": "src/apps/gfx_test/voxtree.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3123,
+						"buffer_size": 9750,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2210,
-								2210
+								9296,
+								9296
 							]
 						],
 						"settings":
@@ -1047,26 +1066,26 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 961.0,
+						"translation.y": 6107.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/apps/gfx_test/voxtreerenderable.cpp",
+					"file": "src/apps/gfx_test/voxtree.inl",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7190,
+						"buffer_size": 21301,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1069,
-								1069
+								3190,
+								3190
 							]
 						],
 						"settings":
@@ -1075,31 +1094,59 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 540.0,
+						"translation.y": 2203.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/apps/gfx_test/voxtreething.h",
+					"file": "src/apps/gfx_test/procvoxtree.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 161,
+						"buffer_size": 1145,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								109,
-								109
+								445,
+								445
 							]
 						],
 						"settings":
 						{
-							"auto_name": "voxtreething.h",
+							"auto_name": "procvoxtree.h",
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 135.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/apps/gfx_test/procvoxtree.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 408,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								342,
+								342
+							]
+						],
+						"settings":
+						{
+							"auto_name": "procvoxtree.cpp",
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -1109,82 +1156,26 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "src/apps/gfx_test/voxtreerenderable.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1886,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								665,
-								665
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 713.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
 					"buffer": 5,
-					"file": "src/apps/gfx_test/voxtree.cpp",
+					"file": "src/apps/gfx_test/proceduraltextureutils.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 20876,
+						"buffer_size": 272,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1766,
-								1766
+								263,
+								263
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1448.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/libs/scene/compoundcolshape.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 622,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								283,
-								299
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"auto_name": "proceduraltextureutils.h",
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1193,25 +1184,53 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "src/apps/gfx_test/voxtreephysical.cpp",
+					"buffer": 6,
+					"file": "src/apps/gfx_test/proceduraltextureutils.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 737,
+						"buffer_size": 6962,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								318,
-								318
+								5892,
+								5892
 							]
 						],
 						"settings":
 						{
-							"auto_name": "voxtreephysical.cpp",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 907.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/apps/gfx_test/voxtreephysical.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 709,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								700,
+								700
+							]
+						],
+						"settings":
+						{
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
@@ -1223,25 +1242,25 @@
 				},
 				{
 					"buffer": 8,
-					"file": "src/apps/gfx_test/voxtreephysical.h",
+					"file": "src/apps/gfx_test/voxtreephysical.inl",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 452,
+						"buffer_size": 2553,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								270,
-								270
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "voxtreephysical.h",
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1251,19 +1270,19 @@
 				},
 				{
 					"buffer": 9,
-					"file": "src/apps/gfx_test/main.cpp",
+					"file": "src/apps/gfx_test/voxtreerenderable.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3735,
+						"buffer_size": 1954,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								274,
-								274
+								1912,
+								1912
 							]
 						],
 						"settings":
@@ -1272,26 +1291,915 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1134.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 10,
-					"file": "src/apps/gfx_test/voxtree_test.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 710,
+						"buffer_size": 46093,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										182,
+										192
+									],
+									[
+										436,
+										446
+									],
+									[
+										619,
+										629
+									],
+									[
+										959,
+										964
+									],
+									[
+										1243,
+										1248
+									],
+									[
+										1595,
+										1600
+									],
+									[
+										1847,
+										1852
+									],
+									[
+										2068,
+										2073
+									],
+									[
+										2113,
+										2118
+									],
+									[
+										2159,
+										2164
+									],
+									[
+										2203,
+										2208
+									],
+									[
+										2396,
+										2401
+									],
+									[
+										2680,
+										2685
+									],
+									[
+										2968,
+										2973
+									],
+									[
+										3206,
+										3211
+									],
+									[
+										3492,
+										3497
+									],
+									[
+										3776,
+										3781
+									],
+									[
+										4089,
+										4094
+									],
+									[
+										4310,
+										4315
+									],
+									[
+										4355,
+										4360
+									],
+									[
+										4401,
+										4406
+									],
+									[
+										4445,
+										4450
+									],
+									[
+										4635,
+										4640
+									],
+									[
+										4919,
+										4924
+									],
+									[
+										5207,
+										5212
+									],
+									[
+										5445,
+										5450
+									],
+									[
+										5740,
+										5745
+									],
+									[
+										6024,
+										6029
+									],
+									[
+										6284,
+										6289
+									],
+									[
+										6695,
+										6700
+									],
+									[
+										6873,
+										6878
+									],
+									[
+										7098,
+										7103
+									],
+									[
+										7334,
+										7339
+									],
+									[
+										7684,
+										7689
+									],
+									[
+										8172,
+										8177
+									],
+									[
+										8251,
+										8256
+									],
+									[
+										8328,
+										8333
+									],
+									[
+										8570,
+										8575
+									],
+									[
+										8630,
+										8635
+									],
+									[
+										8690,
+										8695
+									],
+									[
+										8890,
+										8895
+									],
+									[
+										9100,
+										9105
+									],
+									[
+										9138,
+										9143
+									],
+									[
+										9176,
+										9181
+									],
+									[
+										9212,
+										9217
+									],
+									[
+										9364,
+										9369
+									],
+									[
+										9415,
+										9420
+									],
+									[
+										9466,
+										9471
+									],
+									[
+										9515,
+										9520
+									],
+									[
+										9828,
+										9833
+									],
+									[
+										10098,
+										10103
+									],
+									[
+										10488,
+										10493
+									],
+									[
+										10534,
+										10539
+									],
+									[
+										10673,
+										10678
+									],
+									[
+										10720,
+										10725
+									],
+									[
+										11101,
+										11106
+									],
+									[
+										11371,
+										11376
+									],
+									[
+										11720,
+										11725
+									],
+									[
+										11959,
+										11964
+									],
+									[
+										12268,
+										12273
+									],
+									[
+										12457,
+										12462
+									],
+									[
+										12684,
+										12689
+									],
+									[
+										12868,
+										12873
+									],
+									[
+										13298,
+										13303
+									],
+									[
+										13685,
+										13690
+									],
+									[
+										13802,
+										13807
+									],
+									[
+										13974,
+										13979
+									],
+									[
+										13991,
+										13996
+									],
+									[
+										14168,
+										14173
+									],
+									[
+										14415,
+										14420
+									],
+									[
+										14709,
+										14714
+									],
+									[
+										15058,
+										15063
+									],
+									[
+										15101,
+										15106
+									],
+									[
+										15148,
+										15153
+									],
+									[
+										15208,
+										15213
+									],
+									[
+										15283,
+										15288
+									],
+									[
+										15306,
+										15311
+									],
+									[
+										15480,
+										15485
+									],
+									[
+										15526,
+										15531
+									],
+									[
+										15576,
+										15581
+									],
+									[
+										15639,
+										15644
+									],
+									[
+										15720,
+										15725
+									],
+									[
+										15746,
+										15751
+									],
+									[
+										16169,
+										16174
+									],
+									[
+										16232,
+										16237
+									],
+									[
+										16688,
+										16693
+									],
+									[
+										16757,
+										16762
+									],
+									[
+										17054,
+										17059
+									],
+									[
+										17097,
+										17102
+									],
+									[
+										17256,
+										17261
+									],
+									[
+										17287,
+										17292
+									],
+									[
+										17312,
+										17317
+									],
+									[
+										17576,
+										17581
+									],
+									[
+										17622,
+										17627
+									],
+									[
+										17790,
+										17795
+									],
+									[
+										17824,
+										17829
+									],
+									[
+										17852,
+										17857
+									],
+									[
+										18064,
+										18069
+									],
+									[
+										18447,
+										18452
+									],
+									[
+										18508,
+										18513
+									],
+									[
+										18722,
+										18727
+									],
+									[
+										18785,
+										18790
+									],
+									[
+										19119,
+										19124
+									],
+									[
+										19377,
+										19382
+									],
+									[
+										19667,
+										19672
+									],
+									[
+										19804,
+										19809
+									],
+									[
+										20127,
+										20132
+									],
+									[
+										20139,
+										20144
+									],
+									[
+										20262,
+										20267
+									],
+									[
+										20604,
+										20609
+									],
+									[
+										20616,
+										20621
+									],
+									[
+										20739,
+										20744
+									],
+									[
+										21081,
+										21086
+									],
+									[
+										21093,
+										21098
+									],
+									[
+										21215,
+										21220
+									],
+									[
+										21568,
+										21573
+									],
+									[
+										21768,
+										21773
+									],
+									[
+										21829,
+										21834
+									],
+									[
+										22127,
+										22132
+									],
+									[
+										22428,
+										22433
+									],
+									[
+										22688,
+										22693
+									],
+									[
+										23006,
+										23011
+									],
+									[
+										23033,
+										23038
+									],
+									[
+										23115,
+										23120
+									],
+									[
+										23193,
+										23198
+									],
+									[
+										23255,
+										23260
+									],
+									[
+										23463,
+										23468
+									],
+									[
+										23584,
+										23589
+									],
+									[
+										23795,
+										23800
+									],
+									[
+										23989,
+										23994
+									],
+									[
+										24317,
+										24322
+									],
+									[
+										24418,
+										24423
+									],
+									[
+										24763,
+										24768
+									],
+									[
+										25141,
+										25146
+									],
+									[
+										25631,
+										25636
+									],
+									[
+										26039,
+										26044
+									],
+									[
+										26533,
+										26538
+									],
+									[
+										27012,
+										27017
+									],
+									[
+										27114,
+										27119
+									],
+									[
+										27449,
+										27454
+									],
+									[
+										27624,
+										27629
+									],
+									[
+										27761,
+										27766
+									],
+									[
+										28010,
+										28015
+									],
+									[
+										28339,
+										28344
+									],
+									[
+										28701,
+										28706
+									],
+									[
+										28786,
+										28791
+									],
+									[
+										28987,
+										28992
+									],
+									[
+										29152,
+										29157
+									],
+									[
+										29307,
+										29312
+									],
+									[
+										29475,
+										29480
+									],
+									[
+										29687,
+										29692
+									],
+									[
+										30003,
+										30008
+									],
+									[
+										30149,
+										30154
+									],
+									[
+										30419,
+										30424
+									],
+									[
+										30692,
+										30697
+									],
+									[
+										30753,
+										30758
+									],
+									[
+										31099,
+										31104
+									],
+									[
+										31186,
+										31191
+									],
+									[
+										31364,
+										31369
+									],
+									[
+										31450,
+										31455
+									],
+									[
+										31610,
+										31615
+									],
+									[
+										31787,
+										31792
+									],
+									[
+										32057,
+										32062
+									],
+									[
+										32139,
+										32144
+									],
+									[
+										32221,
+										32226
+									],
+									[
+										32303,
+										32308
+									],
+									[
+										32570,
+										32575
+									],
+									[
+										32841,
+										32846
+									],
+									[
+										33103,
+										33108
+									],
+									[
+										33702,
+										33707
+									],
+									[
+										34425,
+										34430
+									],
+									[
+										35237,
+										35242
+									],
+									[
+										35631,
+										35636
+									],
+									[
+										36164,
+										36169
+									],
+									[
+										36751,
+										36756
+									],
+									[
+										37357,
+										37362
+									],
+									[
+										37840,
+										37845
+									],
+									[
+										37906,
+										37911
+									],
+									[
+										38202,
+										38207
+									],
+									[
+										38494,
+										38499
+									],
+									[
+										38521,
+										38526
+									],
+									[
+										38742,
+										38747
+									],
+									[
+										39154,
+										39159
+									],
+									[
+										39423,
+										39428
+									],
+									[
+										39840,
+										39845
+									],
+									[
+										39912,
+										39917
+									],
+									[
+										40259,
+										40264
+									],
+									[
+										40337,
+										40342
+									],
+									[
+										40613,
+										40618
+									],
+									[
+										40643,
+										40648
+									],
+									[
+										40905,
+										40910
+									],
+									[
+										40938,
+										40943
+									],
+									[
+										41272,
+										41277
+									],
+									[
+										41583,
+										41588
+									],
+									[
+										41792,
+										41797
+									],
+									[
+										42099,
+										42104
+									],
+									[
+										42383,
+										42388
+									],
+									[
+										42607,
+										42612
+									],
+									[
+										42667,
+										42672
+									],
+									[
+										42846,
+										42851
+									],
+									[
+										43132,
+										43137
+									],
+									[
+										43361,
+										43366
+									],
+									[
+										43500,
+										43505
+									],
+									[
+										43565,
+										43570
+									],
+									[
+										43632,
+										43637
+									],
+									[
+										43908,
+										43913
+									],
+									[
+										44387,
+										44392
+									],
+									[
+										44973,
+										44978
+									],
+									[
+										45086,
+										45091
+									],
+									[
+										45518,
+										45523
+									],
+									[
+										45784,
+										45789
+									],
+									[
+										45954,
+										45959
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								732,
+								732
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 2,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 4590.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "src/libs/core/vector_math_c.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 30808,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								694,
-								694
+								21854,
+								21854
 							]
 						],
 						"settings":
@@ -1300,7 +2208,35 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 450.0,
+						"translation.y": 12344.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "src/libs/core/core_utils.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9615,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2968,
+								2968
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2025.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1310,7 +2246,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 49.0
+		"height": 35.0
 	},
 	"input":
 	{
@@ -1345,7 +2281,7 @@
 	},
 	"output.exec":
 	{
-		"height": 130.0
+		"height": 163.0
 	},
 	"output.unsaved_changes":
 	{
@@ -1354,7 +2290,7 @@
 	"project": "yolk.sublime-project",
 	"replace":
 	{
-		"height": 92.0
+		"height": 66.0
 	},
 	"save_all_on_build": true,
 	"select_file":

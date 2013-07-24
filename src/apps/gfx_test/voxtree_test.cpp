@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "voxtree.h"
 #include "proceduraltextureutils.h"
+#include "procvoxtree.h"
 /*
 Vox::Tree* VoxTreeTest() {
 	Core::AABB bound( Math::Vector3(-128,-128,-128), Math::Vector3(128,128,128) );
@@ -54,20 +55,18 @@ Vox::Tree* VoxTreeTest() {
  */
 
 
-Vox::Tree* VoxTreeTest() {
-	Core::AABB bound( Math::Vector3(-128,-128,-128), Math::Vector3(128,128,128) );
-	Vox::Tree* test = CORE_NEW Vox::Tree( bound );
-
-	Vox::Brick* brick;
-	uint32_t brickIndex = test->allocateBrick( &brick );
-	brick->splitable = false;
+Vox::ProcVoxTree* VoxTreeTest() {
+	Core::AABB bound( Math::Vector3(-1280,-1280,-1280), Math::Vector3(1280,1280,1280) );
+	Vox::ProcVoxTree* test = CORE_NEW Vox::ProcVoxTree( bound );
+/*
+	uint32_t brickIndex = 1;
 	for( float k = 0; k < 16; ++k ) {
 		for( float j = 0; j < 16; ++j ) {
 			for( float i = 0; i < 16; ++i ) {
 
-				float val = FBm( Math::Vector3(i,j,k) * (1.f/16.f), 52.3f, 2 );
+				float val = FBm( Math::Vector3(i,j,k) * (1.f/16.f), 2.3f, 2 );
 
-				if( val > 0.9999f ) {
+				if( val > 0.999f ) {
 					test->insertPoint( Math::Vector3(i,j,k), brickIndex );
 				}
 			}
@@ -75,6 +74,6 @@ Vox::Tree* VoxTreeTest() {
 	}
 
 	test->pack();
-
+*/
 	return test;
 }

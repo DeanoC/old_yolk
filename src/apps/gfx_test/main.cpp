@@ -10,6 +10,7 @@
 #include "voxtree.h"
 #include "voxtreerenderable.h"
 #include "voxtreephysical.h"
+#include "procvoxtree.h"
 
 class PrintDebugPrims :	public Core::DebugRenderInterface {
 	public:
@@ -77,10 +78,10 @@ int Main() {
 
 	ThingPtr thing ( ThingFactory::createEmptyThing( TBC_WORLD, NewThingId() ) );
 
-	extern Vox::Tree* VoxTreeTest();
-	Vox::Tree* tree = VoxTreeTest();
-	Vox::TreeRenderablePtr treeRender = std::make_shared<Vox::TreeRenderable>( thing->getTransform(), *tree );
-	Vox::TreePhysicalPtr treePhysical = std::make_shared<Vox::TreePhysical>( thing->getTransform(), *tree );
+	extern Vox::ProcVoxTree* VoxTreeTest();
+	Vox::ProcVoxTree* tree = VoxTreeTest();
+	Vox::TreeRenderable<Vox::ProcVoxTree>::Ptr treeRender = std::make_shared<Vox::TreeRenderable<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
+	Vox::TreePhysical<Vox::ProcVoxTree>::Ptr treePhysical = std::make_shared<Vox::TreePhysical<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
 
 	thing->add( treeRender );
 	thing->add( treePhysical, TBC_PLAYER | TBC_ENEMY );
