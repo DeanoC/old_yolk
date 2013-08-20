@@ -21,3 +21,5 @@
 #define READONLY_MEM
 #define LOCAL_MEM
 
+#define AMP_ONLY			
+#define AMP_ALLOWED				

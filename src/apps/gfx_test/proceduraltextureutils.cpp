@@ -80,10 +80,10 @@ static int NoisePerm[2 * NOISE_PERM_SIZE] = {
        138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
 };
 
-float Noise( const Math::Vector3& pt ) {
+float Noise( const float x, const float y, const float z ) {
     // Compute noise cell coordinates and offsets
-    int ix = Core::floor2Int(pt.x), iy =  Core::floor2Int(pt.y), iz =  Core::floor2Int(pt.z);
-    float dx = pt.x - ix, dy = pt.y - iy, dz = pt.z - iz;
+    int ix = Core::floor2Int(x), iy =  Core::floor2Int(y), iz =  Core::floor2Int(z);
+    float dx = x - ix, dy = y - iy, dz = z - iz;
 
     // Compute gradient weights
     ix &= (NOISE_PERM_SIZE-1);
@@ -109,6 +109,10 @@ float Noise( const Math::Vector3& pt ) {
     return Math::Lerp(wz, y0, y1);
 }
 
+float Noise( const Math::Vector3& pt ) {
+  return Noise( pt.x, pt.y, pt.z );
+}
+
 inline float Grad(int x, int y, int z, float dx, float dy, float dz) {
     int h = NoisePerm[NoisePerm[NoisePerm[x]+y]+z];
     h &= 15;
@@ -124,13 +128,12 @@ inline float NoiseWeight(float t) {
     return 6.f*t4*t - 15.f*t4 + 10.f*t3;
 }
 
-
-float FBm( const Math::Vector3& p, float omega, int octaves) {
+float FBm( const float x, const float y, const float z, float omega, int octaves) {
 
     // Compute sum of octaves of noise for FBm
     float sum = 0.f, lambda = 1.f, o = 1.f;
     for (int i = 0; i < octaves; ++i) {
-        sum += o * Noise(lambda * p);
+        sum += o * Noise(lambda * x, lambda * y, lambda * z);
         lambda *= 1.99f;
         o *= omega;
     }
@@ -139,14 +142,21 @@ float FBm( const Math::Vector3& p, float omega, int octaves) {
 }
 
 
-float Turbulence( const Math::Vector3& p, float omega, int octaves ) {
+float FBm( const Math::Vector3& p, float omega, int octaves) {
+  return FBm( p.x, p.y, p.z, omega, octaves );
+}
+
+float Turbulence( const float x, const float y, const float z, float omega, int octaves) {
     // Compute sum of octaves of noise for turbulence
     float sum = 0.f, lambda = 1.f, o = 1.f;
     for (int i = 0; i < octaves; ++i) {
-        sum += o * fabsf(Noise(lambda * p));
+        sum += o * fabsf(Noise(lambda * x, lambda * y, lambda * z));
         lambda *= 1.99f;
         o *= omega;
     }
 
     return sum;
+}
+float Turbulence( const Math::Vector3& p, float omega, int octaves) {
+  return Turbulence( p.x, p.y, p.z, omega, octaves );
 }

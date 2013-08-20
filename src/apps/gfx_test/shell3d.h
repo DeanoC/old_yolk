@@ -17,6 +17,7 @@ public:
 	void end();
 
 	SceneWorldPtr getSceneWorld() const { return world; }
+	Scene::Renderer* getRenderer() const { return renderer; }
 protected:
 	SceneWorldPtr						world;
 	Scene::Renderer*					renderer;

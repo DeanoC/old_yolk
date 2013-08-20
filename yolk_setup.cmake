@@ -39,6 +39,8 @@ SET( USE_RAIK false CACHE BOOL "Use RIAK cpp library" )
 SET( USE_RAKNET false CACHE BOOL "Use RAKNET library" )
 SET( USE_OPENCV false CACHE BOOL "Use OpenCV library" )
 
+SET( USE_AMP true CACHE BOOL "Use C++ AMP GPU Accelerator libs" )
+
 IF( USE_DOXYGEN_GENERATOR )
 	include( UseDoxygen.cmake )
 ENDIF()

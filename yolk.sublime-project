@@ -2,11 +2,11 @@
 	"folders":
 	[
 		{
-			"path": ".",
-            "pathX": "~/projects/yolk"
+			"follow_symlinks": true,
+			"path": "G:\\Projects\\yolk"
 		}
 	],
-    "settings":
-    {
-    }	
+	"settings":
+	{
+	}
 }

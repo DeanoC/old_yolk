@@ -19,6 +19,10 @@
 #include "scene/renderer.h"
 #endif
 
+#if defined( USE_AMP )
+#include "amp.h"
+#endif
+
 namespace Dx11 {
 
 	class RenderContext;
@@ -30,7 +34,10 @@ namespace Dx11 {
 		Scene::ScreenPtr createScreen( uint32_t width, uint32_t height, uint32_t flags ) override;
 		void destroyScreen( Scene::ScreenPtr screen ) override;
 		void houseKeep() override;
-
+		
+#if defined( USE_AMP )
+		concurrency::accelerator_view getAMPAcceleratorView() override;
+#endif
 		//! returns the actual D3D Device
 		D3DDevicePtr operator()() const { return device; }
 	private:

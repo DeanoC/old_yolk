@@ -18,6 +18,10 @@
 #include "resource.h"
 #endif
 
+#if defined( USE_AMP )
+#include "amp.h"
+#endif
+
 namespace Scene {
 	class RenderContext;
 	class DebugPrims;
@@ -33,6 +37,10 @@ namespace Scene {
 
 		// call once per frame to allow things to be ticked (like loaders etc.)
 		virtual void houseKeep() = 0;
+
+#if defined( USE_AMP )
+		virtual concurrency::accelerator_view getAMPAcceleratorView() = 0;
+#endif
 
 		size_t getNumScreens() const { return screens.size(); }
 		ScreenPtr getScreen( size_t index ) const { return screens[index]; }

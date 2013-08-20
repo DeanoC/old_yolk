@@ -12,6 +12,8 @@
 #include "voxtreephysical.h"
 #include "procvoxtree.h"
 
+#include "proceduraltextureutils.h"
+
 class PrintDebugPrims :	public Core::DebugRenderInterface {
 	public:
 	PrintDebugPrims( SceneWorldPtr world ) : 
@@ -80,6 +82,9 @@ int Main() {
 
 	extern Vox::ProcVoxTree* VoxTreeTest();
 	Vox::ProcVoxTree* tree = VoxTreeTest();
+
+	tree->ampTest( shell.getRenderer() );
+
 	Vox::TreeRenderable<Vox::ProcVoxTree>::Ptr treeRender = std::make_shared<Vox::TreeRenderable<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
 	Vox::TreePhysical<Vox::ProcVoxTree>::Ptr treePhysical = std::make_shared<Vox::TreePhysical<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
 

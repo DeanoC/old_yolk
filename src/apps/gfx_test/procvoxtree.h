@@ -4,6 +4,10 @@
 
 #include "voxtree.h"
 
+namespace Scene {
+	class Renderer;
+}
+
 namespace Vox {
 
 enum ProcVoxNodeType {
@@ -14,6 +18,8 @@ class ProcVoxTree : public Tree<ProcVoxTree> {
 public:
 	friend class Tree<ProcVoxTree>;
 	ProcVoxTree( const Core::AABB& _box );
+
+	void ampTest( Scene::Renderer* _renderer );
 
 protected:
 	bool visit( VisitHelper& _helper, 

@@ -21,3 +21,6 @@
 #define CALL						__device__
 #define READONLY_MEM				__constant__
 #define LOCAL_MEM					__device__
+
+#define AMP_ONLY			
+#define AMP_ALLOWED				

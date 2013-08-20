@@ -9,6 +9,7 @@
 #cmakedefine USE_GC
 #cmakedefine USE_GLOG
 #cmakedefine IS_HOST_64_BIT
+#cmakedefine USE_AMP
 
 // some compile time constants set by the build system
 #define ${PROJECT}_VERSION_MAJOR 	${${PROJECT}_VERSION_MAJOR}

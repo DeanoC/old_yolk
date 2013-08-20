@@ -1,7 +1,13 @@
 #include "core/core.h"
+#include "scene/renderer.h"
 #include "voxtree.h"
 #include "proceduraltextureutils.h"
 #include "procvoxtree.h"
+
+#if defined( USE_AMP )
+#include "amp.h"
+#endif
+
 namespace Vox {
 ProcVoxTree::ProcVoxTree( const Core::AABB& _box ) : Tree(_box) {
 	for( int i = 0;i < 8; ++i ) {
@@ -59,6 +65,28 @@ bool ProcVoxTree::generate( 	VisitHelper& _helper,
 		}
 	}
 	return false;
+}
+
+void ProcVoxTree::ampTest( Scene::Renderer* _renderer ) {
+#if defined( USE_AMP )
+	concurrency::accelerator_view ampAcc = _renderer->getAMPAcceleratorView();
+
+	int v[11] = {'G', 'd', 'k', 'k', 'n', 31, 'v', 'n', 'q', 'k', 'c'};
+	concurrency::array_view<int,1> av( 11, v ); 
+
+	concurrency::parallel_for_each( av.extent, 
+		[=](concurrency::index<1> idx) restrict(amp) {
+			av[idx] += 1;
+		} 
+	);	
+
+	av.synchronize();
+
+	for( int i=0;i < 11; ++i ) {
+		LOG(INFO) << (char)v[i];
+	}
+	CORE_ASSERT( v[0] != 'G' );	
+#endif
 }
 
 } // end namespace Vox
