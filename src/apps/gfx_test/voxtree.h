@@ -22,7 +22,7 @@ static const uint32_t INVALID_INDEX				= ~0;
 
 // we only use 4 bits
 enum NodeType {
-	EMPTY = 0,				//!< nada, technically redundant as CONSTNAT_LEAF could be used
+	EMPTY = 0,				//!< nada, technically redundant as CONSTANT_LEAF could be used
 	NODE,					//!< standard node, with an index to a children node tile
 	LEAF,					//!< leaf node, has an index to a brick
 	CONSTANT_LEAF,			//!< all children use the same brick
@@ -112,34 +112,6 @@ static_assert( sizeof(Node) == (NODE_TYPE_BIT_SIZE + NODE_PAYLOAD_BIT_SIZE)/8, "
 struct NodeTile { 
 	Node nodes[8];
 };
-
-enum class BrickSize : uint32_t {
-	TWO_CUBED,
-	EIGHT_CUBED,
-	SIXTEEN_CUBED,
-	SIXTYFOUR_CUBED
-};
-
-//! Bricks are the smallest element in the voxtree, leaves of the tree
-//! Along with the graphical data to render the tree, they also contain
-//! the type of block and other data for gameplay systems.
-//! uwv coordinate 9 bit per coordinate implicit 0 bit so 10 bit total 1024^3 address space
-struct Brick {
-	uint16_t	type;				//!< game specific type data (material etc.)
-
-	uint16_t	splitable 	: 1;	//!< can brick be split into 8 smaller version of itself
-	uint16_t	userData 	: 14;	//!< extra game data specific to each type.
-
-	BrickSize	size 		: 2;	//!< size of voxel brick 2^3 to 64^3
-	uint32_t	reflectX 	: 1;	//!< if voxel data reflected in x
-	uint32_t	reflectY 	: 1;	//!< if voxel data reflected in y
-	uint32_t	reflectZ 	: 1;	//!< if voxel data reflected in z
-	uint32_t	gfxU 		: 9;	//!< brick gfx U coord
-	uint32_t	gfxV 		: 9;	//!< brick gfx V coord
-	uint32_t	gfxW 		: 9;	//!< brick gfx W coord
-};
-static_assert( sizeof(Brick) == 8, "Eeek vox::Brick not 8 bytes in size" );
-
 
 enum class CULL_FUNC_RETURN {
 	CULL 			= 0,

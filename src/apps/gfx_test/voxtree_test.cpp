@@ -30,29 +30,6 @@ Vox::Tree* VoxTreeTest() {
 	return test;
 }
 */
-/**
- * Surface address x y z
- * generation: 	generate 'space view' spherical cube map
- * 				spherical coords to surface address
- * 				add 3D detail
- * changes :	store block changes or entire block whichever is smaller
- * Look up:		In surface address, quantize to block address
- * 				check change cache
- * 					if in cache
- * 						if entire block, 
- * 							load and use
- * 					 	else
- * 					 		generate block
- * 					 		apply changes
- * 				    else
- * 					 	generate block
- * 					 	
- * Space view:	For each face of cube map
- * 					walk down each block until non atmosphere are produces
- * 						render to face 
- * 				Upload to GPU
- * 
- */
 
 
 Vox::ProcVoxTree* VoxTreeTest() {
