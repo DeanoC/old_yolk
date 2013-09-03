@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"engine",
+				"engineBuilder"
+			],
+			[
+				"engin",
+				"engineBuilder"
+			],
+			[
 				"aab",
 				"aabbStack"
 			],
@@ -506,25 +514,18 @@
 			[
 				"blo",
 				"blockHandles"
-			],
-			[
-				"cu",
-				"curWinHeight"
-			],
-			[
-				"sc",
-				"scrHeight"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/apps/gfx_test/voxtree_test.cpp",
+			"file": "src/libs/sandbox/sandbox.h",
 			"settings":
 			{
-				"buffer_size": 1961,
-				"line_ending": "Windows"
+				"buffer_size": 1143,
+				"line_ending": "Windows",
+				"name": "sandbox.h"
 			}
 		},
 		{
@@ -536,69 +537,94 @@
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/proceduraltextureutils.cpp",
+			"contents": "Searching 6002 files for \"LLVM_ROOT\" (case sensitive)\n\nG:\\Projects\\yolk\\yolk_setup.cmake:\n    8  SET( HEADLESS_PLATFORM 1 CACHE STRING \"Set to 1 if platform is headless and has no keyboard etc.\")\n    9  \n   10: SET( LLVM_ROOT \"${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm\" CACHE PATH \"Root of LLVM install.\")\n   11  \n   12  LIST( APPEND CMAKE_MODULE_PATH 	\"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules\" )\n\n1 match in 1 file\n",
 			"settings":
 			{
-				"buffer_size": 7372,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/apps/gfx_test/proceduraltextureutils.h",
-			"settings":
-			{
-				"buffer_size": 506,
+				"buffer_size": 420,
 				"line_ending": "Windows",
-				"name": "proceduraltextureutils.h"
+				"name": "Find Results",
+				"scratch": true
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/procvoxtree.h",
+			"file": "/G/builds/llvm/share/llvm/cmake/LLVMConfig.cmake",
 			"settings":
 			{
-				"buffer_size": 1416,
+				"buffer_size": 6458,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/gfx_test/procvoxtree.cpp",
+			"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_shaders_gles2.h",
 			"settings":
 			{
-				"buffer_size": 2412,
+				"buffer_size": 1812,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_shaders_gles2.c",
+			"settings":
+			{
+				"buffer_size": 35618,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/G/AdrenoSDK/Development/Samples/Framework/OpenGLES/FrmGLES3.cpp",
+			"settings":
+			{
+				"buffer_size": 48792,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/G/Projects/RBDOOM-3-BFG/neo/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 42387,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/G/AdrenoSDK/Development/Samples/OpenGLES30/CompressedGeometry/CompressedMesh.cpp",
+			"settings":
+			{
+				"buffer_size": 32075,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_render_gles2.c",
+			"settings":
+			{
+				"buffer_size": 60235,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_gles2funcs.h",
+			"settings":
+			{
+				"buffer_size": 2791,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "yolk_setup.cmake",
+			"settings":
+			{
+				"buffer_size": 4482,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/libs/sandbox/sandbox.cpp",
+			"settings":
+			{
+				"buffer_size": 866,
 				"line_ending": "Windows",
-				"name": "procvoxtree.cpp"
-			}
-		},
-		{
-			"file": "src/libs/scene/renderer.h",
-			"settings":
-			{
-				"buffer_size": 2181,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/bitcoder.cpp",
-			"settings":
-			{
-				"buffer_size": 11828,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dwm/isolatedexecengine.cpp",
-			"settings":
-			{
-				"buffer_size": 5370,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/libs/dx11/gfx.cpp",
-			"settings":
-			{
-				"buffer_size": 10308,
-				"line_ending": "Windows"
+				"name": "sandbox.cpp"
 			}
 		}
 	],
@@ -653,9 +679,65 @@
 	},
 	"file_history":
 	[
+		"/G/AdrenoSDK/Development/Samples/OpenGLES30/CompressedGeometry/VS2010/CompressedGeometry.vcxproj",
+		"/G/AdrenoSDK/Development/Samples/OpenGLES30/CompressedGeometry/Scene.cpp",
+		"/G/AdrenoSDK/Development/Samples/OpenGLES30/CompressedGeometry/Eigenvector.cpp",
+		"/G/Projects/SDL2-2.0.0/README-directfb.txt",
+		"/G/Projects/SDL2-2.0.0/README-platforms.txt",
+		"/G/Projects/SDL2-2.0.0/README-porting.txt",
+		"/G/Projects/native_client/src/include/nacl/nacl_minidump.h",
+		"/G/Projects/native_client/src/include/nacl_asm.h",
+		"/G/Projects/native_client/src/third_party/valgrind/README",
+		"/G/Projects/native_client/src/third_party/dlmalloc/README.nacl",
+		"/G/Projects/native_client/src/third_party/dlmalloc/NOTICE",
+		"/G/Projects/native_client/src/untrusted/pthread/nc_condvar.c",
+		"/G/Projects/native_client/src/untrusted/nosys/pclose.c",
+		"/G/Projects/native_client/src/untrusted/nosys/chmod.c",
+		"/G/builds/llvm/examples/BrainF/BrainF.vcxproj",
+		"/G/builds/llvm/share/llvm/cmake/LLVMConfigVersion.cmake",
+		"/G/Projects/yolk/src/libs/CMakeLists.txt",
+		"/G/Projects/yolk/src/apps/gfx_test/voxtree_test.cpp",
+		"/G/Projects/yolk/src/libs/core/aabb.h",
+		"/G/Projects/yolk/src/libs/core/aabb.inl",
+		"/G/Projects/yolk/src/libs/core/kdtree.cpp",
+		"/G/Projects/yolk/src/libs/core/kdtree.h",
+		"/G/Projects/yolk/src/libs/core/luastate.h",
+		"/G/Projects/yolk/src/libs/core/rasteriser.cpp",
+		"/G/Projects/yolk/src/libs/core/rasteriser.h",
+		"/G/Projects/yolk/src/libs/core/ray.cpp",
+		"/G/Projects/yolk/src/libs/core/ray.h",
+		"/G/Projects/yolk/src/libs/core/resource_dir.h",
+		"/G/Projects/yolk/src/libs/core/resourcebase.h",
+		"/G/Projects/yolk/src/libs/core/resourceman.h",
+		"/G/Projects/yolk/src/libs/core/resources.h",
+		"/G/Projects/yolk/src/libs/core/platform_windows/win_shell.h",
+		"/G/Projects/yolk/src/libs/dx11/dxgiformat_cracker.h",
+		"/G/Projects/yolk/src/libs/gl/debugpipeline.h",
+		"/G/Projects/yolk/src/libs/gl/glformat_cracker.h",
+		"/G/Projects/yolk/src/libs/gl/vtpipeline.h",
+		"/G/Projects/yolk/src/libs/gl/wobbackend.h",
+		"/G/Projects/yolk/src/libs/meshmod/edge.cpp",
+		"/G/Projects/yolk/src/libs/meshops/floattexture.cpp",
+		"/G/Projects/yolk/src/libs/meshops/floattexture.h",
+		"/G/Projects/yolk/src/libs/meshops/raycaster.cpp",
+		"/G/Projects/yolk/src/libs/meshops/raycaster.h",
+		"/G/Projects/yolk/src/libs/meshops/textureunit.cpp",
+		"/G/Projects/yolk/src/libs/meshops/textureunit.h",
+		"/G/Projects/yolk/src/libs/dx11/gfx.cpp",
+		"/G/Projects/yolk/src/libs/scene/gtfcracker.h",
+		"/G/Projects/yolk/src/libs/scene/debugpipeline.h",
+		"/G/Projects/yolk/src/apps/gfx_test/proceduraltextureutils.cpp",
+		"/G/Projects/yolk/src/apps/gfx_test/proceduraltextureutils.h",
+		"/G/Projects/yolk/src/apps/gfx_test/procvoxtree.h",
+		"/G/Projects/yolk/src/apps/gfx_test/procvoxtree.cpp",
+		"/G/Projects/yolk/src/libs/scene/renderer.h",
+		"/G/Projects/yolk/src/libs/dwm/bitcoder.cpp",
+		"/G/Projects/yolk/src/libs/sandbox/CMakeLists.txt",
+		"/G/Projects/yolk/src/libs/cl/clformatcracker.h",
+		"/G/Projects/yolk/src/libs/scene/pipeline.h",
+		"/G/Projects/yolk/src/libs/scene/vtpipeline.h",
 		"/G/Projects/native_client/src/shared/ldr/nacl_ldr.c",
 		"/G/Projects/yolk/yolk.sublime-project",
-		"/G/Projects/yolk/src/libs/scene/renderer.h",
 		"/G/Projects/iipmooviewer-1.1/iipmooviewer.html",
 		"/G/Projects/iipmooviewer-1.1/javascript/iipmooviewer-1.1.js",
 		"/G/Projects/Aura2/MWare/Common/TaskMgr/tbb30/include/tbb/parallel_while.h",
@@ -667,7 +749,6 @@
 		"/G/Projects/Aura2/MWare/Common/TaskMgr/tbb30/include/tbb/parallel_invoke.h",
 		"/G/Projects/yolk/yolk_setup.cmake",
 		"/G/Projects/yolk/src/libs/core/buildconfig.h.in",
-		"/G/Projects/yolk/src/apps/gfx_test/procvoxtree.h",
 		"/G/Projects/yolk/src/apps/gfx_test/voxtree.h",
 		"/G/Projects/yolk/src/apps/gfx_test/voxtree.inl",
 		"/G/Projects/yolk/src/apps/gfx_test/voxtreerenderable.inl",
@@ -686,7 +767,6 @@
 		"/G/Projects/yolk/src/apps/gfx_test/voxtreephysical.cpp",
 		"/G/Projects/yolk/src/libs/scene/physicsworld.cpp",
 		"/G/Projects/yolk/src/apps/gfx_test/main.cpp",
-		"/G/Projects/yolk/src/apps/gfx_test/voxtree_test.cpp",
 		"/G/Projects/yolk/src/libs/localworld/sceneworld.cpp",
 		"/G/Projects/yolk/src/libs/scene/compoundcolshape.h",
 		"/G/Projects/yolk/src/libs/scene/physical.h",
@@ -721,66 +801,12 @@
 		"/G/Projects/yolk/src/libs/scene/debugpipeline.cpp",
 		"/G/Projects/yolk/src/libs/scene/programs/shaders/fs_basic.hlsl",
 		"/G/test.stl",
-		"/G/Projects/yolk/src/libs/core/resources.h",
 		"/G/Projects/yolk/src/libs/scene/mesh.h",
-		"/G/Projects/yolk/src/libs/core/aabb.inl",
 		"/G/Projects/yolk/src/apps/gfx_test/freelist.h",
 		"/G/minecraft/server.properties",
 		"/G/minecraft/ops.txt",
 		"/G/minecraft/banned-players.txt",
-		"/G/minecraft/banned-ips.txt",
-		"/G/minecraft/debug/profile-results-2013-06-18_12.56.21.txt",
-		"/G/Projects/yolk/src/libs/core/aabb.h",
-		"/G/Projects/yolk/src/libs/core/standard.h",
-		"/G/Projects/yolk/src/libs/scene/programs/shaders/cs_vtlighting.hlsl",
-		"/G/Projects/yolk/src/libs/CMakeLists.txt",
-		"/G/Projects/yolk/src/apps/CMakeLists.txt",
-		"/G/Projects/yolk/src/apps/Riftball/CMakeLists.txt",
-		"/G/Projects/yolk/src/apps/zombiehospital/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/scene/hier.cpp",
-		"/G/Projects/yolk/src/libs/scene/hierfile.cpp",
-		"/G/Projects/yolk/src/libs/scene/texture.h",
-		"/G/Projects/yolk/src/libs/styx/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/styx/styx.h",
-		"/G/Projects/yolk/src/libs/styx/styxprotocol.cpp",
-		"/G/Projects/yolk/src/libs/styx/styxprotocol.h",
-		"/G/Projects/Aura2/MWare/LightPropagationVolumesClient/Models/sponza.mtl",
-		"/F/PortableApps/SublimeTextPortable/Data/Packages/User/Default (Windows).sublime-keymap",
-		"/F/PortableApps/SublimeTextPortable/Data/Packages/Default/Default (Windows).sublime-keymap",
-		"/G/Projects/yolk/src/libs/core/memory.h",
-		"/G/Projects/yolk/src/libs/styx/styx.cpp",
-		"/G/Projects/yolk/src/apps/convert/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/dwm/bitcoder.cpp",
-		"/Z/Projects/Cyberspace/vt_repo/CMakeToolchain.txt",
-		"/G/Projects/yolk/src/libs/9P2000/CMakeLists.txt",
-		"/Z/Projects/Cyberspace/vt_repo/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/bitmap.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/builder.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/button.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/buttonframeitem.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/displayobjectframeitem.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/dynamictext.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/dynamictext.h",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/gpulinepath.h",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/gpupath.h",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/gradienttexturemanager.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/movieclip.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/player.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/shape.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/text.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/utils.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/basepath.h",
-		"/G/Projects/yolk/src/libs/core/clock.cpp",
-		"/G/Projects/yolk/src/libs/core/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/gui/swfparser/SwfStream.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/utils.h",
-		"/G/Projects/yolk/src/libs/scene/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/rapidjson/CMakeLists.txt",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsAgRuntime.cpp",
-		"/G/Projects/yolk/src/libs/gui/swfruntime/ActionScript/AsVM.cpp",
-		"/C/Users/AndroidDev/AppData/Local/Temp/7zO4F39.tmp/README.txt",
-		"/G/Projects/yolk/src/libs/core/platform.h",
-		"/G/Projects/yolk/src/libs/core/keyboard.h"
+		"/G/minecraft/banned-ips.txt"
 	],
 	"find":
 	{
@@ -805,6 +831,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"LLVM_ROOT",
+			"rattie.demon.co.uk",
 			"iscanvas",
 			"Singleton",
 			"Clamp",
@@ -930,9 +958,7 @@
 			"VertexArrayVertexAttribOffsetEXT",
 			"glVertexArrayVertexAttribOffsetEXT",
 			"REGISTER_SHARED_WITH_CL",
-			"WobBack",
-			"DT_NULL",
-			"setMemoryWritable"
+			"WobBack"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -940,6 +966,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"cloudpixies.com",
 			"_serverVersion",
 			"swfparser/",
 			"#include \"swfruntime.h\"",
@@ -984,34 +1011,33 @@
 	"groups":
 	[
 		{
-			"selected": 8,
+			"selected": 7,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/apps/gfx_test/voxtree_test.cpp",
+					"file": "src/libs/sandbox/sandbox.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1961,
+						"buffer_size": 1143,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1822,
-								1822
+								241,
+								241
 							]
 						],
 						"settings":
 						{
-							"spell_check": false,
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"auto_name": "sandbox.h",
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 972.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1046,19 +1072,91 @@
 				},
 				{
 					"buffer": 2,
-					"file": "src/apps/gfx_test/proceduraltextureutils.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7372,
+						"buffer_size": 420,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										216,
+										225
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								231,
+								231
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/G/builds/llvm/share/llvm/cmake/LLVMConfig.cmake",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6458,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7363,
-								7363
+								5842,
+								5859
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1782.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_shaders_gles2.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1812,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								284,
+								284
 							]
 						],
 						"settings":
@@ -1067,32 +1165,171 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 2635.0,
+						"translation.x": -0.0,
+						"translation.y": 891.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "src/apps/gfx_test/proceduraltextureutils.h",
+					"buffer": 5,
+					"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_shaders_gles2.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 506,
+						"buffer_size": 35618,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								398,
-								398
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"auto_name": "proceduraltextureutils.h",
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 17982.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/G/AdrenoSDK/Development/Samples/Framework/OpenGLES/FrmGLES3.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 48792,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								322,
+								322
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 8748.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/G/Projects/RBDOOM-3-BFG/neo/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 42387,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/G/AdrenoSDK/Development/Samples/OpenGLES30/CompressedGeometry/CompressedMesh.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 32075,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								32075,
+								32075
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 27707.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_render_gles2.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 60235,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								23434,
+								23434
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 28998.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/G/Projects/SDL2-2.0.0/src/render/opengles2/SDL_gles2funcs.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2791,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -1102,171 +1339,58 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "src/apps/gfx_test/procvoxtree.h",
+					"buffer": 11,
+					"file": "yolk_setup.cmake",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1416,
+						"buffer_size": 4482,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								276,
-								276
+								2483,
+								2483
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage",
+							"syntax": "Packages/CMake/CMake.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 81.0,
+						"translation.y": 1987.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "src/apps/gfx_test/procvoxtree.cpp",
+					"buffer": 12,
+					"file": "src/libs/sandbox/sandbox.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2412,
+						"buffer_size": 866,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								544,
-								544
+								734,
+								734
 							]
 						],
 						"settings":
 						{
-							"auto_name": "procvoxtree.cpp",
+							"auto_name": "sandbox.cpp",
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1701.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/libs/scene/renderer.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2181,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								483,
-								490
-							]
-						],
-						"settings":
-						{
-							"history_list_is_closing": true,
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 421.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "src/libs/dwm/bitcoder.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11828,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								389,
-								389
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 4698.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "src/libs/dwm/isolatedexecengine.cpp",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 5370,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5370,
-								5370
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3402.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/libs/dx11/gfx.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10308,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								9313,
-								9313
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 5972.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

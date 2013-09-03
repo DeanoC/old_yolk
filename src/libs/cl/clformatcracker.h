@@ -5,7 +5,7 @@
 /// \brief	Declares the cl image format cracker class.
 ///
 /// \remark	Copyright (c) 2011 Dean Calver. All rights reserved.
-/// \remark	mailto://deano@rattie.demon.co.uk
+/// \remark	mailto://deano@cloudpixies.com
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if !defined( WIERD_CL_CRACKER_H__ )

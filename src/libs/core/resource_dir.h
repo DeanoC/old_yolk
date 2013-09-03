@@ -2,7 +2,7 @@
 //!
 //! \file resource_dir.h
 //!   Copyright (C) 2006 by Dean Calver                                     
-//!   deano@rattie.demon.co.uk                                              
+//!   deano@cloudpixies.com                                              
 //!
 //!
 //!-----------------------------------------------------

@@ -2,7 +2,7 @@
 //!
 //! \file resourcebase.h
 //!   Copyright (C) 2012 by Dean Calver                                     
-//!   deano@rattie.demon.co.uk                                              
+//!   deano@cloudpixies.com                                              
 //!
 //!-----------------------------------------------------
 #ifndef YOLK_CORE_RESOURCEBASE_H_

@@ -13,7 +13,7 @@
 #include "gui/swfparser/SwfSprite.h"
 #include "gui/swfparser/SwfDisplayObject.h"
 #include "gui/swfparser/SwfFrame.h"
-#include "gui/swfparser/SwfParser.h"
+#include "gui/swfparser/swfparser.h"
 #include "gui/swfparser/SwfDictionary.h"
 #include "ActionScript/AsVM.h"
 #include "displayobjectframeitem.h"

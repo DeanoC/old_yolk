@@ -19,7 +19,7 @@
 
 #include "vector_math.h"
 #include "colour.h"
-
+#include <cstdarg>
 
 
 namespace Core {

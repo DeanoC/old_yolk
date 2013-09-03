@@ -8,7 +8,7 @@
 #ifndef YOLK_GUI_SWFRUNTIME_FRAMEITEM_H_
 #define YOLK_GUI_SWFRUNTIME_FRAMEITEM_H_
 
-#include "actionscript/AsObject.h"
+#include "ActionScript/AsObject.h"
 
 namespace Scene {
 	class RenderContext;

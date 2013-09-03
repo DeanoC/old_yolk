@@ -37,7 +37,7 @@ namespace Swf {
 			}
 		}
 
-#define TT( N, O, C ) if( button->condActions[i]. ## N ) { \
+#define TT( N, O, C ) if( button->condActions[i]. N ) { \
 						CORE_ASSERT( transitionTable[ (O) ][ (C) ] == nullptr ); \
 						transitionTable[ (O) ][ (C) ] = &button->condActions[i]; \
 		}

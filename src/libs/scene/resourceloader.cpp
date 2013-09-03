@@ -5,6 +5,7 @@
 //!
 //!-----------------------------------------------------
 
+#include "scene.h"
 #include "screen.h"
 #include "core/resourceman.h"
 #include "wobfile.h"

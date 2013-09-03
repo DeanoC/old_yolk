@@ -175,7 +175,7 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 	}
 }
 
-static enum VTPIPE_GEOMETRY_PASSES {
+enum VTPIPE_GEOMETRY_PASSES {
 	GBUFFER_RENDER_OPAQUE_PASS = 0,
 
 	GBUFFER_RENDER_TRANS_PASS,

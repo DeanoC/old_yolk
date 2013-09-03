@@ -2,7 +2,7 @@
 //!
 //! \file luastate.h
 //!   Copyright (C) 2004 by Dean Calver                                     
-//!   deano@rattie.demon.co.uk                                              
+//!   deano@cloudpixies.com                                              
 //!
 //!
 //!-----------------------------------------------------

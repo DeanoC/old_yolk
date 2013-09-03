@@ -12,7 +12,7 @@
 #include "gui/swfparser/SwfMorphShape.h"
 #include "gui/swfparser/SwfRGB.h"
 #include "gui/swfparser/SwfFillStyle.h"
-#include "gui/swfparser/SwfParser.h"
+#include "gui/swfparser/swfparser.h"
 #include "gui/swfparser/SwfBitmap.h"
 #include "gui/swfparser/SwfFont.h"
 #include "gui/swfparser/SwfButton.h"

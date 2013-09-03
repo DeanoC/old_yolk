@@ -5,7 +5,7 @@
 #ifndef YOLK_GUI_SWFRUNTIME_FILLSTYLE_H_
 #	include "fillstyle.h"
 #endif
-#include "gui/swfparser/swfrgb.h"
+#include "gui/swfparser/SwfRGB.h"
 
 namespace Swf {
 	class FSSolidColour : public FillStyle {

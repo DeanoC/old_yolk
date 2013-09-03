@@ -7,7 +7,7 @@
 ///		rasterisor description goes here
 ///
 /// \remark	Copyright (c) 2011 Dean Calver. All rights reserved.
-/// \remark	mailto://deano@rattie.demon.co.uk
+/// \remark	mailto://deano@cloudpixies.com
 /// \remark see rasteriser.h for meshtool copyright that applies to much of this code as well
 ///
 /// \todo	Fill in detailed file description.

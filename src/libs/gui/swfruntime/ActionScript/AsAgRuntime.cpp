@@ -382,7 +382,7 @@ namespace Swf {
 		push(blta);
 	}
 		
-    void AsAgRuntime::and() {
+    void AsAgRuntime::asand() {
 		AsObjectHandle oa = asPop();
 		AsObjectHandle ob = asPop();
 		double a = oa->toNumber();
@@ -391,7 +391,7 @@ namespace Swf {
 		push(aandb);
 	}
 		
-    void AsAgRuntime::or() {
+    void AsAgRuntime::asor() {
 		AsObjectHandle oa = asPop();
 		AsObjectHandle ob = asPop();
 		double a = oa->toNumber();
@@ -400,7 +400,7 @@ namespace Swf {
 		push(aorb);
 	}
 
-    void AsAgRuntime::not() {
+    void AsAgRuntime::asnot() {
 		/* Swf 4 behavior I believe
 		object oa = currentFrame.stack.Pop();
 		double a = IsNumeric(oa) ? ToNumber(oa) : 0;

@@ -5,7 +5,7 @@
 /// \brief	Declares the controlling class for debug rendering.
 ///
 /// \remark	Copyright (c) 2012 Dean Calver. All rights reserved.
-/// \remark	mailto://deano@rattie.demon.co.uk
+/// \remark	mailto://deano@cloudpixies.com
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -146,7 +146,7 @@ void PhysicsWorld::add( const std::shared_ptr<PhysicSensor>& sensor, uint16_t _c
 
 void PhysicsWorld::remove( const std::shared_ptr<PhysicSensor>& sensor ) {
 	getDynamicsWorld()->removeCollisionObject( sensor->getGhost() );
-	sensors.erase( std::find( sensors.cbegin(), sensors.cend(), sensor ) );
+	sensors.erase( std::find( sensors.begin(), sensors.end(), sensor ) );
 }
 
 }

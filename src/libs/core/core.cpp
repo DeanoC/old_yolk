@@ -112,7 +112,7 @@ void HouseKeep( void ) {
 
 #if PLATFORM == WINDOWS
 	WinGetMessages();
-#elif PLATFORM == POSIX
+#elif PLATFORM == POSIX && !defined( HEADLESS_PLATFORM )
 	extern void X11PumpEvents();
 
 	X11PumpEvents();

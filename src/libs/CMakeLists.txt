@@ -13,8 +13,12 @@ add_subdirectory( bullet )
 add_subdirectory( core )
 add_subdirectory( glog )
 add_subdirectory( jpeg )
-add_subdirectory( protobuf )
-add_subdirectory( protocols )
+
+IF( USE_PROTOBUFFERS )
+	add_subdirectory( protobuf )
+	add_subdirectory( protocols )
+ENDIF( USE_PROTOBUFFERS )
+
 add_subdirectory( scene )
 #add_subdirectory( styx )
 add_subdirectory( tbb )
@@ -40,6 +44,8 @@ IF( USE_DWM )
 	add_subdirectory( dwm )
 	add_subdirectory( dwm_client )
 ENDIF( USE_DWM )
+
+add_subdirectory( sandbox )
 
 add_subdirectory( localworld )
 add_subdirectory( gui )

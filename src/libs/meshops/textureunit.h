@@ -7,7 +7,7 @@
 ///		textureUnit description goes here
 ///
 /// \remark	Copyright (c) 2011 Dean Calver. All rights reserved.
-/// \remark	mailto://deano@rattie.demon.co.uk
+/// \remark	mailto://deano@cloudpixies.com
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once

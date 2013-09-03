@@ -111,9 +111,9 @@ namespace Swf {
 		void divide();		  
 		void equals();
 		void less();
-		void and();
-		void or();
-		void not();
+		void asand();
+		void asor();
+		void asnot();
 		void stringEquals();
 		void stringLength();
 		void stringExtract();

@@ -7,8 +7,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # TODO work out HEADLESS from lack of X on UNIX??
 SET( HEADLESS_PLATFORM 1 CACHE STRING "Set to 1 if platform is headless and has no keyboard etc.")
 
-SET( LLVM_ROOT "${CMAKE_CURRENT_BINARY_DIR}/submodules/llvm" CACHE PATH "Root of LLVM install.")
-
 LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 
 find_package( CMakeCommon REQUIRED )
@@ -39,7 +37,9 @@ SET( USE_RAIK false CACHE BOOL "Use RIAK cpp library" )
 SET( USE_RAKNET false CACHE BOOL "Use RAKNET library" )
 SET( USE_OPENCV false CACHE BOOL "Use OpenCV library" )
 
-SET( USE_AMP true CACHE BOOL "Use C++ AMP GPU Accelerator libs" )
+SET( USE_AMP false CACHE BOOL "Use C++ AMP GPU Accelerator libs" )
+
+SET( USE_LLVM true CACHE BOOL "Use LLVM compiler libs" )
 
 IF( USE_DOXYGEN_GENERATOR )
 	include( UseDoxygen.cmake )
@@ -64,6 +64,9 @@ IF( USE_DEVIL )
 ENDIF()
 IF( USE_OPENCL )
 	find_package( OpenCL )
+ENDIF()
+IF( USE_LLVM ) 
+	find_package( LLVM )
 ENDIF()
 
 # if we have boost setup the include and libs
@@ -93,11 +96,18 @@ if( OPENCL_FOUND AND USE_OPENCL )
 	link_directories( ${OPENCL_LIB_DIR} )
 endif( OPENCL_FOUND AND USE_OPENCL )
 
+if( USE_LLVM )
+	include_directories( ${LLVM_INCLUDE_DIRS} )
+	link_directories( ${LLVM_LIBRARY_DIRS} )
+endif( USE_LLVM )
+
 # special handling for the various submodules bits and peices
 include_directories( ${CMAKE_SOURCE_DIR}/src/libs/glog/include/ )
-find_package( WierdProtobuf  )
-include_directories( ${CMAKE_SOURCE_DIR}/src/libs/protobuf/src/ )
-include_directories( ${CMAKE_SOURCE_DIR}/src/libs/json-spirit/ )
+IF( USE_PROTOBUFFERS )
+	find_package( WierdProtobuf  )
+	include_directories( ${CMAKE_SOURCE_DIR}/src/libs/protobuf/src/ )
+ENDIF( USE_PROTOBUFFERS )
+
 include_directories( ${CMAKE_BINARY_DIR}/src/libs/zlib/ )
 include_directories( ${CMAKE_SOURCE_DIR}/src/libs/zlib/ )
 include_directories( ${CMAKE_SOURCE_DIR}/src/libs/jpeg/ )
@@ -106,13 +116,19 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/libs/bullet/src/ )
 include_directories( ${CMAKE_SOURCE_DIR}/src/libs/bdwgc/include/ )
 
 IF( USE_RIAK )
-include_directories( ${CMAKE_SOURCE_DIR}/src/libs/riak-cpp/ )
-include_directories( ${CMAKE_BINARY_DIR}/src/libs/riak-cpp/ )
+	include_directories( ${CMAKE_SOURCE_DIR}/src/libs/riak-cpp/ )
+	include_directories( ${CMAKE_BINARY_DIR}/src/libs/riak-cpp/ )
 ENDIF( USE_RIAK )
 
 IF( USE_RAKNET )
-include_directories( ${CMAKE_SOURCE_DIR}/src/libs/raknet/Source )
+	include_directories( ${CMAKE_SOURCE_DIR}/src/libs/raknet/Source )
 ENDIF( USE_RAKNET )
+
+IF( USE_LLVM )
+	add_definitions( ${LLVM_CFLAGS} )
+	include_directories( ${LLVM_INCLUDE_DIR} )
+	link_directories( ${LLVM_LIBRARY_DIR} )
+ENDIF( USE_LLVM )
 
 IF( USE_DWM )
 if( WIN32 )

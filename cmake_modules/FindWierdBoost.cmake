@@ -23,14 +23,14 @@ if( WIN32 )
 endif()
 
 # debug
-add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
+add_definitions( ${BOOST_LIB_DIAGNOSTIC_DEFINITIONS} )
 
 # pick the right boost
 set( Boost_USE_STATIC_LIBS   ON )
 set( Boost_USE_STATIC_RUNTIME OFF )
 set( Boost_USE_MULTITHREADED ON )
 set( BOOST_VERSION 1.48.0 )
-set( BOOST_COMPONENTS thread date_time regex system filesystem )
+set( BOOST_COMPONENTS thread date_time regex system filesystem program_options )
 set( Boost_DEBUG OFF )
 
 find_package( Boost ${BOOST_VERSION} QUIET COMPONENTS ${BOOST_COMPONENTS} )
