@@ -45,7 +45,7 @@ IF( USE_DWM )
 	add_subdirectory( dwm_client )
 ENDIF( USE_DWM )
 
-add_subdirectory( sandbox )
+#add_subdirectory( sandbox )
 
 add_subdirectory( localworld )
 add_subdirectory( gui )

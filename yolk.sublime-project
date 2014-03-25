@@ -3,11 +3,7 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "/media/deano/FastData/Projects/yolk"
-		},
-		{
-			"follow_symlinks": true,
-			"path": "/media/deano/FastData/builds/linux/yolk"
+			"path": "."
 		}
 	],
 	"settings":

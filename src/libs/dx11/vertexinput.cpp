@@ -79,7 +79,7 @@ Scene::VertexInput* VertexInput::internalCreate( const Scene::VertexInput::Creat
 
 		vi->streamCount = Math::Max( vi->streamCount, (int) creation->data[i].stream + 1 );
 		if( creation->data[i].stride == VI_AUTO_STRIDE ) {
-			vi->streamStrides[ creation->data[i].stream ] += getElementSize( creation->elements[i] );
+			vi->streamStrides[ creation->data[i].stream ] += (uint32_t) getElementSize( creation->elements[i] );
 		} else {
 			// if multiple elements to the same stride set different strides, its undefined
 			vi->streamStrides[ creation->data[i].stream ] = creation->data[i].stride;

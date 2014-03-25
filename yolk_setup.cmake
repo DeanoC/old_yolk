@@ -5,7 +5,7 @@ cmake_policy( VERSION 2.8.2 )
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # TODO work out HEADLESS from lack of X on UNIX??
-SET( HEADLESS_PLATFORM 1 CACHE STRING "Set to 1 if platform is headless and has no keyboard etc.")
+SET( HEADLESS_PLATFORM 0 CACHE STRING "Set to 1 if platform is headless and has no keyboard etc.")
 
 LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 

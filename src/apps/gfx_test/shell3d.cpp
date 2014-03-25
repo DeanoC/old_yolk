@@ -67,6 +67,7 @@ void Shell3D::start() {
 	renderer = static_cast< Renderer* >( Dx11::Gfx::get() );
 #else
 	#error ASCII Renderer TODO
+	renderer = nullptr;
 #endif
 
 	InitWindow( s_screenWidth, s_screenHeight, !!(START_FLAGS & SCRF_FULLSCREEN) );

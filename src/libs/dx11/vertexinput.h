@@ -27,7 +27,7 @@ namespace Dx11 {
 
 	protected:
 		int							streamCount;
-		size_t						streamStrides[ Scene::VertexInput::MAX_ELEMENT_COUNT ];
+		uint32_t					streamStrides[ Scene::VertexInput::MAX_ELEMENT_COUNT ];
 		Scene::DataBufferHandlePtr	streamBuffers[ Scene::VertexInput::MAX_ELEMENT_COUNT ];	
 		int							elementCount;
 		D3D11_INPUT_ELEMENT_DESC 	vertexElements[ Scene::VertexInput::MAX_ELEMENT_COUNT ];

@@ -234,9 +234,11 @@ void Gfx::destroyScreen( Scene::ScreenPtr screen ) {
 void Gfx::houseKeep() {
 }
 
+#if defined( USE_AMP )
 concurrency::accelerator_view Gfx::getAMPAcceleratorView() {
 	return concurrency::direct3d::create_accelerator_view( device.get() );
 }
+#endif
 
 void Screen::display( Scene::TextureHandlePtr toDisplay ) {
 	Scene::RenderContext* ctx = getRenderer()->getPrimaryContext();
