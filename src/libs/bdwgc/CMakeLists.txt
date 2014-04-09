@@ -229,3 +229,6 @@ IF(WIN32)
 ENDIF(WIN32)
 
 #ADD_SUBDIRECTORY(tests)
+
+set_target_properties( gc-lib PROPERTIES FOLDER "Libs/GC")
+set_target_properties( cord PROPERTIES FOLDER "Libs/GC")

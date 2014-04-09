@@ -9,8 +9,9 @@ SET( HEADLESS_PLATFORM 0 CACHE STRING "Set to 1 if platform is headless and has 
 
 LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 
+
 find_package( CMakeCommon REQUIRED )
-find_package( WierdBoost REQUIRED )
+find_package( Boost REQUIRED COMPONENTS thread chrono )
 
 IF( NOT HEADLESS_PLATFORM )
 	IF( WIN32 )
@@ -25,7 +26,7 @@ ELSE( NOT HEADLESS_PLATFORM )
 	SET( USE_OPENGL false CACHE BOOL "Use OpenGL render back end" )	
 ENDIF( NOT HEADLESS_PLATFORM )
 
-SET( USE_GC true CACHE BOOL "Use BDW C/C++ Garbage Collection system (needed for Swf Runtime)" )
+SET( USE_GC false CACHE BOOL "Use BDW C/C++ Garbage Collection system (needed for Swf Runtime)" )
 
 SET( USE_OPENCL false CACHE BOOL "Use OpenCL" )
 SET( USE_TBB false CACHE BOOL "Use Intel Thread Building Blocks system" )
@@ -39,7 +40,7 @@ SET( USE_OPENCV false CACHE BOOL "Use OpenCV library" )
 
 SET( USE_AMP false CACHE BOOL "Use C++ AMP GPU Accelerator libs" )
 
-SET( USE_LLVM true CACHE BOOL "Use LLVM compiler libs" )
+SET( USE_LLVM false CACHE BOOL "Use LLVM compiler libs" )
 
 IF( USE_DOXYGEN_GENERATOR )
 	include( UseDoxygen.cmake )
@@ -142,3 +143,4 @@ ENDIF( USE_DWM )
 
 set( USE_GLOG TRUE )
 set( Core_LIBRARIES core ${Boost_LIBRARIES} glog )
+add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})

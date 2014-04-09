@@ -71,4 +71,4 @@ endif()
 target_link_libraries( tbb ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( tbb PROPERTIES FOLDER "Libs" )
+set_target_properties( tbb PROPERTIES FOLDER "Libs/3rdparty" )

@@ -16,4 +16,4 @@ else()
 endif()
 
 # make a nice hierachy
-set_target_properties( tbb_rml PROPERTIES FOLDER "Libs" )
+set_target_properties( tbb_rml PROPERTIES FOLDER "Libs/3rdparty" )

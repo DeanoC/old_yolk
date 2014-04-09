@@ -1,3 +1,4 @@
+#pragma once
 #ifndef YOLK_CONVERT_TOF_H_
 #define YOLK_CONVERT_TOF_H_ 1
 
@@ -24,7 +25,7 @@ struct Tof {
 	std::vector< std::string > files;
 };
 
-// loads of if not possible sets up the defualt Tof
+// loads up if not possible sets up the defualt Tof
 extern Tof loadTof( const Core::FilePath& inPath );
 extern void loadTao( const Core::FilePath& inPath, std::vector<std::string>& outFilenames, 
 													std::vector<Export::SubTexture>& outSprites );

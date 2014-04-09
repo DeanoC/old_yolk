@@ -55,4 +55,4 @@ add_library( jpeg ${jpeg_src_files} )
 target_link_libraries( jpeg ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( jpeg PROPERTIES FOLDER "Libs" )
+set_target_properties( jpeg PROPERTIES FOLDER "Libs/3rdparty" )

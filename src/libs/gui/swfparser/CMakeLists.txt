@@ -12,4 +12,4 @@ list( APPEND targ_link_libs core  )
 target_link_libraries( swfparser ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( swfparser PROPERTIES FOLDER "Gui/Libs")
+set_target_properties( swfparser PROPERTIES FOLDER "Libs/Gui")

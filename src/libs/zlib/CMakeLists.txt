@@ -177,5 +177,5 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
 endif()
 
 # make nice hierachy
-set_target_properties( zlib PROPERTIES FOLDER "Libs")
+set_target_properties( zlib PROPERTIES FOLDER "Libs/3rdparty")
 set( HAVE_ZLIB true )

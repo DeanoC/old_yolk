@@ -34,7 +34,6 @@ check_library_exists( pthread pthread_rwlock_init "" HAVE_RWLOCK )
 check_type_size(void* SIZEOF_VOID_P)
 
 if( WIN32 )
-	set( _ITERATOR_DEBUG_LEVEL 0 )
 	set( HAVE_NAMESPACES 1 )
 elseif( UNIX )
 	set( HAVE_NAMESPACES 1 )
@@ -66,4 +65,4 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 add_library( glog ${src_files} ${header_files} )
 
 # make a nice hierachy
-set_target_properties( glog PROPERTIES FOLDER "Libs")
+set_target_properties( glog PROPERTIES FOLDER "Libs/3rdparty")

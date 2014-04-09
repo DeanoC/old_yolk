@@ -528,74 +528,58 @@
 			}
 		},
 		{
-			"file": "src/apps/resilience/main.cpp",
+			"file": "src/libs/dx11/databuffer.h",
 			"settings":
 			{
-				"buffer_size": 3207,
+				"buffer_size": 1644,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/apps/CMakeLists.txt",
+			"file": "src/libs/gl/databuffer.h",
 			"settings":
 			{
-				"buffer_size": 542,
+				"buffer_size": 842,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "cmake_modules/FindDirectX.cmake",
+			"file": "src/libs/gl/gfx.cpp",
 			"settings":
 			{
-				"buffer_size": 3321,
+				"buffer_size": 3699,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "CMakeLists.txt",
+			"file": "src/libs/dx11/gfx.cpp",
 			"settings":
 			{
-				"buffer_size": 1032,
+				"buffer_size": 10338,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "yolk_setup.cmake",
+			"file": "src/libs/dx11/resource.cpp",
 			"settings":
 			{
-				"buffer_size": 4627,
+				"buffer_size": 10903,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLRenderDevice.cpp",
+			"file": "src/libs/scene/programman.cpp",
 			"settings":
 			{
-				"buffer_size": 49878,
+				"buffer_size": 8569,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Projects/emf/lsm303dlhc_read.ino",
+			"file": "src/libs/scene/renderworld.h",
 			"settings":
 			{
-				"buffer_size": 4155,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Projects/emf/drsac_emf1/drsac_emf.ino",
-			"settings":
-			{
-				"buffer_size": 0,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLRenderInterface.cpp",
-			"settings":
-			{
-				"buffer_size": 62405,
+				"buffer_size": 2507,
 				"line_ending": "Windows"
 			}
 		}
@@ -651,8 +635,16 @@
 	},
 	"file_history":
 	[
-		"/C/Projects/TripWire/KillingFloor/Engine/Src/UnEngine.cpp",
+		"/P/Source/yolk/src/libs/gl/databuffer.cpp",
+		"/P/Source/yolk/src/apps/resilience/main.cpp",
+		"/P/Source/yolk/src/apps/CMakeLists.txt",
+		"/P/Source/yolk/cmake_modules/FindDirectX.cmake",
+		"/P/Source/yolk/yolk_setup.cmake",
+		"/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLRenderInterface.cpp",
+		"/C/Projects/emf/lsm303dlhc_read.ino",
 		"/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLRenderDevice.cpp",
+		"/C/Projects/emf/drsac_emf1/drsac_emf.ino",
+		"/C/Projects/TripWire/KillingFloor/Engine/Src/UnEngine.cpp",
 		"/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLMaterialState.cpp",
 		"/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/trip_postfx_opengl.cpp",
 		"/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLDrv.cpp",
@@ -770,15 +762,7 @@
 		"/G/Projects/yolk/src/libs/scene/collisionshape.h",
 		"/G/Projects/yolk/src/apps/gfx_test/gfxdbgconsole.h",
 		"/G/Projects/yolk/src/apps/gfx_test/gfxdbgconsole.cpp",
-		"/G/Projects/yolk/src/libs/scene/dynamicphysical.h",
-		"/G/Projects/yolk/src/libs/scene/compoundcolshape.cpp",
-		"/G/Projects/yolk/src/apps/Riftball/levels/testlvl.cpp",
-		"/G/Projects/yolk/src/apps/Riftball/main.cpp",
-		"/G/Projects/yolk/src/apps/Riftball/bowlball.cpp",
-		"/G/Projects/yolk/src/apps/dvm_owned_dedi/main.cpp",
-		"/G/Projects/yolk/src/apps/cyberhackerspace/levels/baselvl.cpp",
-		"/G/Projects/yolk/src/apps/cyberhackerspace/shell3d.cpp",
-		"/G/Projects/yolk/src/apps/cyberhackerspace/gamethread.cpp"
+		"/G/Projects/yolk/src/libs/scene/dynamicphysical.h"
 	],
 	"find":
 	{
@@ -984,7 +968,7 @@
 	"groups":
 	[
 		{
-			"selected": 8,
+			"selected": 7,
 			"sheets":
 			[
 				{
@@ -1013,16 +997,16 @@
 						"translation.y": 81.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/apps/resilience/main.cpp",
+					"file": "src/libs/dx11/databuffer.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3207,
+						"buffer_size": 1644,
 						"regions":
 						{
 						},
@@ -1039,76 +1023,19 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/apps/CMakeLists.txt",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 542,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								542,
-								542
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "cmake_modules/FindDirectX.cmake",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3321,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1680,
-								2832
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1177.0,
+						"translation.y": 756.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "CMakeLists.txt",
-					"semi_transient": true,
+					"buffer": 2,
+					"file": "src/libs/gl/databuffer.h",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1032,
+						"buffer_size": 842,
 						"regions":
 						{
 						},
@@ -1121,59 +1048,60 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/CMake/CMake.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 432.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "yolk_setup.cmake",
+					"buffer": 3,
+					"file": "src/libs/gl/gfx.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4627,
+						"buffer_size": 3699,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								253,
-								253
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/CMake/CMake.tmLanguage",
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3726.0,
+						"translation.y": 1944.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLRenderDevice.cpp",
+					"buffer": 4,
+					"file": "src/libs/dx11/gfx.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 49878,
+						"buffer_size": 10338,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2000,
-								2000
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1182,47 +1110,77 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1604.0,
+						"translation.y": 5292.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/libs/dx11/resource.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10903,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								682,
+								682
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 9720.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "/C/Projects/emf/lsm303dlhc_read.ino",
+					"buffer": 6,
+					"file": "src/libs/scene/programman.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4155,
+						"buffer_size": 8569,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								436,
+								436
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Arduino-like IDE/Arduino.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1782.0,
+						"translation.y": 4536.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "/C/Projects/emf/drsac_emf1/drsac_emf.ino",
-					"semi_transient": false,
+					"buffer": 7,
+					"file": "src/libs/scene/renderworld.h",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 2507,
 						"regions":
 						{
 						},
@@ -1231,34 +1189,6 @@
 							[
 								0,
 								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Arduino-like IDE/Arduino.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "/C/Projects/TripWire/KillingFloor/OpenGLDrv/Src/OpenGLRenderInterface.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 62405,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								361,
-								361
 							]
 						],
 						"settings":
@@ -1270,7 +1200,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]

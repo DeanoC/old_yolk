@@ -146,7 +146,7 @@ ResourceMan::~ResourceMan() {
 const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, const void* pData, size_t sizeofData, uint32_t type, RESOURCE_FLAGS flags ) {
 	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
 	if( impl.resourceTypeMap.find( roRTM, type ) == false ) {
-		CORE_ASSERT( false && "Resource type not registered" );
+		LOG(FATAL) << "Resource type not registered";
 		return nullptr;
 	}
 
@@ -205,7 +205,7 @@ const ResourceHandleBase* ResourceMan::implOpenResource( const char* pName, cons
 	} else {
 		CORE_DELETE_ARRAY( pSafeData );
 		CORE_DELETE_ARRAY( baseMem );
-		CORE_ASSERT( false && "resourceHandleBaseMap.insert failed" )
+		LOG(FATAL) << "resourceHandleBaseMap.insert failed\n";
 	}
 
 	return pBase;
@@ -248,7 +248,7 @@ void ResourceMan::baseCloseResource( ResourceHandleBase* pHandle ) {
 				
 		}
 	} else {
-		CORE_ASSERT( false && "TypedResourceHandle does not exist\n" );
+		LOG(FATAL) << "TypedResourceHandle does not exist\n";
 	}
 }
 ResourceHandleBase* ResourceMan::baseCloneResource( ResourceHandleBase* pHandle ) {
@@ -258,7 +258,7 @@ ResourceHandleBase* ResourceMan::baseCloneResource( ResourceHandleBase* pHandle 
 		CORE_ASSERT( pHandle == pRD->handle );
 		++pRD->refCount;
 	} else {
-		CORE_ASSERT( false && "TypedResourceHandle does not exist\n" );		
+		LOG(FATAL) << "TypedResourceHandle does not exist\n";
 	}
 	return pHandle;
 }
@@ -266,7 +266,7 @@ ResourceHandleBase* ResourceMan::baseCloneResource( ResourceHandleBase* pHandle 
 void ResourceMan::implFlushResource( const char* pName, uint32_t type, RESOURCE_FLAGS flags ) {
 	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
 	if( impl.resourceTypeMap.find( roRTM, type ) == false ) {
-		CORE_ASSERT( false && "Resource type not registered" );
+		LOG(FATAL) << "Resource type not registered";
 	}
 
 	const ResourceTypeData& rtd = roRTM->second;
@@ -308,7 +308,7 @@ void ResourceMan::registerResourceType (	uint32_t type,
 	}
 
 	if( impl.resourceTypeMap.insert( rtmIt, type ) == true ) {
-//	LOG(INFO) << "Registering Resource Type : " << GetResourceTypeAsString(type) << " (" << type << ")" << "\n";
+		LOG(INFO) << "Registering Resource Type : " << getResourceTypeAsString(type) << " (" << type << ")" << "\n";
 		rtmIt->second = ResourceTypeData( pCreate, pDestroy, pChange, pDestroyHandle, dir, resourceHandleSize );
 	}
 }
@@ -335,19 +335,18 @@ std::shared_ptr<ResourceBase> ResourceMan::implAcquireResource( ResourceHandleBa
 
 	ResourceManImpl::ResourceTypeMap::const_accessor roRTM;
 	if( impl.resourceTypeMap.find( roRTM, pHandle->type ) == false ) {
-		CORE_ASSERT( false && "Resource type not registered" );
+		LOG(FATAL) << "Resource type not registered";
 	}
 	const ResourceTypeData& rtd = roRTM->second;
 
 	ResourceManImpl::PtrIndex::const_accessor rdIt;
 	if( impl.resourceHandleBaseMap.find( rdIt, pHandle ) == false ) {
-		CORE_ASSERT( false && "Invalid Resource require" );		
+		LOG(FATAL) << "Invalid Resource require";
 	}
 	const ResourceData* pRD = rdIt->second;
 	CORE_ASSERT( pRD->resourceName.get() || pRD->resourceData.get() );
 	rdIt.release();
-
-
+	
 	rtd.createCallback( pHandle, pRD->flags, pRD->resourceName.get(), pRD->resourceData.get() );
 
 	res = pHandle->resourceBase.lock();
@@ -368,7 +367,7 @@ void ResourceMan::internalAcquireComplete( const ResourceHandleBase* _handle, st
 
 	ResourceManImpl::PtrIndex::accessor rdIt;
 	if( impl.resourceHandleBaseMap.find( rdIt, pHandle ) == false ) {
-		CORE_ASSERT( false && "Invalid Resource require" );
+		LOG(FATAL) << "Invalid Resource require";
 	}
 
 	ResourceData* pRD = rdIt->second;

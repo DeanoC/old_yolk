@@ -22,6 +22,7 @@ uint32_t Resource::createView( uint32_t viewType, const Scene::Resource::Creatio
 	CORE_ASSERT( viewType <= Scene::Resource::UNORDERED_ACCESS_VIEW );
 	uint32_t index;
 	if( custom ) {
+		// TODO thread safe!
 		views.resize( views.size() + 1 );
 		index = (uint32_t)(views.size() - 1);
 	} else {

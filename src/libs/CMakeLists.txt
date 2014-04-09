@@ -7,11 +7,15 @@ IF( UNIX )
 ENDIF( UNIX )
 
 
-add_subdirectory( bdwgc )
+IF( USE_GC )
+	add_subdirectory( bdwgc )
+ENDIF( USE_GC )
 add_subdirectory( binify )
 add_subdirectory( bullet )
 add_subdirectory( core )
-add_subdirectory( glog )
+IF( USE_GLOG )
+	add_subdirectory( glog )
+ENDIF( USE_GLOG )
 add_subdirectory( jpeg )
 
 IF( USE_PROTOBUFFERS )
@@ -49,3 +53,5 @@ ENDIF( USE_DWM )
 
 add_subdirectory( localworld )
 add_subdirectory( gui )
+
+add_subdirectory( freetype-2.5.3)
