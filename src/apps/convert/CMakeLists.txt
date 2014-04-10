@@ -8,7 +8,15 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} )
 include_directories( ${CMAKE_BINARY_DIR}/src/libs/freetype-2.5.3/include )
 include_directories( ${CMAKE_SOURCE_DIR}/src/libs/freetype-2.5.3/include )
 
-list( APPEND targ_link_libs ${Core_LIBRARIES} meshimport meshmod meshops export binify ${BOOST_LIBRARIES} )
+list( APPEND targ_link_libs 
+			${Core_LIBRARIES} 
+			meshimport 
+			meshmod 
+			meshops 
+			export 
+			binify 
+			freetype
+			${BOOST_LIBRARIES} )
 add_executable( convert ${src_files} ${header_files} )
 
 if( UNIX )

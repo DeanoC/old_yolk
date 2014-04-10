@@ -2,6 +2,7 @@
 #include "core/coreresources.h"
 #include "core/fileio.h"
 #include "core/file_path.h"
+#include "edtaa3func.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -71,7 +72,18 @@ void loadTTF( const Core::FilePath& inPath ) {
 		FT_Bitmap& bitmap = bitmap_glyph->bitmap;
 
 		// data is stored 1 bit per pixel 8 bits per pixel, we now 
-		// need to make distance maps
+		// need to make distance maps, first job convert to 
+		std::vector<float> fimg(bitmap.width * bitmap.rows, 0.f);
+		std::vector<float> gx(bitmap.width * bitmap.rows, 0.f);
+		std::vector<float> gy(bitmap.width * bitmap.rows, 0.f);
+		std::vector<int16_t> xdist(bitmap.width * bitmap.rows, 0);
+		std::vector<int16_t> ydist(bitmap.width * bitmap.rows, 0);
+		std::vector<float> dist(bitmap.width * bitmap.rows, 0.f);
+		prepBinaryImage(bitmap.buffer, bitmap.width, bitmap.rows, fimg.data());
+		computegradient(fimg.data(), bitmap.width, bitmap.rows, gx.data(), gy.data());
+		edtaa3(	fimg.data(), gx.data(), gx.data(),
+				bitmap.width, bitmap.rows,
+				xdist.data(), ydist.data(), dist.data() );
 
 		FT_Done_Glyph(glyph);
 	}

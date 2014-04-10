@@ -55,7 +55,21 @@
 * Updated in 2011 to avoid a corner case infinite loop.
 *
 */
-#include <math.h>
+#include <core/core.h>
+
+// in must be width*height/8 bytes with a bit per pixel
+// img must be allocated width*height*sizeof(float)
+void prepBinaryImage(const uint8_t* in, const int width, const int height, float* img) {
+	for (int y = 0; y < height; ++y){
+		for (int x = 0; x < width/8; ++x){
+			const uint8_t bite = *(in + (y * width) + x);
+			float* fout = img + (y * width * 8) + x;
+			for (int i = 0; i < 8; ++i){
+				*(fout + (7-i)) = bite & (i << 8) ? 1.0f : 0.0f;
+			}
+		}
+	}
+}
 
 /*
 * Compute the local gradient at edge pixels using convolution filters.
