@@ -526,6 +526,14 @@
 				"buffer_size": 838,
 				"line_ending": "Windows"
 			}
+		},
+		{
+			"file": "/D/Ruffian_Perforce/Halo4/shared/engine/source/blofeld/tool/convert_address_to_symbol.cpp",
+			"settings":
+			{
+				"buffer_size": 650,
+				"line_ending": "Windows"
+			}
 		}
 	],
 	"build_system": "",
@@ -912,7 +920,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -935,6 +943,34 @@
 						"settings":
 						{
 							"syntax": "Packages/CMake/CMake.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/D/Ruffian_Perforce/Halo4/shared/engine/source/blofeld/tool/convert_address_to_symbol.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 650,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,

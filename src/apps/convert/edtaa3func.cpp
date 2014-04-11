@@ -56,14 +56,15 @@
 *
 */
 #include <core/core.h>
+#include "edtaa3func.h"
 
 // in must be width*height/8 bytes with a bit per pixel
-// img must be allocated width*height*sizeof(float)
-void prepBinaryImage(const uint8_t* in, const int width, const int height, float* img) {
+// img must be allocated width*height*sizeof(edtaa3real)
+void prepBinaryImage(const uint8_t* in, const int width, const int height, edtaa3real* img) {
 	for (int y = 0; y < height; ++y){
 		for (int x = 0; x < width/8; ++x){
 			const uint8_t bite = *(in + (y * width) + x);
-			float* fout = img + (y * width * 8) + x;
+			edtaa3real* fout = img + (y * width * 8) + x;
 			for (int i = 0; i < 8; ++i){
 				*(fout + (7-i)) = bite & (i << 8) ? 1.0f : 0.0f;
 			}
@@ -76,10 +77,10 @@ void prepBinaryImage(const uint8_t* in, const int width, const int height, float
 * The gradient is computed only at edge pixels. At other places in the
 * image, it is never used, and it's mostly zero anyway.
 */
-void computegradient(float *img, int w, int h, float *gx, float *gy)
+void computegradient(edtaa3real *img, int w, int h, edtaa3real *gx, edtaa3real *gy)
 {
 	int i, j, k;
-	float glength;
+	edtaa3real glength;
 #define SQRT2 1.4142136f
 	for (i = 1; i < h - 1; i++) { // Avoid edges where the kernels would spill over
 		for (j = 1; j < w - 1; j++) {
@@ -110,9 +111,9 @@ void computegradient(float *img, int w, int h, float *gx, float *gy)
 * accuracy at and near edges, and reduces the error even at distant pixels
 * provided that the gradient direction is accurately estimated.
 */
-float edgedf(float gx, float gy, float a)
+edtaa3real edgedf(edtaa3real gx, edtaa3real gy, edtaa3real a)
 {
-	float df, glength, temp, a1;
+	edtaa3real df, glength, temp, a1;
 
 	if ((gx == 0) || (gy == 0)) { // Either A) gu or gv are zero, or B) both
 		df = 0.5f - a;  // Linear approximation is A) correct or B) a fair guess
@@ -148,9 +149,9 @@ float edgedf(float gx, float gy, float a)
 	return df;
 }
 
-float distaa3(float *img, float *gximg, float *gyimg, int w, int c, int xc, int yc, int xi, int yi)
+edtaa3real distaa3(edtaa3real *img, edtaa3real *gximg, edtaa3real *gyimg, int w, int c, int xc, int yc, int xi, int yi)
 {
-	float di, df, dx, dy, gx, gy, a;
+	edtaa3real di, df, dx, dy, gx, gy, a;
 	int closest;
 
 	closest = c - xc - yc*w; // Index to the edge pixel pointed to from c
@@ -162,8 +163,8 @@ float distaa3(float *img, float *gximg, float *gyimg, int w, int c, int xc, int 
 	if (a < 0.0) a = 0.0; // Clip grayscale values outside the range [0,1]
 	if (a == 0.0) return 1000000.0; // Not an object pixel, return "very far" ("don't know yet")
 
-	dx = (float)xi;
-	dy = (float)yi;
+	dx = (edtaa3real)xi;
+	dy = (edtaa3real)yi;
 	di = sqrt(dx*dx + dy*dy); // Length of integer vector, like a traditional EDT
 	if (di == 0) { // Use local gradient only at edges
 		// Estimate based on local gradient only
@@ -179,15 +180,15 @@ float distaa3(float *img, float *gximg, float *gyimg, int w, int c, int xc, int 
 // Shorthand macro: add ubiquitous parameters dist, gx, gy, img and w and call distaa3()
 #define DISTAA(c,xc,yc,xi,yi) (distaa3(img, gx, gy, w, c, xc, yc, xi, yi))
 
-void edtaa3(float *img, float *gx, float *gy, int w, int h, short *distx, short *disty, float *dist)
+void edtaa3(edtaa3real *img, edtaa3real *gx, edtaa3real *gy, int w, int h, short *distx, short *disty, edtaa3real *dist)
 {
 	int x, y, i, c;
 	int offset_u, offset_ur, offset_r, offset_rd,
 		offset_d, offset_dl, offset_l, offset_lu;
-	float olddist, newdist;
+	edtaa3real olddist, newdist;
 	int cdistx, cdisty, newdistx, newdisty;
 	int changed;
-	float epsilon = 1e-3f;
+	edtaa3real epsilon = 1e-3f;
 
 	/* Initialize index offsets for the current image width */
 	offset_u = -w;
@@ -208,7 +209,7 @@ void edtaa3(float *img, float *gx, float *gy, int w, int h, short *distx, short 
 			dist[i] = 1000000.0; // Big value, means "not set yet"
 		}
 		else if (img[i] < 1.0) {
-			dist[i] = (float) edgedf(gx[i], gy[i], img[i]); // Gradient-assisted estimate
+			dist[i] = (edtaa3real) edgedf(gx[i], gy[i], img[i]); // Gradient-assisted estimate
 		}
 		else {
 			dist[i] = 0.0; // Inside the object
