@@ -6,12 +6,13 @@ namespace Export {
 	
 		enum BI_FLAGS {
 			BI_UINT16		= BIT(1),
-			BI_HALF			= BIT(2),
-			BI_FLOAT		= BIT(3),
-			BI_RGBA			= BIT(4),
+			BI_UINT32		= BIT(2),
+			BI_HALF			= BIT(3),
+			BI_FLOAT		= BIT(4),
+			BI_RGBA			= BIT(5),
 		};
 
-		unsigned int	flags;
+		uint32_t		flags;
 		int 			width;		// must always be set
 		int 			height;		// 0 for 1D
 		uint32_t 		channels; 	// count (>4 likely not supported)

@@ -417,6 +417,25 @@ public:
 		default: return getBitWidth( fmt );
 		}
 	}
+	static bool isFloat(GENERIC_TEXTURE_FORMAT fmt) {
+		switch (fmt) {
+		case GTF_RGBA32F:
+		case GTF_RGB32F:
+		case GTF_RG32F:
+		case GTF_RGBA16F:
+		case GTF_RGB16F:
+		case GTF_RG16F:
+		case GTF_R32F:
+		case GTF_DEPTH_COMPONENT32F:
+		case GTF_R11F_G11F_B10F:
+		case GTF_R16F:
+		case GTF_COMPRESSED_RGB_BPTC_SIGNED_FLOAT:
+		case GTF_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:
+			return true;
+		default:
+			return false;
+		}
+	}
 };
 
 #endif

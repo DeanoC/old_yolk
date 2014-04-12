@@ -12,15 +12,37 @@
 
 namespace Export {
 
-static uint32_t Up1chan8bit( const uint8_t* data) {
-	return (data[0] << 24) | (data[0] << 16) | (data[0] << 8) | (data[0] << 0);
+static uint32_t up1chan8bit( const uint8_t* data, const bool isFloat) {
+	// currently the same but integer should use repeat fill and float shouldn't
+	if (isFloat) {
+		return (data[0] << 24) | (data[0] << 16) | (data[0] << 8) | (data[0] << 0);
+	}
+	else {
+		// TODO integer LSB fill != 0
+		return (data[0] << 24) | (data[0] << 16) | (data[0] << 8) | (data[0] << 0);
+	}
 }
 
-static uint32_t Up1chan16bit( const uint8_t* data ) {
-	return (((const uint16_t*)data)[0] << 16) | (((const uint16_t*)data)[0] << 0);
+static uint32_t up1chan16bit(const uint8_t* data, const bool isFloat) {
+	// currently the same but integer should use repeat fill and float shouldn't
+	if (isFloat) {
+		return (((const uint16_t*)data)[0] << 16) | (((const uint16_t*)data)[0] << 0);
+	} else {
+		// TODO integer LSB fill != 0
+		return (((const uint16_t*)data)[0] << 16) | (((const uint16_t*)data)[0] << 0);
+	}
 }
-static uint32_t Up1chan32bit( const uint8_t* data ) {
-	return ((const uint32_t*)data)[0];
+static uint32_t up1chan32bit(const uint8_t* data, const bool isFloat) {
+	if (isFloat) {
+		return ((const uint32_t*)data)[0];
+	} else {
+		// TODO integer LSB fill != 0
+		return ((const uint32_t*)data)[0];
+	}
+}
+
+static bool isInFloat( const uint32_t flags) {
+	return (flags & (BitmapInput::BI_HALF | BitmapInput::BI_FLOAT)) != 0;
 }
 
 static void WriteTexture( 	const Export::BitmapInput& in, 
@@ -39,41 +61,48 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 		stream << ".type u32\n";		
 	}
  	
+	const unsigned int inBits = (in.flags & (BitmapInput::BI_UINT32 | BitmapInput::BI_FLOAT)) ? 32 :
+								(in.flags & (BitmapInput::BI_UINT16 | BitmapInput::BI_HALF)) ? 16 :
+								8;
 	uint8_t* data = in.data;
-	// not supported fully yet nor is HALF
-	if( in.flags & (BitmapInput::BI_FLOAT | BitmapInput::BI_HALF) ) {
-	} else {
-		int dataSize = 1;
-		if( in.flags & BitmapInput::BI_UINT16 ) {
-			dataSize = 2;
-		}
 
-		// expand integer data to high precision
-		uint32_t expandedData[4]; // 4 channels at 32 bit integer
-		for( auto y = 0; y < in.height; ++y ) {
-			for( auto x = 0;x < in.width; ++x ) {
-				// make channel mismatch obvious
-				memset( expandedData, 0xFF, sizeof(uint32_t) * 4 );
-				for( uint32_t c = 0; c < in.channels; ++c ) {
-					switch( dataSize ) {
-						case 4: expandedData[c] = Up1chan32bit( data++ ); break;
-						case 2: expandedData[c] = Up1chan16bit( data++ ); break;
-						case 1: expandedData[c] = Up1chan8bit( data++ ); break;
-						default: break;
+	// expand integer data to high precision
+	uint32_t expandedData[4]; // 4 channels at 32 bit integer
+	for( auto y = 0; y < in.height; ++y ) {
+		for( auto x = 0;x < in.width; ++x ) {
+			
+			// make channel mismatch obvious
+			memset( expandedData, 0xFF, sizeof(uint32_t) * 4 );
+			
+			// expand integer inputs. Treat float as binary if no conversion required
+			if ( isInFloat(in.flags)  == GtfFormat::isFloat(outFmt) ) {
+				for (uint32_t c = 0; c < in.channels; ++c) {
+					switch (inBits) {
+					case 32: expandedData[c] = up1chan32bit(data++, isInFloat(in.flags)); break;
+					case 16: expandedData[c] = up1chan16bit(data++, isInFloat(in.flags)); break;
+					case 8: expandedData[c] = up1chan8bit(data++, isInFloat(in.flags)); break;
+					default: break;
 					}
 				}
+			}
+			else {
+				// TODO float to integer or vice versa
+				CORE_ASSERT(false);
+			}
 
-/*				if( in.flags & BitmapInput::BI_RGBA ) {
-					CORE_ASSERT( in.channels == 4 );
-					// swap RGBA to ABGR
+			// for 4 channel format (RGBA or ARGB) we swap to our prefered RGBA format
+			if (in.channels == 4) {
+				// output is currently always LE RGBA (TODO endianess correctness)
+				CORE_ASSERT(in.channels == 4);
+				if (in.flags & BitmapInput::BI_RGBA) {
+					// in argb = out abgr (AKA LE RGBA)
 					const uint32_t r = expandedData[0];
 					expandedData[0] = expandedData[3]; // alpha
 					expandedData[1] = expandedData[1]; // blue
 					expandedData[2] = expandedData[2]; // green
 					expandedData[3] = r; // red
-				} else */{
-					// just swap order so when read by LE target comes out okay
-					// TODO big endian targets
+				} else {
+					// in rgba = out abgr (AKA LE rgba)
 					const uint32_t r = expandedData[0];
 					const uint32_t g = expandedData[1];
 					const uint32_t b = expandedData[2];
@@ -83,32 +112,35 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 					expandedData[2] = g;
 					expandedData[3] = r;
 				}
+			}
 
-				int accumCount = 32;
-				uint32_t payload;
-				// now cut back down to out precision and channels
-				for( unsigned int c = 0; c < outChannels; ++c ) {
-					const auto chanBits = GtfFormat::getChannelBits( outFmt, c );
-					expandedData[c] >>= (32 - chanBits);
-					expandedData[c] &= ((1 << chanBits) - 1);
+			// generalised precision reduction/shift and output
+			int accumCount = 32;
+			uint32_t payload;
+			// now cut back down to out precision and channels
+			for( unsigned int c = 0; c < outChannels; ++c ) {
+				const auto chanBits = GtfFormat::getChannelBits( outFmt, c );
+				CORE_ASSERT(!isInFloat(in.flags) || (chanBits == inBits));
+				expandedData[c] >>= (32 - chanBits);
+				expandedData[c] &= ((1 << chanBits) - 1);
 
-					accumCount -= chanBits;
-					assert( accumCount >= 0 );
-					payload |= expandedData[c] << accumCount;
-					if( accumCount == 0 ) {
-						stream << payload;
-						if( (x != (in.width - 1)) || (c != (outChannels-1)) ) {
-							stream << ",";
-						} else {
-							stream << "\n";
-						}		
-						accumCount = 0;
-						payload = 0;
-					}
+				accumCount -= chanBits;
+				assert( accumCount >= 0 );
+				payload |= expandedData[c] << accumCount;
+				if( accumCount == 0 ) {
+					stream << payload;
+					if( (x != (in.width - 1)) || (c != (outChannels-1)) ) {
+						stream << ",";
+					} else {
+						stream << "\n";
+					}		
+					accumCount = 0;
+					payload = 0;
 				}
 			}
 		}
 	}
+
 	//reset stream to defaults
 	stream.width( 6 );
 	stream << std::hex << std::resetiosflags( std::ios_base::showbase );

@@ -10,6 +10,77 @@
 // #include FT_ADVANCES_H
 #include FT_LCD_FILTER_H
 
+void generateDistanceMapFromBitmap(const int width, const int height, const uint8_t *buffer, std::vector<edtaa3real>& distance){
+	typedef edtaa3real real;
+	const int size = width * height;
+
+	// data is stored 1 bit per pixel 8 bits per pixel, we now 
+	// need to make distance maps, first job convert to 
+	std::vector<real> fimg(width * height, 0.f);
+	prepBinaryImage(buffer, width, height, fimg.data());
+
+	// temp data, 
+	// may be possible to re-use some arrays
+	std::vector<real> gx(size, 0.f);
+	std::vector<real> gy(size, 0.f);
+	std::vector<real> inside(size, 0.f);
+	std::vector<real> outside(size, 0.f);
+	std::vector<int16_t> xdist(size);
+	std::vector<int16_t> ydist(size);
+
+	// compute gradient
+	// TODO is there nessecary for binary input images?
+	computegradient(fimg.data(), width, height, gx.data(), gy.data());
+	// distance to the outside
+	edtaa3(fimg.data(), gx.data(), gy.data(), width, height,
+		xdist.data(), ydist.data(), outside.data());
+	// clamp outside distances to 0
+	std::replace_if(outside.begin(), outside.end(),
+		[](real v) -> bool { return v < 0.f; },
+		0);
+
+	// inverse pass (1 - intensity)
+	std::transform(fimg.begin(), fimg.end(), fimg.begin(),
+		[](real& v){ return 1 - v; });
+	// memset gx and gy
+	std::fill(gx.begin(), gx.end(), 0.f);
+	std::fill(gy.begin(), gy.end(), 0.f);
+	// compute gradient
+	// TODO is there nessecary for binary input images?
+	computegradient(fimg.data(), width, height, gx.data(), gy.data());
+	// distance to the inside
+	edtaa3(fimg.data(), gx.data(), gy.data(),
+		width, height,
+		xdist.data(), ydist.data(), inside.data());
+	// clamp inside distance to 1.f
+	std::replace_if(inside.begin(), inside.end(),
+		[](real v) -> bool { return v > 1.f; },
+		1);
+	// distance is the difference between outside array and inside
+	std::transform(outside.begin(), outside.end(), inside.begin(), distance.begin(),
+		[](const real &o, const real &i) -> real {
+		return (o - i);
+	});
+	// compute abs(min(distance))
+	real dmin = *std::min_element(distance.begin(), distance.end());
+	dmin = abs(dmin);
+	// clamp distance to [-min,+min]
+	std::transform(distance.begin(), distance.end(), distance.begin(),
+		[dmin](const real& d) -> real {
+		return std::max(std::min(d, -dmin), +dmin);
+	});
+	// normalise distance
+	std::transform(distance.begin(), distance.end(), distance.begin(),
+		[dmin](const real d) -> real {
+		return (d + dmin) / (2 * dmin);
+	});
+}
+
+void convertToTexture(const int width, const int height, std::vector<edtaa3real>& distance) {
+
+}
+
+
 void loadTTF( const Core::FilePath& inPath ) {
 
 	FT_Library    library;
@@ -74,6 +145,9 @@ void loadTTF( const Core::FilePath& inPath ) {
 		std::vector<edtaa3real> distanceMap(bitmap.width * bitmap.rows);
 		generateDistanceMapFromBitmap(bitmap.width, bitmap.rows, bitmap.buffer, distanceMap);
 
+		// convert to texture format
+//		convertToTexture(bitmap.width, bitmap.rows, distanceMap);
+
 		FT_Done_Glyph(glyph);
 	}
 
@@ -81,54 +155,3 @@ void loadTTF( const Core::FilePath& inPath ) {
 	FT_Done_FreeType(library);
 }
 
-void generateDistanceMapFromBitmap(const int width, const int height, const uint8_t *buffer, std::vector<edtaa3real>& distance ){
-	typedef edtaa3real real;
-	const int size = width * height;
-
-	// data is stored 1 bit per pixel 8 bits per pixel, we now 
-	// need to make distance maps, first job convert to 
-	std::vector<real> fimg(width * height, 0.f);
-	prepBinaryImage(buffer, width, height, fimg.data());
-
-	std::vector<real> gx(size, 0.f);
-	std::vector<real> gy(size, 0.f);
-	std::vector<real> inside(size, 0.f);
-	std::vector<real> outside(size, 0.f);
-
-	std::vector<int16_t> xdist(size);
-	std::vector<int16_t> ydist(size);
-
-	computegradient(fimg.data(), width, height, gx.data(), gy.data());
-	edtaa3(fimg.data(), gx.data(), gy.data(), width, height,
-				xdist.data(), ydist.data(), outside.data());
-	std::replace_if(outside.begin(), outside.end(),
-		[](real v) -> bool { return v < 0.f; },
-		0);
-
-	// inverse pass (1 - intensity)
-	std::transform(fimg.begin(), fimg.end(), fimg.begin(),
-		[](real& v){ return 1 - v; });
-	std::fill(gx.begin(), gx.end(), 0.f);
-	std::fill(gy.begin(), gy.end(), 0.f);
-	computegradient(fimg.data(), width, height, gx.data(), gy.data());
-	edtaa3(fimg.data(), gx.data(), gy.data(),
-		width, height,
-		xdist.data(), ydist.data(), outside.data());
-	std::replace_if(inside.begin(), inside.end(),
-		[](real v) -> bool { return v > 1.f; },
-		1);
-	std::transform(outside.begin(), outside.end(), inside.begin(), distance.begin(),
-		[](const real &o, const real &i) -> real {
-		return (o - i);
-	});
-	real dmin = *std::min_element(distance.begin(), distance.end());
-	dmin = abs(dmin);
-	std::transform(distance.begin(), distance.end(), distance.begin(),
-		[dmin](const real& d) -> real {
-		return std::max(std::min(d, -dmin), +dmin);
-	});
-	std::transform(distance.begin(), distance.end(), distance.begin(),
-		[dmin](const real d) -> real {
-		return (d + dmin) / (2 * dmin);
-	});
-}

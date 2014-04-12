@@ -17,7 +17,7 @@ void SavePropList( const std::vector< MeshMod::PropertyPtr >& props, const Core:
 	for( auto it = props.cbegin(); it != props.cend(); ++it ) {
 		auto prop = *it;
 		int flags;
-		int count;
+		size_t count;
 
 		float f;
 		Math::Vector3 mv3;
