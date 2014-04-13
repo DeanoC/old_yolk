@@ -24,7 +24,7 @@
 ///		- system
 /// The not supported exceptions are
 ///		- <numerics> Not helpful as non SIMD /todo Core replacement
-///		- std::wstring Wierd is UTF8 based so wstring not required
+///		- std::wstring Wierd is Yolk based so wstring not required
 ///		- tr1 complex cmath functions.
 /// Boost libraries considered standard are: (excluding TR1 ones)
 ///		- pool_allocator
@@ -33,7 +33,7 @@
 ///		- iterator (not all are currently brought in, just cos I haven't seen a need)
 ///		- swap
 ///		- string algo
-///		- static_assert (used for portable CORE_STATIC_ASSERT)
+///		- static_assert
 ///		- asio
 ///		- scoped_array
 ///      - foreach (due to VC10 not supporting c++11 range for
@@ -41,11 +41,11 @@
 /// To use simple replace std:: or std::tr1:: boost, with Core:: and viola will work as you expect.
 ///
 /// C++11 support - 
-///		= auto keyword (no libray)
+///		- auto keyword (no libray)
 ///		- std::unique_ptr -> included if _HAS_CPP0X is defined
+///		- static_assert
 /// Known work around.
 /// Lack of tr1 - 95% supported via boost
-/// MS crappy vector - replaced with alignedvector
 /// 
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////

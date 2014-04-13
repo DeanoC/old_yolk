@@ -13,36 +13,20 @@
 namespace Export {
 
 static uint32_t up1chan8bit( const uint8_t* data, const bool isFloat) {
-	// currently the same but integer should use repeat fill and float shouldn't
-	if (isFloat) {
-		return (data[0] << 24) | (data[0] << 16) | (data[0] << 8) | (data[0] << 0);
-	}
-	else {
-		// TODO integer LSB fill != 0
-		return (data[0] << 24) | (data[0] << 16) | (data[0] << 8) | (data[0] << 0);
-	}
+	CORE_ASSERT(!isFloat); // 8 bit float not supported yet
+	return (data[0] << 24) | (data[0] << 16) | (data[0] << 8) | (data[0] << 0);
 }
 
 static uint32_t up1chan16bit(const uint8_t* data, const bool isFloat) {
-	// currently the same but integer should use repeat fill and float shouldn't
+	// integer should use repeat fill and half shouldn't just shift up
 	if (isFloat) {
-		return (((const uint16_t*)data)[0] << 16) | (((const uint16_t*)data)[0] << 0);
+		return (uint32_t)(*((const uint16_t*)data))<<16;
 	} else {
-		// TODO integer LSB fill != 0
 		return (((const uint16_t*)data)[0] << 16) | (((const uint16_t*)data)[0] << 0);
 	}
 }
 static uint32_t up1chan32bit(const uint8_t* data, const bool isFloat) {
-	if (isFloat) {
-		return ((const uint32_t*)data)[0];
-	} else {
-		// TODO integer LSB fill != 0
-		return ((const uint32_t*)data)[0];
-	}
-}
-
-static bool isInFloat( const uint32_t flags) {
-	return (flags & (BitmapInput::BI_HALF | BitmapInput::BI_FLOAT)) != 0;
+	return *((const uint32_t*)data);
 }
 
 static void WriteTexture( 	const Export::BitmapInput& in, 
@@ -60,8 +44,9 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 	} else {
 		stream << ".type u32\n";		
 	}
- 	
-	const unsigned int inBits = (in.flags & (BitmapInput::BI_UINT32 | BitmapInput::BI_FLOAT)) ? 32 :
+
+	bool isInFloat = ((in.flags & (BitmapInput::BI_HALF | BitmapInput::BI_FLOAT)) != 0);	
+	unsigned int inBits = (in.flags & (BitmapInput::BI_UINT32 | BitmapInput::BI_FLOAT)) ? 32 :
 								(in.flags & (BitmapInput::BI_UINT16 | BitmapInput::BI_HALF)) ? 16 :
 								8;
 	uint8_t* data = in.data;
@@ -74,20 +59,56 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 			// make channel mismatch obvious
 			memset( expandedData, 0xFF, sizeof(uint32_t) * 4 );
 			
-			// expand integer inputs. Treat float as binary if no conversion required
-			if ( isInFloat(in.flags)  == GtfFormat::isFloat(outFmt) ) {
-				for (uint32_t c = 0; c < in.channels; ++c) {
-					switch (inBits) {
-					case 32: expandedData[c] = up1chan32bit(data++, isInFloat(in.flags)); break;
-					case 16: expandedData[c] = up1chan16bit(data++, isInFloat(in.flags)); break;
-					case 8: expandedData[c] = up1chan8bit(data++, isInFloat(in.flags)); break;
-					default: break;
-					}
+			// expand inputs to a 32 bit binary representation. 
+			for (uint32_t c = 0; c < in.channels; ++c) {
+				switch (inBits) {
+				case 32: expandedData[c] = up1chan32bit(data++, isInFloat); break;
+				case 16: expandedData[c] = up1chan16bit(data++, isInFloat); break;
+				case 8: expandedData[c] = up1chan8bit(data++, isInFloat); break;
+				default: break;
 				}
 			}
-			else {
-				// TODO float to integer or vice versa
-				CORE_ASSERT(false);
+
+			// if input/output float/int (or vice versa) need conversion convert it
+			if (isInFloat != GtfFormat::isFloat(outFmt) ) {
+				union {
+					float		f;
+					struct {
+						half_float::half ha, hb;
+					};
+					uint32_t	i;
+				} if2f;
+				// if the input is integer
+				if (!isInFloat) {
+					for (uint32_t c = 0; c < in.channels; ++c) {
+						uint32_t d = expandedData[c];
+						if (outBits == 32) {
+							if2f.f = float(d);
+							expandedData[c] = if2f.i;
+							inBits = 32;
+							isInFloat = true;
+						} else if (outBits == 16) {
+							if2f.ha = half_float::half(float(d));
+							if2f.hb = if2f.ha;
+							inBits = 16;
+							isInFloat = true;
+						}
+						else {
+							LOG(FATAL) << "half and float only supported\n";
+						}
+						expandedData[c] = if2f.i;
+					}
+				} else {
+					CORE_ASSERT(isInFloat);
+					CORE_ASSERT(inBits == 32 || inBits == 16);
+					// in half/float
+					for (uint32_t c = 0; c < in.channels; ++c) {
+						if2f.i = expandedData[c];
+						float tf = (inBits == 32) ? if2f.f : (float) if2f.ha;
+						tf = tf * GtfFormat::isNormalised(outFmt) ? (float)(1 << outBits) : 1.0f;
+						expandedData[c] = (uint32_t)Core::floor2Int( tf );
+					}
+				}
 			}
 
 			// for 4 channel format (RGBA or ARGB) we swap to our prefered RGBA format
@@ -120,9 +141,12 @@ static void WriteTexture( 	const Export::BitmapInput& in,
 			// now cut back down to out precision and channels
 			for( unsigned int c = 0; c < outChannels; ++c ) {
 				const auto chanBits = GtfFormat::getChannelBits( outFmt, c );
-				CORE_ASSERT(!isInFloat(in.flags) || (chanBits == inBits));
-				expandedData[c] >>= (32 - chanBits);
-				expandedData[c] &= ((1 << chanBits) - 1);
+				CORE_ASSERT(!isInFloat || (chanBits == inBits));
+				if (GtfFormat::isFloat(outFmt) && inBits != chanBits ) {
+				} else {
+					expandedData[c] >>= (32 - chanBits);
+					expandedData[c] &= ((1 << chanBits) - 1);
+				}
 
 				accumCount -= chanBits;
 				assert( accumCount >= 0 );

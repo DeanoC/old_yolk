@@ -82,6 +82,7 @@
 #include <memory>
 
 // standard parts of the engine
+#include "half.h"
 #include "core_utils.h"
 
 #if PLATFORM != GPU

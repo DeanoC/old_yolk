@@ -436,6 +436,25 @@ public:
 			return false;
 		}
 	}
+
+	static bool isNormalised(GENERIC_TEXTURE_FORMAT fmt) {
+		switch (fmt) {
+		case GTF_RGBA8_SNORM:
+		case GTF_RGBA16_SNORM:
+		case GTF_RGB8_SNORM:
+		case GTF_RGB16_SNORM:
+		case GTF_RG8_SNORM:
+		case GTF_RG16_SNORM:
+		case GTF_R8_SNORM:
+		case GTF_R16_SNORM:
+		case GTF_COMPRESSED_RGBA_BPTC_UNORM:
+		case GTF_COMPRESSED_SRGB_ALPHA_BPTC_UNORM:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 };
 
 #endif

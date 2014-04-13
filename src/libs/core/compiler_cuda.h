@@ -10,11 +10,9 @@
 /// \remark	mailto://deano@cloudpixies.com
 /// 		
 /// \todo does CUDA support alignment attributes for members?
-/// \todo can CUDA support CORE_STATIC_ASSERT?
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define CORE_ALIGN(x)				(x)
-#define CORE_STATIC_ASSERT(x)
 #define CORE_INLINE					inline
 #define CORE_FORCE_INLINE			inline
 
