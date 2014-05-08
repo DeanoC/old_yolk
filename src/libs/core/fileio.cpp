@@ -74,7 +74,7 @@ namespace Core
 		if( file.isValid() ) {
 			size = (size_t) file.bytesLeft();
 			buffer = CORE_NEW_ARRAY uint8_t[ size ];
-			file.read( buffer, size );
+			size = file.read( buffer, size );
 			offset = 0;
 			return true;
 		} else {
@@ -87,8 +87,8 @@ namespace Core
 		if( file.isValid() ) {
 			size = (size_t) file.bytesLeft() + 1;
 			buffer = CORE_NEW_ARRAY uint8_t[ size ];
-			file.read( buffer, size - 1 );
-			buffer[ size - 1 ] = 0; // add end null
+			size = file.read( buffer, size - 1 ) + 1;
+			buffer[ size - 1] = 0; // add end null
 			offset = 0;
 			return true;
 		} else {

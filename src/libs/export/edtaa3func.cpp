@@ -58,26 +58,13 @@
 #include <core/core.h>
 #include "edtaa3func.h"
 
-// in must be width*height/8 bytes with a bit per pixel
-// img must be allocated width*height*sizeof(edtaa3real)
-void prepBinaryImage(const uint8_t* in, const int width, const int height, edtaa3real* img) {
-	for (int y = 0; y < height; ++y){
-		for (int x = 0; x < width/8; ++x){
-			const uint8_t bite = *(in + (y * width) + x);
-			edtaa3real* fout = img + (y * width * 8) + x;
-			for (int i = 0; i < 8; ++i){
-				*(fout + (7-i)) = bite & (i << 8) ? 1.0f : 0.0f;
-			}
-		}
-	}
-}
 
 /*
 * Compute the local gradient at edge pixels using convolution filters.
 * The gradient is computed only at edge pixels. At other places in the
 * image, it is never used, and it's mostly zero anyway.
 */
-void computegradient(edtaa3real *img, int w, int h, edtaa3real *gx, edtaa3real *gy)
+void computegradient(const edtaa3real *img, int w, int h, edtaa3real *gx, edtaa3real *gy)
 {
 	int i, j, k;
 	edtaa3real glength;
@@ -149,7 +136,7 @@ edtaa3real edgedf(edtaa3real gx, edtaa3real gy, edtaa3real a)
 	return df;
 }
 
-edtaa3real distaa3(edtaa3real *img, edtaa3real *gximg, edtaa3real *gyimg, int w, int c, int xc, int yc, int xi, int yi)
+edtaa3real distaa3(const edtaa3real *img, const edtaa3real *gximg, const edtaa3real *gyimg, int w, int c, int xc, int yc, int xi, int yi)
 {
 	edtaa3real di, df, dx, dy, gx, gy, a;
 	int closest;
@@ -180,7 +167,7 @@ edtaa3real distaa3(edtaa3real *img, edtaa3real *gximg, edtaa3real *gyimg, int w,
 // Shorthand macro: add ubiquitous parameters dist, gx, gy, img and w and call distaa3()
 #define DISTAA(c,xc,yc,xi,yi) (distaa3(img, gx, gy, w, c, xc, yc, xi, yi))
 
-void edtaa3(edtaa3real *img, edtaa3real *gx, edtaa3real *gy, int w, int h, short *distx, short *disty, edtaa3real *dist)
+void edtaa3(const edtaa3real *img, const edtaa3real *gx, const edtaa3real *gy, int w, int h, short *distx, short *disty, edtaa3real *dist)
 {
 	int x, y, i, c;
 	int offset_u, offset_ur, offset_r, offset_rd,

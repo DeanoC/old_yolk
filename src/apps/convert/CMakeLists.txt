@@ -27,5 +27,5 @@ endif()
 target_link_libraries( convert ${targ_link_libs} )
 
 # make a nice hierachy
-set_target_properties( convert PROPERTIES FOLDER "Apps")
+set_target_properties( convert PROPERTIES FOLDER "Tools")
 

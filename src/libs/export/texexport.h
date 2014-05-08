@@ -5,24 +5,27 @@ namespace Export {
 	struct BitmapInput {
 	
 		enum BI_FLAGS {
+			BI_UINT8		= BIT(0),
 			BI_UINT16		= BIT(1),
 			BI_UINT32		= BIT(2),
 			BI_HALF			= BIT(3),
 			BI_FLOAT		= BIT(4),
 			BI_RGBA			= BIT(5),
+			BI_NORMALISED   = BIT(6),
 		};
 
 		uint32_t		flags;
 		int 			width;		// must always be set
 		int 			height;		// 0 for 1D
 		uint32_t 		channels; 	// count (>4 likely not supported)
-		uint8_t*		data;	  	// the actual data		
+		uint8_t const*	data;	  	// the actual data		
 	};
 
 	struct TextureExport {
 
 		enum TE_FLAGS {
 			TE_CUBEMAP 		= BIT( 0 ),
+			TE_NORMALISED	= BIT( 1 ), // this is whether the data is normalised different from if the GTF is normalised
 		};
 
 		GENERIC_TEXTURE_FORMAT 	outFormat;

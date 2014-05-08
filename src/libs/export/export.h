@@ -24,6 +24,8 @@ namespace Export {
 
 	extern void SaveTexture( const TextureExport& tex, const Core::FilePath outFilename );
 
+	extern void SaveTextureToPNG(const TextureExport& tex, const Core::FilePath outFilename);
+
 	extern bool SaveTextureAtlas( 	const std::vector<std::string>& textures,
 									const std::vector<SubTexture>& sprites,
 									const Core::FilePath pOutFilename );
