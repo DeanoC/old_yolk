@@ -149,6 +149,8 @@ void DoTextureAtlas(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	std::vector<std::string> filenames;
 	std::vector<SubTexture> sprites;
 
+//	filenames.push_back(inFullPath.BaseName().ReplaceExtension(".png").value());
+
 	loadTao(inPath, filenames, sprites);
 
 	for (auto fiIt = filenames.cbegin();

@@ -27,7 +27,6 @@ struct Tof {
 
 // loads up if not possible sets up the defualt Tof
 extern Tof loadTof( const Core::FilePath& inPath );
-extern void loadTao( const Core::FilePath& inPath, std::vector<std::string>& outFilenames, 
-													std::vector<Export::SubTexture>& outSprites );
+extern void loadTao(const Core::FilePath& inPath, std::vector<std::string>& outFilenames, std::vector<Export::SubTexture>& outSprites);
 
 #endif

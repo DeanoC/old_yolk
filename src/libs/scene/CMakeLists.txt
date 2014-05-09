@@ -24,8 +24,10 @@ foreach( sc ${shader_files} )
 						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} 
 						COMMENT "${sc}: if this fails create the directory part of ${sc} in the build folders manually" 
 					)
-	list( APPEND src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
+	list( APPEND gen_src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
 endforeach( sc ${shader_files} )
+
+list( APPEND src_files ${cpp_src_files} ${c_src_files} ${gen_src_files} )
 
 ADD_MSVC_PRECOMPILED_HEADER( "scene.h" "${cpp_src_files}" )
 add_library( scene ${src_files} ${header_files}  ${shader_files} )
@@ -36,4 +38,7 @@ target_link_libraries( 	scene
 						swfruntime )
 
 # make a nice hierachy
+
+SOURCE_GROUP( Generated FILES ${gen_src_files} )
+SOURCE_GROUP( Shaders FILES ${shader_files} )
 set_target_properties( scene PROPERTIES FOLDER "Libs")

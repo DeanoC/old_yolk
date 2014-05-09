@@ -119,6 +119,7 @@ void convertToTexture(	const unsigned int glyph,
 
 }
 
+void DoTextureAtlas(const Core::FilePath& inPath, const Core::FilePath& outPath);
 
 void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outPath) {
 
@@ -172,13 +173,17 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	LOG(INFO) << "Temp Path : " << tmpDir.value() << "\n";
 
+// testing with existing texture TEST_WITH_EXISTING_TEXTURES is defined
+#if !defined(TEST_WITH_EXISTING_TEXTURES)
 	// in debug or in case of crash, clean up any tmp folder
 	if (boost::filesystem::exists(tmpDir.value()) ) {
-		boost::filesystem::remove_all(tmpDir.value());
+		boost::system::error_code ec; // hide the error if for some reason the remove above still failed to work
+		boost::filesystem::remove_all(tmpDir.value(),ec);
 		Core::Clock::sleep(0.5f); // create fails if delete hasn't finished...
 	}
 
-	boost::filesystem::create_directory(tmpDir.value());
+	boost::system::error_code ec; // hide the error if for some reason the remove above still failed to work
+	boost::filesystem::create_directory(tmpDir.value(),ec);
 
 	boost::filesystem::current_path(tmpDir.value());
 
@@ -256,35 +261,32 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
+#endif // end TEST_WITH_EXISTING_TEXTURES
 
 	using namespace boost::filesystem;
 	current_path(tmpDir.value());
 
+	if (!boost::filesystem::exists("packer")) {
+		boost::filesystem::create_directory("packer");
+	}
+
 	// now call texture packer to convert it into texture pages
 	// TODO make this non filesystem setup dependant and non windows...
-	if( exists("font_template.tps") ) {
-		remove("font_template.tps");
-	}
-	copy_file( "../../../source/Templates/font_template.tps", "font_template.tps" );
-	system( "\"C:\\Program Files\\CodeAndWeb\\TexturePacker\\bin\\texturepacker\" font_template.tps");
+	std::string tpCmdLine = "\"C:\\Program Files\\CodeAndWeb\\TexturePacker\\bin\\texturepacker\"";
+	tpCmdLine += " ../../../source/Templates/font_template.tps";
+	const std::string taoName = outPath.BaseName().RemoveExtension().value() + "{n}.tao";
+	tpCmdLine += " --data packer/" + taoName;
+	tpCmdLine += " --texture-format png";
+	tpCmdLine += " --trim-sprite-names";
+	tpCmdLine += " --sheet packer/" + outPath.BaseName().RemoveExtension().value() + "{n}.png";
+	tpCmdLine += " .";
 
-	LOG(INFO) << "Output Path : " << outPath.value() << "\n";
-	std::for_each(directory_iterator(current_path()), directory_iterator(), 
-		[fileName](const boost::filesystem::path& path) {
-			const auto file = wstring_to_utf8(path.filename().native());
-			const auto ext = path.filename().extension();
-			const auto tmpOffset0 = file.find(std::string("tmp_atlas"));
-			if ( tmpOffset0 != std::string::npos ) {
-				// find end of "tmp_atlass
-				const auto tmpOffset1 = tmpOffset0 + 9;
-				const auto tmpOffset2 = file.find(".", tmpOffset1);
-				const auto tmpNum = file.substr(tmpOffset1, tmpOffset2 - tmpOffset1);
+	system( tpCmdLine.c_str() );
 
-				const boost::filesystem::path namePath(fileName.RemoveExtension().value() + tmpNum);
-				boost::filesystem::path destFN = current_path().parent_path();
-				destFN /= namePath;
-				destFN.replace_extension(ext);
-				copy_file(file, destFN, copy_option::overwrite_if_exists);
+	std::for_each(directory_iterator( "packer/"), directory_iterator(),
+		[taoName, outPath](const boost::filesystem::path& path) {
+			if (path.extension() == ".tao") {
+				DoTextureAtlas(Core::FilePath(wstring_to_utf8(path.wstring())), outPath);
 			}
 		}
 	);

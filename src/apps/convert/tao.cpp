@@ -8,8 +8,9 @@
 #include "scene/generictextureformat.h"
 #include "export/texexport.h"
 
-void loadTao(const Core::FilePath& inPath, std::vector<std::string>& outFilenames,
-	std::vector<Export::SubTexture>& outSprites) {
+void loadTao(	const Core::FilePath& inPath,
+				std::vector<std::string>& outFilenames, 
+				std::vector<Export::SubTexture>& outSprites) {
 
 	Core::MemFile file;
 	Core::FilePath tofPath = inPath.ReplaceExtension(".tao");
