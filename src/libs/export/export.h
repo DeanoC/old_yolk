@@ -30,6 +30,10 @@ namespace Export {
 									const std::vector<SubTexture>& sprites,
 									const Core::FilePath pOutFilename );
 
+	extern bool SaveFont(	const std::string& textureAtlas,
+							const std::vector<Glyph>& glyphs,
+							const Core::FilePath pOutFilename);
+
 }
 
 extern void Binify( const std::string& txt, std::ostream& out );

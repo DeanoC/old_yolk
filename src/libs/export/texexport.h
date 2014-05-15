@@ -1,6 +1,16 @@
 #ifndef YOLK_EXPORT_TEXEXPORT_H_
 #define YOLK_EXPORT_TEXEXPORT_H_ 1
+
+#if !defined( CORE_CORE_H_ )
+#include "core/core.h"
+#endif
+
+#if !defined( YOLK_SCENE_GENERIC_TEXTURE_FORMAT_H_ )
+#include "scene/generictextureformat.h"
+#endif
+
 namespace Export {
+
 	// one 1 or 2D plane of a texture, from a bitmap
 	struct BitmapInput {
 	
@@ -44,6 +54,14 @@ namespace Export {
 		uint32_t 	index;
 		float		u0,v0;
 		float		u1,v1;
+	};
+
+	// glyph used for fonts
+	struct Glyph {
+		uint32_t	unicode;
+		uint8_t 	page;
+		uint8_t		padd;
+		uint16_t	sprite;
 	};
 }
 #endif

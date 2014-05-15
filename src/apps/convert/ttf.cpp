@@ -5,6 +5,7 @@
 #include "core/clock.h"
 #include "export/edtaa3func.h"
 #include "export/export.h"
+#include "core/rapidjson/document.h"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -14,8 +15,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_STROKER_H
-// #include FT_ADVANCES_H
-//#include FT_LCD_FILTER_H
+#include FT_ADVANCES_H
 
 // convert wstring to UTF-8 string
 namespace {
@@ -23,6 +23,58 @@ namespace {
 	{
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
 		return myconv.to_bytes(str);
+	}
+
+	std::string ReadFontTao(const std::string& filestring, std::unordered_map<uint32_t, Export::Glyph>& outGlyphs ){
+		std::string outFilename;
+
+		using namespace rapidjson;
+		Document doc;
+		doc.Parse<0>(filestring.c_str());
+
+		for (Value::ConstMemberIterator val = doc.MemberBegin();
+			val != doc.MemberEnd();
+			++val) {
+			std::string attr = val->name.GetString();
+			boost::algorithm::to_lower(attr);
+
+			// decode metadata includes original texture filename
+			if (attr == "meta") {
+				for (Value::ConstMemberIterator mval = val->value.MemberBegin();
+					mval != val->value.MemberEnd();
+					++mval) {
+					std::string mattr = mval->name.GetString();
+					boost::algorithm::to_lower(mattr);
+					if (mattr == "image") {
+						if (mval->value.IsString() == false) {
+							continue;
+						}
+						std::string mvalstr = mval->value.GetString();
+						CORE_ASSERT(outFilename.empty());
+						outFilename = mvalstr;
+						continue;
+					}
+				}
+				continue;
+			}
+
+			// each frame in the textue atlas
+			if (attr == "frames") {
+				uint16_t count = 0;
+				for (Value::ConstMemberIterator aval = val->value.MemberBegin();
+							aval != val->value.MemberEnd();
+							++aval) {
+					std::string name = aval->name.GetString();
+					size_t last_index = name.find_last_not_of("0123456789");
+					std::string numString = name.substr(last_index + 1);
+					int num = boost::lexical_cast<int>(numString);
+					auto glyph = outGlyphs.find(num);
+					glyph->second.page = 0; // TODO multiple sprite pages
+					glyph->second.sprite = count++;
+				}
+			}
+		}
+		return outFilename;
 	}
 }
 
@@ -187,6 +239,9 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	boost::filesystem::current_path(tmpDir.value());
 
+	// fast search glyphs by unicode code point
+	std::unordered_map<uint32_t, Export::Glyph> outGlyphs;
+
 	for (unsigned int ch = 0; ch < 256; ++ch) {
 
 		//Load the Glyph for our character.
@@ -226,8 +281,8 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 					for (int x = 0; x < inBitmapWidth; ++x) {
 						const uint8_t bite = *(bitmap.buffer + (y * inBitmapPitch) + x);
 
-						edtaa3real* fout = binaryMap.data() + 
-									(((y + outPaddY) * outBitmapWidth) + ((x * 8) + outPaddX));
+						edtaa3real* fout = binaryMap.data() +
+							(((y + outPaddY) * outBitmapWidth) + ((x * 8) + outPaddX));
 						for (int i = 0; i < 8; ++i){
 							if (((x * 8) + i) < inBitmapWidth) {
 								*(fout + i) = bite & (1 << (7 - i)) ? 1.0f : 0.0f;
@@ -240,8 +295,8 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 				for (int y = 0; y < inBitmapHeight; ++y) {
 					for (int x = 0; x < inBitmapWidth; ++x) {
 						const uint8_t bite = *(bitmap.buffer + (y * inBitmapPitch) + x);
-						edtaa3real* fout = binaryMap.data() + 
-									(((y+outPaddY) * outBitmapWidth) + (x+outPaddX));
+						edtaa3real* fout = binaryMap.data() +
+							(((y + outPaddY) * outBitmapWidth) + (x + outPaddX));
 						*(fout) = ((edtaa3real)bite) / edtaa3real(256);
 					}
 				}
@@ -254,6 +309,9 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 			// convert to texture format
 			convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
+			Export::Glyph outGlyph;
+			outGlyph.unicode = ch;
+			outGlyphs[ ch ] = outGlyph;
 		}
 
 		FT_Done_Glyph(glyph);
@@ -283,13 +341,41 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	system( tpCmdLine.c_str() );
 
+	// currently we only support a single texture atlas per font... fix here if this becomes
+	// a problem (combine tao's?)
+
+	std::string textureAtlasName;
+
 	std::for_each(directory_iterator( "packer/"), directory_iterator(),
-		[taoName, outPath](const boost::filesystem::path& path) {
+		[taoName, outPath, &textureAtlasName](const boost::filesystem::path& path) {
 			if (path.extension() == ".tao") {
 				DoTextureAtlas(Core::FilePath(wstring_to_utf8(path.wstring())), outPath);
+				textureAtlasName = wstring_to_utf8(path.wstring());
 			}
 		}
 	);
+	current_path(tmpDir.value());
+	Core::MemFile file;
+	Core::FilePath toaPath = Core::FilePath(textureAtlasName).ReplaceExtension(".tao");
+	bool ok = file.loadTextFile(toaPath.value().c_str());
+	auto filestring = std::string((char*)file.takeBufferOwnership());
+	file.close();
+
+	ReadFontTao(filestring, outGlyphs);
+	assert(!textureAtlasName.empty());
+	std::vector<Export::Glyph> vecGlyphs(outGlyphs.size());
+	std::transform(outGlyphs.cbegin(), outGlyphs.cend(), vecGlyphs.begin(), 
+		[](const std::pair<uint32_t, Export::Glyph>& in) {
+			return in.second;
+		}
+	);
+	// sort into unicode code point order for fast look up at real-time
+	std::sort(vecGlyphs.begin(), vecGlyphs.end(), 
+		[](const Export::Glyph& a, const Export::Glyph&b){
+			return a.unicode < b.unicode;
+		}
+	);
+	SaveFont(textureAtlasName, vecGlyphs, outPath);
 
 #if !defined(_DEBUG)
 	// in release cleanup tmp folder, in debug leave for examination

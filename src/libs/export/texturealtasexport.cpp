@@ -1,14 +1,14 @@
 #include "export.h"
-
+#include <iostream>
 namespace Export {
 
-bool SaveTextureAtlas( 	const std::vector<std::string>& textures,
+bool SaveTextureAtlas(	const std::vector<std::string>& textures,
 						const std::vector<SubTexture>& sprites,
 						const Core::FilePath pOutFilename ) {
 	std::ostringstream outStream;
 
-	// produce a manifest header 
-	outStream << "// man file\n";
+	// produce a texture atlas header 
+	outStream << "// texture atlas file\n";
 	outStream << ".type u32\n";
 	outStream << ".align 8\n";
 	outStream << "// Start texture atlas Header" << "\n";
@@ -34,6 +34,7 @@ bool SaveTextureAtlas( 	const std::vector<std::string>& textures,
 		outStream << stabentry.c_str() << " - beginLabel\t\t\t\t //texture name offset\n";
 		++tit;
 	}
+	outStream.setf(std::ios_base::scientific);
 	auto sit = sprites.begin();
 	while( sit != sprites.end() ) {
 		outStream << "//---------------------------------------------\n";
