@@ -43,6 +43,7 @@ void loadTao(	const Core::FilePath& inPath,
 						}
 						std::string mvalstr = mval->value.GetString();
 						outFilenames.push_back(mvalstr);
+						// TODO when we handle multi-page texture atlas this will need a better fix
 						continue;
 					}
 					if (mattr == "size") {
@@ -117,15 +118,12 @@ void loadTao(	const Core::FilePath& inPath,
 							continue;
 						}
 					}
-					// we placed the w and h in u/v1 now to make them proper
-					st.u1 += st.u0;
-					st.v1 += st.v0;
-
 					// now rotate if required
 					if (rotated) {
-						std::swap(st.u0, st.v0);
-						std::swap(st.u1, st.v1);
+						// mark rotation for later processing
+						st.u0 = -st.u0;
 					}
+
 					// now push but still not quite ready
 					outSprites.push_back(st);
 					continue;
@@ -133,11 +131,30 @@ void loadTao(	const Core::FilePath& inPath,
 			}
 		}
 		// now we need to convert into normalised coords
-		for (auto it = outSprites.begin(); it != outSprites.end(); ++it) {
-			(*it).u0 /= (float)texWidth;
-			(*it).u1 /= (float)texWidth;
-			(*it).v0 /= (float)texHeight;
-			(*it).v1 /= (float)texHeight;
+		for (auto& st : outSprites ) {
+			// rotated
+			if (st.u0 < 0) {
+				// we placed the w and h in u/v1 now to make them proper
+				auto w = st.u1;
+				auto h = st.v1;
+				st.u1 = -st.u0 + h;
+				st.v1 = st.v0 + w;
+
+				st.u0 /= (float)texWidth;
+				st.u1 /= (float)texWidth;
+				st.v0 /= (float)texHeight;
+				st.v1 /= (float)texHeight;
+			}
+			else {
+				// we placed the w and h in u/v1 now to make them proper
+				st.u1 += st.u0;
+				st.v1 += st.v0;
+
+				st.u0 /= (float)texWidth;
+				st.u1 /= (float)texWidth;
+				st.v0 /= (float)texHeight;
+				st.v1 /= (float)texHeight;
+			}
 		}
 	}
 }

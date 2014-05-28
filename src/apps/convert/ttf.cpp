@@ -78,6 +78,7 @@ namespace {
 	}
 }
 
+// TODO generate distance map at higher resolution then downsample.
 void generateDistanceMapFromBitmap(const int width, const int height, const std::vector<edtaa3real>& buffer, std::vector<edtaa3real>& distance){
 	typedef edtaa3real real;
 	const int size = width * height;
@@ -141,6 +142,12 @@ void generateDistanceMapFromBitmap(const int width, const int height, const std:
 	std::transform(distance.begin(), distance.end(), distance.begin(),
 		[dmin](const real d) -> real {
 		return (d + dmin) / (2 * dmin);
+	});
+
+	// invert distance field to help shader
+	std::transform(distance.begin(), distance.end(), distance.begin(),
+		[](const real d) -> real {
+		return 1 - d;
 	});
 }
 
@@ -208,10 +215,12 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	// h is the height in pixels of each glyph (<< 6 accounts for FT being fixed point with 6 fractional bits)
 	// we want a 'standard' 18pt glyph to be stored at highest dpi we can get for the texture we are using
 	// 72pt = 1 inch high therefore 18pt = 1/4inch high
-	// we want a single 2Kx2K 8 bit distance field for the font. For latin lets have max 128-256 glyphs
-	// so roughly 8x8 leading us to 256x256pixels per glyph with a dpi of 256pixels = 1/4inch aka 1024 dpi
+	// we want a single 2Kx2K 8 bit distance field for the font. For latin lets have max 256 glyphs
+	// so roughly 16x16 leading us to 128x128pixels per inch with a dpi of 128 
+	// therefore 18pt AKA 1/4inch @ 128dpi = 2K^2 page of 16x16 glyphs ~32pixels for 18pt font( before padding)
 	int h = 72;
-	error = FT_Set_Char_Size(face, h << 6, 0, 330, 0);
+	int dpi = 256;
+	error = FT_Set_Char_Size(face, h << 6, 0, dpi, 0);
 	if (error != 0) {
 		LOG(INFO) << "FreeType FT_Set_Char_Size error";
 		return;
@@ -241,6 +250,13 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	// fast search glyphs by unicode code point
 	std::unordered_map<uint32_t, Export::Glyph> outGlyphs;
+	Export::FontMetrics fontMetrics;
+
+	fontMetrics.ascender = (face->ascender >> 6);
+	fontMetrics.descender = (face->descender >> 6);
+	fontMetrics.height = (face->height >> 6);
+	fontMetrics.linegap = fontMetrics.height - (fontMetrics.ascender + fontMetrics.descender);
+	fontMetrics.dpi = dpi;
 
 	for (unsigned int ch = 0; ch < 256; ++ch) {
 
@@ -266,8 +282,8 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 			const int inBitmapPitch = bitmap.pitch;
 			const int inBitmapWidth = bitmap.width;
 			const int inBitmapHeight = bitmap.rows;
-			const int outPaddX = 4;
-			const int outPaddY = 4;
+			const int outPaddX = 2;
+			const int outPaddY = 2;
 			const int outBitmapWidth = inBitmapWidth + (outPaddX * 2);
 			const int outBitmapHeight = inBitmapHeight + (outPaddY * 2);
 
@@ -305,13 +321,27 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 				CORE_ASSERT("font format not supported");
 			}
 
-			generateDistanceMapFromBitmap(outBitmapWidth, outBitmapHeight, binaryMap, distanceMap);
+			// TODO resize
 
-			// convert to texture format
+			generateDistanceMapFromBitmap(outBitmapWidth, outBitmapHeight, binaryMap, distanceMap);
 			convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
+
+			// store glyph data
 			Export::Glyph outGlyph;
 			outGlyph.unicode = ch;
-			outGlyphs[ ch ] = outGlyph;
+			outGlyph.width = (uint16_t)(face->glyph->metrics.width / 64) + (outPaddX * 2);
+			outGlyph.height = (uint16_t)(face->glyph->metrics.height / 64) + (outPaddY * 2);
+			outGlyph.offsetX = (uint16_t)slot->bitmap_left + ((uint16_t)face->glyph->metrics.horiBearingX / 64);// +outPaddX;
+			outGlyph.offsetY = (uint16_t)slot->bitmap_top + ((uint16_t)face->glyph->metrics.horiBearingY / 64);// +outPaddY;
+
+			// get advance info without hinting
+			if (FT_Load_Glyph(face, FT_Get_Char_Index(face, ch), FT_LOAD_RENDER | FT_LOAD_NO_HINTING))
+				throw std::runtime_error("FT_Load_Glyph failed");
+
+			outGlyph.advanceX = (int16_t)(face->glyph->metrics.horiAdvance >> 6);
+			outGlyph.advanceY = (int16_t)0;
+
+			outGlyphs[ch] = outGlyph;
 		}
 
 		FT_Done_Glyph(glyph);
@@ -332,7 +362,8 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	// TODO make this non filesystem setup dependant and non windows...
 	std::string tpCmdLine = "\"C:\\Program Files\\CodeAndWeb\\TexturePacker\\bin\\texturepacker\"";
 	tpCmdLine += " ../../../source/Templates/font_template.tps";
-	const std::string taoName = outPath.BaseName().RemoveExtension().value() + "{n}.tao";
+	const std::string fontName = outPath.BaseName().RemoveExtension().value();
+	const std::string taoName = fontName + "{n}.tao";
 	tpCmdLine += " --data packer/" + taoName;
 	tpCmdLine += " --texture-format png";
 	tpCmdLine += " --trim-sprite-names";
@@ -344,25 +375,27 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	// currently we only support a single texture atlas per font... fix here if this becomes
 	// a problem (combine tao's?)
 
-	std::string textureAtlasName;
+	std::string	textureAtlasPath;
 
+	// TODO export single channel format
+	// TODO texture compression
 	std::for_each(directory_iterator( "packer/"), directory_iterator(),
-		[taoName, outPath, &textureAtlasName](const boost::filesystem::path& path) {
+		[taoName, outPath, &textureAtlasPath](const boost::filesystem::path& path) {
 			if (path.extension() == ".tao") {
 				DoTextureAtlas(Core::FilePath(wstring_to_utf8(path.wstring())), outPath);
-				textureAtlasName = wstring_to_utf8(path.wstring());
+				textureAtlasPath = wstring_to_utf8(path.wstring());
 			}
 		}
 	);
 	current_path(tmpDir.value());
 	Core::MemFile file;
-	Core::FilePath toaPath = Core::FilePath(textureAtlasName).ReplaceExtension(".tao");
+	Core::FilePath toaPath = Core::FilePath(textureAtlasPath).ReplaceExtension(".tao");
 	bool ok = file.loadTextFile(toaPath.value().c_str());
 	auto filestring = std::string((char*)file.takeBufferOwnership());
 	file.close();
 
 	ReadFontTao(filestring, outGlyphs);
-	assert(!textureAtlasName.empty());
+	assert(!fontName.empty());
 	std::vector<Export::Glyph> vecGlyphs(outGlyphs.size());
 	std::transform(outGlyphs.cbegin(), outGlyphs.cend(), vecGlyphs.begin(), 
 		[](const std::pair<uint32_t, Export::Glyph>& in) {
@@ -375,7 +408,7 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 			return a.unicode < b.unicode;
 		}
 	);
-	SaveFont(textureAtlasName, vecGlyphs, outPath);
+	SaveFont(fontName, fontMetrics, vecGlyphs, outPath);
 
 #if !defined(_DEBUG)
 	// in release cleanup tmp folder, in debug leave for examination

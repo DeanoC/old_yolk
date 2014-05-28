@@ -37,6 +37,7 @@ namespace Scene {
 
 		unsigned int getWidth() const { return width; }
 		unsigned int getHeight() const { return height; }
+		unsigned int getDPI() const { return dpi; }
 		bool isStereo() const { return !!(flags & SCRF_STEREO); }
 		bool hasOverlay() const { return !!(flags & SCRF_OVERLAY); }
 		bool hasDebugPrims() const { return !!(flags & SCRF_DEBUGPRIMS); }
@@ -57,6 +58,7 @@ namespace Scene {
 	protected:
 		unsigned int width;
 		unsigned int height;
+		unsigned int dpi;
 		unsigned int flags;
 
 		std::unique_ptr<DebugPrims>						debugPrims;

@@ -95,7 +95,7 @@ namespace Swf {
 				pos.x = tempRecords[0]->offset.x;
 				pos.y = pos.y + dynText->fontHeight + leading;
 				rec->glyphEntries = CORE_NEW_ARRAY SwfGlyphEntry[tempGlyph.size()];
-				rec->numGlyphEntries = tempGlyph.size();
+				rec->numGlyphEntries = (int)tempGlyph.size();
 				memcpy( rec->glyphEntries, &tempGlyph[0], sizeof(SwfGlyphEntry) * tempGlyph.size() );
 				align_line(dynText->align, rec, (float) pos.x);
 
@@ -123,7 +123,7 @@ namespace Swf {
 					pos.x = tempRecords[0]->offset.x;
 					pos.y = pos.y + dynText->fontHeight + leading;
 					rec->glyphEntries = CORE_NEW_ARRAY SwfGlyphEntry[tempGlyph.size()];
-					rec->numGlyphEntries = tempGlyph.size();
+					rec->numGlyphEntries = (int)tempGlyph.size();
 					memcpy( rec->glyphEntries, &tempGlyph[0], sizeof(SwfGlyphEntry) * tempGlyph.size() );
 					align_line(dynText->align, rec, (float) pos.x);
 
@@ -141,7 +141,7 @@ namespace Swf {
 		}
 		
 		rec->glyphEntries = CORE_NEW_ARRAY SwfGlyphEntry[tempGlyph.size()];
-		rec->numGlyphEntries = tempGlyph.size();
+		rec->numGlyphEntries = (int)tempGlyph.size();
 		memcpy( rec->glyphEntries, &tempGlyph[0], sizeof(SwfGlyphEntry) * tempGlyph.size() );
 		align_line(dynText->align, rec, (float) pos.x);
 
@@ -157,13 +157,13 @@ namespace Swf {
 		}
 		
 		text->records = CORE_NEW_ARRAY SwfTextRecord*[tempRecords.size()];
-		text->numRecords = tempRecords.size();
+		text->numRecords = (int)tempRecords.size();
 		for( 	std::vector<SwfTextRecord*>::iterator i = tempRecords.begin(); 
 				i != tempRecords.end();
 				++i ) {
 			(*i)->offset.x += dynText->bounds->minX;
 			(*i)->offset.y += dynText->bounds->minY;
-			const int index = std::distance(tempRecords.begin(),i);
+			const int index = (const int)std::distance(tempRecords.begin(), i);
 			text->records[index] = *i;
 		}
 	}

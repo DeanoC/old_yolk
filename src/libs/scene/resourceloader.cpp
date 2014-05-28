@@ -19,6 +19,7 @@
 #include "renderstates.h"
 #include "debugprims.h"
 #include "programman.h"
+#include "font.h"
 
 // doesn't really belong here, its higher level library than scene but scene needs a seperation itself, 
 // so for now and make life simple, just bung its loader here
@@ -88,6 +89,7 @@ void ProcessRender( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RenderTargetStatesType: RENDER( RenderTargetStates ); break;
 	case DepthStencilStateType: RENDER( DepthStencilState ); break;
 	case RasteriserStateType: RENDER( RasteriserState ); break;
+	case FontType: RENDER( Font ); break;
 	case PlayerType: RENDER1( Player, SwfPlayer ); break;
 	default:;
 		LOG(FATAL) << "Process Resource Type Error\n";
@@ -119,6 +121,7 @@ void ProcessLoader( const Core::ResourceHandleBase* handle, Core::RESOURCE_FLAGS
 	case RenderTargetStatesType: LOADER( RenderTargetStates ); break;
 	case DepthStencilStateType: LOADER( DepthStencilState ); break;
 	case RasteriserStateType: LOADER( RasteriserState ); break;
+	case FontType: LOADER( Font ); break;
 	case PlayerType: LOADER( Player ); break;
 	default:;
 	}
@@ -185,13 +188,15 @@ void ResourceLoaderImpl::installResourceTypes() {
 							NULL, 0, "" );
 	REG( RasteriserStateType, cb, &SRD(RasteriserState), SO(RasteriserStateHandle), 
 							NULL, 0, "" );
-	REG( Swf::PlayerType, cb, &SRD(Swf::Player), SO(Swf::PlayerHandle), 
+	REG( FontType, cb, &SRD(Font), SO(FontHandle),
+							NULL, 0, "Ui/");
+	REG(Swf::PlayerType, cb, &SRD(Swf::Player), SO(Swf::PlayerHandle),
 							NULL, 0, "Ui/" );
 	#undef SRD
 	#undef SO
 	#undef REG
 
-	loadTextureAtlas = TextureAtlasHandle::load( "basic_ui.tat" );
+//	loadTextureAtlas = TextureAtlasHandle::load( "basic_ui.tat" );
 }
 
 ResourceLoaderImpl::ResourceLoaderImpl() {
@@ -233,12 +238,12 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 						0 );*/
 
 		if( ResourceLoaderImpl::workCounter > 0) {
-			composer->putSprite( loadTextureAtlas, 0, 
+/*			composer->putSprite( loadTextureAtlas, 0, 
 							ImageComposer::ALPHA_BLEND, 
 							Math::Vector2( 0.85f, 0.85f ),
 							Math::Vector2( 0.10f, 0.10f ),
 							Core::RGBAColour::unpackARGB(0x80FFFFFF),
-							1 );
+							1 );*/
 		}
 
 	}
@@ -246,7 +251,7 @@ void ResourceLoaderImpl::renderThreadUpdate( Scene::ImageComposer* composer ) {
 }
 
 ResourceLoaderImpl::~ResourceLoaderImpl() {
-	loadTextureAtlas->close();
+//	loadTextureAtlas->close();
 	workUnit.reset();
 	loaderThread->join();
 	CORE_DELETE loaderThread;
@@ -283,6 +288,10 @@ Program* ResourceLoader::createProgram( const void* data ) {
 Wob* ResourceLoader::createWob( const void* data ) {
 	return Wob::internalCreate( getRenderer(), data );
 }
+Font* ResourceLoader::createFont(const void* data) {
+	return (Font*)data;
+}
+
 Swf::Player* ResourceLoader::createSwfPlayer( const void* data ) {
 	return (Swf::Player*)data;
 }
@@ -320,6 +329,10 @@ const void* ResourceLoader::preCreate( const char* name, const DepthStencilState
 const void* ResourceLoader::preCreate( const char* name, const RasteriserState::CreationInfo* loader ) {
 	return RasteriserState::internalPreCreate( name, loader );
 }
+const void* ResourceLoader::preCreate( const char* name, const Font::CreationInfo* loader) {
+	return Font::internalPreCreate(name, loader);
+}
+
 const void* ResourceLoader::preCreate( const char* name, const  Swf::Player::CreationInfo* loader ) {
 	return Swf::Player::internalPreCreate( name, loader );
 }

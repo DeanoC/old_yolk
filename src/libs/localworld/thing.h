@@ -32,9 +32,9 @@ public:
 	friend class ThingFactory;
 	~Thing();
 
-	int getPhysicalCount() const { return preps.size(); }
-	int getRenderableCount() const { return vreps.size(); }
-	int getPhysicSensorCount() const { return sreps.size(); }
+	int getPhysicalCount() const { return (int)preps.size(); }
+	int getRenderableCount() const { return (int)vreps.size(); }
+	int getPhysicSensorCount() const { return (int)sreps.size(); }
 
 	Scene::RenderablePtr getRenderable( int nodeId = 0 ) const {
 		CORE_ASSERT( nodeId >= 0 && nodeId < getRenderableCount() );

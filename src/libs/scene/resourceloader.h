@@ -23,6 +23,10 @@
 #ifndef YOLK_SCENE_TEXTUREATLAS_H_
 #include "scene/textureatlas.h"
 #endif
+#ifndef YOLK_SCENE_FONT_H_
+#include "scene/font.h"
+#endif
+
 #ifndef YOLK_SCENE_WOB_H_
 #include "scene/wobfile.h"
 #endif
@@ -55,15 +59,17 @@ public:
 	virtual Hie* createHie( const void* data );
 	virtual Program* createProgram( const void* data );
 	virtual TextureAtlas* createTextureAtlas( const void* data );
+	virtual Font* createFont(const void* data);
+	virtual Swf::Player* createSwfPlayer(const void* data);
+	virtual Wob* createWob(const void* data);
+
 	virtual DataBuffer* createDataBuffer( const void* data ) = 0;
 	virtual Texture* createTexture( const void* data ) = 0;
 	virtual VertexInput* createVertexInput( const void* data ) = 0;
-	virtual Wob* createWob( const void* data );
 	virtual SamplerState* createSamplerState( const void* data ) = 0;
 	virtual RenderTargetStates* createRenderTargetStates( const void* data ) = 0;
 	virtual DepthStencilState* createDepthStencilState( const void* data ) = 0;
 	virtual RasteriserState* createRasteriserState( const void* data ) = 0;
-	virtual Swf::Player* createSwfPlayer( const void* data );
 
 	virtual const void* preCreate( const char* name, const DataBuffer::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const Hie::CreationInfo* loader );
@@ -76,6 +82,7 @@ public:
 	virtual const void* preCreate( const char* name, const RenderTargetStates::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const DepthStencilState::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const RasteriserState::CreationInfo* loader );
+	virtual const void* preCreate( const char* name, const Font::CreationInfo* loader );
 	virtual const void* preCreate( const char* name, const Swf::Player::CreationInfo* loader );
 
 protected:

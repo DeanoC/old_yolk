@@ -9,7 +9,7 @@ Tree<Derived>::Tree( const Core::AABB& _box ) :
 	boundingBox( _box ),
 	nodeTiles( 1 )
 {
-	uint32_t rootIndex = nodeTiles.alloc();
+	uintptr_t rootIndex = nodeTiles.alloc();
 	CORE_ASSERT( rootIndex == 0 );
 	for( int i = 0;i < 8; ++i ) {
 		nodeTiles.get(0).nodes[i].type = NodeType::EMPTY;

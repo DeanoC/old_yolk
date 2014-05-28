@@ -1,104 +1,47 @@
 
 #include "core/core.h"
 #include "core/vector_math.h"
-#include "gui/swfruntime/ActionScript/AsObject.h"
-#include "gui/swfruntime/player.h"
 #include "localworld/sceneworld.h"
-#include "gui/swfruntime/movieclip.h"
 #include "scene/rendercontext.h"
-#include "gui/swfruntime/swfman.h"
 
 #include "gfxdbgconsole.h"
-
-namespace {
-	static const char* s_RowNames[GfxDbgConsole::Y_LINE_COUNT] = {
-		"TextRow1",
-		"TextRow2",
-		"TextRow3",
-		"TextRow4",
-		"TextRow5",
-		"TextRow6",
-		"TextRow7",
-		"TextRow8",
-		"TextRow9",
-		"TextRow10",
-		"TextRow11",
-		"TextRow12",
-		"TextRow13",
-		"TextRow14",
-		"TextRow15",
-		"TextRow16",
-		"TextRow17",
-		"TextRow18",
-		"TextRow19",
-		"TextRow20",
-	};
-	static const char* s_VarNames[GfxDbgConsole::VAR_COUNT] = {
-		"TextFloaty1",
-		"TextFloaty2",
-		"TextFloaty3",
-		"TextFloaty4",
-	};
-}
 
 GfxDbgConsole::GfxDbgConsole( SceneWorldPtr _world ) :
 	world( _world ),
 	curLine( 0 )
 {
-	if( Swf::SwfMan::exists() == false ) {
-		Swf::SwfMan::init();
-	}
-
 	namespace arg = std::placeholders;
 
-	flashConsole.reset( Swf::PlayerHandle::load( "dbg_text_console" ) );
 	auto r2d = std::bind( &GfxDbgConsole::renderable2DCallback, this, arg::_1, arg::_2 );
 	world->addRenderable2D( std::make_shared< Scene::Renderable2DCallbackType >( r2d ) );	
 
-	auto fl = flashConsole.acquire();
-	if( fl ) {
-		for( int i = 0; i < Y_LINE_COUNT; ++i ) {
-			textRows[i] = CORE_NEW Swf::AsObjectString("");
-			fl->getRoot()->setProperty( s_RowNames[i], textRows[i] );
-		}
-		for( int i = 0; i < VAR_COUNT; ++i ) {
-			textVars[i] = CORE_NEW Swf::AsObjectString("");
-			xVars[i] = CORE_NEW Swf::AsObjectNumber(0);
-			yVars[i] = CORE_NEW Swf::AsObjectNumber(0);
-			fl->getRoot()->setProperty( s_VarNames[i], textVars[i] );
-			auto lc = fl->getRoot()->findLocalTarget( s_VarNames[i] );
-			lc->setProperty( 0, xVars[i]);
-			lc->setProperty( 1, yVars[i] );
-		}
+	for( int i = 0; i < Y_LINE_COUNT; ++i ) {
+		textRows[i].clear();
 	}
+	for( int i = 0; i < VAR_COUNT; ++i ) {
+		textVars[i].clear();
+		xVars[i] = 0;
+		yVars[i] = 0;
+	}
+
+	font.reset(Scene::FontHandle::load("arial") );
+
 }
 
 GfxDbgConsole::~GfxDbgConsole() {	
-	for( int i = 0; i < VAR_COUNT; ++i ) {
-		CORE_DELETE( textVars[i] );
-		CORE_DELETE( yVars[i] );
-		CORE_DELETE( xVars[i] );
-	}
-
-	for( int i = 0; i < Y_LINE_COUNT; ++i ) {
-		CORE_DELETE( textRows[i] );
-	}
-
-	// need to refernce cound singleton
-	Swf::SwfMan::shutdown();	
 }
 
 void GfxDbgConsole::scrollUp() {
 	for(unsigned int i=1;i < Y_LINE_COUNT;i++) {
-		textRows[i-1]->value = textRows[i]->value;
+		textRows[i-1] = textRows[i];
 	}
 }
 
 void GfxDbgConsole::scrollDown() {
 	for(unsigned int i=0;i < Y_LINE_COUNT-1;i++) {
-		textRows[i+1]->value = textRows[i]->value;
+		textRows[i+1] = textRows[i];
 	}
-	textRows[0]->value.clear();
+	textRows[0].clear();
 }
 
 void GfxDbgConsole::setCursor(unsigned int line) {
@@ -112,39 +55,41 @@ void GfxDbgConsole::setCursor(unsigned int line) {
 
 void GfxDbgConsole::clear() {
 	for(unsigned int i=0;i < Y_LINE_COUNT;i++) {
-		textRows[i]->value.clear();
+		textRows[i].clear();
 	}
 	curLine = 0;
 }
 
 void GfxDbgConsole::print( const char* _text ) {
-	textRows[curLine]->value = _text;
-
+	textRows[curLine]= _text;
 	setCursor( curLine+1 );
 }
 
 void GfxDbgConsole::printVar( const int _index, const float _x, const float _y, const char* _text ) {
-	textVars[ _index ]->value = _text;
-
-	auto fl = flashConsole.acquire();
-	if( fl ) {
-		auto lc = fl->getRoot()->findLocalTarget( s_VarNames[ _index ] );
-		Math::Vector2 v;
-		v = Math::Vector2( _x, _y );
-		v = Math::TransformAndDropZ( v, fl->getNdxToTwip() );
-		xVars[ _index ]->value = v.x;
-		yVars[ _index ]->value = v.y;
-
-		lc->setProperty( 0, xVars[ _index ] );
-		lc->setProperty( 1, yVars[ _index ] );
-	}
+	textVars[ _index ] = _text;
+	xVars[ _index ] = _x;
+	yVars[ _index ] = _y;
 
 }
 
 
-void GfxDbgConsole::renderable2DCallback( const Scene::ScreenPtr& , Scene::RenderContext* _ctx ) {
-	auto fl = flashConsole.tryAcquire();
-	if( fl ) {
-		fl->display( _ctx );
+void GfxDbgConsole::renderable2DCallback( const Scene::ScreenPtr& _scr, Scene::RenderContext* _ctx ) {
+	Math::Vector2 pos(-0.8f, 0.8f); // TODO proper x and y adjust
+	Core::RGBAColour col(1.f,1.f,1.f,1.f);
+	const float pt = 18.0f;
+
+	for (int i = 0; i < Y_LINE_COUNT; ++i) {
+		pos.x = -0.8f;
+		for (const char ch : textRows[i]) {
+			Math::Vector2 advance = _scr->getComposer()->putChar( font.get(), 
+																  ch, 
+																  Scene::ImageComposer::PM_OVER, 
+																  pos, 
+																  pt, 
+																  col, 
+																  15);
+			pos.x += advance.x;
+		}
+//		pos.y += 2 * size.y;
 	}
 }

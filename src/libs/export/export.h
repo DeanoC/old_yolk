@@ -31,6 +31,7 @@ namespace Export {
 									const Core::FilePath pOutFilename );
 
 	extern bool SaveFont(	const std::string& textureAtlas,
+							const Export::FontMetrics& fontMetrics,
 							const std::vector<Glyph>& glyphs,
 							const Core::FilePath pOutFilename);
 

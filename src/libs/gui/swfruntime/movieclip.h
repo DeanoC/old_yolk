@@ -60,7 +60,7 @@ namespace Swf {
 			return currentFrameNumber;
 		}
 		int getMaximumFrameNumber() const {
-			return frames->size();
+			return (int)frames->size();
 		}
 		
 		Player* getPlayer() {

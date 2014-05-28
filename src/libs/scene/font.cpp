@@ -16,56 +16,48 @@ namespace Scene {
 
 	Font::~Font() {
 		Core::ResourceMan::get()->closeResource(textureAtlas);
+		CORE_DELETE_ARRAY fontMem;
 	}
-
-//! Header of a Font file	
-struct FontFileHeader {
-	uint32_t magic;					//!< Should be FONT
-	uint32_t size;					//!< total size
-	uint16_t numGlyphs;				//!< no of font glyphs
-	uint8_t version;				//!< an incrementing version number
-	uint8_t padd8[5];	// padding so that properties start on a 64 bit alignment 
-};
 
 const void* Font::internalPreCreate( const char* name, const Font::CreationInfo *loader ) {
 
 	Core::FilePath path( name );
 	path = path.ReplaceExtension( ".fnt" );
 
-	Core::MemFile fio( path.value().c_str() );
+	Core::File fio( path.value().c_str() );
 	if( !fio.isValid() ) {
 		return nullptr;
 	}
+	Font* fnt = CORE_NEW Font();
 
-	FontFileHeader header;
-	fio.read( (uint8_t*) &header, sizeof(FontFileHeader) );
-	if( header.magic != FontType ) {
+	fio.read( (uint8_t*) &fnt->header, sizeof(FontFileHeader) );
+	if (fnt->header.magic != FontType) {
 		LOG(INFO) << path.value() << " is not a FONT file\n";
 		return nullptr;
 	}
-	if( header.version != 1 ) {
+	if (fnt->header.version != 2) {
 		LOG(INFO) << path.value() << " is a FONT file of the wrong version\n";
 		return nullptr;		
 	}
 
-	uint8_t* fontMem = fio.takeBufferOwnership();
-	uint8_t* ph = (uint8_t*) Core::alignTo( (uintptr_t)fontMem + sizeof( FontFileHeader ), 8 );
-	void* startph = (void*)ph;
+	fnt->fontMem = CORE_NEW_ARRAY uint8_t[fnt->header.size];
+	fio.read(fnt->fontMem, fnt->header.size);
 
-	Font* fnt = CORE_NEW Font();
 
-	uint32_t* strOff = (uint32_t*)ph;
-	fnt->textureAtlas = TextureAtlasHandle::load(Core::fixupPointer<const char>(startph, *strOff));
-
-	Glyph* st = (Glyph*)(strOff + 1);
-	for (int i = 0; i < header.numGlyphs; ++i) {
-		fnt->glyphs[ st->unicode ] = (*st);
-		st += 1;
-	}
-
-	CORE_DELETE_ARRAY fontMem;
+	fnt->textureAtlas = TextureAtlasHandle::load(Core::fixupPointer<const char>(fnt->fontMem, fnt->header.textureName));
+	fnt->rangeTable = Core::fixupPointer<const Range>(fnt->fontMem, fnt->header.rangeOffset);
+	fnt->glyphTable = Core::fixupPointer<const Glyph>(fnt->fontMem, fnt->header.glyphOffset);
 
 	return fnt;
+}
+
+const Font::Glyph& Font::getGlyph(uint32_t _unicode) const {
+	for (uint32_t i = 0; i < header.numRanges; ++i) {
+		if (_unicode >= rangeTable[i].minGlyph && _unicode < rangeTable[i].maxGlyph) {
+			return glyphTable[rangeTable[i].startIndex  + (_unicode - rangeTable[i].minGlyph)];
+		}
+	}
+	return glyphTable[0];
 }
 
 }; // end namespace Scene

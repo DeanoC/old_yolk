@@ -25,6 +25,9 @@
 #if !defined( YOLK_SCENE_RENDERCONTEXT_H_ )
 #	include "rendercontext.h"
 #endif
+#if !defined( YOLK_SCENE_FONT_H_ )
+#	include "font.h"
+#endif
 
 namespace Scene {
 //!-----------------------------------------------------
@@ -34,8 +37,8 @@ namespace Scene {
 //! rendered onto the current render target. 
 //! Assumes full post pixel blend ops are available (lots of alpha...)
 //! 
-//! I flip the y so we match cairo. Basically 0,1 is the
-//! nearer the bottom of your monitor
+//! I flip the y so we match cairo. Basically y=1 is the
+//! nearest to the bottom of your monitor
 //! Our space 
 //!   -1               0                1
 //!-1 -----------------|----------------| -1
@@ -70,7 +73,10 @@ public:
 		MAX_RENDER_STATES,
 	};
 
-	ImageComposer( int iMaxSpritesPerLayer = 64 );
+	ImageComposer(	unsigned int _screenWidth, 
+					unsigned int _screenHeight, 
+					unsigned int _screenDPI, 
+					unsigned int _maxSpritesPerLayer = 64 );
 
 	//!-----------------------------------------------------
 	//! Places a solid colour rectangle on to the screen at a 
@@ -167,6 +173,18 @@ public:
 						const Core::Colour&				colour,
 						unsigned int					layer );
 
+	//!-----------------------------------------------------
+	//! Places a glyph n to the screen at a given NDC 
+	//! position and font point size, can also be coloured.
+	//!-----------------------------------------------------
+	Math::Vector2 putChar(	const FontHandlePtr&			_font,
+							const uint32_t					_glyph, 
+							unsigned int					_renderStates,
+							const Math::Vector2&			_pos,
+							const float						_pt,
+							const Core::Colour&				_colour,
+							unsigned int					_layer );
+
 	//! Cause all the image operations to be submitted
 	void render( RenderContext* context );
 
@@ -175,6 +193,7 @@ private:
 	enum RENDER_TYPE {
 		SIMPLE_SPRITE,			//!< simple coloured single image sprites
 		SOLID_COLOUR,			//!< a solid colour polygon
+		DISTANCE_FIELD,			//!< Valve style distance field glyph render
 		MAX_RENDER_TYPE
 	};
 
@@ -233,6 +252,9 @@ private:
 	Core::ScopedResourceHandle<SamplerStateHandle>				linearClampSampler;
 	Core::ScopedResourceHandle<RenderTargetStatesHandle>		blendState[MAX_RENDER_STATES];
 
+	const unsigned int screenWidth;
+	const unsigned int screenHeight;
+	const unsigned int screenDPI;
 	const unsigned int maxSpritesPerLayer;				//! how many sprites per layer can this composer support
 	static const uint32_t SizeOfRenderType[MAX_RENDER_TYPE];
 	static const VertexInput::CreationInfo VaoCS[MAX_RENDER_TYPE];

@@ -3,9 +3,8 @@
 #define YOLK_GFXDBGCONSOLE_H_ 1
 
 #include "core/vector_math.h"
-#include "gui/swfruntime/ActionScript/AsObject.h"
-#include "gui/swfruntime/player.h"
 #include "localworld/sceneworld.h"
+#include "scene/font.h"
 
 class GfxDbgConsole {
 public:
@@ -28,12 +27,12 @@ private:
 
 	SceneWorldPtr										world;
 
-	Core::ScopedResourceHandle<Swf::PlayerHandle> 		flashConsole;
-	Swf::AsObjectString*								textRows[Y_LINE_COUNT];
-	Swf::AsObjectString*								textVars[VAR_COUNT];
-	Swf::AsObjectNumber*								xVars[VAR_COUNT];
-	Swf::AsObjectNumber*								yVars[VAR_COUNT];
+	std::string											textRows[Y_LINE_COUNT];
+	std::string											textVars[VAR_COUNT];
+	float												xVars[VAR_COUNT];
+	float												yVars[VAR_COUNT];
 	int													curLine;
+	Core::ScopedResourceHandle<Scene::FontHandle>		font;
 };
 
 #endif

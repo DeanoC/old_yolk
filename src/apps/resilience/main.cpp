@@ -70,8 +70,8 @@ int Main() {
 	Core::DevelopmentContext::get()->activateContext( "DebugCam" );
 
 	SceneWorldPtr world = shell.getSceneWorld();
-//	std::unique_ptr<PrintDebugPrims> pdp( CORE_NEW PrintDebugPrims(world) );
-
+	std::unique_ptr<PrintDebugPrims> pdp( CORE_NEW PrintDebugPrims(world) );
+	pdp->print("hello gPqQ~");
 	ThingPtr thing ( ThingFactory::createEmptyThing( TBC_WORLD, NewThingId() ) );
 
 	world->add( thing );

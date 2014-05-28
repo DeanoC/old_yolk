@@ -149,14 +149,15 @@ void DoTextureAtlas(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	std::vector<std::string> filenames;
 	std::vector<SubTexture> sprites;
 
-//	filenames.push_back(inFullPath.BaseName().ReplaceExtension(".png").value());
+	// TODO when we handle multi-page texture atlas this will need a revisit
+	//filenames.push_back(inPath.ReplaceExtension(".png").value());
 
 	loadTao(inPath, filenames, sprites);
 
 	for (auto fiIt = filenames.cbegin();
 		fiIt != filenames.cend();
 		++fiIt) {
-		DoTexture(Core::FilePath(*fiIt), outPath);
+		DoTexture(Core::FilePath(*fiIt), outPath.DirName().Append(Core::FilePath(*fiIt).BaseName()));
 	}
 
 	LOG(INFO) << "Output Path : " << outPath.DirName().value().c_str() << "\n";

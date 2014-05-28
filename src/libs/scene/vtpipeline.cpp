@@ -150,7 +150,7 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 		// material data buffer
 		DataBuffer::CreationInfo mdcs = Resource::BufferCtor(
 				RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_ACE_IMMUTABLE,
-				sizeof( GPUConstants::VtMaterial ) * materialStoreSystemMem.size(),
+				(int) (sizeof( GPUConstants::VtMaterial ) * materialStoreSystemMem.size()),
 				&materialStoreSystemMem[0]
 			);
 		mdcs.structureSize = sizeof( GPUConstants::VtMaterial );
@@ -165,7 +165,7 @@ void VtPipeline::bind( Scene::RenderContext* ctx ) {
 		// light data buffer, TODO Raw or make all lights same structure size?
 		DataBuffer::CreationInfo ldcs = Resource::BufferCtor(
 				RCF_BUF_GENERAL | RCF_PRG_STRUCTURED | RCF_PRG_READ | RCF_ACE_IMMUTABLE,
-				sizeof( GPUConstants::VtLight ) * lightStoreSystemMem.size(),
+				(int)(sizeof( GPUConstants::VtLight ) * lightStoreSystemMem.size()),
 				&lightStoreSystemMem[0]
 			);
 		ldcs.structureSize = sizeof( GPUConstants::VtLight );
@@ -436,7 +436,7 @@ void VtPipelineDataStore::render( Scene::RenderContext* ctx ) {
 			if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 			ctx->bind( vao );
 			ctx->bindIB( ib, mds->indexSize );
-			ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
+			ctx->drawIndexed( PT_TRIANGLE_LIST, (uint32_t) mds->numIndices );
 		}
 	}
 }
@@ -458,7 +458,7 @@ void VtPipelineDataStore::renderTransparent( Scene::RenderContext* rc ) {
 			if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 			ctx->bind( vao );
 			ctx->bindIB( ib, mds->indexSize );
-			ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
+			ctx->drawIndexed( PT_TRIANGLE_LIST, (uint32_t) mds->numIndices );
 		}
 	}
 

@@ -154,7 +154,7 @@ void DebugPipelineDataStore::render( Scene::RenderContext* rc ) {
 		if( !ib ) { /* LOG(INFO) << "ib not ready\n"; */ return; }
 		ctx->bind( vao );
 		ctx->bindIB( ib, mds->indexSize );
-		ctx->drawIndexed( PT_TRIANGLE_LIST, mds->numIndices );
+		ctx->drawIndexed( PT_TRIANGLE_LIST, (uint32_t) mds->numIndices );
 	}
 
 }

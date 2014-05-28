@@ -56,12 +56,26 @@ namespace Export {
 		float		u1,v1;
 	};
 
+	struct FontMetrics {
+		uint16_t	dpi;
+		int16_t		ascender;
+		int16_t		descender;
+		uint16_t	height;
+		uint16_t	linegap;
+	};
+
 	// glyph used for fonts
 	struct Glyph {
 		uint32_t	unicode;
+		uint16_t	sprite;
 		uint8_t 	page;
 		uint8_t		padd;
-		uint16_t	sprite;
+		uint16_t	width;
+		uint16_t	height;
+		uint16_t	offsetX;
+		uint16_t	offsetY;
+		uint16_t	advanceX;
+		uint16_t	advanceY;
 	};
 }
 #endif

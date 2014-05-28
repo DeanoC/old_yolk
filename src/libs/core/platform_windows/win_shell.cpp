@@ -14,6 +14,9 @@
 #include <io.h>
 #include <iostream>
 #include <fstream>
+#if _NTDDI_VERSION >= NTDDI_WINBLUE
+#include <ShellScalingAPI.h>
+#endif
 
 
 
@@ -87,7 +90,7 @@ void WinMainCmdLineToMainArgs(char* command_line) {
 	int    index;
 
 	// early out if already set up (either double call or via a main -> winmain
-	// thikn from a command line app
+	// thunk from a command line app
 	if( Core::g_argc != 0 ) {
 		return;
 	}
@@ -239,6 +242,11 @@ int WINAPI WinMain(         HINSTANCE hInstance,
 	WinMainCmdLineToMainArgs( lpCmdLine );
 #if defined( USE_GLOG )
 	google::InitGoogleLogging(Core::g_argv[0]);
+#endif
+#if _NTDDI_VERSION >= NTDDI_WINBLUE
+	SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+#else
+	SetProcessDPIAware();
 #endif
 
 	Core::Init();

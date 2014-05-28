@@ -421,7 +421,7 @@ namespace Swf {
 
 	void AsAgRuntime::stringLength() {
 		AsObjectHandle oa = asPop();
-		int len = oa->toString().size();
+		int len = (int)oa->toString().size();
 		push((int32_t)len);
 	}
 		
@@ -449,7 +449,7 @@ namespace Swf {
 
 	void AsAgRuntime::MBStringLength() {
 		AsObjectHandle oa = asPop();
-		int len = oa->toString().size();
+		int len = (int)oa->toString().size();
 		push((int32_t)len);
 	}
 

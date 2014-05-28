@@ -28,6 +28,7 @@ DECLARE_SHADER( fs_tex_col );
 DECLARE_SHADER( fs_vtopaque );
 DECLARE_SHADER( fs_vtresolve );
 DECLARE_SHADER( fs_vttransparent );
+DECLARE_SHADER( fs_distance_field );
 
 DECLARE_SHADER( cs_vtlighting );
 
@@ -40,3 +41,4 @@ DECLARE_PROGRAM( vtopaque );
 DECLARE_PROGRAM( vtresolve );
 DECLARE_PROGRAM( vtlighting );
 DECLARE_PROGRAM( vttransparent );
+DECLARE_PROGRAM( distance_field );

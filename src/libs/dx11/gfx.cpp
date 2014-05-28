@@ -20,6 +20,10 @@
 #include <boost/lexical_cast.hpp>
 #include "gfx.h"
 
+#if _NTDDI_VERSION >= NTDDI_WINBLUE
+#include <ShellScalingAPI.h>
+#endif
+
 namespace Dx11
 {
 
@@ -162,7 +166,7 @@ Gfx::~Gfx() {
 	adapters.clear();
 }
 
-Scene::ScreenPtr Gfx::createScreen( uint32_t width, uint32_t height, uint32_t flags ) {
+Scene::ScreenPtr Gfx::createScreen(uint32_t width, uint32_t height, uint32_t flags) {
 	using namespace Scene;
 	HRESULT hr;
 
@@ -179,32 +183,53 @@ Scene::ScreenPtr Gfx::createScreen( uint32_t width, uint32_t height, uint32_t fl
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
- 	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;
-	if( flags & Scene::SCRF_FULLSCREEN ) {
+	if (flags & Scene::SCRF_FULLSCREEN) {
 		swapChainDesc.Windowed = false;
-	} else {
+	}
+	else {
 		swapChainDesc.Windowed = true;
 	}
 	IDXGIFactory1* 				factory;
 	IDXGISwapChain*				swapChain;
 
-	adapter->GetParent( __uuidof( IDXGIFactory1 ), (VOID**)(&factory) );
-	DXFAIL( factory->CreateSwapChain( device.get(), &swapChainDesc, &swapChain ) );
+	adapter->GetParent(__uuidof(IDXGIFactory1), (VOID**)(&factory));
+	DXFAIL(factory->CreateSwapChain(device.get(), &swapChainDesc, &swapChain));
 	factory->Release();
 	ID3D11Texture2D* backBuffer;
-	hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( void** )&backBuffer );
-	auto cs = Scene::Texture::TextureCtor( 
+	hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
+	auto cs = Scene::Texture::TextureCtor(
 		RCF_TEX_2D | RCF_OUT_RENDER_TARGET | RCF_D3D_FROM_OS, GTF_UNKNOWN, 0
-	);
+		);
 	cs.referenceTex = backBuffer;
-	const std::string backName = "_BackBuffer" + boost::lexical_cast<std::string>( screens.size() );
-	TextureHandlePtr backHandle = TextureHandle::create( backName.c_str(), &cs );
+	const std::string backName = "_BackBuffer" + boost::lexical_cast<std::string>(screens.size());
+	TextureHandlePtr backHandle = TextureHandle::create(backName.c_str(), &cs);
 
 	auto screen = std::make_shared<Dx11::Screen>();
 	screen->width = width;
 	screen->height = height;
 	screen->flags = flags;
+	screen->dpi = 96; // windows default
+#if _NTDDI_VERSION >= NTDDI_WINBLUE
+	UINT dpiX;
+	UINT dpiY;
+	GetDpiForMonitor(MonitorFromWindow(g_hWnd, MONITOR_DEFAULTTONEAREST), MDT_DEFAULT, &dpiX, &dpiY);
+	if( hr == S_OK ) {
+		screen->dpi = std::min(dpiX, dpiY);
+	}
+#else
+	UINT dpiX;
+	UINT dpiY;
+	HDC hdc = GetDC(g_hWnd);
+	if (hdc) {
+		dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+		dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+		ReleaseDC(NULL, hdc);
+		screen->dpi = std::min(dpiX, dpiY);
+	}
+#endif
+
 	screen->swapChain = swapChain;
 	screen->renderer = this;
 	screen->backHandle.reset( backHandle );
@@ -214,7 +239,7 @@ Scene::ScreenPtr Gfx::createScreen( uint32_t width, uint32_t height, uint32_t fl
 
 
 	if( flags & SCRF_OVERLAY ) {
-		screen->imageComposer.reset( CORE_NEW ImageComposer() );
+		screen->imageComposer.reset( CORE_NEW ImageComposer(screen->getWidth(), screen->getHeight(), screen->getDPI() ) );
 	}
 	if( flags & SCRF_DEBUGPRIMS ) {
 		screen->debugPrims.reset( CORE_NEW DebugPrims() );
