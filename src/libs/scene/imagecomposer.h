@@ -76,7 +76,7 @@ public:
 	ImageComposer(	unsigned int _screenWidth, 
 					unsigned int _screenHeight, 
 					unsigned int _screenDPI, 
-					unsigned int _maxSpritesPerLayer = 64 );
+					unsigned int _maxSpritesPerLayer = 1024 );
 
 	//!-----------------------------------------------------
 	//! Places a solid colour rectangle on to the screen at a 

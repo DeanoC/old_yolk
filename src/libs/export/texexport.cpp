@@ -80,12 +80,16 @@ static void WriteTexture(	const TextureImage<double>& hpTexture,
 			for (unsigned int x = 0; x < hpTexture.getWidth(); ++x) {
 				unsigned int accumCount = 32; // write 32 bit chunks
 				uint32_t payload = 0;
+				unsigned int lastGoodc = 0;
 				for (unsigned int c = 0; c < outChannels; ++c) {
 					const auto chanBits = GtfFormat::getChannelBits(outFmt, c);
 					double val = 0;
-					// allow more channels than input set to 0 (TODO?)
+					// allow more channels than input set to last
 					if (c < hpTexture.getChannelCount()) {
 						val = hpTexture.value(c, x, y);
+						lastGoodc = c;
+					} else {
+						val = hpTexture.value(lastGoodc, x, y);
 					}
 					// if format is fixed point 0-1 multiply before floor
 					val = val * (textureIsNormalised ? ((1 << chanBits)-1) : 1.0);

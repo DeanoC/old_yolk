@@ -320,10 +320,10 @@ Math::Vector2 ImageComposer::putChar(const FontHandlePtr&			_font,
 
 	// special case ' '
 	if (_glyph == ' ') {
-		return Math::ComponentMultiply(Math::Vector2(fontGlyph.advanceX, -fontGlyph.advanceY), scrScale);
+		return Math::ComponentMultiply(Math::Vector2((float)fontGlyph.advanceX, (float)-fontGlyph.advanceY), scrScale);
 	}
 
-	const Math::Vector2 pos = _pos + Math::ComponentMultiply(Math::Vector2(fontGlyph.offsetX, -fontGlyph.offsetY), scrScale);
+	const Math::Vector2 pos = _pos + Math::ComponentMultiply(Math::Vector2((float)fontGlyph.offsetX, (float)-fontGlyph.offsetY), scrScale);
 	const TextureAtlas::SubTexture& sprite = atlas->getSubTexture( fontGlyph.sprite);
 	TextureHandlePtr texture = atlas->getPackedTexture(fontGlyph.page);
 
@@ -388,8 +388,10 @@ Math::Vector2 ImageComposer::putChar(const FontHandlePtr&			_font,
 
 	page.numVertices += 6;
 
-	return Math::ComponentMultiply(Math::Vector2(fontGlyph.advanceX, -fontGlyph.advanceY), scrScale);
+	auto ret = Math::ComponentMultiply(Math::Vector2((float)fontGlyph.advanceX, 0), scrScale);
+	ret.y = size.y;
 
+	return ret;
 }
 
 void ImageComposer::filledRect( unsigned int					renderStates,

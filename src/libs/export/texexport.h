@@ -65,7 +65,6 @@ namespace Export {
 		int16_t		ascender;
 		int16_t		descender;
 		uint16_t	height;
-		uint16_t	linegap;
 	};
 
 	// glyph used for fonts
@@ -76,10 +75,10 @@ namespace Export {
 		uint8_t		padd;
 		uint16_t	width;
 		uint16_t	height;
-		uint16_t	offsetX;
-		uint16_t	offsetY;
-		uint16_t	advanceX;
-		uint16_t	advanceY;
+		int16_t		offsetX;
+		int16_t		offsetY;
+		int16_t		advanceX;
+		int16_t		advanceY;
 	};
 }
 #endif

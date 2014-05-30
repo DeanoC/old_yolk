@@ -46,10 +46,10 @@ namespace Scene {
 			uint8_t		padd;
 			uint16_t	width;	//!< in dots
 			uint16_t	height;	//!< in dots
-			uint16_t	offsetX;	//!< in dots
-			uint16_t	offsetY;	//!< in dots
-			uint16_t	advanceX;	//!< in dots
-			uint16_t	advanceY;	//!< in dots
+			int16_t		offsetX;	//!< in dots
+			int16_t		offsetY;	//!< in dots
+			int16_t		advanceX;	//!< in dots
+			int16_t		advanceY;	//!< in dots
 
 		};
 
@@ -60,7 +60,7 @@ namespace Scene {
 		int getDPI() const { return header.dpi; }
 		int getAscender() const { return header.ascender; }
 		int getDescender() const { return header.descender; }
-		int getLineGap() const { return header.height - (header.ascender + header.descender); }
+		int getLineGap() const { return header.height - header.descender; }// -(header.ascender + header.descender); }
 
 		~Font();
 	private:

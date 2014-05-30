@@ -65,7 +65,10 @@ void GfxDbgConsole::print( const char* _text ) {
 	setCursor( curLine+1 );
 }
 
-void GfxDbgConsole::printVar( const int _index, const float _x, const float _y, const char* _text ) {
+void GfxDbgConsole::printVar(	const int _index, 
+								const float _x, 
+								const float _y, 
+								const char* _text ) {
 	textVars[ _index ] = _text;
 	xVars[ _index ] = _x;
 	yVars[ _index ] = _y;
@@ -74,9 +77,11 @@ void GfxDbgConsole::printVar( const int _index, const float _x, const float _y, 
 
 
 void GfxDbgConsole::renderable2DCallback( const Scene::ScreenPtr& _scr, Scene::RenderContext* _ctx ) {
-	Math::Vector2 pos(-0.8f, 0.8f); // TODO proper x and y adjust
+	Math::Vector2 pos(-0.8f, -0.8f); // TODO proper x and y adjust
 	Core::RGBAColour col(1.f,1.f,1.f,1.f);
-	const float pt = 18.0f;
+	const float pt = 17.0f;
+
+	float lineGap = 0.0f;
 
 	for (int i = 0; i < Y_LINE_COUNT; ++i) {
 		pos.x = -0.8f;
@@ -89,7 +94,25 @@ void GfxDbgConsole::renderable2DCallback( const Scene::ScreenPtr& _scr, Scene::R
 																  col, 
 																  15);
 			pos.x += advance.x;
+			lineGap = std::max( lineGap, advance.y);
 		}
-//		pos.y += 2 * size.y;
+		pos.y += lineGap + (_scr->getOneVerticalPixInNDC() * 3);
+	}
+
+	for (int i = 0; i < VAR_COUNT; ++i) {
+		if (!textVars[i].empty()) {
+			pos.x = xVars[i];
+			pos.y = yVars[i];
+			for (const char ch : textVars[i]) {
+				Math::Vector2 advance = _scr->getComposer()->putChar(font.get(),
+					ch,
+					Scene::ImageComposer::PM_OVER,
+					pos,
+					pt,
+					col,
+					15);
+				pos.x += advance.x;
+			}
+		}
 	}
 }

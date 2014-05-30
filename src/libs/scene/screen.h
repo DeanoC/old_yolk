@@ -44,6 +44,13 @@ namespace Scene {
 
 		virtual void display( TextureHandlePtr toDisplay ) = 0;
 
+		float getOneHorizontalPixInNDC() const {
+			return 2.0f / (float)width;
+		}
+		float getOneVerticalPixInNDC() const {
+			return 2.0f / (float)height;
+		}
+
 		float getNDCX( int ptX ) const { 
 			return( ((float)ptX / (float)(width/2)) - 1.0f );
 		}

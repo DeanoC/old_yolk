@@ -167,12 +167,13 @@ void generateDistanceMapFromBitmap(const int width, const int height, const std:
 		return (d + dmin) / (2 * dmin);
 	});
 
+	/*
 	// invert distance field to help shader
 	std::transform(distance.begin(), distance.end(), distance.begin(),
 		[](const real d) -> real {
 		return 1 - d;
 	});
-
+	*/
 }
 
 void convertToTexture(	const unsigned int glyph,
@@ -266,8 +267,11 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	// we want a single 2Kx2K 8 bit distance field for the font. For latin lets have max 256 glyphs
 	// so roughly 16x16 leading us to 128x128pixels per inch with a dpi of 128 
 	// therefore 18pt AKA 1/4inch @ 128dpi = 2K^2 page of 16x16 glyphs ~32pixels for 18pt font( before padding)
-	int h = 72;
-	int dpi = 256;
+
+	// scale not currently supported in distance before pack run order
+	const int scale = (runOrder == DISTANCE_BEFORE_PACK) ? 1 : 4;
+	const int h = 72 * scale;
+	const int dpi = 256;
 	error = FT_Set_Char_Size(face, h << 6, 0, dpi, 0);
 	if (error != 0) {
 		LOG(INFO) << "FreeType FT_Set_Char_Size error";
@@ -299,14 +303,6 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	// fast search glyphs by unicode code point
 	std::unordered_map<uint32_t, Export::Glyph> outGlyphs;
-	Export::FontMetrics fontMetrics;
-
-	fontMetrics.ascender = (face->ascender >> 6);
-	fontMetrics.descender = (face->descender >> 6);
-	fontMetrics.height = (face->height >> 6);
-	fontMetrics.linegap = fontMetrics.height - (fontMetrics.ascender + fontMetrics.descender);
-	fontMetrics.dpi = dpi;
-
 	for (unsigned int ch = 0; ch < 256; ++ch) {
 
 		//Load the Glyph for our character.
@@ -331,13 +327,12 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 			const int inBitmapPitch = bitmap.pitch;
 			const int inBitmapWidth = bitmap.width;
 			const int inBitmapHeight = bitmap.rows;
-			const int outPaddX = 2;
-			const int outPaddY = 2;
+			const int outPaddX = (runOrder == DISTANCE_BEFORE_PACK) ? 2 : 0;
+			const int outPaddY = (runOrder == DISTANCE_BEFORE_PACK) ? 2 : 0;
 			const int outBitmapWidth = inBitmapWidth + (outPaddX * 2);
 			const int outBitmapHeight = inBitmapHeight + (outPaddY * 2);
 
 			std::vector<edtaa3real> binaryMap(outBitmapWidth * outBitmapHeight, 0);
-			std::vector<edtaa3real> distanceMap(outBitmapWidth * outBitmapHeight, 0);
 
 			// convert from binary to float
 			switch (bitmap.pixel_mode){
@@ -371,12 +366,12 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 			}
 
 			if (runOrder == DISTANCE_BEFORE_PACK) {
+				std::vector<edtaa3real> distanceMap(outBitmapWidth * outBitmapHeight, 0);
 				generateDistanceMapFromBitmap(outBitmapWidth, outBitmapHeight, binaryMap, distanceMap);
+				binaryMap.resize(0); binaryMap.shrink_to_fit();
 				convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
 			} else {
-				// just copy the raw 'binary' float data over to the texture packer
-				std::copy(binaryMap.begin(), binaryMap.end(), distanceMap.begin());
-				convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
+				convertToTexture(ch, outBitmapWidth, outBitmapHeight, binaryMap, fileName);
 			}
 
 			// store glyph data
@@ -384,8 +379,8 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 			outGlyph.unicode = ch;
 			outGlyph.width = (uint16_t)(face->glyph->metrics.width / 64) + (outPaddX * 2);
 			outGlyph.height = (uint16_t)(face->glyph->metrics.height / 64) + (outPaddY * 2);
-			outGlyph.offsetX = (uint16_t)slot->bitmap_left + ((uint16_t)face->glyph->metrics.horiBearingX / 64);// +outPaddX;
-			outGlyph.offsetY = (uint16_t)slot->bitmap_top + ((uint16_t)face->glyph->metrics.horiBearingY / 64);// +outPaddY;
+			outGlyph.offsetX = (int16_t)(slot->bitmap_left + (face->glyph->metrics.horiBearingX / 64));// +outPaddX;
+			outGlyph.offsetY = (int16_t)(slot->bitmap_top + (face->glyph->metrics.horiBearingY / 64));// +outPaddY;
 
 			// get advance info without hinting
 			if (FT_Load_Glyph(face, FT_Get_Char_Index(face, ch), FT_LOAD_RENDER | FT_LOAD_NO_HINTING))
@@ -399,6 +394,12 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 		FT_Done_Glyph(glyph);
 	}
+
+	Export::FontMetrics fontMetrics;
+	fontMetrics.ascender = ((face->ascender >> 6) * dpi) / h / scale;
+	fontMetrics.descender = ((face->descender >> 6) * dpi) / h / scale;
+	fontMetrics.height = ((face->height >> 6) * dpi) / h / scale;
+	fontMetrics.dpi = dpi;
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
@@ -421,6 +422,7 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	tpCmdLine += " --texture-format png";
 	tpCmdLine += " --trim-sprite-names";
 	tpCmdLine += " --sheet packer/" + outPath.BaseName().RemoveExtension().value() + "{n}.png";
+	tpCmdLine += " --shape-padding " + boost::lexical_cast<std::string>(scale * 4);
 	tpCmdLine += " .";
 
 	system( tpCmdLine.c_str() );
@@ -460,10 +462,12 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 						*/
 
 						std::copy(distanceMap.begin(), distanceMap.end(), img.textureImage->getData().begin());
+						distanceMap.resize(0); distanceMap.shrink_to_fit();
+
 						Export::TextureExport texp;
 						memset(&texp, 0, sizeof(Export::TextureExport));
-						texp.outWidth = img.width;
-						texp.outHeight = img.height;
+						texp.outWidth = img.width / scale;
+						texp.outHeight = img.height / scale;
 						texp.outMipMapCount = 1;
 						texp.outSlices = 1;
 						texp.outDepth = 1;
@@ -496,6 +500,15 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	file.close();
 
 #if !defined(TEST_WITH_EXISTING_TEXTURES)
+
+	for (auto& gl : outGlyphs) {
+		gl.second.width /= scale;
+		gl.second.height /= scale;
+		gl.second.advanceX /= scale;
+		gl.second.advanceY /= scale;
+		gl.second.offsetX /= scale;
+		gl.second.offsetY /= scale;
+	}
 	ReadFontTao(filestring, outGlyphs);
 	assert(!fontName.empty());
 	std::vector<Export::Glyph> vecGlyphs(outGlyphs.size());

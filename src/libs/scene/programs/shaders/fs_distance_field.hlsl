@@ -16,7 +16,7 @@ FS_OUT main( FS_IN input) {
 
 	const float dist = inputTexture.Sample( linearSampler, input.uv ).r;
 	const float smoothing = fwidth( dist ) * 1; // TODO change 1 to a 'sharpness'
-    float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
+    float alpha = 1 - smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
 
 	output.colour0 = float4( alpha.xxx * input.col.xyz, alpha );
 	return output;
