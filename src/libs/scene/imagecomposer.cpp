@@ -13,7 +13,6 @@
 #include "databuffer.h"
 #include "constantcache.h"
 #include "vertexinput.h"
-
 #include "imagecomposer.h"
 
 namespace Scene {
@@ -75,6 +74,12 @@ ImageComposer::ImageComposer(unsigned int _screenWidth,
 	blendState[ ALPHA_MASK ].reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAlpha" ) );
 	blendState[ ALPHA_BLEND ].reset( RenderTargetStatesHandle::create( "_RTS_Over_WriteAll" ) );
 	blendState[ PM_OVER ].reset( RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll" ) );
+
+	DataBuffer::CreationInfo cbcs(Resource::BufferCtor(
+		RCF_BUF_CONSTANT | RCF_ACE_CPU_WRITE, (uint32_t)sizeof( Scene::GPUConstants::ICGPUConstants )
+		));
+	imGPUConstants = DataBufferHandle::create(std::string("imagecomposer").c_str(), &cbcs);
+
 }
 
 ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Layer& layer, ImageComposer::Layer::PageKey& key ) {
@@ -336,6 +341,17 @@ Math::Vector2 ImageComposer::putChar(const FontHandlePtr&			_font,
 
 	assert(((page.numVertices / 6) + 1) < maxSpritesPerLayer);
 
+	// TODO change this based on pt size wanted smoothly
+	if (_pt < 37) {
+		page.constants.fontSharpness.x = 0.7f;
+	} else if (_pt < 60) {
+		page.constants.fontSharpness.x = 1.0f;
+	} else if (_pt < 200) {
+		page.constants.fontSharpness.x = 1.6f;
+	} else {
+		page.constants.fontSharpness.x = 2.0f;
+	}
+
 	const Math::Vector2 size = Math::ComponentMultiply( Math::Vector2(fontGlyph.width,fontGlyph.height), scrScale);
 
 	SimpleSpriteVertex* pVertexData = (SimpleSpriteVertex*)page.mapped.get();
@@ -533,34 +549,38 @@ void ImageComposer::texturedQuad( const Scene::TextureHandlePtr&		pTexture,
 void ImageComposer::render( RenderContext* context ) {
 	using namespace Scene;
 
-//	glDisable( GL_CULL_FACE );
-//	glDisable( GL_DEPTH_TEST );
-
 	auto samplerState = linearClampSampler.acquire();
 
-	for( unsigned int i=0;i < MAX_LAYERS;++i) {
-		Layer::PageMap::iterator pmIt = layers[i].pageMap.begin();
-		while( pmIt != layers[i].pageMap.end() ) {
-			const Layer::PageKey& pagekey = pmIt->first;
-			Layer::Page& page = pmIt->second;
-			if( page.numVertices == 0 ) {
-				++pmIt;
-				continue;
-			}
+	CORE_ASSERT(YOLK_GPU_GET_OFFSET_IN_BLOCK(ICGPUConstants, fontSharpness) == offsetof(Scene::GPUConstants::ICGPUConstants, fontSharpness));
 
+	for( unsigned int i=0;i < MAX_LAYERS;++i) {
+
+		// each layer can have multiple pages of different GPU programs & state
+		for (auto& pm : layers[i].pageMap) {
+			const Layer::PageKey& pagekey = pm.first;
+			Layer::Page& page = pm.second;
+			if( page.numVertices == 0 ) { continue; }
+
+			// TODO threading issue here :(
+			// close the CPU vertex buffer
 			page.unmap();
+			
+			// copy composers vertices to GPU
 			DataBufferPtr db = page.vertexBufferHandle->acquire();
-			if( !db ) { ++pmIt; continue; }
+			if( !db ) { continue; }
 			void* gpuVerts = (void*) db->map( context, (RESOURCE_MAP_ACCESS)( RMA_WRITE | RMA_DISCARD ) );
 			memcpy( gpuVerts, page.mapped.get(), page.numVertices * SizeOfRenderType[ pagekey.type ] );
 			db->unmap( context );
+
+			// setup the GPU programs and vertex access HW
 			auto icProgram = program[ pagekey.type ].acquire();
 			auto vao = page.vaoHandle->tryAcquire();
-			if( !vao ) { ++pmIt; continue; }
+			if( !vao ) { continue; }
 			vao->validate( icProgram );
 
 			context->bind( vao );
 
+			// if using a texture set it up
 			if( pagekey.texture0 ) {
 				auto tex = pagekey.texture0->tryAcquire();
 				if( tex ) {
@@ -568,20 +588,30 @@ void ImageComposer::render( RenderContext* context ) {
 					context->bind( ST_FRAGMENT, 0, tex );
 				}
 			}
-
+			//  upload an identity matrix for view proj
 			context->getConstantCache().setMatrixBypassCache( CVN_VIEW_PROJ, Math::IdentityMatrix() );
 			context->getConstantCache().updateGPU( context, icProgram );
+
+			// TODO make a general flag rather than based on type for when other passes use custom constants
+			if (pagekey.type == DISTANCE_FIELD) {
+				DataBufferPtr cb = imGPUConstants.acquire();
+				void* buffer = cb->map(context, (RESOURCE_MAP_ACCESS)(RMA_WRITE | RMA_DISCARD));
+				memcpy(buffer, &page.constants, sizeof(Scene::GPUConstants::ICGPUConstants));
+				cb->unmap(context);
+
+				context->bindCB(Scene::ST_FRAGMENT, Scene::CF_USER_BLOCK0, cb);
+			}
 			context->bind( icProgram );
 
+			// setup blender state
 			auto blender = blendState[ pagekey.renderStates ].acquire();
 			context->bind( blender );
+			// now actually draw it
 			context->draw( PT_TRIANGLE_LIST, page.numVertices );
 			page.numVertices = 0;
-			++pmIt;
 		}
 	}
 
-//	glDisable( GL_BLEND );
 }
 
 bool ImageComposer::Layer::PageKey::operator <(const ImageComposer::Layer::PageKey &b) const {

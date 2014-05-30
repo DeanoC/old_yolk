@@ -14,10 +14,13 @@
 #define DECLARE_SHARED( x ) 		extern "C" const char* binary_data_programs_ ## x;
 #define DECLARE_PROGRAM( x) 		extern "C" const char* binary_data_programs_programs_ ## x; 
 #define DECLARE_SHADER( x )			extern "C" const char* binary_data_programs_shaders_ ## x; 
+#define DECLARE_STRUCT( x ) 		extern "C" const char* binary_data_programs_structs_ ## x;
+
 #include "builtin_programs.h"
 #undef DECLARE_SHARED
 #undef DECLARE_PROGRAM
 #undef DECLARE_SHADER
+#undef DECLARE_STRUCT
 
 namespace {
 const char* shaderTypeStrings[ Scene::MAX_SHADER_TYPES ] = { "vs_",		"fs_", 			"gs_", 			"hs_", 		"ds_", 		"cs_" 		};
@@ -40,13 +43,15 @@ uint32_t GetOffsetFromProgram( const char* block, const Scene::Program* prg, con
 namespace Scene {
 
 void ProgramMan::initDefaultPrograms() {
-#define DECLARE_SHARED( x )				this->registerProgramSource( #x, binary_data_programs_ ## x  );
-#define DECLARE_PROGRAM( x )			this->registerProgramSource( #x, binary_data_programs_programs_ ## x );
-#define DECLARE_SHADER( x )				this->registerProgramSource( "shaders_" #x, binary_data_programs_shaders_ ## x );
+#define DECLARE_SHARED( x )		this->registerProgramSource( #x, binary_data_programs_ ## x  );
+#define DECLARE_PROGRAM( x )	this->registerProgramSource( #x, binary_data_programs_programs_ ## x );
+#define DECLARE_SHADER( x )		this->registerProgramSource( "shaders_" #x, binary_data_programs_shaders_ ## x );
+#define DECLARE_STRUCT( x ) 	this->registerProgramSource( "structs_" #x, binary_data_programs_structs_ ## x  );
 #include "builtin_programs.h"
 #undef DECLARE_SHARED
 #undef DECLARE_PROGRAM
 #undef DECLARE_SHADER
+#undef DECLARE_STRUCT
 }
 
 const char* ProgramMan::getProgramSource( const std::string& prgName ) const {

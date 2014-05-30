@@ -3,6 +3,8 @@ DECLARE_SHARED( shared_structs );
 DECLARE_SHARED( constant_blocks );
 DECLARE_SHARED( vtstructs );
 
+DECLARE_STRUCT( imagecomposer_structs );
+
 DECLARE_SHADER( vs_null );
 DECLARE_SHADER( vs_basic );
 DECLARE_SHADER( vs_sprite_basic );

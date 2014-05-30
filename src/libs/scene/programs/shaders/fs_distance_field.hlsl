@@ -1,3 +1,7 @@
+#include "shared_structs.hlsl"
+#include "constant_blocks.hlsl"
+#include "structs/imagecomposer_structs.hlsl"
+
 struct FS_IN {
 	float4 position : SV_POSITION;
 	float2 uv 		: TEXCOORD0;
@@ -15,7 +19,7 @@ FS_OUT main( FS_IN input) {
 	FS_OUT output;
 
 	const float dist = inputTexture.Sample( linearSampler, input.uv ).r;
-	const float smoothing = fwidth( dist ) * 1; // TODO change 1 to a 'sharpness'
+	const float smoothing = fwidth( dist * fontSharpness.x );
     float alpha = 1 - smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
 
 	output.colour0 = float4( alpha.xxx * input.col.xyz, alpha );

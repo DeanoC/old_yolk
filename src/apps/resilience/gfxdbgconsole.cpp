@@ -77,14 +77,15 @@ void GfxDbgConsole::printVar(	const int _index,
 
 
 void GfxDbgConsole::renderable2DCallback( const Scene::ScreenPtr& _scr, Scene::RenderContext* _ctx ) {
-	Math::Vector2 pos(-0.8f, -0.8f); // TODO proper x and y adjust
-	Core::RGBAColour col(1.f,1.f,1.f,1.f);
-	const float pt = 17.0f;
+	const Math::Vector2 topLeft(-0.9f, -0.9f); // TODO proper x and y adjust
+	const Core::RGBAColour col(1.0f,1.0f,1.0f,1.0f);
+	const float pt = 37.0f;
 
 	float lineGap = 0.0f;
 
+	Math::Vector2 pos = topLeft; 
 	for (int i = 0; i < Y_LINE_COUNT; ++i) {
-		pos.x = -0.8f;
+		pos.x = topLeft.x;
 		for (const char ch : textRows[i]) {
 			Math::Vector2 advance = _scr->getComposer()->putChar( font.get(), 
 																  ch, 

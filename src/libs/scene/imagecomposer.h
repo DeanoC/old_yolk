@@ -29,6 +29,18 @@
 #	include "font.h"
 #endif
 
+#if !defined( YOLK_SCENE_GPU_CONSTANTS_H_ )
+#include "gpu_constants.h"
+#endif
+#if !defined( YOLK_SCENE_IMAGECOMPOSER_STRUCTS_H_ )
+namespace Scene {
+	namespace GPUConstants {
+#include "programs/structs/imagecomposer_structs.hlsl"
+	}
+}
+#define YOLK_SCENE_IMAGECOMPOSER_STRUCTS_H_
+#endif
+
 namespace Scene {
 //!-----------------------------------------------------
 //!
@@ -241,6 +253,8 @@ private:
 			ProgramHandlePtr					programHandle;
 			uint32_t							numVertices;
 			std::shared_ptr<uint8_t>			mapped;
+			Scene::GPUConstants::ICGPUConstants constants;
+
 		};
 
 		typedef std::map<PageKey, Page>				PageMap;
@@ -251,6 +265,7 @@ private:
 	Core::ScopedResourceHandle<ProgramHandle>					program[MAX_RENDER_TYPE];
 	Core::ScopedResourceHandle<SamplerStateHandle>				linearClampSampler;
 	Core::ScopedResourceHandle<RenderTargetStatesHandle>		blendState[MAX_RENDER_STATES];
+	Core::ScopedResourceHandle<DataBufferHandle>				imGPUConstants;
 
 	const unsigned int screenWidth;
 	const unsigned int screenHeight;

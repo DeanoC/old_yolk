@@ -9,6 +9,7 @@ file( GLOB shader_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 								programs/*.hlsl 
 								programs/programs/*.hlsl 
 								programs/shaders/*.hlsl 
+								programs/structs/*.hlsl 
 								)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/libs/bullet/src/ )

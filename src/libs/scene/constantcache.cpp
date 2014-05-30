@@ -70,66 +70,66 @@ const Scene::ConstantCache::CachedBitFlags varBitsPerBlock[ Scene::CF_NUM_BLOCKS
 };
 
 const size_t offsetInBlocks[ Scene::CVN_NUM_CONSTANTS ] = {
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixView ),							// VIEW
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixViewInverse ),						// VIEW_INVERSE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixViewIT ),							// VIEW_IT
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixProjection ),						// PROJ
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixProjectionInverse ),				// PROJ_INVERSE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixProjectionIT ),					// PROJ_IT
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixViewProjection ),					// VIEW_PROJ
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixViewProjectionInverse ),			// VIEW_PROJ_INVERSE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, matrixViewProjectionIT ),				// VIEW_PROJ_IT
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorld ),							// WORLD
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldInverse ),					// WORLD_INVERSE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldIT ),						// WORLD_IT
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldView ),						// WORLD_VIEW
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewInverse ),				// WORLD_VIEW_INVERSE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewIT ),					// WORLD_VIEW_IT
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjection ),			// WORLD_VIEW_PROJ
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjectionInverse ),		// WORLD_VIEW_PROJ_INVERSE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjectionIT ),			// WORLD_VIEW_PROJ_IT
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixUser0 ),							// USER_MATRIX_0
-	YOLK_GL_GET_OFFSET_IN_BLOCK( StdObject, matrixUser1 ),							// USER_MATRIX_1
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixView ),							// VIEW
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixViewInverse ),						// VIEW_INVERSE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixViewIT ),							// VIEW_IT
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixProjection ),						// PROJ
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixProjectionInverse ),				// PROJ_INVERSE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixProjectionIT ),					// PROJ_IT
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixViewProjection ),					// VIEW_PROJ
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixViewProjectionInverse ),			// VIEW_PROJ_INVERSE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, matrixViewProjectionIT ),				// VIEW_PROJ_IT
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorld ),							// WORLD
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldInverse ),					// WORLD_INVERSE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldIT ),						// WORLD_IT
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldView ),						// WORLD_VIEW
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewInverse ),				// WORLD_VIEW_INVERSE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewIT ),					// WORLD_VIEW_IT
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjection ),			// WORLD_VIEW_PROJ
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjectionInverse ),		// WORLD_VIEW_PROJ_INVERSE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixWorldViewProjectionIT ),			// WORLD_VIEW_PROJ_IT
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixUser0 ),							// USER_MATRIX_0
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( StdObject, matrixUser1 ),							// USER_MATRIX_1
 	0,					//		CVN_NUM_MATRICES
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerFrame, frameCount ),							// FRAMERATE
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerTargets, targetDims),							// TARGET_DIMS
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, zPlanes ),								// ZPLANES
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerViews, fov ),									// FOV
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerMaterial, materialIndex ),						// MATERIAL_INDEX
-	YOLK_GL_GET_OFFSET_IN_BLOCK( PerPipeline, lightCounts ),						// LIGHT_COUNTS
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerFrame, frameCount ),							// FRAMERATE
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerTargets, targetDims),							// TARGET_DIMS
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, zPlanes ),								// ZPLANES
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerViews, fov ),									// FOV
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerMaterial, materialIndex ),						// MATERIAL_INDEX
+	YOLK_GPU_GET_OFFSET_IN_BLOCK( PerPipeline, lightCounts ),						// LIGHT_COUNTS
 
 };
 
 const size_t sizeofInBlock[ Scene::CVN_NUM_CONSTANTS ] = {
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixView ),							// VIEW
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewInverse ),					// VIEW_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewIT ),						// VIEW_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixProjection ),					// PROJ
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixProjectionInverse ),			// PROJ_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixProjectionIT ),					// PROJ_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjection ),				// VIEW_PROJ
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionInverse ),		// VIEW_PROJ_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionIT ),				// VIEW_PROJ_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorld ),						// WORLD
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldInverse ),				// WORLD_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldIT ),						// WORLD_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldView ),					// WORLD_VIEW
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewInverse ),			// WORLD_VIEW_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewIT ),					// WORLD_VIEW_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjection ),			// WORLD_VIEW_PROJ
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionInverse ),	// WORLD_VIEW_PROJ_INVERSE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionIT ),		// WORLD_VIEW_PROJ_IT
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixUser0 ),						// USER_MATRIX_0
-	YOLK_GL_GET_SIZEOF_PRG_VAR( StdObject, matrixUser1 ),						// USER_MATRIX_1
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixView ),							// VIEW
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixViewInverse ),					// VIEW_INVERSE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixViewIT ),						// VIEW_IT
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixProjection ),					// PROJ
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixProjectionInverse ),			// PROJ_INVERSE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixProjectionIT ),					// PROJ_IT
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjection ),				// VIEW_PROJ
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionInverse ),		// VIEW_PROJ_INVERSE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, matrixViewProjectionIT ),				// VIEW_PROJ_IT
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorld ),						// WORLD
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldInverse ),				// WORLD_INVERSE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldIT ),						// WORLD_IT
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldView ),					// WORLD_VIEW
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewInverse ),			// WORLD_VIEW_INVERSE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewIT ),					// WORLD_VIEW_IT
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjection ),			// WORLD_VIEW_PROJ
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionInverse ),	// WORLD_VIEW_PROJ_INVERSE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixWorldViewProjectionIT ),		// WORLD_VIEW_PROJ_IT
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixPreviousWorldViewProjection ),	// PREV_WORLD_VIEW_PROJ 
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixUser0 ),						// USER_MATRIX_0
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( StdObject, matrixUser1 ),						// USER_MATRIX_1
 	0,					//		CVN_NUM_MATRICES
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerFrame, frameCount ),							// FRAMERATE
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerTargets, targetDims),						// TARGET_DIMS
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, zPlanes ),							// ZPLANES
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerViews, fov ),								// FOV
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerMaterial, materialIndex ),					// MATERIAL_INDEX
-	YOLK_GL_GET_SIZEOF_PRG_VAR( PerPipeline, lightCounts ),						// LIGHT_COUNTS
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerFrame, frameCount ),							// FRAMERATE
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerTargets, targetDims),						// TARGET_DIMS
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, zPlanes ),							// ZPLANES
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerViews, fov ),								// FOV
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerMaterial, materialIndex ),					// MATERIAL_INDEX
+	YOLK_GPU_GET_SIZEOF_PRG_VAR( PerPipeline, lightCounts ),						// LIGHT_COUNTS
 
 };
 
