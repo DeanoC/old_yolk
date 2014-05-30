@@ -8,7 +8,9 @@
 #if !defined( YOLK_SCENE_GENERIC_TEXTURE_FORMAT_H_ )
 #include "scene/generictextureformat.h"
 #endif
-
+#if !defined(YOLK_EXPORT_TEXTUREIMAGE_H_)
+#include "textureimage.h"
+#endif
 namespace Export {
 
 	// one 1 or 2D plane of a texture, from a bitmap
@@ -22,13 +24,15 @@ namespace Export {
 			BI_FLOAT		= BIT(4),
 			BI_RGBA			= BIT(5),
 			BI_NORMALISED   = BIT(6),
+			BI_DOUBLE		= BIT(7),
 		};
 
 		uint32_t		flags;
 		int 			width;		// must always be set
 		int 			height;		// 0 for 1D
 		uint32_t 		channels; 	// count (>4 likely not supported)
-		uint8_t const*	data;	  	// the actual data		
+		uint8_t const*	data;		// the oldskool data if TextureImage<> has 0 channels
+		std::shared_ptr<TextureImage<double>> textureImage; // prefered storage of data
 	};
 
 	struct TextureExport {

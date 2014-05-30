@@ -14,10 +14,13 @@ SamplerState linearSampler : register( s0 );
 FS_OUT main( FS_IN input) {
 	FS_OUT output;
 
-	const float dist = inputTexture.Sample( linearSampler, input.uv ).r;
+	const float4 gathered = inputTexture.Gather( linearSampler, input.uv );
+	const float dist = gathered.y + gathered.w - gathered.x - gathered.z;
+
+//	const float dist = inputTexture.Sample( linearSampler, input.uv ).r;
 	const float smoothing = fwidth( dist ) * 1; // TODO change 1 to a 'sharpness'
     float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist);
+	output.colour0 = float4( alpha.xxx * input.col.xyz, 1.0f );//alpha );
 
-	output.colour0 = float4( alpha.xxx * input.col.xyz, alpha );
 	return output;
 }

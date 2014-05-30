@@ -27,13 +27,16 @@ namespace Export {
 		};
 
 	};
-
-	TextureImage<double> convertInputToTextureImage(const Export::BitmapInput& in) {
+	
+	void convertInputToTextureImage(Export::BitmapInput& in) {
 
 		using namespace Export;
 
-		bool isInFloat = ((in.flags & (BitmapInput::BI_HALF | BitmapInput::BI_FLOAT)) != 0);
-		unsigned int inBits = (in.flags & (BitmapInput::BI_UINT32 | BitmapInput::BI_FLOAT)) ? 32 :
+		bool isInFloat = ((in.flags & 
+			(BitmapInput::BI_HALF | BitmapInput::BI_FLOAT | BitmapInput::BI_DOUBLE)) != 0);
+		unsigned int inBits =
+			(in.flags & BitmapInput::BI_DOUBLE) ? 64 :
+			(in.flags & (BitmapInput::BI_UINT32 | BitmapInput::BI_FLOAT)) ? 32 :
 			(in.flags & (BitmapInput::BI_UINT16 | BitmapInput::BI_HALF)) ? 16 :
 			8;
 		const uint8_t* data = in.data;
@@ -56,6 +59,7 @@ namespace Export {
 				for (uint32_t c = 0; c < in.channels; ++c) {
 					// repeat load N times for later masking
 					switch (inBits) {
+					case 64: expd[c].i64 = *(uint64_t*)(data); data += 8; break;
 					case 32: for (int i = 0; i < 2; ++i){ expd[c].i[i] = *(uint32_t*)(data); }; data += 4; break;
 					case 16: for (int i = 0; i < 4; ++i){ expd[c].s[i] = *(uint16_t*)(data); };  data += 2; break;
 					case 8:  for (int i = 0; i < 8; ++i){ expd[c].b[i] = *(uint8_t*)(data); }; data += 1; break;
@@ -101,9 +105,11 @@ namespace Export {
 							expd[c].d = expd[c].h[0]; // half to double convert
 						}
 						else {
-							CORE_ASSERT(inBits == 32);
-							// float load from binary
-							expd[c].d = expd[c].f[0];
+							if (inBits == 32) {
+								// float load from binary
+								expd[c].d = expd[c].f[0];
+							}
+							// double don't need any convertion
 						}
 					}
 					else {
@@ -120,7 +126,8 @@ namespace Export {
 				outData += in.channels;
 			}
 		}
-		return outTexture;
+
+		in.textureImage = std::make_shared<TextureImage<double>>(outTexture);
 	}
 
 } // end namespace

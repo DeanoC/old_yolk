@@ -11,11 +11,14 @@ namespace Export {
 	public:
 		explicit TextureImage(const unsigned int _channelCount, const unsigned int _width, const unsigned int _height = 1,
 			const unsigned int _depth = 1, const unsigned int _slices = 1);
+		explicit TextureImage(const TextureImage<real>& _rhs);
+
 		void setData(const real* _data);
 		void setData(const std::vector<real>& _data);
 
-		TextureImage<real> resizeFilter(const unsigned int _width, const unsigned int _height = 1,
+		std::shared_ptr<TextureImage<real>> resizeFilter(const unsigned int _width, const unsigned int _height = 1,
 			const unsigned int _depth = 1, const real _b = real(1) / real(3), const real _c = real(1) / real(3) ) const;
+		std::shared_ptr<TextureImage<real>> changeChannelCount(unsigned int newChannelCount) const;
 
 		unsigned int getChannelCount() const { return channelCount; }
 		unsigned int getWidth() const { return width; }
@@ -48,6 +51,16 @@ namespace Export {
 		size(_channelCount * _width * _height * _depth * _slices),
 		data(_channelCount * _width * _height * _depth * _slices, real(0)) {
 	}
+
+	template<typename real>
+	TextureImage<real>::TextureImage(const TextureImage<real>& _rhs) :
+		channelCount(_rhs.channelCount), width(_rhs.width), height(_rhs.height), 
+		depth(_rhs.depth), slices(_rhs.slices),
+		size(_rhs.channelCount * _rhs.width * _rhs.height * _rhs.depth * _rhs.slices)
+	{
+		data = _rhs.data;
+	}
+
 	template<typename real>
 	void TextureImage<real>::setData(const real* _data) {
 		std::copy(_data, _data + size, data.begin());
@@ -59,21 +72,22 @@ namespace Export {
 	}
 
 	template<typename real>
-	TextureImage<real> TextureImage<real>::resizeFilter(
+	std::shared_ptr<TextureImage<real>> TextureImage<real>::resizeFilter(
 		const unsigned int _width, const unsigned int _height,
 		const unsigned int _depth, const real _b, const real _c ) const {
 		const unsigned int size3D(channelCount * width * height * depth);
 
-		TextureImage<real> out(channelCount,_width, _height, _depth, getSlices());
+		auto out = std::make_shared<TextureImage<real>>( channelCount, _width, _height, _depth, getSlices() );
+
 		for (unsigned int i = 0; i < getSlices(); ++i){
 			unsigned int spliceStartOffset = size3D*i;
 			const auto& inDS = data.begin() + spliceStartOffset;
-			auto& outDS = out.data.begin() + spliceStartOffset;
+			auto& outDS = out->data.begin() + spliceStartOffset;
 			// 1 or 2D textures in and out
 			if (_depth == 1 && getDepth() == 1) {
 				hq_resample<real>(channelCount, 
 									&(*inDS), getWidth(), getHeight(),
-									&(*outDS), out.getWidth(), out.getHeight(), _b, _c);
+									&(*outDS), out->getWidth(), out->getHeight(), _b, _c);
 			}
 			else {
 				LOG(FATAL) << "3D textures not supported yet\n";
@@ -81,6 +95,26 @@ namespace Export {
 		}
 		return out;
 	}
+	template<typename real>
+	std::shared_ptr<TextureImage<real>> TextureImage<real>::changeChannelCount(unsigned int newChannelCount) const {
+
+		const unsigned int size3D(channelCount * width * height * depth);
+		auto out = std::make_shared<TextureImage<real>>(newChannelCount, getWidth(), getHeight(), getDepth(), getSlices());
+
+		const auto& inDS = data.begin();
+		auto& outDS = out->data.begin();
+
+		unsigned int j = 0;
+		for (unsigned int i = 0; i < size; ++i){
+			unsigned int chan = i % channelCount;
+			if (chan < newChannelCount) {
+				outDS[j++] = inDS[i];
+			}
+		}
+
+		return out;
+	}
+
 	template<typename real>
 	real TextureImage<real>::value(const unsigned int _c, const unsigned int _x, const unsigned int _y,
 		const unsigned int _z, const unsigned int _s) const {

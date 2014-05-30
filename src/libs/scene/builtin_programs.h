@@ -29,6 +29,7 @@ DECLARE_SHADER( fs_vtopaque );
 DECLARE_SHADER( fs_vtresolve );
 DECLARE_SHADER( fs_vttransparent );
 DECLARE_SHADER( fs_distance_field );
+DECLARE_SHADER( fs_summed_area_distance_field );
 
 DECLARE_SHADER( cs_vtlighting );
 

@@ -16,9 +16,7 @@
 
 namespace Export {
 
-
 static void WriteTexture(	const TextureImage<double>& hpTexture,
-							const Export::BitmapInput& in,
 							const GENERIC_TEXTURE_FORMAT outFmt,
 							std::ostringstream& stream,
 							bool textureIsNormalised, 
@@ -48,10 +46,6 @@ static void WriteTexture(	const TextureImage<double>& hpTexture,
 		stream << ".type u32\n";
 	}
 
-	if (outFloat == true) {
-		stream << std::hexfloat; // write floats as hex 
-	}
-
 	// easiest is output floats
 	if (outFloat == true) {
 		for (unsigned int y = 0; y < hpTexture.getHeight(); ++y) {
@@ -66,7 +60,12 @@ static void WriteTexture(	const TextureImage<double>& hpTexture,
 						if2f.ha = (float)val; // double to half
 						stream << if2f.i16a; // write as hex
 					} else {
-						stream << (float)val; // double to float written as hex
+						union {
+							float f;
+							uint32_t i;
+						} t;
+						t.f = (float)val;
+						stream << t.i; // double to float written as hex
 					}
 					if ((x != (hpTexture.getWidth() - 1)) || (c != (outChannels - 1))) {
 						stream << ",";
@@ -126,9 +125,10 @@ static void WriteTexture(	const TextureImage<double>& hpTexture,
 	stream << std::hex << std::resetiosflags(std::ios_base::showbase);
 }
 
-void SaveTexture( const TextureExport& tex, const Core::FilePath outFilename ) {
+void SaveTexture( const TextureExport& itex, const Core::FilePath outFilename ) {
 	using namespace Core;
 
+	TextureExport tex = itex;
 	auto fileName = outFilename.BaseName();
 
 	//--------------------------------
@@ -165,19 +165,26 @@ void SaveTexture( const TextureExport& tex, const Core::FilePath outFilename ) {
 #else
 			false;
 #endif
-
-		TextureImage<double> hpTexture = convertInputToTextureImage(tex.bitmaps[i]);
-		hpTexture = hpTexture.resizeFilter(tex.outWidth, tex.outHeight); // TODO depth
-
-		if (doDebugPnt) {
-			debugOut.reset(CORE_NEW uint32_t[hpTexture.getWidth() * hpTexture.getHeight() * hpTexture.getDepth()]);
+		// convert into a texture image if not already done
+		if (!tex.bitmaps[i].textureImage) {
+			convertInputToTextureImage(tex.bitmaps[i]);
 		}
 
-		WriteTexture(hpTexture, tex.bitmaps[i], tex.outFormat, outStream, !!(tex.outFlags & TextureExport::TE_NORMALISED), debugOut.get());
+		std::shared_ptr<TextureImage<double>> hpTexture( tex.bitmaps[i].textureImage );
+		if (tex.bitmaps[i].width != tex.outWidth ||
+			tex.bitmaps[i].height != tex.outHeight) {
+			hpTexture = hpTexture->resizeFilter(tex.outWidth, tex.outHeight); // TODO depth
+		}
+
+		if (doDebugPnt) {
+			debugOut.reset(CORE_NEW uint32_t[hpTexture->getWidth() * hpTexture->getHeight() * hpTexture->getDepth()]);
+		}
+
+		WriteTexture(*hpTexture.get(), tex.outFormat, outStream, !!(tex.outFlags & TextureExport::TE_NORMALISED), debugOut.get());
 
 		if (doDebugPnt) {
 			auto pngpath = fileName.ReplaceExtension(".png");
-			stbi_write_png(pngpath.value().c_str(), hpTexture.getWidth(), hpTexture.getHeight(), 4, debugOut.get(), 0);
+			stbi_write_png(pngpath.value().c_str(), hpTexture->getWidth(), hpTexture->getHeight(), 4, debugOut.get(), 0);
 		}
 	}
 
@@ -197,8 +204,9 @@ void SaveTexture( const TextureExport& tex, const Core::FilePath outFilename ) {
 	Binify( outStream.str(), foutStream );
 	foutStream.close();
 }
-void SaveTextureToPNG(const TextureExport& tex, const Core::FilePath outFilename) {
+void SaveTextureToPNG(const TextureExport& itex, const Core::FilePath outFilename) {
 	auto fileName = outFilename.BaseName();
+	TextureExport tex = itex;
 
 	//--------------------------------
 	// dummy write out texture not actually used
@@ -208,16 +216,18 @@ void SaveTextureToPNG(const TextureExport& tex, const Core::FilePath outFilename
 	for (size_t i = 0; i < tex.bitmaps.size(); ++i) {
 		std::unique_ptr<uint32_t> pngOut;
 
-		TextureImage<double> hpTexture = convertInputToTextureImage(tex.bitmaps[i]);
-		hpTexture = hpTexture.resizeFilter(tex.outWidth, tex.outHeight); // TODO depth
+		convertInputToTextureImage(tex.bitmaps[i]);
+		std::shared_ptr<TextureImage<double>> hpTexture( tex.bitmaps[i].textureImage );
 
-		pngOut.reset(CORE_NEW uint32_t[hpTexture.getWidth() * hpTexture.getHeight() * hpTexture.getDepth()]);
+		hpTexture = hpTexture->resizeFilter(tex.outWidth, tex.outHeight); // TODO depth
 
-		WriteTexture(hpTexture, tex.bitmaps[i], tex.outFormat, outStream, 
+		pngOut.reset(CORE_NEW uint32_t[hpTexture->getWidth() * hpTexture->getHeight() * hpTexture->getDepth()]);
+
+		WriteTexture(*hpTexture.get(), tex.outFormat, outStream, 
 									!!(tex.outFlags & TextureExport::TE_NORMALISED), pngOut.get());
 
 		auto pngpath = fileName.ReplaceExtension(".png");
-		stbi_write_png(pngpath.value().c_str(), hpTexture.getWidth(), hpTexture.getHeight(), 4, 
+		stbi_write_png(pngpath.value().c_str(), hpTexture->getWidth(), hpTexture->getHeight(), 4, 
 									pngOut.get(), 0);
 	}
 

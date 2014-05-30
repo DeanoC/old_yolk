@@ -12,6 +12,7 @@
 #include "export/export.h"
 #include "export/wobexp.h"
 #include "tof.h"
+#include "do.h"
 
 //--------------------------------------------------------------------------------------
 // Global Variables
@@ -21,9 +22,6 @@
 // Forward declarations
 //--------------------------------------------------------------------------------------
 void OutputScene(Core::FilePath outPath, std::shared_ptr<MeshImport::ImportInterface> importer);
-void DoTexture(const Core::FilePath& inPath, const Core::FilePath& outPath);
-void DoTextureAtlas(const Core::FilePath& inPath, const Core::FilePath& outPath);
-void DoTrueTypeFont(const Core::FilePath& inPath, const Core::FilePath& outPath);
 
 //--------------------------------------------------------------------------------------
 // Entry point to the program.
@@ -120,7 +118,7 @@ int Main() {
 		DoTextureAtlas(inPath, outPath);
 	}
 	else if (ext == ".ttf") {
-		DoTrueTypeFont(inPath, outPath);
+		DoTrueTypeFont(inPath, outPath, PACK_BEFORE_DISTANCE);
 	}
 	else {
 #if 0

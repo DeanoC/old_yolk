@@ -5,9 +5,12 @@
 #include "core/clock.h"
 #include "export/edtaa3func.h"
 #include "export/export.h"
+#include "export/imageimport.h"
 #include "core/rapidjson/document.h"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include "core/stb_image.h"
+#include "do.h"
 
 #include <codecvt>
 #include <string>
@@ -78,6 +81,26 @@ namespace {
 	}
 }
 
+void generateSummedAreaTable1D(const edtaa3real* img, const unsigned int w, unsigned int h, edtaa3real* out) {
+	// handle border (top left) with a 0.0 border
+
+	// handle 0th row
+	for (unsigned int j = 0; j < w - 1; j++) {
+		out[j] = img[j];
+	}
+
+	for (unsigned int i = 1; i < h; i++) {
+		out[i*w] = img[i*w]; // handle 0th col
+		for (unsigned int j = 1; j < w; j++) {
+			unsigned int k00 = (i - 0)*w + (j - 0);
+			unsigned int k10 = (i - 1)*w + (j - 0);
+			unsigned int k01 = (i - 0)*w + (j - 1);
+			unsigned int k11 = (i - 1)*w + (j - 1);
+			out[k00] = img[k00] + out[k10] + out[k01] + out[k11];
+		}
+	}
+}
+
 // TODO generate distance map at higher resolution then downsample.
 void generateDistanceMapFromBitmap(const int width, const int height, const std::vector<edtaa3real>& buffer, std::vector<edtaa3real>& distance){
 	typedef edtaa3real real;
@@ -115,7 +138,7 @@ void generateDistanceMapFromBitmap(const int width, const int height, const std:
 	std::fill(gx.begin(), gx.end(), 0.f);
 	std::fill(gy.begin(), gy.end(), 0.f);
 	// compute gradient
-	// TODO is there nessecary for binary input images?
+	// TODO is this nessecary for binary input images?
 	computegradient(fimg.data(), width, height, gx.data(), gy.data());
 	// distance to the inside
 	edtaa3(fimg.data(), gx.data(), gy.data(),
@@ -149,6 +172,7 @@ void generateDistanceMapFromBitmap(const int width, const int height, const std:
 		[](const real d) -> real {
 		return 1 - d;
 	});
+
 }
 
 void convertToTexture(	const unsigned int glyph,
@@ -167,6 +191,32 @@ void convertToTexture(	const unsigned int glyph,
 	tex.outMipMapCount = 1;
 
 	BitmapInput bi;
+	bi.flags = BitmapInput::BI_DOUBLE;
+	bi.width = width;
+	bi.height = height;
+	bi.data = (uint8_t const*)distance.data();
+	bi.channels = 1;
+	tex.bitmaps.push_back(bi);
+
+	Export::SaveTextureToPNG(tex, fileName.InsertBeforeExtension(boost::lexical_cast<std::string>(glyph)));
+}
+
+void convertToSummedAreaTableTexture(const unsigned int glyph,
+	const int width, const int height,
+	const std::vector<edtaa3real>& distance,
+	const Core::FilePath& fileName) {
+	using namespace Export;
+
+	TextureExport tex;
+	tex.outFormat = GTF_R32F;
+	tex.outFlags = TextureExport::TE_NORMALISED;
+	tex.outWidth = width;
+	tex.outHeight = height;
+	tex.outDepth = 1;
+	tex.outSlices = 1;
+	tex.outMipMapCount = 1;
+
+	BitmapInput bi;
 	bi.flags = BitmapInput::BI_FLOAT;
 	bi.width = width;
 	bi.height = height;
@@ -175,12 +225,10 @@ void convertToTexture(	const unsigned int glyph,
 	tex.bitmaps.push_back(bi);
 
 	Export::SaveTextureToPNG(tex, fileName.InsertBeforeExtension(boost::lexical_cast<std::string>(glyph)));
-
 }
 
-void DoTextureAtlas(const Core::FilePath& inPath, const Core::FilePath& outPath);
 
-void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outPath) {
+void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outPath, const PACKING_ORDER runOrder) {
 
 	FT_Library    library;
 	FT_Face       face;
@@ -234,6 +282,7 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	LOG(INFO) << "Temp Path : " << tmpDir.value() << "\n";
 
+//#define TEST_WITH_EXISTING_TEXTURES
 // testing with existing texture TEST_WITH_EXISTING_TEXTURES is defined
 #if !defined(TEST_WITH_EXISTING_TEXTURES)
 	// in debug or in case of crash, clean up any tmp folder
@@ -321,10 +370,14 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 				CORE_ASSERT("font format not supported");
 			}
 
-			// TODO resize
-
-			generateDistanceMapFromBitmap(outBitmapWidth, outBitmapHeight, binaryMap, distanceMap);
-			convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
+			if (runOrder == DISTANCE_BEFORE_PACK) {
+				generateDistanceMapFromBitmap(outBitmapWidth, outBitmapHeight, binaryMap, distanceMap);
+				convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
+			} else {
+				// just copy the raw 'binary' float data over to the texture packer
+				std::copy(binaryMap.begin(), binaryMap.end(), distanceMap.begin());
+				convertToTexture(ch, outBitmapWidth, outBitmapHeight, distanceMap, fileName);
+			}
 
 			// store glyph data
 			Export::Glyph outGlyph;
@@ -371,7 +424,6 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	tpCmdLine += " .";
 
 	system( tpCmdLine.c_str() );
-
 	// currently we only support a single texture atlas per font... fix here if this becomes
 	// a problem (combine tao's?)
 
@@ -380,9 +432,58 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	// TODO export single channel format
 	// TODO texture compression
 	std::for_each(directory_iterator( "packer/"), directory_iterator(),
-		[taoName, outPath, &textureAtlasPath](const boost::filesystem::path& path) {
+		[=, &textureAtlasPath](const boost::filesystem::path& path) {
 			if (path.extension() == ".tao") {
-				DoTextureAtlas(Core::FilePath(wstring_to_utf8(path.wstring())), outPath);
+				if (runOrder == PACK_BEFORE_DISTANCE) {
+
+					// TODO support multiple texture pages
+					// we stop texture atlas from converting the textures and do it ourself from our fancy
+					// distance texture
+					const auto p = Core::FilePath(wstring_to_utf8(path.wstring()));
+					const auto filenames = DoTextureAtlas(p, outPath, false);
+
+					for (auto fi : filenames) {
+						// load in the packed 'binary' image to run distance and optionally
+						// summed area table
+						current_path(tmpDir.value());
+						auto img = Export::loadImage(p.DirName().Append(fi).value().c_str());
+						CORE_ASSERT(img.textureImage);
+						img.textureImage = img.textureImage->changeChannelCount(1);
+
+						std::vector<edtaa3real> distanceMap(img.width * img.height, 0);
+						generateDistanceMapFromBitmap(img.width, img.height, img.textureImage->getData(), distanceMap);
+
+						/* TODO
+						std::vector<edtaa3real> summedAreaTable(img.width * img.height, 0.f);
+						generateSummedAreaTable1D(distanceMap.data(), img.width, img.height, summedAreaTable.data());
+						std::copy(summedAreaTable.begin(), summedAreaTable.end(), img.textureImage->getData().begin());
+						*/
+
+						std::copy(distanceMap.begin(), distanceMap.end(), img.textureImage->getData().begin());
+						Export::TextureExport texp;
+						memset(&texp, 0, sizeof(Export::TextureExport));
+						texp.outWidth = img.width;
+						texp.outHeight = img.height;
+						texp.outMipMapCount = 1;
+						texp.outSlices = 1;
+						texp.outDepth = 1;
+						texp.outFormat = GTF_R32F;
+						Export::BitmapInput bi;
+						bi.width = img.width;
+						bi.height = img.height;
+						bi.channels = 1;
+						bi.flags = Export::BitmapInput::BI_DOUBLE;
+						bi.textureImage = img.textureImage;
+						texp.bitmaps.push_back(bi);
+
+						DoTexture(texp, Core::FilePath(fi), outPath.DirName().Append(Core::FilePath(fi).BaseName()));
+					}
+
+				} else {
+					DoTextureAtlas(Core::FilePath(wstring_to_utf8(path.wstring())), outPath, true );
+				}
+
+
 				textureAtlasPath = wstring_to_utf8(path.wstring());
 			}
 		}
@@ -394,6 +495,7 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	auto filestring = std::string((char*)file.takeBufferOwnership());
 	file.close();
 
+#if !defined(TEST_WITH_EXISTING_TEXTURES)
 	ReadFontTao(filestring, outGlyphs);
 	assert(!fontName.empty());
 	std::vector<Export::Glyph> vecGlyphs(outGlyphs.size());
@@ -409,6 +511,7 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 		}
 	);
 	SaveFont(fontName, fontMetrics, vecGlyphs, outPath);
+#endif
 
 #if !defined(_DEBUG)
 	// in release cleanup tmp folder, in debug leave for examination

@@ -5,14 +5,15 @@
 #include <boost/filesystem.hpp>
 #include "export/export.h"
 #include "tof.h"
+#include "do.h"
 
 void DoTexture(const Core::FilePath& inFullPath, const Core::FilePath& outPath) {
+	using namespace Export;
 	LOG(INFO) << "Input Path : " << inFullPath.DirName().value().c_str() << "\n";
 	boost::filesystem::current_path(inFullPath.DirName().value().c_str());
 
 	Core::FilePath inPath = inFullPath.BaseName();
 
-	using namespace Export;
 	Tof tof = loadTof(inPath);
 
 	TextureExport tex;
@@ -62,66 +63,70 @@ void DoTexture(const Core::FilePath& inFullPath, const Core::FilePath& outPath) 
 			tex.bitmaps.push_back(bi);
 		}
 	}
+	tex.outFormat = (GENERIC_TEXTURE_FORMAT)tof.format;
+	tex.outFlags = TextureExport::TE_NORMALISED; // TODO set this properly
+	tex.outWidth = tof.width;
+	tex.outHeight = tof.height;
+	tex.outDepth = tof.depth;
+	tex.outSlices = tof.arraySize;
+	tex.outMipMapCount = 1; // TODO
+
+	// handle defaults, use first bitmap
+	if (tof.format == TOF_DEFAULT) {
+		uint32_t channels = tex.bitmaps[0].channels;
+		switch (channels) {
+		case 1: tex.outFormat = GTF_R8; break;
+		case 2: tex.outFormat = GTF_RG8; break;
+		case 3:
+		default:
+			if (tof.linear == false) {
+				tex.outFormat = GTF_SRGB8;
+			}
+			else {
+				tex.outFormat = GTF_RGB8;
+			}
+			break;
+		case 4:
+			if (tof.linear == false) {
+				tex.outFormat = GTF_SRGB8_ALPHA8;
+			}
+			else {
+				tex.outFormat = GTF_RGBA8;
+			}
+			break;
+		}
+	}
+	if (tof.width == TOF_DEFAULT) {
+		tex.outWidth = (int)tex.bitmaps[0].width;
+	}
+	if (tof.height == TOF_DEFAULT) {
+		tex.outHeight = (int)tex.bitmaps[0].height;
+	}
+	if (tof.depth == TOF_DEFAULT && !tof.cubeMap) {
+		tex.outDepth = (int)tex.bitmaps.size();
+	}
+	if (tof.depth != TOF_DEFAULT && tof.arraySize == TOF_DEFAULT) {
+		tex.outSlices = (int)tex.bitmaps.size() / (int)tof.depth;
+	}
+	else {
+		tex.outSlices = 1;
+	}
+	if (tof.cubeMap) {
+		tex.outFlags |= TextureExport::TE_CUBEMAP;
+		if ((tex.bitmaps.size() % 6) != 0) {
+			LOG(INFO) << "Cubemap (array) missing faces for " << inPath.value() << "\n";
+		}
+		tex.outSlices = (int)tex.bitmaps.size(); // faces are in the arrays
+		tex.outDepth = 0; // depth cubemaps make no sense
+	}
+
+	DoTexture(tex, inFullPath, outPath);
+}
+
+void DoTexture(const Export::TextureExport& tex, const Core::FilePath& inFullPath, const Core::FilePath& outPath) {
+	using namespace Export;
 
 	if (!tex.bitmaps.empty()) {
-
-		tex.outFormat = (GENERIC_TEXTURE_FORMAT)tof.format;
-		tex.outFlags = TextureExport::TE_NORMALISED; // TODO set this properly
-		tex.outWidth = tof.width;
-		tex.outHeight = tof.height;
-		tex.outDepth = tof.depth;
-		tex.outSlices = tof.arraySize;
-		tex.outMipMapCount = 1; // TODO
-
-		// handle defaults, use first bitmap
-		if (tof.format == TOF_DEFAULT) {
-			uint32_t channels = tex.bitmaps[0].channels;
-			switch (channels) {
-			case 1: tex.outFormat = GTF_R8; break;
-			case 2: tex.outFormat = GTF_RG8; break;
-			case 3:
-			default:
-				if (tof.linear == false) {
-					tex.outFormat = GTF_SRGB8;
-				}
-				else {
-					tex.outFormat = GTF_RGB8;
-				}
-				break;
-			case 4:
-				if (tof.linear == false) {
-					tex.outFormat = GTF_SRGB8_ALPHA8;
-				}
-				else {
-					tex.outFormat = GTF_RGBA8;
-				}
-				break;
-			}
-		}
-		if (tof.width == TOF_DEFAULT) {
-			tex.outWidth = (int)tex.bitmaps[0].width;
-		}
-		if (tof.height == TOF_DEFAULT) {
-			tex.outHeight = (int)tex.bitmaps[0].height;
-		}
-		if (tof.depth == TOF_DEFAULT && !tof.cubeMap) {
-			tex.outDepth = (int)tex.bitmaps.size();
-		}
-		if (tof.depth != TOF_DEFAULT && tof.arraySize == TOF_DEFAULT) {
-			tex.outSlices = (int)tex.bitmaps.size() / (int)tof.depth;
-		}
-		else {
-			tex.outSlices = 1;
-		}
-		if (tof.cubeMap) {
-			tex.outFlags |= TextureExport::TE_CUBEMAP;
-			if ((tex.bitmaps.size() % 6) != 0) {
-				LOG(INFO) << "Cubemap (array) missing faces for " << inPath.value() << "\n";
-			}
-			tex.outSlices = (int)tex.bitmaps.size(); // faces are in the arrays
-			tex.outDepth = 0; // depth cubemaps make no sense
-		}
-		
 		//--------------------------------
 		// add a Manifest folder to the path
 		auto filedir = outPath.DirName();
@@ -132,14 +137,12 @@ void DoTexture(const Core::FilePath& inFullPath, const Core::FilePath& outPath) 
 
 		Export::SaveTexture(tex, outPath.BaseName());
 
+	} else {
+		LOG(INFO) << "No bitmaps are valid for " << inFullPath.value() << "\n";
 	}
-	else {
-		LOG(INFO) << "No bitmaps are valid for " << inPath.value() << "\n";
-	}
-
 }
 
-void DoTextureAtlas(const Core::FilePath& inFullPath, const Core::FilePath& outPath) {
+std::vector<std::string> DoTextureAtlas(const Core::FilePath& inFullPath, const Core::FilePath& outPath, bool doTextures) {
 	LOG(INFO) << "Input Path : " << inFullPath.DirName().value().c_str() << "\n";
 	boost::filesystem::current_path(inFullPath.DirName().value().c_str());
 
@@ -154,14 +157,16 @@ void DoTextureAtlas(const Core::FilePath& inFullPath, const Core::FilePath& outP
 
 	loadTao(inPath, filenames, sprites);
 
-	for (auto fiIt = filenames.cbegin();
-		fiIt != filenames.cend();
-		++fiIt) {
-		DoTexture(Core::FilePath(*fiIt), outPath.DirName().Append(Core::FilePath(*fiIt).BaseName()));
+	if (doTextures) {
+		for (auto fiIt : filenames ) {
+			DoTexture(Core::FilePath(fiIt), outPath.DirName().Append(Core::FilePath(fiIt).BaseName()));
+		}
 	}
 
 	LOG(INFO) << "Output Path : " << outPath.DirName().value().c_str() << "\n";
 	boost::filesystem::current_path(outPath.DirName().value().c_str());
 
 	SaveTextureAtlas(filenames, sprites, outPath);
+
+	return filenames;
 }
