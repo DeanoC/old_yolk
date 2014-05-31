@@ -85,9 +85,9 @@ public:
 		MAX_RENDER_STATES,
 	};
 
-	ImageComposer(	unsigned int _screenWidth, 
-					unsigned int _screenHeight, 
-					unsigned int _screenDPI, 
+	ImageComposer(	unsigned int _targetWidth, 
+					unsigned int _targetHeight, 
+					unsigned int _targetDPI, 
 					unsigned int _maxSpritesPerLayer = 1024 );
 
 	//!-----------------------------------------------------
@@ -224,12 +224,14 @@ private:
 		//! a sort page, there are 0 or 1 textures, several different rendering state and different types (shaders)
 		//! this gives us unique pages only where nessecary. Sprites on the same page are rendered in 1 batch
 		struct PageKey {
-			PageKey( TextureHandlePtr a, uint32_t b, RENDER_TYPE c ) : 
-				texture0(a), renderStates(b), type(c) {}
+			PageKey(	const TextureHandlePtr _a, const uint32_t _b, const RENDER_TYPE _c, 
+						const Scene::GPUConstants::ICGPUConstants& _d ) : 
+				texture0(_a), renderStates(_b), type(_c), gpuConstants(_d) {}
 
-			TextureHandlePtr	texture0;
-			uint32_t			renderStates;
-			RENDER_TYPE			type;
+			TextureHandlePtr						texture0;
+			uint32_t								renderStates;
+			RENDER_TYPE								type;
+			Scene::GPUConstants::ICGPUConstants		gpuConstants;
 
 			// sorts the page keys for the map lookup
 			bool operator<( const PageKey& b ) const;
@@ -238,8 +240,10 @@ private:
 		struct Page {
 			Page() : vertexBufferHandle(nullptr), numVertices(0) {}
 
-			Page( DataBufferHandlePtr a, VertexInputHandlePtr b, ProgramHandlePtr c ) :
-				vertexBufferHandle(a), vaoHandle(b), programHandle(c), numVertices(0) {}
+			Page(	DataBufferHandlePtr _a, VertexInputHandlePtr _b, 
+					ProgramHandlePtr _c, DataBufferHandlePtr _d ) :
+				vertexBufferHandle(_a), vaoHandle(_b), programHandle(_c), 
+				constantsHandle(_d), numVertices(0) {}
 
 			// neither function is used for actual memory mapping with the system memory 
 			// backed implementation
@@ -248,12 +252,14 @@ private:
 			}
 			void unmap() {}
 
-			DataBufferHandlePtr					vertexBufferHandle;
-			VertexInputHandlePtr 				vaoHandle;
-			ProgramHandlePtr					programHandle;
-			uint32_t							numVertices;
-			std::shared_ptr<uint8_t>			mapped;
-			Scene::GPUConstants::ICGPUConstants constants;
+			// not the key doesn't own the program handles so MUST NOT use Scoped
+			ProgramHandlePtr												programHandle;
+
+			Core::ScopedResourceHandle<DataBufferHandle>					vertexBufferHandle;
+			Core::ScopedResourceHandle<VertexInputHandle> 					vaoHandle;
+			Core::ScopedResourceHandle<DataBufferHandle>					constantsHandle;
+			uint32_t														numVertices;
+			std::shared_ptr<uint8_t>										mapped;
 
 		};
 
@@ -265,14 +271,14 @@ private:
 	Core::ScopedResourceHandle<ProgramHandle>					program[MAX_RENDER_TYPE];
 	Core::ScopedResourceHandle<SamplerStateHandle>				linearClampSampler;
 	Core::ScopedResourceHandle<RenderTargetStatesHandle>		blendState[MAX_RENDER_STATES];
-	Core::ScopedResourceHandle<DataBufferHandle>				imGPUConstants;
 
-	const unsigned int screenWidth;
-	const unsigned int screenHeight;
-	const unsigned int screenDPI;
+	const unsigned int targetWidth;
+	const unsigned int targetHeight;
+	const unsigned int targetDPI;
 	const unsigned int maxSpritesPerLayer;				//! how many sprites per layer can this composer support
 	static const uint32_t SizeOfRenderType[MAX_RENDER_TYPE];
 	static const VertexInput::CreationInfo VaoCS[MAX_RENDER_TYPE];
+	static const Scene::GPUConstants::ICGPUConstants defaultConstants;
 	Layer::Page& findOrCreatePage( Layer& layer, Layer::PageKey& key );
 
 

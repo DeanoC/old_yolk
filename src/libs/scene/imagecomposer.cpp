@@ -51,13 +51,17 @@ const VertexInput::CreationInfo ImageComposer::VaoCS[ImageComposer::MAX_RENDER_T
 	}
 };
 
-ImageComposer::ImageComposer(unsigned int _screenWidth,
-							unsigned int _screenHeight,
-							unsigned int _screenDPI,
-							unsigned int _maxSpritesPerLayer ) :
-	screenWidth(_screenWidth),
-	screenHeight(_screenHeight),
-	screenDPI(_screenDPI),
+const Scene::GPUConstants::ICGPUConstants ImageComposer::defaultConstants = {
+	Math::Vector4(1.0f, 0, 0, 0),
+};
+
+ImageComposer::ImageComposer(	unsigned int _targetWidth,
+								unsigned int _targetHeight,
+								unsigned int _targetDPI,
+								unsigned int _maxSpritesPerLayer ) :
+	targetWidth(_targetWidth),
+	targetHeight(_targetHeight),
+	targetDPI(_targetDPI),
 	maxSpritesPerLayer(_maxSpritesPerLayer)
 {
 	program[ SIMPLE_SPRITE ].reset( ProgramHandle::load( "sprite_basic" ) );
@@ -74,12 +78,6 @@ ImageComposer::ImageComposer(unsigned int _screenWidth,
 	blendState[ ALPHA_MASK ].reset( RenderTargetStatesHandle::create( "_RTS_NoBlend_WriteAlpha" ) );
 	blendState[ ALPHA_BLEND ].reset( RenderTargetStatesHandle::create( "_RTS_Over_WriteAll" ) );
 	blendState[ PM_OVER ].reset( RenderTargetStatesHandle::create( "_RTS_PMOver_WriteAll" ) );
-
-	DataBuffer::CreationInfo cbcs(Resource::BufferCtor(
-		RCF_BUF_CONSTANT | RCF_ACE_CPU_WRITE, (uint32_t)sizeof( Scene::GPUConstants::ICGPUConstants )
-		));
-	imGPUConstants = DataBufferHandle::create(std::string("imagecomposer").c_str(), &cbcs);
-
 }
 
 ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Layer& layer, ImageComposer::Layer::PageKey& key ) {
@@ -110,10 +108,15 @@ ImageComposer::Layer::Page& ImageComposer::findOrCreatePage( ImageComposer::Laye
 		const std::string vaoName = name + VertexInput::genEleString( vcs.elementCount, vcs.elements );
 		VertexInputHandlePtr vaoHandle = VertexInputHandle::create( vaoName.c_str(), &vcs );
 
-		layer.pageMap[ key ] = Layer::Page( vertexBufferHandle, vaoHandle, program[ key.type ].get() );
+		DataBuffer::CreationInfo cbcs(Resource::BufferCtor(
+			RCF_BUF_CONSTANT | RCF_ACE_CPU_WRITE, (uint32_t)sizeof(Scene::GPUConstants::ICGPUConstants)
+			));
+		const auto constantsHandle = DataBufferHandle::create(std::string("imagecomposer").c_str(), &cbcs);
+
+		layer.pageMap[key] = Layer::Page{ vertexBufferHandle, vaoHandle, program[key.type].get(), constantsHandle };
 		Layer::Page& page = layer.pageMap[ key ];
 
-		page.mapped.reset( sysBuffer );
+		page.mapped.reset(sysBuffer, [](uint8_t* arr) { CORE_DELETE_ARRAY( arr ); });
 		page.map();
 
 		return page;
@@ -138,7 +141,7 @@ void ImageComposer::putTexture(	const Scene::TextureHandlePtr&	pTexture,
 	Layer& layer = layers[ layerNum ];
 
 	// assign a sorting page for this sprite
-	Layer::PageKey key( pTexture, renderStates, SIMPLE_SPRITE );
+	Layer::PageKey key( pTexture, renderStates, SIMPLE_SPRITE, defaultConstants );
 	Layer::Page& page = findOrCreatePage( layer, key );
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
@@ -189,7 +192,7 @@ void ImageComposer::putSprite(	const TextureAtlasHandlePtr&	atlasHandle,
 	Layer& layer = layers[ layerNum ];
 
 	// assign a sorting page for this sprite
-	Layer::PageKey key(texture, renderStates, SIMPLE_SPRITE);
+	Layer::PageKey key(texture, renderStates, SIMPLE_SPRITE, defaultConstants);
 	Layer::Page& page = findOrCreatePage( layer, key );
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
@@ -262,7 +265,7 @@ void ImageComposer::putSubSprite(
 	Layer& layer = layers[layerNum];
 
 	// assign a sorting page for this sprite
-	Layer::PageKey key( texture, renderStates, SIMPLE_SPRITE);
+	Layer::PageKey key(texture, renderStates, SIMPLE_SPRITE, defaultConstants);
 	Layer::Page& page = findOrCreatePage( layer, key );
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
@@ -319,9 +322,9 @@ Math::Vector2 ImageComposer::putChar(const FontHandlePtr&			_font,
 	TextureAtlasPtr atlas = font->getAtlas()->tryAcquire();
 	if (!atlas) { return Math::Vector2(0,0); }
 
-	const float dpiScale = (float)font->getDPI() / (float)screenDPI;
-	const Math::Vector2 scrScale((2.0f / (screenWidth * dpiScale))* (_pt / 72.0f),
-									(2.0f / (screenHeight * dpiScale) * (_pt / 72.0f)) );
+	const float dpiScale = (float)font->getDPI() / (float)targetDPI;
+	const Math::Vector2 scrScale(	(2.0f / (targetWidth * dpiScale))* (_pt / 72.0f),
+									(2.0f / (targetHeight * dpiScale) * (_pt / 72.0f)));
 
 	// special case ' '
 	if (_glyph == ' ') {
@@ -335,22 +338,27 @@ Math::Vector2 ImageComposer::putChar(const FontHandlePtr&			_font,
 	// put this sprite on the appropaite layer
 	Layer& layer = layers[_layerNum];
 
+	Scene::GPUConstants::ICGPUConstants constants;
+	// TODO change this based on pt size wanted smoothly
+	if (_pt < 37) {
+		constants.fontSharpness.x = 0.7f;
+	}
+	else if (_pt < 60) {
+		constants.fontSharpness.x = 1.0f;
+	}
+	else if (_pt < 200) {
+		constants.fontSharpness.x = 1.6f;
+	}
+	else {
+		constants.fontSharpness.x = 2.0f;
+	}
+
 	// assign a sorting page for this sprite
-	Layer::PageKey key(texture, _renderStates, DISTANCE_FIELD);
+	Layer::PageKey key(texture, _renderStates, DISTANCE_FIELD, constants);
 	Layer::Page& page = findOrCreatePage(layer, key);
 
 	assert(((page.numVertices / 6) + 1) < maxSpritesPerLayer);
 
-	// TODO change this based on pt size wanted smoothly
-	if (_pt < 37) {
-		page.constants.fontSharpness.x = 0.7f;
-	} else if (_pt < 60) {
-		page.constants.fontSharpness.x = 1.0f;
-	} else if (_pt < 200) {
-		page.constants.fontSharpness.x = 1.6f;
-	} else {
-		page.constants.fontSharpness.x = 2.0f;
-	}
 
 	const Math::Vector2 size = Math::ComponentMultiply( Math::Vector2(fontGlyph.width,fontGlyph.height), scrScale);
 
@@ -445,7 +453,7 @@ void ImageComposer::filledQuad( unsigned int					renderStates,
 	Layer& layer = layers[layerNum];
 
 	// assign a sorting page for this quad
-	Layer::PageKey key( NULL, renderStates, SOLID_COLOUR );
+	Layer::PageKey key( NULL, renderStates, SOLID_COLOUR, defaultConstants );
 	Layer::Page& page = findOrCreatePage( layer, key );
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
@@ -514,7 +522,7 @@ void ImageComposer::texturedQuad( const Scene::TextureHandlePtr&		pTexture,
 	Layer& layer = layers[layerNum];
 
 	// assign a sorting page for this quad
-	Layer::PageKey key(pTexture, renderStates, SIMPLE_SPRITE );
+	Layer::PageKey key(pTexture, renderStates, SIMPLE_SPRITE, defaultConstants);
 	Layer::Page& page = findOrCreatePage( layer, key );
 
 	assert( ((page.numVertices / 6) + 1) < maxSpritesPerLayer );
@@ -545,7 +553,7 @@ void ImageComposer::texturedQuad( const Scene::TextureHandlePtr&		pTexture,
 
 }
 
-
+// not thread safe, *AT LEAST* due to sharing of ICGPUConstants
 void ImageComposer::render( RenderContext* context ) {
 	using namespace Scene;
 
@@ -566,7 +574,7 @@ void ImageComposer::render( RenderContext* context ) {
 			page.unmap();
 			
 			// copy composers vertices to GPU
-			DataBufferPtr db = page.vertexBufferHandle->acquire();
+			DataBufferPtr db = page.vertexBufferHandle.acquire();
 			if( !db ) { continue; }
 			void* gpuVerts = (void*) db->map( context, (RESOURCE_MAP_ACCESS)( RMA_WRITE | RMA_DISCARD ) );
 			memcpy( gpuVerts, page.mapped.get(), page.numVertices * SizeOfRenderType[ pagekey.type ] );
@@ -574,7 +582,7 @@ void ImageComposer::render( RenderContext* context ) {
 
 			// setup the GPU programs and vertex access HW
 			auto icProgram = program[ pagekey.type ].acquire();
-			auto vao = page.vaoHandle->tryAcquire();
+			auto vao = page.vaoHandle.tryAcquire();
 			if( !vao ) { continue; }
 			vao->validate( icProgram );
 
@@ -593,14 +601,13 @@ void ImageComposer::render( RenderContext* context ) {
 			context->getConstantCache().updateGPU( context, icProgram );
 
 			// TODO make a general flag rather than based on type for when other passes use custom constants
-			if (pagekey.type == DISTANCE_FIELD) {
-				DataBufferPtr cb = imGPUConstants.acquire();
-				void* buffer = cb->map(context, (RESOURCE_MAP_ACCESS)(RMA_WRITE | RMA_DISCARD));
-				memcpy(buffer, &page.constants, sizeof(Scene::GPUConstants::ICGPUConstants));
-				cb->unmap(context);
+			DataBufferPtr cb = page.constantsHandle.acquire();
+			void* buffer = cb->map(context, (RESOURCE_MAP_ACCESS)(RMA_WRITE | RMA_DISCARD));
+			memcpy(buffer, &pagekey.gpuConstants, sizeof(Scene::GPUConstants::ICGPUConstants));
+			cb->unmap(context);
 
-				context->bindCB(Scene::ST_FRAGMENT, Scene::CF_USER_BLOCK0, cb);
-			}
+			context->bindCB(Scene::ST_FRAGMENT, Scene::CF_USER_BLOCK0, cb);
+
 			context->bind( icProgram );
 
 			// setup blender state
@@ -617,7 +624,11 @@ void ImageComposer::render( RenderContext* context ) {
 bool ImageComposer::Layer::PageKey::operator <(const ImageComposer::Layer::PageKey &b) const {
 	if( renderStates == b.renderStates ) {
 		if( type == type ){
-			return texture0 < texture0;
+			if (type == DISTANCE_FIELD && texture0 == b.texture0 ) {
+				return memcmp(&gpuConstants, &b.gpuConstants, sizeof(Scene::GPUConstants::ICGPUConstants)) < 0;
+			} else {
+				return texture0 < b.texture0;
+			}
 		} else {
 			return type < b.type;
 		}

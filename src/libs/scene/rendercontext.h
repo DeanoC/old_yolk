@@ -46,6 +46,7 @@ namespace Scene {
 		float maxDepth;
 	};
 
+	// each RenderContext must only be used by 1 thread at a time!
 	class RenderContext {
 	public:
 		virtual void pushDebugMarker( const char* ) const = 0;

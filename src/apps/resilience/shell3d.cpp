@@ -118,6 +118,9 @@ void Shell3D::end() {
 	using namespace Core;
 	using namespace Scene;
 
+	world.reset();
+	screen.reset();
+
 //	renderer->destroyScreen();
 #if defined( USE_OPENGL )
 	Gl::Gfx::shutdown();	

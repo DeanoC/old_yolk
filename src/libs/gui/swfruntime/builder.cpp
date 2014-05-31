@@ -272,8 +272,8 @@ namespace Swf {
 		// morphs always use direct quadratic rendering rather than the subdiving renderer
 		bool useDirectQuadratic = false; // TODO player.UseGpuDirectQuadraticDrawer | _morphShape;
 
-		int fillLen = _fillStyles.size();
-		int lineLen = _lineFillStyles.size();
+		int fillLen = (int)_fillStyles.size();
+		int lineLen = (int)_lineFillStyles.size();
 		
 		if( !useDirectQuadratic ){
 			_fillPaths.resize( fillLen );
