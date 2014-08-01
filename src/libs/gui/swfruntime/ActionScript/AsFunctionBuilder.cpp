@@ -88,7 +88,7 @@ namespace Swf {
 			AsFunctionBuilder::InstMap::const_iterator imit = instMap.find(pc);
 			if( imit != instMap.end() ) {
 				const AsFunctionBuilder::FuncInstVec* it = imit->second;
-				newAddr += it->size();
+				newAddr += (int)it->size();
 			}
 		}			
 	}

@@ -117,7 +117,7 @@ namespace Swf
 			
 				SwfActionByteCode* actionScript = CORE_NEW SwfActionByteCode();
 				actionScript->byteCode = CORE_NEW_ARRAY uint8_t[ temp.size() + 1 ];
-				actionScript->lengthInBytes = temp.size();
+				actionScript->lengthInBytes = (uint32_t)temp.size();
 				if( true /*fileVersion < 7*/ ) {
 					actionScript->isCaseSensitive = false;
 				} else {
@@ -133,11 +133,11 @@ namespace Swf
 
 		button->records = CORE_NEW_ARRAY SwfButtonRecord[ records.size() ];
 		memcpy( button->records, &records[0], sizeof( SwfButtonRecord ) * records.size() );
-		button->numRecords = records.size();
+		button->numRecords = (int)records.size();
 
 		button->condActions = CORE_NEW_ARRAY SwfButtonCondAction[ condActions.size() ];
 		memcpy( button->condActions, &condActions[0], sizeof( SwfButtonCondAction ) * condActions.size() );
-		button->numCondActions = condActions.size();
+		button->numCondActions = (int)condActions.size();
 		
 		return button;
 	}

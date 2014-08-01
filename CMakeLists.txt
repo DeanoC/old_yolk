@@ -1,4 +1,8 @@
 cmake_minimum_required( VERSION 2.8.2 )
+if( UNIX )
+elseif( WIN32 )
+	set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR /MP /D_ITERATOR_DEBUG_LEVEL=0 /DTBB_USE_CAPTURED_EXCEPTION=1" CACHE STRING "C++ Flags" )
+endif()
 
 IF( USE_DWM )
 

@@ -36,7 +36,7 @@ namespace Swf
 			}
 		} while (rec != NULL);
 		obj->records = CORE_NEW_ARRAY SwfTextRecord*[tempTextRecords.size()];
-		obj->numRecords = tempTextRecords.size();
+		obj->numRecords = (int)tempTextRecords.size();
 		for( 	std::list<SwfTextRecord*>::iterator i = tempTextRecords.begin(); 
 				i != tempTextRecords.end();
 				++i )

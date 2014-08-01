@@ -271,7 +271,7 @@ void DoTrueTypeFont(const Core::FilePath& inFullPath, const Core::FilePath& outP
 	// scale not currently supported in distance before pack run order
 	const int scale = (runOrder == DISTANCE_BEFORE_PACK) ? 1 : 4;
 	const int h = 72 * scale;
-	const int dpi = 256;
+	const int dpi = 128;
 	error = FT_Set_Char_Size(face, h << 6, 0, dpi, 0);
 	if (error != 0) {
 		LOG(INFO) << "FreeType FT_Set_Char_Size error";

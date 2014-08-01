@@ -64,7 +64,7 @@ namespace Swf
 		for(unsigned int i=0;i < tempShapeRecords.size();++i) {
 			shape->shapeRecords[i] = tempShapeRecords[i];
 		}
-		shape->numShapeRecords = tempShapeRecords.size();
+		shape->numShapeRecords = (int)tempShapeRecords.size();
 
 		return shape;
 	}

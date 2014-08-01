@@ -52,7 +52,7 @@ namespace Swf {
 			destIndexData.push_back((uint16_t)i+1);
 		}
 
-		polysSizeInBytes = sizeof(float) * 2 * pathVertices.size();
+		polysSizeInBytes = (int) (sizeof(float) * 2 * pathVertices.size());
 
 		if (destIndexData.size() >= 2) {
 
@@ -64,11 +64,11 @@ namespace Swf {
 			vertexBufferHandle = s::DataBufferHandle::create( "swfgpulinepath_vb", &vbcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
 			s::DataBuffer::CreationInfo ibcs ( s::Resource::BufferCtor(
 				s::RCF_BUF_INDEX | s::RCF_ACE_IMMUTABLE, 
-				sizeof(uint16_t) * destIndexData.size(), &destIndexData[0]
+				(uint32_t) sizeof(uint16_t) * destIndexData.size(), &destIndexData[0]
 			) );
 			indexBufferHandle = s::DataBufferHandle::create( "swfgpulinepath_ib", &ibcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
 
-			numIndices = destIndexData.size();
+			numIndices = (uint32_t) destIndexData.size();
 
 		}
 	}

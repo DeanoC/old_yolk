@@ -35,13 +35,13 @@ namespace Swf {
 					break;
 					case AsFuncInstruction::AFI_JUMP: {
 						AsFuncInstructionJump* ji = (AsFuncInstructionJump*)(*i);
-						ji->absJump = labels[ji->absJump] - function.size();
+						ji->absJump = labels[ji->absJump] - (int)function.size();
 						function.push_back(*i);
 					}
 					break;
 					case AsFuncInstruction::AFI_IF: {
 						AsFuncInstructionIf* ji = (AsFuncInstructionIf*)(*i);
-						ji->absJump = labels[ji->absJump] - function.size();
+						ji->absJump = labels[ji->absJump] - (int)function.size();
 						function.push_back(*i);
 					}
 					break;

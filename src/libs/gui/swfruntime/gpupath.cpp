@@ -40,7 +40,7 @@ namespace Swf {
 			maxY = std::max(maxY, twip.y);
 		}
 
-		PolygonClass::Enum pclass = PolygonClass::ClassifyPolygon(tmp, pathVertices.size());
+		PolygonClass::Enum pclass = PolygonClass::ClassifyPolygon(tmp, (int)pathVertices.size());
 
 		if(pclass != PolygonClass::NOT_CONVEX_DEGENERATE && pclass != PolygonClass::CONVEX_DEGENERATE) {
 			if( pclass == PolygonClass::CONVEX_CCW || pclass == PolygonClass::CONVEX_CW ) {
@@ -73,8 +73,8 @@ namespace Swf {
 		tmp[index++] = (float)( minY + (maxY - minY) / 2 );
 		pathVertices.push_back(SwfVec2Twip(minX + (maxX - minX)/2, minY + (maxY - minY)/2));
 
-		polysSizeInBytes = sizeof(float) * 2 * pathVertices.size();
-		extentsRectVertexOffset = pathVertices.size();
+		polysSizeInBytes = (int)(sizeof(float) * 2 * pathVertices.size());
+		extentsRectVertexOffset = (int)pathVertices.size();
 
 		// tri-strip for coverage quad
 		tmp[index++] = (float)minX;
@@ -99,10 +99,10 @@ namespace Swf {
 			vertexBufferHandle = s::DataBufferHandle::create( "swfgpupath_vb", &vbcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
 			s::DataBuffer::CreationInfo ibcs ( s::Resource::BufferCtor(
 				s::RCF_BUF_INDEX | s::RCF_ACE_IMMUTABLE, 
-				sizeof(uint16_t) * destIndexData.size(), &destIndexData[0]
+				(int)sizeof(uint16_t) * destIndexData.size(), &destIndexData[0]
 			) );
 			indexBufferHandle = s::DataBufferHandle::create( "swfgpupath_ib", &ibcs, Core::RESOURCE_FLAGS::RMRF_DONTCACHE );
-			numIndices = destIndexData.size();
+			numIndices = (int)destIndexData.size();
 		}
 	}
 

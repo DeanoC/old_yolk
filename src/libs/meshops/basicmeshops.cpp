@@ -232,10 +232,10 @@ void BasicMeshOps::triangulate() {
 				FaceIndex triNum;
 
 				if( i != 0) {
-					triNum = faceCon.cloneElement( faceNum ); // clone original
+					triNum = (MeshMod::FaceIndex) faceCon.cloneElement( faceNum ); // clone original
 				} else {
 					// reuse original poly if first triangle
-					triNum = faceNum;
+					triNum = (MeshMod::FaceIndex)faceNum;
 				}
 
 				// start edge

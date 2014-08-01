@@ -408,8 +408,8 @@ namespace LWObject2Go_Local
 			}
 			pivot += (*layItCur)->pivot;
 
-			const unsigned int baseVertex = out->getVertexContainer().size();
-			const unsigned int baseFace = out->getFaceContainer().size();
+			const auto baseVertex = out->getVertexContainer().size();
+			const auto baseFace = out->getFaceContainer().size();
 
 			AddLWLayerVertices( *(*layIt), out, transform, pivot );
 			
@@ -556,7 +556,7 @@ namespace LWObject2Go_Local
 		EdgeIndexContainer edgeList;
 		mesh->getFaceEdges( faceIdx, edgeList );
 	
-		VertexIndex newVert = vertCon.cloneElement( oldVert );
+		VertexIndex newVert = (VertexIndex) vertCon.cloneElement( oldVert );
 		(*prEle)[ newVert ].next = (*prEle)[ oldVert ].next;
 		(*prEle)[ oldVert ].next = newVert;
 
@@ -748,7 +748,7 @@ namespace LWObject2Go_Local
 		while( tagIt != in.loader->surfaceMap.end() ) {
 			LightWave::Surface* curSurface = tagIt->second;
 
-			const unsigned int matNum = matCon.size();
+			const auto matNum = matCon.size();
 			matCon.resize( matNum + 1 );
 			// fill in name
 			(*nameEle)[ matNum ].matName = curSurface->name;

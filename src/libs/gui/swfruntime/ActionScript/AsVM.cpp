@@ -85,8 +85,8 @@ namespace Swf {
 	}
 		
 	std::string AsVM::readString( const uint8_t* _byteCode, int& pc ) const {
-		int len = strlen( (char*) &_byteCode[pc] );
-		int origPc = pc;
+		const auto len = strlen( (char*) &_byteCode[pc] );
+		const auto origPc = pc;
 		pc += 1 + len;
 		return std::string( (char*) &_byteCode[origPc] );
 	}

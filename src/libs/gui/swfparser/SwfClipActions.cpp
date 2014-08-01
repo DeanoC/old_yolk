@@ -39,7 +39,7 @@ namespace Swf
 		SwfClipActions* clipAction = CORE_NEW SwfClipActions();
 		clipAction->allEventFlags = flags;
 		clipAction->clipActionRecords = CORE_NEW SwfClipActionRecord*[tempClipActions.size()];
-		clipAction->numClipActions = tempClipActions.size();
+		clipAction->numClipActions = (int)tempClipActions.size();
 		for( std::list<SwfClipActionRecord*>::iterator i = tempClipActions.begin(); i != tempClipActions.end();++i)
 		{
 			clipAction->clipActionRecords[std::distance(tempClipActions.begin(),i)] = *i;
