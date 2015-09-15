@@ -62,7 +62,6 @@ add_definitions( "-D__TBB_BUILD=1")
 list( APPEND targ_link_libs tbb_rml )
 
 if( UNIX )
-	add_definitions( "-D__TBB_USE_GENERIC_DWORD_LOAD_STORE=1" )
 	add_definitions( "-DUSE_PTHREAD -DTBB_USE_GCC_BUILTINS -D__TBB_GCC_BUILTIN_ATOMICS_PRESENT" )
 	list( APPEND targ_link_libs pthread dl )
 else()

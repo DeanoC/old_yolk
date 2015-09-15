@@ -77,12 +77,13 @@ namespace Export {
 		const unsigned int _depth, const real _b, const real _c ) const {
 		const unsigned int size3D(channelCount * width * height * depth);
 
-		auto out = std::make_shared<TextureImage<real>>( channelCount, _width, _height, _depth, getSlices() );
-
+		std::shared_ptr<TextureImage<real>> out = std::make_shared<TextureImage<real>>( channelCount, _width, _height, _depth, getSlices() );
+		real* dataO = &out->data.begin()[0];
 		for (unsigned int i = 0; i < getSlices(); ++i){
-			unsigned int spliceStartOffset = size3D*i;
+			const unsigned int spliceStartOffset = size3D*i;
 			const auto& inDS = data.begin() + spliceStartOffset;
-			auto& outDS = out->data.begin() + spliceStartOffset;
+
+			auto outDS = dataO + spliceStartOffset;
 			// 1 or 2D textures in and out
 			if (_depth == 1 && getDepth() == 1) {
 				hq_resample<real>(channelCount, 
@@ -102,7 +103,7 @@ namespace Export {
 		auto out = std::make_shared<TextureImage<real>>(newChannelCount, getWidth(), getHeight(), getDepth(), getSlices());
 
 		const auto& inDS = data.begin();
-		auto& outDS = out->data.begin();
+		auto outDS = out->data.begin();
 
 		unsigned int j = 0;
 		for (unsigned int i = 0; i < size; ++i){

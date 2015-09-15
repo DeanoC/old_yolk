@@ -11,9 +11,8 @@ CACHE STRING "Semicolon-separated list of targets to build, or \"all\".")
 set(LLVM_REQUIRES_RTTI 1 CACHE STRING "llvm uses RTTI")
 
 ENDIF( USE_DWM )
-if( UNIX )
-	add_definitions( "-std=c++11")
-endif()
+
+set( CMAKE_CXX_STANDARD 11 )
 
 # top level wierd cmake file
 project( Yolk )

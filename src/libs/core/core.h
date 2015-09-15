@@ -43,7 +43,7 @@
 #elif PLATFORM == APPLE_MAC
 #	include "compiler_gcc.h"
 #	include "compiler_llvm.h"
-#	error Not supported
+
 #elif PLATFORM == IPHONE
 //#	include "compiler_gcc.h"
 //#	include "compiler_llvm.h"

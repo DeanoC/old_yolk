@@ -4,12 +4,12 @@ if( NOT WIN32 )
 else()
 	FIND_PATH( TBB_INCLUDE_DIRS "tbb/atomic.h"
 		PATHS
-			"${CMAKE_CURRENT_SOURCE_DIR}/third/tbb/include"
+			"${CMAKE_CURRENT_SOURCE_DIR}/libs/tbb/include"
 		DOC
 			"The Intel Thread Building Blocks Include Directory"
 	)
 
-	SET( Tbb_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/third/tbb/lib" )
+	SET( Tbb_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/libs/tbb/lib" )
 	IF( IS_HOST_64_BIT )
 		SET( Tbb_PATH "${Tbb_PATH}/x64" )
 	ELSE()

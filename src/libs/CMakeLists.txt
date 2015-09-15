@@ -1,10 +1,12 @@
 cmake_minimum_required( VERSION 2.8 )
 # TODO only on non x86 without ASM support use generics
-IF( UNIX )
-	add_definitions( "-D__TBB_USE_GENERIC_DWORD_LOAD_STORE=1" )
-	add_definitions( "-DUSE_PTHREAD -DTBB_USE_GCC_BUILTINS -D__TBB_GCC_BUILTIN_ATOMICS_PRESENT" )
-	list( APPEND targ_link_libs pthread dl )
-ENDIF( UNIX )
+IF( USE_TBB )
+	IF( UNIX ) 
+#		add_definitions( "-D__TBB_USE_GENERIC_DWORD_LOAD_STORE=1" )
+		add_definitions( "-DUSE_PTHREAD -DTBB_USE_GCC_BUILTINS -D__TBB_GCC_BUILTIN_ATOMICS_PRESENT" )
+		list( APPEND targ_link_libs pthread dl )
+	ENDIF( UNIX )
+ENDIF( USE_TBB )
 
 
 IF( USE_GC )
@@ -25,7 +27,9 @@ ENDIF( USE_PROTOBUFFERS )
 
 add_subdirectory( scene )
 #add_subdirectory( styx )
+IF( USE_TBB )
 add_subdirectory( tbb )
+ENDIF( USE_TBB )
 add_subdirectory( zlib )
 
 IF( USE_DX11 )

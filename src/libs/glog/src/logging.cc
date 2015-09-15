@@ -1243,12 +1243,7 @@ static void logging_fail() {
 #endif
 }
 
-#ifdef HAVE___ATTRIBUTE__
-GOOGLE_GLOG_DLL_DECL
-void (*g_logging_fail_func)() __attribute__((noreturn)) = &logging_fail;
-#else
 GOOGLE_GLOG_DLL_DECL void (*g_logging_fail_func)() = &logging_fail;
-#endif
 
 void InstallFailureFunction(void (*fail_func)()) {
   g_logging_fail_func = fail_func;

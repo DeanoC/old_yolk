@@ -27,17 +27,19 @@ if( UNIX )
 		file( GLOB platform_cpp_src_files platform_posix/*.cpp platform_posix/*.cxx)
 		file( GLOB platform_c_src_files platform_posix/*.c )
 		file( GLOB platform_header_files platform_posix/*.h platform_posix/*.inl platform_posix/*.hpp platform_posix/*.hxx )
+		if( UNIX )
+			list( APPEND targ_link_libs X11 )
+		endif()
 	ENDIF( HEADLESS_PLATFORM )
 endif()
 
-list( APPEND targ_link_libs tbb_rml tbb )
+if( USE_TBB )
+	list( APPEND targ_link_libs tbb )
+endif()
 if( USE_GC )
 	list( APPEND targ_link_libs gc-lib )
 endif()
 
-if( UNIX )
-	list( APPEND targ_link_libs X11 )
-endif()
 
 
 list( APPEND cpp_src_files ${platform_cpp_src_files} )

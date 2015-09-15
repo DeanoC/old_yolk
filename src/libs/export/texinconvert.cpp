@@ -17,9 +17,6 @@ namespace Export {
 			uint32_t	i[2];
 		};
 		struct {
-			half_float::half h[4];
-		};
-		struct {
 			uint16_t s[4];
 		};
 		struct {
@@ -98,30 +95,34 @@ namespace Export {
 
 				// format conversion, handle different bit width, float/integer, normalisation etc.
 				for (unsigned int c = 0; c < in.channels; ++c) {
+
+					double d[16];
 					// changing float bit depth portion 
 					if (isInFloat) {
 						if (inBits == 16) {
 							// half load from binary
-							expd[c].d = expd[c].h[0]; // half to double convert
+							half_float::half h;
+							*(reinterpret_cast<uint16_t*>(&h)) = expd[c].s[0]; // nasty!
+							d[c] = (double)(float)h; // half to double convert
 						}
 						else {
 							if (inBits == 32) {
 								// float load from binary
-								expd[c].d = expd[c].f[0];
+								d[c] = expd[c].f[0];
 							}
 							// double don't need any convertion
 						}
 					}
 					else {
 						// int to float
-						expd[c].d = (double)(expd[c].i64 & ((1LL << inBits) - 1LL));
+						d[c] = (double)(expd[c].i64 & ((1LL << inBits) - 1LL));
 						if (BitmapInput::BI_NORMALISED) {
-							expd[c].d /= ((1 << inBits)-1); // the classic edge case..
+							d[c] /= ((1 << inBits)-1); // the classic edge case..
 						}
 					}
 
 					// store into texture image
-					outData[c] = expd[c].d;
+					outData[c] = d[c];
 				}
 				outData += in.channels;
 			}

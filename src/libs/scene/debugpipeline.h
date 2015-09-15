@@ -44,7 +44,7 @@ namespace Scene {
 		// transfer into the result texture
 		virtual void resolve( RenderContext* _context ) override;
 
-		virtual TextureHandlePtr getResult() { return colourTargetHandle.get(); }
+		virtual TextureHandlePtr getResult() override { return colourTargetHandle.get(); }
 
 		//setup
 		virtual void conditionWob( class Scene::Wob* wob ) override;

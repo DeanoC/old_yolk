@@ -155,7 +155,7 @@ void generateDistanceMapFromBitmap(const int width, const int height, const std:
 	});
 	// compute abs(min(distance))
 	real dmin = *std::min_element(distance.begin(), distance.end());
-	dmin = abs(dmin);
+	dmin = std::abs(dmin);
 	// clamp distance to [-min,+min]
 	std::transform(distance.begin(), distance.end(), distance.begin(),
 		[dmin](const real& d) -> real {

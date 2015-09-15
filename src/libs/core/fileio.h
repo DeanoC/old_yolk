@@ -136,8 +136,6 @@ public:
 	virtual uint8_t getByte() {
 		if( offset > size)
 			return 0;
-		if( offset < 0 )
-			return 0;
 				
 		return buffer[ offset++ ];
 	}

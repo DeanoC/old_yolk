@@ -1,11 +1,11 @@
-
+ 
 #include <iomanip>
 #include "export.h"
 #include "core/coreresources.h"
 #include "scene/generictextureformat.h"
 #include "scene/gtfcracker.h"
-#include "export\textureimage.h"
-#include "export\texinconvert.h"
+#include "textureimage.h"
+#include "texinconvert.h"
 #include "core/stb_image_write.h"
 #include <ios>
 
@@ -23,9 +23,6 @@ static void WriteTexture(	const TextureImage<double>& hpTexture,
 							uint32_t* debugOut = nullptr ) {
 	union {
 		float		f;
-		struct {
-			half_float::half ha, hb;
-		};
 		struct {
 			uint16_t i16a, i16b;
 		};
@@ -57,8 +54,8 @@ static void WriteTexture(	const TextureImage<double>& hpTexture,
 						val = hpTexture.value(c, x, y);
 					}
 					if (chanBits == 16) {
-						if2f.ha = (float)val; // double to half
-						stream << if2f.i16a; // write as hex
+						half_float::half ha((float)val); // double to half
+						stream << *reinterpret_cast<uint16_t*>(&ha); // write as hex
 					} else {
 						union {
 							float f;
