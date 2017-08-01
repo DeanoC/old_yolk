@@ -11,6 +11,7 @@
 #include "voxtreerenderable.h"
 #include "voxtreephysical.h"
 #include "procvoxtree.h"
+#include <boost/program_options.hpp>
 
 #include "proceduraltextureutils.h"
 
@@ -49,7 +50,7 @@ private:
 
 int Main() {
 	using namespace Core;
-/*	namespace po = boost::program_options;
+	namespace po = boost::program_options;
 
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
@@ -64,7 +65,6 @@ int Main() {
 		LOG(INFO) << desc << "\n";
 		return 1;
 	}
-	*/
 
 	Shell3D shell;
 
@@ -80,28 +80,28 @@ int Main() {
 
 	ThingPtr thing ( ThingFactory::createEmptyThing( TBC_WORLD, NewThingId() ) );
 
-	extern Vox::ProcVoxTree* VoxTreeTest();
-	Vox::ProcVoxTree* tree = VoxTreeTest();
+//	extern Vox::ProcVoxTree* VoxTreeTest();
+//	Vox::ProcVoxTree* tree = VoxTreeTest();
 
-	tree->ampTest( shell.getRenderer() );
+//	tree->ampTest( shell.getRenderer() );
 
-	Vox::TreeRenderable<Vox::ProcVoxTree>::Ptr treeRender = std::make_shared<Vox::TreeRenderable<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
-	Vox::TreePhysical<Vox::ProcVoxTree>::Ptr treePhysical = std::make_shared<Vox::TreePhysical<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
+//	Vox::TreeRenderable<Vox::ProcVoxTree>::Ptr treeRender = std::make_shared<Vox::TreeRenderable<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
+//	Vox::TreePhysical<Vox::ProcVoxTree>::Ptr treePhysical = std::make_shared<Vox::TreePhysical<Vox::ProcVoxTree>>( thing->getTransform(), *tree );
 
-	thing->add( treeRender );
-	thing->add( treePhysical, TBC_PLAYER | TBC_ENEMY );
-	world->add( thing );
+//	thing->add( treeRender );
+	//thing->add( treePhysical, TBC_PLAYER | TBC_ENEMY );
+//	world->add( thing );
 
 	auto gameThread = std::make_shared<GameThread>( world );
 	shell.run(); // will loop until exit is called 
 	gameThread->exit();
 	gameThread = nullptr;
 
-	world->remove( thing );
-	thing.reset();
-	treePhysical.reset();
-	treeRender.reset();
-	CORE_DELETE tree;
+//	world->remove( thing );
+//	thing.reset();
+//	treePhysical.reset();
+//	treeRender.reset();
+//	CORE_DELETE tree;
 
 	// shutdown
 	pdp.reset();

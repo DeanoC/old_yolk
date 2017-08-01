@@ -23,12 +23,12 @@ foreach( sc ${shader_files} )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp 
 						COMMAND bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp ${sc}
 						DEPENDS bin2c ${CMAKE_CURRENT_SOURCE_DIR}/${sc} 
-						COMMENT "${sc}: if this fails create the directory part of ${sc} in the build folders manually" 
 					)
 	list( APPEND gen_src_files ${CMAKE_CURRENT_BINARY_DIR}/${sc}.cpp )
 endforeach( sc ${shader_files} )
 
 list( APPEND src_files ${cpp_src_files} ${c_src_files} ${gen_src_files} )
+set_source_files_properties(${shader_files} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 ADD_MSVC_PRECOMPILED_HEADER( "scene.h" "${cpp_src_files}" )
 add_library( scene ${src_files} ${header_files}  ${shader_files} )

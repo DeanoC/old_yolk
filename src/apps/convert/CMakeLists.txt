@@ -15,8 +15,7 @@ list( APPEND targ_link_libs
 			meshops 
 			export 
 			binify 
-			freetype
-			${BOOST_LIBRARIES} )
+			freetype )
 add_executable( convert ${src_files} ${header_files} )
 
 if( UNIX )

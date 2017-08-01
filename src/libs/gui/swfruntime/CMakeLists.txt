@@ -26,6 +26,7 @@ list( APPEND src_files ${cpp_src_files} ${c_src_files} ${as_src_files} ${as_lib_
 list( APPEND hdr_files ${c_hdr_files} ${as_hdr_files} ${as_lib_hdr_files} )
 
 add_library( swfruntime STATIC ${src_files} ${hdr_files} ${shader_files} )
+set_source_files_properties(${shader_files} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 list( APPEND targ_link_libs core swfparser scene zlib jpeg )
 target_link_libraries( swfruntime ${targ_link_libs} )

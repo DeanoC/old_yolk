@@ -35,7 +35,7 @@ bool ProcVoxTree::generate( 	VisitHelper& _helper,
 								const Core::AABB& _aabb, 
 								NodeCullFunc _cullFunc, 
 								LeafVisitConstFunc _leafFunc ) {
-	std::stack<const Core::AABB> aabbStack;
+	std::stack<Core::AABB> aabbStack;
 
 	const Math::Vector3 totalTranslate = _helper.getRootBoundingBox().getHalfLength();
 	const float totalSizeRecip = 1.f/_helper.getRootBoundingBox().getHalfLength()[0];

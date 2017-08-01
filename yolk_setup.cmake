@@ -1,6 +1,4 @@
-# CMake policies ( essentially pragma to use old or new behaviour)
-# use all new policies as of 2.8.2
-cmake_policy( VERSION 2.8.2 )
+cmake_minimum_required( VERSION 3.9)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -11,6 +9,10 @@ LIST( APPEND CMAKE_MODULE_PATH 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" )
 
 
 find_package( CMakeCommon REQUIRED )
+set(Boost_USE_STATIC_LIBS        ON) # only find static libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
 find_package( Boost REQUIRED COMPONENTS thread chrono filesystem program_options system )
 
 IF( NOT HEADLESS_PLATFORM )
@@ -143,4 +145,3 @@ ENDIF( USE_DWM )
 
 set( USE_GLOG TRUE )
 set( Core_LIBRARIES core ${Boost_LIBRARIES} glog )
-add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})

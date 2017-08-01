@@ -104,7 +104,7 @@ namespace Math {
 
 		// unroll for more speed...
 		for (int64_t i = 0; i < NUM_BITS; i++) {
-			uint64_t anders = (1UL << i);
+			uint64_t anders = (1ULL << i);
 			r |=	((x & anders) >> i)	<< ((i*3)+0)	| 
 					((y & anders) >> i) << ((i*3)+1)	|
 					((z & anders) >> i) << ((i*3)+2);

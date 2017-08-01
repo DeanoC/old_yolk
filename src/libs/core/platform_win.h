@@ -1,8 +1,9 @@
-#	if COMPILER_VERSION < MS_VS2010
+#if COMPILER_VERSION < MS_VS2010
 #	include "pstdint.h"	
 #	else
 #	include <stdint.h>
 #endif
+
 //#	define _CRTDBG_MAP_ALLOC
 //#	include <crtdbg.h>
 

@@ -30,6 +30,7 @@ int Main() {
 	using namespace Core;
 
 	// Declare the supported options.
+
 	namespace po = boost::program_options;
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -53,7 +54,7 @@ int Main() {
 		LOG(INFO) << desc << "\n";
 		return 1;
 	}
-
+	
 	const std::string cwd = boost::filesystem::current_path().string();
 
 	const std::string inname = vm["input"].as<std::string>();
@@ -69,7 +70,7 @@ int Main() {
 			outPath = FilePath(cwd).Append(outPath);
 		}
 	}
-
+	
 	using namespace MeshImport;
 	using namespace MeshMod;
 	using namespace Export;
